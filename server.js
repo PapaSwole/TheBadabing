@@ -1,8 +1,6 @@
 import express from 'express';
 import { WebSocketServer } from 'ws';
 import http from 'http';
-import sqlite3 from 'sqlite3';
-import { open } from 'sqlite';
 
 const app = express();
 const server = http.createServer(app);
@@ -10,42 +8,6 @@ const wss = new WebSocketServer({ server });
 
 app.use(express.json());
 app.use(express.static('public'));
-
-let db = null;
-
-async function initDB() {
-  try {
-    db = await open({
-      filename: './database.sqlite',
-      driver: sqlite3.Database
-    });
-
-    await db.exec(`
-      CREATE TABLE IF NOT EXISTS safehouse_stations (
-        uid TEXT PRIMARY KEY,
-        type TEXT NOT NULL,
-        gridX INTEGER NOT NULL,
-        gridZ INTEGER NOT NULL,
-        rotation INTEGER NOT NULL,
-        footprintX INTEGER NOT NULL,
-        footprintZ INTEGER NOT NULL
-      )
-    `);
-
-    console.log("📦 SQLite Database Connected & Tables Verified.");
-  } catch (err) {
-    console.error("⚠️ SQLite init warning:", err.message);
-  }
-}
-
-// Start server immediately so Render connects right away
-const PORT = process.env.PORT || 10000;
-server.listen(PORT, '0.0.0.0', () => {
-  console.log(`🦫 The Badabing server running on port ${PORT}`);
-});
-
-// Initialize DB in background
-initDB();
 
 const worldState = {
   bird: {
@@ -57,6 +19,9 @@ const worldState = {
   },
   connectedClients: 0
 };
+
+// In-memory stations array instead of SQLite for testing
+let stationsList = [];
 
 const waypoints = [
   { x: 0, z: -30 },
@@ -105,39 +70,27 @@ wss.on('connection', (ws) => {
   worldState.connectedClients++;
   console.log(`🔌 Client connected. Total: ${worldState.connectedClients}`);
 
-  const sendStations = async () => {
-    let stations = [];
-    if (db) {
-      try {
-        stations = await db.all(`SELECT * FROM safehouse_stations`);
-      } catch (e) {
-        stations = [];
-      }
-    }
-    ws.send(JSON.stringify({ type: 'init_world', state: worldState, stations }));
-  };
+  ws.send(JSON.stringify({ 
+    type: 'init_world', 
+    state: worldState, 
+    stations: stationsList 
+  }));
 
-  sendStations();
-
-  ws.on('message', async (message) => {
+  ws.on('message', (message) => {
     try {
       const data = JSON.parse(message);
 
-      if (data.type === 'admin:place_station' && db) {
+      if (data.type === 'admin:place_station') {
         const { uid, type, gridX, gridZ, rotation, footprintX, footprintZ } = data.station;
-        await db.run(
-          `INSERT OR REPLACE INTO safehouse_stations (uid, type, gridX, gridZ, rotation, footprintX, footprintZ) 
-           VALUES (?, ?, ?, ?, ?, ?, ?)`,
-          [uid, type, gridX, gridZ, rotation, footprintX, footprintZ]
-        );
-        const allStations = await db.all(`SELECT * FROM safehouse_stations`);
-        broadcast({ type: 'world:stations_updated', stations: allStations });
+        // Remove existing if duplicate, then push
+        stationsList = stationsList.filter(s => s.uid !== uid);
+        stationsList.push({ uid, type, gridX, gridZ, rotation, footprintX, footprintZ });
+        broadcast({ type: 'world:stations_updated', stations: stationsList });
       }
 
-      if (data.type === 'admin:delete_station' && db) {
-        await db.run(`DELETE FROM safehouse_stations WHERE uid = ?`, [data.uid]);
-        const allStations = await db.all(`SELECT * FROM safehouse_stations`);
-        broadcast({ type: 'world:stations_updated', stations: allStations });
+      if (data.type === 'admin:delete_station') {
+        stationsList = stationsList.filter(s => s.uid !== data.uid);
+        broadcast({ type: 'world:stations_updated', stations: stationsList });
       }
     } catch (err) {
       console.error("Error processing WebSocket message:", err);
@@ -155,3 +108,8 @@ function broadcast(data) {
     if (client.readyState === 1) client.send(payload);
   });
 }
+
+const PORT = process.env.PORT || 10000;
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`🦫 The Badabing server running on port ${PORT}`);
+});
