@@ -32,17 +32,6 @@ async function initDB() {
     )
   `);
 
-  await db.exec(`
-    CREATE TABLE IF NOT EXISTS dead_drops (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      visitor_name TEXT,
-      message TEXT,
-      location_id TEXT,
-      status TEXT DEFAULT 'unread',
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-
   console.log("📦 SQLite Database Connected & The Badabing Tables Verified.");
 }
 
@@ -50,18 +39,59 @@ const worldState = {
   bird: {
     name: "Peanut",
     x: 0, y: 0, z: 0,
-    targetX: 0, targetZ: 0,
-    state: "idle",
-    mood: "curious",
-    energy: 100
+    targetX: 5, targetZ: 5,
+    state: "wandering",
+    mood: "exploring"
   },
-  timeOfDay: "night",
   connectedClients: 0
 };
 
+const waypoints = [
+  { x: 0, z: -30 },
+  { x: 0, z: -10 },
+  { x: 0, z: 10 },
+  { x: 0, z: 30 },
+  { x: -25, z: -20 },
+  { x: 25, z: -20 },
+  { x: -25, z: 20 },
+  { x: 25, z: 20 },
+  { x: -40, z: 0 },
+  { x: 40, z: 0 }
+];
+
+function setRandomPeanutTarget() {
+  const wp = waypoints[Math.floor(Math.random() * waypoints.length)];
+  worldState.bird.targetX = wp.x + (Math.random() * 6 - 3);
+  worldState.bird.targetZ = wp.z + (Math.random() * 6 - 3);
+}
+
+setRandomPeanutTarget();
+
+let lastWaypointTime = Date.now();
+
+setInterval(() => {
+  const bird = worldState.bird;
+  const dx = bird.targetX - bird.x;
+  const dz = bird.targetZ - bird.z;
+  const dist = Math.sqrt(dx * dx + dz * dz);
+
+  if (dist < 0.8) {
+    const now = Date.now();
+    if (now - lastWaypointTime > 2500) {
+      setRandomPeanutTarget();
+      lastWaypointTime = now;
+    }
+  } else {
+    bird.x += (dx / dist) * 0.08;
+    bird.z += (dz / dist) * 0.08;
+  }
+
+  broadcast({ type: 'bird:position', bird: worldState.bird });
+}, 50);
+
 wss.on('connection', (ws) => {
   worldState.connectedClients++;
-  console.log(`🔌 Client connected to The Badabing. Total: ${worldState.connectedClients}`);
+  console.log(`🔌 Client connected. Total: ${worldState.connectedClients}`);
 
   db.all(`SELECT * FROM safehouse_stations`).then((stations) => {
     ws.send(JSON.stringify({ type: 'init_world', state: worldState, stations }));
@@ -103,24 +133,6 @@ function broadcast(data) {
     if (client.readyState === 1) client.send(payload);
   });
 }
-
-setInterval(() => {
-  if (worldState.bird.state === 'walking') {
-    const dx = worldState.bird.targetX - worldState.bird.x;
-    const dz = worldState.bird.targetZ - worldState.bird.z;
-    const dist = Math.sqrt(dx * dx + dz * dz);
-
-    if (dist < 0.1) {
-      worldState.bird.x = worldState.bird.targetX;
-      worldState.bird.z = worldState.bird.targetZ;
-      worldState.bird.state = 'idle';
-    } else {
-      worldState.bird.x += (dx / dist) * 0.05;
-      worldState.bird.z += (dz / dist) * 0.05;
-    }
-    broadcast({ type: 'bird:position', bird: worldState.bird });
-  }
-}, 100);
 
 initDB().then(() => {
   const PORT = process.env.PORT || 10000;
