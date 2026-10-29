@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Badabing - Detailed Realistic Town</title>
+    <title>The Badabing - Peanut Walking Town</title>
     <style>
         body {
             margin: 0;
@@ -114,7 +114,7 @@
 
         // 1. Scene, Camera, Renderer Setup
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x1e222a); // Brighter, atmospheric slate blue-grey
+        scene.background = new THREE.Color(0x1e222a);
         scene.fog = new THREE.FogExp2(0x1e222a, 0.012);
 
         const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1500);
@@ -134,11 +134,11 @@
         controls.maxPolarAngle = Math.PI / 2 - 0.05;
         controls.target.set(0, 0, 0);
 
-        // 2. Realistic Daylight & Ambient Lighting
-        const ambientLight = new THREE.AmbientLight(0xddeeff, 0.75); // Bright natural fill light
+        // 2. Lighting
+        const ambientLight = new THREE.AmbientLight(0xddeeff, 0.75);
         scene.add(ambientLight);
 
-        const sunLight = new THREE.DirectionalLight(0xfff8ee, 1.4); // Strong warm sunlight
+        const sunLight = new THREE.DirectionalLight(0xfff8ee, 1.4);
         sunLight.position.set(45, 70, 35);
         sunLight.castShadow = true;
         sunLight.shadow.mapSize.width = 4096;
@@ -153,11 +153,10 @@
         sunLight.shadow.bias = -0.0005;
         scene.add(sunLight);
 
-        // 3. Detailed Architectural Town Generator
+        // 3. Town Environment
         const townGroup = new THREE.Group();
         scene.add(townGroup);
 
-        // Ground & Sidewalks
         const groundGeo = new THREE.PlaneGeometry(300, 300);
         const groundMat = new THREE.MeshStandardMaterial({ color: 0x2b2f38, roughness: 0.9 });
         const ground = new THREE.Mesh(groundGeo, groundMat);
@@ -179,7 +178,6 @@
             const awningBlue = new THREE.MeshStandardMaterial({ color: 0x256cb3, roughness: 0.6 });
             const awningGreen = new THREE.MeshStandardMaterial({ color: 0x2e8540, roughness: 0.6 });
 
-            // Roads
             const roadNS = new THREE.Mesh(new THREE.PlaneGeometry(16, 240), asphaltMat);
             roadNS.rotation.x = -Math.PI / 2;
             roadNS.position.set(0, 0.01, 0);
@@ -192,7 +190,6 @@
             roadEW.receiveShadow = true;
             townGroup.add(roadEW);
 
-            // Sidewalk curbs
             const sw1 = new THREE.Mesh(new THREE.PlaneGeometry(3.5, 240), concreteMat);
             sw1.rotation.x = -Math.PI / 2;
             sw1.position.set(-9.75, 0.02, 0);
@@ -205,32 +202,20 @@
             sw2.receiveShadow = true;
             townGroup.add(sw2);
 
-            // Function to build highly detailed modular buildings
-            function createBuilding(x, z, w, h, d, wallMat, storeName, awningMat) {
+            function createBuilding(x, z, w, h, d, wallMat, awningMat) {
                 const bld = new THREE.Group();
-
-                // Main Wall Body
                 const body = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), wallMat);
                 body.position.set(0, h / 2, 0);
                 body.castShadow = true;
                 body.receiveShadow = true;
                 bld.add(body);
 
-                // Recessed Storefront Glass & Frame
                 const winWidth = w * 0.7;
                 const winHeight = h * 0.35;
                 const glass = new THREE.Mesh(new THREE.BoxGeometry(winWidth, winHeight, 0.1), windowGlassMat);
                 glass.position.set(0, winHeight / 2 + 0.4, d / 2 + 0.03);
                 bld.add(glass);
 
-                // Window Pane Grid Mullions (Adds realism)
-                for (let i = -1; i <= 1; i += 2) {
-                    const mullion = new THREE.Mesh(new THREE.BoxGeometry(0.06, winHeight, 0.15), windowFrameMat);
-                    mullion.position.set(i * (winWidth / 4), winHeight / 2 + 0.4, d / 2 + 0.04);
-                    bld.add(mullion);
-                }
-
-                // Fabric Awning over storefront
                 if (awningMat) {
                     const awning = new THREE.Mesh(new THREE.BoxGeometry(w * 0.85, 0.35, 1.8), awningMat);
                     awning.position.set(0, winHeight + 0.9, d / 2 + 0.8);
@@ -239,48 +224,62 @@
                     bld.add(awning);
                 }
 
-                // Roof Parapet / Cornice Trim
                 const cornice = new THREE.Mesh(new THREE.BoxGeometry(w + 0.6, 0.6, d + 0.6), metalTrimMat);
                 cornice.position.set(0, h + 0.3, 0);
-                cornice.castShadow = true;
                 bld.add(cornice);
-
-                // Rooftop HVAC / Ventilation Units (Adds mechanical grit)
-                const hvacCount = Math.floor(w / 6) + 1;
-                for (let i = 0; i < hvacCount; i++) {
-                    const hvac = new THREE.Mesh(new THREE.BoxGeometry(1.4, 1.0, 1.4), hvacMat);
-                    hvac.position.set(-w / 4 + i * 2.2, h + 0.85, (Math.random() - 0.5) * (d / 2));
-                    hvac.castShadow = true;
-                    bld.add(hvac);
-                }
 
                 bld.position.set(x, 0, z);
                 townGroup.add(bld);
             }
 
-            // Build distinct, detailed storefronts around the intersection
-            createBuilding(0, -35, 24, 9, 16, brickRedMat, "The Badabing HQ", awningRed);
-            createBuilding(-35, -18, 18, 7.5, 16, brickDarkMat, "Supply Depot", awningBlue);
-            createBuilding(35, -18, 20, 8, 16, concreteMat, "Corner Bodega", awningGreen);
-            createBuilding(-35, 18, 20, 7.5, 16, brickRedMat, "Hardware Exchange", awningRed);
-            createBuilding(35, 18, 22, 9, 16, brickDarkMat, "Safehouse Arms", awningBlue);
+            createBuilding(0, -35, 24, 9, 16, brickRedMat, awningRed);
+            createBuilding(-35, -18, 18, 7.5, 16, brickDarkMat, awningBlue);
+            createBuilding(35, -18, 20, 8, 16, concreteMat, awningGreen);
+            createBuilding(-35, 18, 20, 7.5, 16, brickRedMat, awningRed);
+            createBuilding(35, 18, 22, 9, 16, brickDarkMat, awningBlue);
         }
 
         buildDetailedEnvironment();
 
-        // 4. Peanut (The Bird Representation)
-        const peanutGeo = new THREE.BoxGeometry(1.2, 1.2, 1.2);
-        const peanutMat = new THREE.MeshStandardMaterial({ color: 0xffaa00, roughness: 0.2, metalness: 0.3 });
-        const peanutMesh = new THREE.Mesh(peanutGeo, peanutMat);
-        peanutMesh.position.y = 0.6;
-        peanutMesh.castShadow = true;
-        scene.add(peanutMesh);
+        // 4. Articulated Peanut Character Model (Walking Person)
+        const peanutGroup = new THREE.Group();
+        scene.add(peanutGroup);
+
+        const bodyMat = new THREE.MeshStandardMaterial({ color: 0xffaa00, roughness: 0.3 }); // Orange outfit/body
+        const limbsMat = new THREE.MeshStandardMaterial({ color: 0x22222a, roughness: 0.5 }); // Dark jacket/limbs
+        const headMat = new THREE.MeshStandardMaterial({ color: 0xffd1a4, roughness: 0.6 });  // Skin tone head
+
+        // Torso
+        const torso = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.9, 0.4), bodyMat);
+        torso.position.y = 1.15;
+        torso.castShadow = true;
+        peanutGroup.add(torso);
+
+        // Head
+        const head = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.45, 0.45), headMat);
+        head.position.y = 1.8;
+        head.castShadow = true;
+        peanutGroup.add(head);
+
+        // Limbs (Pivoted for walking animation)
+        const legGeo = new THREE.BoxGeometry(0.2, 0.7, 0.2);
+        
+        const leftLeg = new THREE.Mesh(legGeo, limbsMat);
+        leftLeg.position.set(-0.2, 0.55, 0);
+        leftLeg.castShadow = true;
+        peanutGroup.add(leftLeg);
+
+        const rightLeg = new THREE.Mesh(legGeo, limbsMat);
+        rightLeg.position.set(0.2, 0.55, 0);
+        rightLeg.castShadow = true;
+        peanutGroup.add(rightLeg);
+
+        peanutGroup.position.set(0, 0, 0);
 
         // Stations Group
         const stationsGroup = new THREE.Group();
         scene.add(stationsGroup);
 
-        // --- DETAILED MODULAR PROP BUILDERS ---
         function createWorkbenchModel() {
             const group = new THREE.Group();
             const frameMat = new THREE.MeshStandardMaterial({ color: 0x1e1e26, metalness: 0.8, roughness: 0.3 });
@@ -365,7 +364,7 @@
         const coordsEl = document.getElementById('coords');
 
         ws.onopen = () => {
-            statusEl.innerText = "Connected to Detailed Town";
+            statusEl.innerText = "Connected";
             statusEl.style.color = "#55ff55";
         };
 
@@ -378,19 +377,22 @@
             const data = JSON.parse(event.data);
             if (data.type === 'init_world') {
                 updateStations(data.stations);
-                if (data.state?.bird) updateBird(data.state.bird);
+                if (data.state?.bird) updatePeanut(data.state.bird);
             }
             if (data.type === 'world:stations_updated') {
                 updateStations(data.stations);
             }
             if (data.type === 'bird:position') {
-                updateBird(data.bird);
+                updatePeanut(data.bird);
             }
         };
 
-        function updateBird(bird) {
-            peanutMesh.position.x = bird.x;
-            peanutMesh.position.z = bird.z;
+        let targetPeanutX = 0;
+        let targetPeanutZ = 0;
+
+        function updatePeanut(bird) {
+            targetPeanutX = bird.x;
+            targetPeanutZ = bird.z;
             coordsEl.innerText = `X: ${bird.x.toFixed(2)}, Z: ${bird.z.toFixed(2)}`;
         }
 
@@ -411,7 +413,7 @@
             });
         }
 
-        // 6. Movement System (WASD / Keyboard Navigation)
+        // 6. Movement System
         const moveState = { forward: false, backward: false, left: false, right: false };
         const moveSpeed = 0.45;
         let followCamMode = false;
@@ -500,8 +502,26 @@
         });
 
         // 8. Animation & Camera Loop
+        let clock = new THREE.Clock();
+
         function animate() {
             requestAnimationFrame(animate);
+
+            const elapsedTime = clock.getElapsedTime();
+
+            // Smoothly interpolate Peanut's position towards target coordinates
+            peanutGroup.position.x = THREE.MathUtils.lerp(peanutGroup.position.x, targetPeanutX, 0.1);
+            peanutGroup.position.z = THREE.MathUtils.lerp(peanutGroup.position.z, targetPeanutZ, 0.1);
+
+            // Simple walking leg swing animation
+            const isMoving = Math.abs(peanutGroup.position.x - targetPeanutX) > 0.01 || Math.abs(peanutGroup.position.z - targetPeanutZ) > 0.01;
+            if (isMoving) {
+                leftLeg.rotation.x = Math.sin(elapsedTime * 12) * 0.5;
+                rightLeg.rotation.x = -Math.sin(elapsedTime * 12) * 0.5;
+            } else {
+                leftLeg.rotation.x = 0;
+                rightLeg.rotation.x = 0;
+            }
 
             if (moveState.forward) camera.position.z -= moveSpeed;
             if (moveState.backward) camera.position.z += moveSpeed;
@@ -510,10 +530,10 @@
 
             if (followCamMode) {
                 controls.enabled = false;
-                camera.position.x = THREE.MathUtils.lerp(camera.position.x, peanutMesh.position.x, 0.1);
-                camera.position.z = THREE.MathUtils.lerp(camera.position.z, peanutMesh.position.z + 12, 0.1);
+                camera.position.x = THREE.MathUtils.lerp(camera.position.x, peanutGroup.position.x, 0.1);
+                camera.position.z = THREE.MathUtils.lerp(camera.position.z, peanutGroup.position.z + 12, 0.1);
                 camera.position.y = THREE.MathUtils.lerp(camera.position.y, 8, 0.1);
-                camera.lookAt(peanutMesh.position);
+                camera.lookAt(peanutGroup.position);
             } else {
                 controls.enabled = true;
                 controls.update();
