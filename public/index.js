@@ -35,52 +35,54 @@ async function initDB() {
   console.log("📦 SQLite Database Connected & The Badabing Tables Verified.");
 }
 
-// Peanut's independent state & wandering waypoints around the town
 const worldState = {
   bird: {
     name: "Peanut",
-    x: 0, y: 0, z: -10,
-    targetX: 0, targetZ: -10,
+    x: 0, y: 0, z: 0,
+    targetX: 0, targetZ: 0,
     state: "wandering",
     mood: "exploring"
   },
   connectedClients: 0
 };
 
-// Town waypoints for Peanut to freely roam between stores
+// Expanded town waypoints covering the entire realistic street grid
 const waypoints = [
-  { x: 0, z: -25 },   // Near Badabing HQ
-  { x: -20, z: -10 }, // Supply Depot
-  { x: 20, z: -10 },  // Corner Bodega
-  { x: -20, z: 10 },  // Hardware Exchange
-  { x: 20, z: 10 },   // Safehouse Arms
-  { x: 0, z: 20 }     // South Plaza
+  { x: 0, z: -30 },   // Badabing HQ North
+  { x: 0, z: -10 },   // Central Intersection North
+  { x: 0, z: 10 },    // Central Intersection South
+  { x: 0, z: 30 },    // South Plaza
+  { x: -25, z: -20 }, // Northwest Supply Depot
+  { x: 25, z: -20 },  // Northeast Bodega
+  { x: -25, z: 20 },  // Southwest Hardware
+  { x: 25, z: 20 },   // Southeast Arms
+  { x: -40, z: 0 },   // West Avenue
+  { x: 40, z: 0 }     // East Avenue
 ];
 
 function setRandomPeanutTarget() {
   const wp = waypoints[Math.floor(Math.random() * waypoints.length)];
-  worldState.bird.targetX = wp.x + (Math.random() * 4 - 2);
-  worldState.bird.targetZ = wp.z + (Math.random() * 4 - 2);
+  // Add slight random offset so he doesn't hit the exact same pixel every time
+  worldState.bird.targetX = wp.x + (Math.random() * 6 - 3);
+  worldState.bird.targetZ = wp.z + (Math.random() * 6 - 3);
 }
 
 setRandomPeanutTarget();
 
-// Autonomous AI Loop for Peanut roaming freely
+// Autonomous AI Loop for Peanut roaming freely across the map
 setInterval(() => {
   const bird = worldState.bird;
   const dx = bird.targetX - bird.x;
   const dz = bird.targetZ - bird.z;
   const dist = Math.sqrt(dx * dx + dz * dz);
 
-  if (dist < 0.5) {
-    // Reached destination, pick a new waypoint after a brief pause
+  if (dist < 0.6) {
     setTimeout(() => {
       setRandomPeanutTarget();
-    }, 1500);
+    }, 2000); // Pause briefly at each destination before walking to the next
   } else {
-    // Move towards target smoothly
-    bird.x += (dx / dist) * 0.08;
-    bird.z += (dz / dist) * 0.08;
+    bird.x += (dx / dist) * 0.06; // Smooth walking speed
+    bird.z += (dz / dist) * 0.06;
   }
 
   broadcast({ type: 'bird:position', bird: worldState.bird });
