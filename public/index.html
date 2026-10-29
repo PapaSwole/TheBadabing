@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Badabing - God Mode & Free Roaming Peanut</title>
+    <title>The Badabing - God Mode & Roaming Peanut Bird</title>
     <style>
         body {
             margin: 0;
@@ -134,7 +134,7 @@
         controls.enableDamping = true;
         controls.dampingFactor = 0.05;
         controls.maxPolarAngle = Math.PI / 2 - 0.05;
-        controls.target.set(0, 0, 0); // Independent center pivot for God Mode
+        controls.target.set(0, 0, 0);
 
         // 2. Lighting
         const ambientLight = new THREE.AmbientLight(0xddeeff, 0.75);
@@ -241,34 +241,53 @@
 
         buildDetailedEnvironment();
 
-        // 4. Independent Roaming Peanut Model
+        // 4. Detailed 3D Bird Model for Peanut
         const peanutGroup = new THREE.Group();
         scene.add(peanutGroup);
 
-        const bodyMat = new THREE.MeshStandardMaterial({ color: 0xffaa00, roughness: 0.3 });
-        const limbsMat = new THREE.MeshStandardMaterial({ color: 0x22222a, roughness: 0.5 });
-        const headMat = new THREE.MeshStandardMaterial({ color: 0xffd1a4, roughness: 0.6 });
+        const featherMat = new THREE.MeshStandardMaterial({ color: 0xff8c00, roughness: 0.3 }); // Vibrant orange/amber feathers
+        const wingMat = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.3 });    // Slightly darker wings
+        const beakMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.2 });    // Yellow-orange beak
+        const eyeMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.1 });     // Beady black eyes
 
-        const torso = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.9, 0.4), bodyMat);
-        torso.position.y = 1.15;
-        torso.castShadow = true;
-        peanutGroup.add(torso);
+        // Bird Body (Plump rounded torso)
+        const bodyGeo = new THREE.SphereGeometry(0.5, 16, 16);
+        bodyGeo.scale(1, 0.8, 1.3);
+        const birdBody = new THREE.Mesh(bodyGeo, featherMat);
+        birdBody.position.y = 0.6;
+        birdBody.castShadow = true;
+        peanutGroup.add(birdBody);
 
-        const head = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.45, 0.45), headMat);
-        head.position.y = 1.8;
-        head.castShadow = true;
-        peanutGroup.add(head);
+        // Bird Head
+        const headGeo = new THREE.SphereGeometry(0.3, 16, 16);
+        const birdHead = new THREE.Mesh(headGeo, featherMat);
+        birdHead.position.set(0, 0.95, 0.35);
+        birdHead.castShadow = true;
+        peanutGroup.add(birdHead);
 
-        const legGeo = new THREE.BoxGeometry(0.2, 0.7, 0.2);
-        const leftLeg = new THREE.Mesh(legGeo, limbsMat);
-        leftLeg.position.set(-0.2, 0.55, 0);
-        leftLeg.castShadow = true;
-        peanutGroup.add(leftLeg);
+        // Beak
+        const beakGeo = new THREE.ConeGeometry(0.12, 0.3, 8);
+        beakGeo.rotateX(Math.PI / 2);
+        const birdBeak = new THREE.Mesh(beakGeo, beakMat);
+        birdBeak.position.set(0, 0.95, 0.65);
+        peanutGroup.add(birdBeak);
 
-        const rightLeg = new THREE.Mesh(legGeo, limbsMat);
-        rightLeg.position.set(0.2, 0.55, 0);
-        rightLeg.castShadow = true;
-        peanutGroup.add(rightLeg);
+        // Eyes
+        [-0.15, 0.15].forEach(x => {
+            const eye = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 8), eyeMat);
+            eye.position.set(x, 1.02, 0.5);
+            peanutGroup.add(eye);
+        });
+
+        // Folded Wings
+        const wingGeo = new THREE.BoxGeometry(0.15, 0.35, 0.7);
+        const leftWing = new THREE.Mesh(wingGeo, wingMat);
+        leftWing.position.set(-0.5, 0.6, 0);
+        peanutGroup.add(leftWing);
+
+        const rightWing = new THREE.Mesh(wingGeo, wingMat);
+        rightWing.position.set(0.5, 0.6, 0);
+        peanutGroup.add(rightWing);
 
         // Stations Group
         const stationsGroup = new THREE.Group();
@@ -381,13 +400,19 @@
             }
         };
 
-        let targetPeanutX = 0;
-        let targetPeanutZ = 0;
-
         function updatePeanut(bird) {
-            targetPeanutX = bird.x;
-            targetPeanutZ = bird.z;
+            const oldX = peanutGroup.position.x;
+            const oldZ = peanutGroup.position.z;
+
+            peanutGroup.position.x = bird.x;
+            peanutGroup.position.z = bird.z;
             coordsEl.innerText = `X: ${bird.x.toFixed(2)}, Z: ${bird.z.toFixed(2)}`;
+
+            const moveX = bird.x - oldX;
+            const moveZ = bird.z - oldZ;
+            if (Math.abs(moveX) > 0.001 || Math.abs(moveZ) > 0.001) {
+                peanutGroup.rotation.y = Math.atan2(moveX, moveZ);
+            }
         }
 
         function updateStations(stations) {
@@ -407,7 +432,7 @@
             });
         }
 
-        // 6. Camera Modes ('orbit' for free God Mode building, 'follow' to watch Peanut)
+        // 6. Camera Mode
         let followPeanut = false;
 
         window.addEventListener('keydown', (e) => {
@@ -449,86 +474,4 @@
             if (intersectsStations.length > 0) {
                 if (!selectedTool) {
                     let rootObj = intersectsStations[0].object;
-                    while (rootObj.parent && rootObj.parent !== stationsGroup) {
-                        rootObj = rootObj.parent;
-                    }
-                    const hitUid = rootObj.userData.uid;
-                    if (hitUid) {
-                        ws.send(JSON.stringify({ type: 'admin:delete_station', uid: hitUid }));
-                    }
-                    return;
-                }
-            }
-
-            if (selectedTool) {
-                const intersectsGround = raycaster.intersectObject(ground);
-                if (intersectsGround.length > 0) {
-                    const point = intersectsGround[0].point;
-                    const gridX = Math.round(point.x);
-                    const gridZ = Math.round(point.z);
-                    const uid = `station_${Date.now()}_${Math.floor(Math.random()*1000)}`
-
-                    const newStation = {
-                        uid,
-                        type: selectedTool,
-                        gridX,
-                        gridZ,
-                        rotation: 0,
-                        footprintX: 1,
-                        footprintZ: 1
-                    };
-                    ws.send(JSON.stringify({ type: 'admin:place_station', station: newStation }));
-                }
-            }
-        });
-
-        // 8. Animation & Camera Loop
-        const clock = new THREE.Clock();
-
-        function animate() {
-            requestAnimationFrame(animate);
-
-            const elapsedTime = clock.getElapsedTime();
-
-            // Peanut autonomously walks across the entire town
-            const oldX = peanutGroup.position.x;
-            const oldZ = peanutGroup.position.z;
-
-            peanutGroup.position.x = THREE.MathUtils.lerp(peanutGroup.position.x, targetPeanutX, 0.08);
-            peanutGroup.position.z = THREE.MathUtils.lerp(peanutGroup.position.z, targetPeanutZ, 0.08);
-
-            const moveX = peanutGroup.position.x - oldX;
-            const moveZ = peanutGroup.position.z - oldZ;
-            if (Math.abs(moveX) > 0.001 || Math.abs(moveZ) > 0.001) {
-                peanutGroup.rotation.y = Math.atan2(moveX, moveZ);
-                leftLeg.rotation.x = Math.sin(elapsedTime * 12) * 0.5;
-                rightLeg.rotation.x = -Math.sin(elapsedTime * 12) * 0.5;
-            } else {
-                leftLeg.rotation.x = 0;
-                rightLeg.rotation.x = 0;
-            }
-
-            // Camera handling: Free orbit by default, locked to Peanut if 'C' is pressed
-            if (followPeanut) {
-                controls.enabled = false;
-                camera.position.x = THREE.MathUtils.lerp(camera.position.x, peanutGroup.position.x, 0.1);
-                camera.position.z = THREE.MathUtils.lerp(camera.position.z, peanutGroup.position.z + 12, 0.1);
-                camera.position.y = THREE.MathUtils.lerp(camera.position.y, 8, 0.1);
-                camera.lookAt(peanutGroup.position);
-            } else {
-                controls.enabled = true;
-                controls.update();
-            }
-
-            renderer.render(scene, camera);
-        }
-        animate();
-
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-    </script>
-</body>
-</html>
+                    while (rootObj.parent &&
