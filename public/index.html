@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Badabing - Safehouse Town & God Mode</title>
+    <title>The Badabing - Detailed Safehouse & God Mode</title>
     <style>
         body {
             margin: 0;
             padding: 0;
             overflow: hidden;
-            background-color: #111;
+            background-color: #0d0d11;
             font-family: sans-serif;
             color: #fff;
             user-select: none;
@@ -18,15 +18,16 @@
             position: absolute;
             top: 20px;
             left: 20px;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(15, 15, 20, 0.9);
             padding: 15px;
             border-radius: 8px;
-            border: 1px solid #444;
+            border: 1px solid #333;
             pointer-events: auto;
             z-index: 10;
             width: 260px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-        h1 { margin: 0 0 5px 0; font-size: 18px; color: #ff5555; }
+        h1 { margin: 0 0 5px 0; font-size: 18px; color: #ff5555; letter-spacing: 0.5px; }
         p { margin: 0 0 8px 0; font-size: 13px; color: #aaa; }
         #status { font-weight: bold; color: #55ff55; }
 
@@ -34,21 +35,22 @@
             position: absolute;
             top: 20px;
             right: 20px;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(15, 15, 20, 0.9);
             padding: 15px;
             border-radius: 8px;
             border: 1px solid #ff5555;
             z-index: 10;
             width: 240px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
         #god-mode-panel h2 { margin: 0 0 10px 0; font-size: 16px; color: #ff5555; }
         .station-btn {
             display: block;
             width: 100%;
-            padding: 8px;
+            padding: 9px;
             margin-bottom: 8px;
-            background: #222;
-            border: 1px solid #555;
+            background: #1f1f28;
+            border: 1px solid #3f3f4e;
             color: #fff;
             border-radius: 4px;
             cursor: pointer;
@@ -57,8 +59,8 @@
             transition: 0.2s;
         }
         .station-btn:hover { background: #ff5555; border-color: #ff5555; }
-        .station-btn.active { background: #ff3333; border-color: #fff; font-weight: bold; }
-        #instructions { font-size: 11px; color: #888; margin-top: 5px; line-height: 1.4; }
+        .station-btn.active { background: #e63939; border-color: #fff; font-weight: bold; }
+        #instructions { font-size: 11px; color: #777; margin-top: 5px; line-height: 1.4; }
     </style>
 </head>
 <body>
@@ -71,12 +73,12 @@
 
     <div id="god-mode-panel">
         <h2>God Mode Base-Building</h2>
-        <p>Select an asset to place:</p>
-        <button class="station-btn" data-type="workbench">🛠️ Workbench</button>
-        <button class="station-btn" data-type="crate">📦 Storage Crate</button>
+        <p>Select detailed asset:</p>
+        <button class="station-btn" data-type="workbench">🛠️ Industrial Workbench</button>
+        <button class="station-btn" data-type="crate">📦 Storage Crate Stack</button>
         <button class="station-btn" data-type="bed">🛌 Recovery Pod</button>
-        <button class="station-btn" data-type="none" style="background: #442222;">❌ Clear Selection</button>
-        <div id="instructions">Click on the town grid to spawn items. Click an existing item to delete it.</div>
+        <button class="station-btn" data-type="none" style="background: #361c1c;">❌ Clear Selection</button>
+        <div id="instructions">Click on floor grid to spawn detailed props. Click any asset to delete it.</div>
     </div>
 
     <!-- Import Three.js via CDN -->
@@ -95,8 +97,8 @@
 
         // 1. Scene, Camera, Renderer Setup
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x121216);
-        scene.fog = new THREE.FogExp2(0x121216, 0.025);
+        scene.background = new THREE.Color(0x0d0d11);
+        scene.fog = new THREE.FogExp2(0x0d0d11, 0.022);
 
         const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.set(0, 22, 28);
@@ -104,103 +106,171 @@
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         document.body.appendChild(renderer.domElement);
 
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
         controls.target.set(0, 0, 0);
 
-        // 2. Lighting
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        // 2. Lighting (Industrial Atmosphere)
+        const ambientLight = new THREE.AmbientLight(0xddeeff, 0.4);
         scene.add(ambientLight);
 
-        const dirLight = new THREE.DirectionalLight(0xfff5e6, 0.9);
-        dirLight.position.set(15, 30, 15);
+        const dirLight = new THREE.DirectionalLight(0xfff0dd, 0.8);
+        dirLight.position.set(20, 35, 20);
         dirLight.castShadow = true;
+        dirLight.shadow.mapSize.width = 2048;
+        dirLight.shadow.mapSize.height = 2048;
         scene.add(dirLight);
 
         // 3. Ground & Town Architecture Layout
-        const gridHelper = new THREE.GridHelper(50, 50, 0xff5555, 0x333333);
+        const gridHelper = new THREE.GridHelper(50, 50, 0xff5555, 0x22222a);
         gridHelper.position.y = 0;
         scene.add(gridHelper);
 
         const floorGeo = new THREE.PlaneGeometry(50, 50);
-        const floorMat = new THREE.MeshStandardMaterial({ color: 0x1b1b1f, roughness: 0.9 });
+        const floorMat = new THREE.MeshStandardMaterial({ color: 0x141419, roughness: 0.95, metalness: 0.1 });
         const floor = new THREE.Mesh(floorGeo, floorMat);
         floor.rotation.x = -Math.PI / 2;
         floor.receiveShadow = true;
         scene.add(floor);
 
-        // Build Town Perimeter Walls & Safehouse Structures
+        // Build Town Perimeter & Headquarters Compound
         const townGroup = new THREE.Group();
         scene.add(townGroup);
 
         function buildTownLayout() {
-            const wallMat = new THREE.MeshStandardMaterial({ color: 0x3a3a42, roughness: 0.7 });
-            const trimMat = new THREE.MeshStandardMaterial({ color: 0xcc4444, roughness: 0.5 });
+            const wallMat = new THREE.MeshStandardMaterial({ color: 0x2a2a33, roughness: 0.8, metalness: 0.2 });
+            const trimMat = new THREE.MeshStandardMaterial({ color: 0xcc3333, roughness: 0.4 });
+            const concreteMat = new THREE.MeshStandardMaterial({ color: 0x1f1f26, roughness: 0.9 });
 
-            // Perimeter Boundary Walls (Safehouse Compound)
+            // Perimeter Boundary Walls
             const walls = [
-                { x: 0, z: -25, w: 50, h: 3, d: 1 }, // North Wall
-                { x: 0, z: 25, w: 50, h: 3, d: 1 },  // South Wall
-                { x: -25, z: 0, w: 1, h: 3, d: 50 }, // West Wall
-                { x: 25, z: 0, w: 1, h: 3, d: 50 },  // East Wall
+                { x: 0, z: -25, w: 50, h: 3.5, d: 1 },
+                { x: 0, z: 25, w: 50, h: 3.5, d: 1 },
+                { x: -25, z: 0, w: 1, h: 3.5, d: 50 },
+                { x: 25, z: 0, w: 1, h: 3.5, d: 50 },
             ];
 
-            walls.forEach(wData => {
-                const geo = new THREE.BoxGeometry(wData.w, wData.h, wData.d);
-                const mesh = new THREE.Mesh(geo, wallMat);
-                mesh.position.set(wData.x, wData.h / 2, wData.z);
+            walls.forEach(w => {
+                const mesh = new THREE.Mesh(new THREE.BoxGeometry(w.w, w.h, w.d), wallMat);
+                mesh.position.set(w.x, w.h / 2, w.z);
                 mesh.castShadow = true;
                 mesh.receiveShadow = true;
                 townGroup.add(mesh);
             });
 
-            // Central Safehouse Building (The Badabing HQ)
-            const hqGeo = new THREE.BoxGeometry(14, 5, 10);
-            const hqMat = new THREE.MeshStandardMaterial({ color: 0x282830, roughness: 0.6 });
-            const hq = new THREE.Mesh(hqGeo, hqMat);
-            hq.position.set(0, 2.5, -12);
+            // HQ Building
+            const hq = new THREE.Mesh(new THREE.BoxGeometry(14, 5.5, 10), concreteMat);
+            hq.position.set(0, 2.75, -12);
             hq.castShadow = true;
             hq.receiveShadow = true;
             townGroup.add(hq);
 
-            // HQ Roof Trim
-            const roofGeo = new THREE.BoxGeometry(15, 0.6, 11);
-            const roof = new THREE.Mesh(roofGeo, trimMat);
-            roof.position.set(0, 5.3, -12);
+            const roof = new THREE.Mesh(new THREE.BoxGeometry(15, 0.5, 11), trimMat);
+            roof.position.set(0, 5.75, -12);
             roof.castShadow = true;
             townGroup.add(roof);
-
-            // Side Storage Modules (Left & Right Wings)
-            const wingGeo = new THREE.BoxGeometry(8, 3.5, 8);
-            
-            const leftWing = new THREE.Mesh(wingGeo, wallMat);
-            leftWing.position.set(-16, 1.75, -12);
-            leftWing.castShadow = true;
-            leftWing.receiveShadow = true;
-            townGroup.add(leftWing);
-
-            const rightWing = new THREE.Mesh(wingGeo, wallMat);
-            rightWing.position.set(16, 1.75, -12);
-            rightWing.castShadow = true;
-            rightWing.receiveShadow = true;
-            townGroup.add(rightWing);
         }
 
         buildTownLayout();
 
         // 4. Peanut (The Bird Representation)
         const peanutGeo = new THREE.BoxGeometry(1, 1, 1);
-        const peanutMat = new THREE.MeshStandardMaterial({ color: 0xffaa00, roughness: 0.3 });
+        const peanutMat = new THREE.MeshStandardMaterial({ color: 0xffaa00, roughness: 0.3, metalness: 0.1 });
         const peanutMesh = new THREE.Mesh(peanutGeo, peanutMat);
         peanutMesh.position.y = 0.5;
         peanutMesh.castShadow = true;
         scene.add(peanutMesh);
 
-        // Station Meshes Group
+        // Stations Group
         const stationsGroup = new THREE.Group();
         scene.add(stationsGroup);
+
+        // --- DETAILED MODULAR PROP BUILDERS ---
+        function createWorkbenchModel() {
+            const group = new THREE.Group();
+            const frameMat = new THREE.MeshStandardMaterial({ color: 0x22222a, metalness: 0.8, roughness: 0.3 });
+            const topMat = new THREE.MeshStandardMaterial({ color: 0x8b5a2b, roughness: 0.6 }); // Wood block top
+            const screenMat = new THREE.MeshStandardMaterial({ color: 0x111111, emissive: 0x0055ff, emissiveIntensity: 0.6 });
+
+            // Table Legs & Frame
+            const legGeo = new THREE.BoxGeometry(0.12, 0.9, 0.12);
+            [-0.5, 0.5].forEach(x => {
+                [-0.3, 0.3].forEach(z => {
+                    const leg = new THREE.Mesh(legGeo, frameMat);
+                    leg.position.set(x, 0.45, z);
+                    leg.castShadow = true;
+                    group.add(leg);
+                });
+            });
+
+            // Tabletop
+            const top = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.1, 0.8), topMat);
+            top.position.set(0, 0.95, 0);
+            top.castShadow = true;
+            top.receiveShadow = true;
+            group.add(top);
+
+            // Back Terminal / Computer Monitor
+            const monitor = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.4, 0.1), screenMat);
+            monitor.position.set(0, 1.3, -0.3);
+            monitor.castShadow = true;
+            group.add(monitor);
+
+            return group;
+        }
+
+        function createCrateModel() {
+            const group = new THREE.Group();
+            const crateMat = new THREE.MeshStandardMaterial({ color: 0xc68b59, roughness: 0.8 });
+            const bandMat = new THREE.MeshStandardMaterial({ color: 0x333338, metalness: 0.7, roughness: 0.4 });
+
+            // Stack of two crates
+            [0.35, 1.05].forEach((y, i) => {
+                const size = i === 0 ? 0.8 : 0.6;
+                const crate = new THREE.Mesh(new THREE.BoxGeometry(size, size, size), crateMat);
+                crate.position.set((i * 0.1), y, (i * -0.05));
+                crate.castShadow = true;
+                crate.receiveShadow = true;
+                group.add(crate);
+
+                // Metal corner straps
+                const band = new THREE.Mesh(new THREE.BoxGeometry(size + 0.02, 0.08, size + 0.02), bandMat);
+                band.position.set((i * 0.1), y, (i * -0.05));
+                group.add(band);
+            });
+
+            return group;
+        }
+
+        function createBedModel() {
+            const group = new THREE.Group();
+            const frameMat = new THREE.MeshStandardMaterial({ color: 0x33333d, metalness: 0.6, roughness: 0.4 });
+            const mattressMat = new THREE.MeshStandardMaterial({ color: 0x2d6a4f, roughness: 0.9 });
+            const pillowMat = new THREE.MeshStandardMaterial({ color: 0xe0e0e0, roughness: 0.9 });
+
+            // Cot Frame
+            const frame = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.3, 1.8), frameMat);
+            frame.position.set(0, 0.15, 0);
+            frame.castShadow = true;
+            group.add(frame);
+
+            // Mattress
+            const mattress = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.25, 1.7), mattressMat);
+            mattress.position.set(0, 0.35, 0);
+            mattress.castShadow = true;
+            group.add(mattress);
+
+            // Pillow
+            const pillow = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.12, 0.35), pillowMat);
+            pillow.position.set(0, 0.5, -0.6);
+            pillow.castShadow = true;
+            group.add(pillow);
+
+            return group;
+        }
 
         // 5. WebSocket Connection to Live Backend
         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -211,7 +281,7 @@
         const coordsEl = document.getElementById('coords');
 
         ws.onopen = () => {
-            statusEl.innerText = "Connected to Town Server";
+            statusEl.innerText = "Connected to Detailed Town";
             statusEl.style.color = "#55ff55";
         };
 
@@ -249,22 +319,16 @@
             }
 
             stations.forEach(st => {
-                let color = 0x888888;
-                let sizeY = 1;
-                if (st.type === 'workbench') { color = 0x3388ff; sizeY = 1.2; }
-                else if (st.type === 'crate') { color = 0xcc8833; sizeY = 0.8; }
-                else if (st.type === 'bed') { color = 0x33cc66; sizeY = 0.5; }
+                let model;
+                if (st.type === 'workbench') model = createWorkbenchModel();
+                else if (st.type === 'crate') model = createCrateModel();
+                else if (st.type === 'bed') model = createBedModel();
+                else model = createWorkbenchModel(); // Fallback
 
-                const geo = new THREE.BoxGeometry(st.footprintX, sizeY, st.footprintZ);
-                const mat = new THREE.MeshStandardMaterial({ color, roughness: 0.4 });
-                const mesh = new THREE.Mesh(geo, mat);
-                
-                mesh.position.set(st.gridX, sizeY / 2, st.gridZ);
-                mesh.castShadow = true;
-                mesh.receiveShadow = true;
-                mesh.userData = { uid: st.uid };
+                model.position.set(st.gridX, 0, st.gridZ);
+                model.userData = { uid: st.uid };
 
-                stationsGroup.add(mesh);
+                stationsGroup.add(model);
             });
         }
 
@@ -296,11 +360,17 @@
 
             raycaster.setFromCamera(mouse, camera);
 
-            const intersectsStations = raycaster.intersectObjects(stationsGroup.children);
+            const intersectsStations = raycaster.intersectObjects(stationsGroup.children, true);
             if (intersectsStations.length > 0) {
                 if (!selectedTool) {
-                    const hitUid = intersectsStations[0].object.userData.uid;
-                    ws.send(JSON.stringify({ type: 'admin:delete_station', uid: hitUid }));
+                    let rootObj = intersectsStations[0].object;
+                    while (rootObj.parent && rootObj.parent !== stationsGroup) {
+                        rootObj = rootObj.parent;
+                    }
+                    const hitUid = rootObj.userData.uid;
+                    if (hitUid) {
+                        ws.send(JSON.stringify({ type: 'admin:delete_station', uid: hitUid }));
+                    }
                     return;
                 }
             }
