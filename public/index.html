@@ -12,21 +12,53 @@
             background-color: #111;
             font-family: sans-serif;
             color: #fff;
+            user-select: none;
         }
         #info-panel {
             position: absolute;
             top: 20px;
             left: 20px;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.85);
             padding: 15px;
             border-radius: 8px;
-            border: 1px solid #333;
+            border: 1px solid #444;
             pointer-events: auto;
             z-index: 10;
+            width: 260px;
         }
         h1 { margin: 0 0 5px 0; font-size: 18px; color: #ff5555; }
-        p { margin: 0; font-size: 14px; color: #aaa; }
+        p { margin: 0 0 8px 0; font-size: 13px; color: #aaa; }
         #status { font-weight: bold; color: #55ff55; }
+
+        #god-mode-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.85);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ff5555;
+            z-index: 10;
+            width: 240px;
+        }
+        #god-mode-panel h2 { margin: 0 0 10px 0; font-size: 16px; color: #ff5555; }
+        .station-btn {
+            display: block;
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 8px;
+            background: #222;
+            border: 1px solid #555;
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 13px;
+            transition: 0.2s;
+        }
+        .station-btn:hover { background: #ff5555; border-color: #ff5555; }
+        .station-btn.active { background: #ff3333; border-color: #fff; font-weight: bold; }
+        #instructions { font-size: 11px; color: #888; margin-top: 5px; line-height: 1.4; }
     </style>
 </head>
 <body>
@@ -35,6 +67,16 @@
         <h1>The Badabing 🦫</h1>
         <p>Status: <span id="status">Connecting...</span></p>
         <p>Peanut Coordinates: <span id="coords">X: 0, Z: 0</span></p>
+    </div>
+
+    <div id="god-mode-panel">
+        <h2>God Mode Base-Building</h2>
+        <p>Select an asset to place:</p>
+        <button class="station-btn" data-type="workbench">🛠️ Workbench</button>
+        <button class="station-btn" data-type="crate">📦 Storage Crate</button>
+        <button class="station-btn" data-type="bed">🛌 Recovery Pod</button>
+        <button class="station-btn" data-type="none" style="background: #442222;">❌ Clear Selection</button>
+        <div id="instructions">Click on the floor grid to spawn items. Click an existing item to delete it.</div>
     </div>
 
     <!-- Import Three.js via CDN -->
@@ -57,7 +99,7 @@
         scene.fog = new THREE.FogExp2(0x1a1a1a, 0.03);
 
         const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 15, 20);
+        camera.position.set(0, 18, 22);
 
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -66,6 +108,7 @@
 
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
+        controls.target.set(0, 0, 0);
 
         // 2. Lighting
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
@@ -76,7 +119,7 @@
         dirLight.castShadow = true;
         scene.add(dirLight);
 
-        // 3. Ground Grid (The Safehouse Floor)
+        // 3. Ground Grid & Raycasting Plane
         const gridHelper = new THREE.GridHelper(40, 40, 0xff5555, 0x444444);
         gridHelper.position.y = 0;
         scene.add(gridHelper);
@@ -95,6 +138,12 @@
         peanutMesh.position.y = 0.5;
         peanutMesh.castShadow = true;
         scene.add(peanutMesh);
+
+        // Station Meshes Group
+        const stationsGroup = new THREE.Group();
+        scene.add(stationsGroup);
+
+        const stationMeshes = {};
 
         // 5. WebSocket Connection to Live Backend
         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -117,17 +166,116 @@
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
 
-            if (data.type === 'init_world' || data.type === 'bird:position') {
-                const bird = data.bird || data.state?.bird;
-                if (bird) {
-                    peanutMesh.position.x = bird.x;
-                    peanutMesh.position.z = bird.z;
-                    coordsEl.innerText = `X: ${bird.x.toFixed(2)}, Z: ${bird.z.toFixed(2)}`;
-                }
+            if (data.type === 'init_world') {
+                updateStations(data.stations);
+                if (data.state?.bird) updateBird(data.state.bird);
+            }
+
+            if (data.type === 'world:stations_updated') {
+                updateStations(data.stations);
+            }
+
+            if (data.type === 'bird:position') {
+                updateBird(data.bird);
             }
         };
 
-        // 6. Animation Loop
+        function updateBird(bird) {
+            peanutMesh.position.x = bird.x;
+            peanutMesh.position.z = bird.z;
+            coordsEl.innerText = `X: ${bird.x.toFixed(2)}, Z: ${bird.z.toFixed(2)}`;
+        }
+
+        function updateStations(stations) {
+            // Clear existing meshes
+            while(stationsGroup.children.length > 0){ 
+                stationsGroup.remove(stationsGroup.children[0]); 
+            }
+
+            stations.forEach(st => {
+                let color = 0x888888;
+                let sizeY = 1;
+                if (st.type === 'workbench') { color = 0x3388ff; sizeY = 1.2; }
+                else if (st.type === 'crate') { color = 0xcc8833; sizeY = 0.8; }
+                else if (st.type === 'bed') { color = 0x33cc66; sizeY = 0.5; }
+
+                const geo = new THREE.BoxGeometry(st.footprintX, sizeY, st.footprintZ);
+                const mat = new THREE.MeshStandardMaterial({ color });
+                const mesh = new THREE.Mesh(geo, mat);
+                
+                mesh.position.set(st.gridX, sizeY / 2, st.gridZ);
+                mesh.castShadow = true;
+                mesh.receiveShadow = true;
+                mesh.userData = { uid: st.uid };
+
+                stationsGroup.add(mesh);
+            });
+        }
+
+        // 6. God Mode Placement Logic
+        let selectedTool = null;
+
+        document.querySelectorAll('.station-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.station-btn').forEach(b => b.classList.remove('active'));
+                const type = e.target.getAttribute('data-type');
+                if (type === 'none') {
+                    selectedTool = null;
+                } else {
+                    selectedTool = type;
+                    e.target.classList.add('active');
+                }
+            });
+        });
+
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        window.addEventListener('click', (event) => {
+            // Ignore clicks on HTML UI panels
+            if (event.clientX > window.innerWidth - 280 && event.clientY < 300) return;
+            if (event.clientX < 280 && event.clientY < 200) return;
+
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+
+            // Check if clicking existing stations for deletion
+            const intersectsStations = raycaster.intersectObjects(stationsGroup.children);
+            if (intersectsStations.length > 0) {
+                if (!selectedTool) {
+                    const hitUid = intersectsStations[0].object.userData.uid;
+                    ws.send(JSON.stringify({ type: 'admin:delete_station', uid: hitUid }));
+                    return;
+                }
+            }
+
+            // Otherwise, if a tool is selected, place a new station on the floor grid
+            if (selectedTool) {
+                const intersectsFloor = raycaster.intersectObject(floor);
+                if (intersectsFloor.length > 0) {
+                    const point = intersectsFloor[0].point;
+                    const gridX = Math.round(point.x);
+                    const gridZ = Math.round(point.z);
+                    const uid = `station_${Date.now()}_${Math.floor(Math.random()*1000)}`
+
+                    const newStation = {
+                        uid,
+                        type: selectedTool,
+                        gridX,
+                        gridZ,
+                        rotation: 0,
+                        footprintX: 1,
+                        footprintZ: 1
+                    };
+
+                    ws.send(JSON.stringify({ type: 'admin:place_station', station: newStation }));
+                }
+            }
+        });
+
+        // 7. Animation Loop
         function animate() {
             requestAnimationFrame(animate);
             controls.update();
