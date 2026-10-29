@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Badabing - Safehouse & God Mode</title>
+    <title>The Badabing - Safehouse Town & God Mode</title>
     <style>
         body {
             margin: 0;
@@ -76,7 +76,7 @@
         <button class="station-btn" data-type="crate">📦 Storage Crate</button>
         <button class="station-btn" data-type="bed">🛌 Recovery Pod</button>
         <button class="station-btn" data-type="none" style="background: #442222;">❌ Clear Selection</button>
-        <div id="instructions">Click on the floor grid to spawn items. Click an existing item to delete it.</div>
+        <div id="instructions">Click on the town grid to spawn items. Click an existing item to delete it.</div>
     </div>
 
     <!-- Import Three.js via CDN -->
@@ -95,11 +95,11 @@
 
         // 1. Scene, Camera, Renderer Setup
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x1a1a1a);
-        scene.fog = new THREE.FogExp2(0x1a1a1a, 0.03);
+        scene.background = new THREE.Color(0x121216);
+        scene.fog = new THREE.FogExp2(0x121216, 0.025);
 
         const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 18, 22);
+        camera.position.set(0, 22, 28);
 
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -111,29 +111,88 @@
         controls.target.set(0, 0, 0);
 
         // 2. Lighting
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
         scene.add(ambientLight);
 
-        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-        dirLight.position.set(10, 20, 10);
+        const dirLight = new THREE.DirectionalLight(0xfff5e6, 0.9);
+        dirLight.position.set(15, 30, 15);
         dirLight.castShadow = true;
         scene.add(dirLight);
 
-        // 3. Ground Grid & Raycasting Plane
-        const gridHelper = new THREE.GridHelper(40, 40, 0xff5555, 0x444444);
+        // 3. Ground & Town Architecture Layout
+        const gridHelper = new THREE.GridHelper(50, 50, 0xff5555, 0x333333);
         gridHelper.position.y = 0;
         scene.add(gridHelper);
 
-        const floorGeo = new THREE.PlaneGeometry(40, 40);
-        const floorMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.8 });
+        const floorGeo = new THREE.PlaneGeometry(50, 50);
+        const floorMat = new THREE.MeshStandardMaterial({ color: 0x1b1b1f, roughness: 0.9 });
         const floor = new THREE.Mesh(floorGeo, floorMat);
         floor.rotation.x = -Math.PI / 2;
         floor.receiveShadow = true;
         scene.add(floor);
 
+        // Build Town Perimeter Walls & Safehouse Structures
+        const townGroup = new THREE.Group();
+        scene.add(townGroup);
+
+        function buildTownLayout() {
+            const wallMat = new THREE.MeshStandardMaterial({ color: 0x3a3a42, roughness: 0.7 });
+            const trimMat = new THREE.MeshStandardMaterial({ color: 0xcc4444, roughness: 0.5 });
+
+            // Perimeter Boundary Walls (Safehouse Compound)
+            const walls = [
+                { x: 0, z: -25, w: 50, h: 3, d: 1 }, // North Wall
+                { x: 0, z: 25, w: 50, h: 3, d: 1 },  // South Wall
+                { x: -25, z: 0, w: 1, h: 3, d: 50 }, // West Wall
+                { x: 25, z: 0, w: 1, h: 3, d: 50 },  // East Wall
+            ];
+
+            walls.forEach(wData => {
+                const geo = new THREE.BoxGeometry(wData.w, wData.h, wData.d);
+                const mesh = new THREE.Mesh(geo, wallMat);
+                mesh.position.set(wData.x, wData.h / 2, wData.z);
+                mesh.castShadow = true;
+                mesh.receiveShadow = true;
+                townGroup.add(mesh);
+            });
+
+            // Central Safehouse Building (The Badabing HQ)
+            const hqGeo = new THREE.BoxGeometry(14, 5, 10);
+            const hqMat = new THREE.MeshStandardMaterial({ color: 0x282830, roughness: 0.6 });
+            const hq = new THREE.Mesh(hqGeo, hqMat);
+            hq.position.set(0, 2.5, -12);
+            hq.castShadow = true;
+            hq.receiveShadow = true;
+            townGroup.add(hq);
+
+            // HQ Roof Trim
+            const roofGeo = new THREE.BoxGeometry(15, 0.6, 11);
+            const roof = new THREE.Mesh(roofGeo, trimMat);
+            roof.position.set(0, 5.3, -12);
+            roof.castShadow = true;
+            townGroup.add(roof);
+
+            // Side Storage Modules (Left & Right Wings)
+            const wingGeo = new THREE.BoxGeometry(8, 3.5, 8);
+            
+            const leftWing = new THREE.Mesh(wingGeo, wallMat);
+            leftWing.position.set(-16, 1.75, -12);
+            leftWing.castShadow = true;
+            leftWing.receiveShadow = true;
+            townGroup.add(leftWing);
+
+            const rightWing = new THREE.Mesh(wingGeo, wallMat);
+            rightWing.position.set(16, 1.75, -12);
+            rightWing.castShadow = true;
+            rightWing.receiveShadow = true;
+            townGroup.add(rightWing);
+        }
+
+        buildTownLayout();
+
         // 4. Peanut (The Bird Representation)
         const peanutGeo = new THREE.BoxGeometry(1, 1, 1);
-        const peanutMat = new THREE.MeshStandardMaterial({ color: 0xffaa00 });
+        const peanutMat = new THREE.MeshStandardMaterial({ color: 0xffaa00, roughness: 0.3 });
         const peanutMesh = new THREE.Mesh(peanutGeo, peanutMat);
         peanutMesh.position.y = 0.5;
         peanutMesh.castShadow = true;
@@ -142,8 +201,6 @@
         // Station Meshes Group
         const stationsGroup = new THREE.Group();
         scene.add(stationsGroup);
-
-        const stationMeshes = {};
 
         // 5. WebSocket Connection to Live Backend
         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -154,7 +211,7 @@
         const coordsEl = document.getElementById('coords');
 
         ws.onopen = () => {
-            statusEl.innerText = "Connected to Render Server";
+            statusEl.innerText = "Connected to Town Server";
             statusEl.style.color = "#55ff55";
         };
 
@@ -187,7 +244,6 @@
         }
 
         function updateStations(stations) {
-            // Clear existing meshes
             while(stationsGroup.children.length > 0){ 
                 stationsGroup.remove(stationsGroup.children[0]); 
             }
@@ -200,7 +256,7 @@
                 else if (st.type === 'bed') { color = 0x33cc66; sizeY = 0.5; }
 
                 const geo = new THREE.BoxGeometry(st.footprintX, sizeY, st.footprintZ);
-                const mat = new THREE.MeshStandardMaterial({ color });
+                const mat = new THREE.MeshStandardMaterial({ color, roughness: 0.4 });
                 const mesh = new THREE.Mesh(geo, mat);
                 
                 mesh.position.set(st.gridX, sizeY / 2, st.gridZ);
@@ -232,7 +288,6 @@
         const mouse = new THREE.Vector2();
 
         window.addEventListener('click', (event) => {
-            // Ignore clicks on HTML UI panels
             if (event.clientX > window.innerWidth - 280 && event.clientY < 300) return;
             if (event.clientX < 280 && event.clientY < 200) return;
 
@@ -241,7 +296,6 @@
 
             raycaster.setFromCamera(mouse, camera);
 
-            // Check if clicking existing stations for deletion
             const intersectsStations = raycaster.intersectObjects(stationsGroup.children);
             if (intersectsStations.length > 0) {
                 if (!selectedTool) {
@@ -251,7 +305,6 @@
                 }
             }
 
-            // Otherwise, if a tool is selected, place a new station on the floor grid
             if (selectedTool) {
                 const intersectsFloor = raycaster.intersectObject(floor);
                 if (intersectsFloor.length > 0) {
@@ -283,7 +336,6 @@
         }
         animate();
 
-        // Handle Window Resizing
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
