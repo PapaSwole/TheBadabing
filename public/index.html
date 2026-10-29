@@ -28,7 +28,7 @@
         }
         h1 { margin: 0 0 5px 0; font-size: 18px; color: #ff5555; }
         p { margin: 0 0 6px 0; font-size: 12px; color: #ccc; }
-        #status { font-weight: bold; color: #55ff55; }
+        #status { font-weight: bold; color: #ffaa00; }
 
         #god-mode-panel {
             position: absolute;
@@ -112,66 +112,62 @@
         import * as THREE from 'three';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-        // 1. Scene, Camera, Renderer Setup
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x1e222a);
-        scene.fog = new THREE.FogExp2(0x1e222a, 0.012);
+        const statusEl = document.getElementById('status');
+        const coordsEl = document.getElementById('coords');
 
-        const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1500);
-        camera.position.set(0, 35, 45);
+        try {
+            console.log("🚀 Starting Three.js Scene Setup...");
 
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = 1.3;
-        document.body.appendChild(renderer.domElement);
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x1e222a);
+            scene.fog = new THREE.FogExp2(0x1e222a, 0.012);
 
-        const controls = new OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.05;
-        controls.maxPolarAngle = Math.PI / 2 - 0.05;
-        controls.target.set(0, 0, 0);
+            const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1500);
+            camera.position.set(0, 35, 45);
 
-        // 2. Lighting
-        const ambientLight = new THREE.AmbientLight(0xddeeff, 0.75);
-        scene.add(ambientLight);
+            const renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.3;
+            document.body.appendChild(renderer.domElement);
 
-        const sunLight = new THREE.DirectionalLight(0xfff8ee, 1.4);
-        sunLight.position.set(45, 70, 35);
-        sunLight.castShadow = true;
-        sunLight.shadow.mapSize.width = 4096;
-        sunLight.shadow.mapSize.height = 4096;
-        sunLight.shadow.camera.near = 0.5;
-        sunLight.shadow.camera.far = 250;
-        const d = 60;
-        sunLight.shadow.camera.left = -d;
-        sunLight.shadow.camera.right = d;
-        sunLight.shadow.camera.top = d;
-        sunLight.shadow.camera.bottom = -d;
-        sunLight.shadow.bias = -0.0005;
-        scene.add(sunLight);
+            const controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.maxPolarAngle = Math.PI / 2 - 0.05;
+            controls.target.set(0, 0, 0);
 
-        // 3. Full Detailed Town Environment & Stores
-        const townGroup = new THREE.Group();
-        scene.add(townGroup);
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0xddeeff, 0.75);
+            scene.add(ambientLight);
 
-        const groundGeo = new THREE.PlaneGeometry(300, 300);
-        const groundMat = new THREE.MeshStandardMaterial({ color: 0x2b2f38, roughness: 0.9 });
-        const ground = new THREE.Mesh(groundGeo, groundMat);
-        ground.rotation.x = -Math.PI / 2;
-        ground.receiveShadow = true;
-        scene.add(ground);
+            const sunLight = new THREE.DirectionalLight(0xfff8ee, 1.4);
+            sunLight.position.set(45, 70, 35);
+            sunLight.castShadow = true;
+            sunLight.shadow.mapSize.width = 2048;
+            sunLight.shadow.mapSize.height = 2048;
+            scene.add(sunLight);
 
-        function buildDetailedEnvironment() {
+            // Ground
+            const groundGeo = new THREE.PlaneGeometry(300, 300);
+            const groundMat = new THREE.MeshStandardMaterial({ color: 0x2b2f38, roughness: 0.9 });
+            const ground = new THREE.Mesh(groundGeo, groundMat);
+            ground.rotation.x = -Math.PI / 2;
+            ground.receiveShadow = true;
+            scene.add(ground);
+
+            // Town Buildings
+            const townGroup = new THREE.Group();
+            scene.add(townGroup);
+
             const asphaltMat = new THREE.MeshStandardMaterial({ color: 0x242830, roughness: 0.85 });
             const concreteMat = new THREE.MeshStandardMaterial({ color: 0x545b6b, roughness: 0.75 });
             const brickRedMat = new THREE.MeshStandardMaterial({ color: 0x6e3b30, roughness: 0.8 });
             const brickDarkMat = new THREE.MeshStandardMaterial({ color: 0x423d42, roughness: 0.8 });
             const metalTrimMat = new THREE.MeshStandardMaterial({ color: 0x2e323b, metalness: 0.7, roughness: 0.4 });
             const windowGlassMat = new THREE.MeshStandardMaterial({ color: 0x1f3b4f, roughness: 0.1, metalness: 0.9, emissive: 0x112233, emissiveIntensity: 0.5 });
-            
             const awningRed = new THREE.MeshStandardMaterial({ color: 0xb82e2e, roughness: 0.6 });
             const awningBlue = new THREE.MeshStandardMaterial({ color: 0x256cb3, roughness: 0.6 });
             const awningGreen = new THREE.MeshStandardMaterial({ color: 0x2e8540, roughness: 0.6 });
@@ -180,34 +176,18 @@
             const roadNS = new THREE.Mesh(new THREE.PlaneGeometry(16, 240), asphaltMat);
             roadNS.rotation.x = -Math.PI / 2;
             roadNS.position.set(0, 0.01, 0);
-            roadNS.receiveShadow = true;
             townGroup.add(roadNS);
 
             const roadEW = new THREE.Mesh(new THREE.PlaneGeometry(240, 16), asphaltMat);
             roadEW.rotation.x = -Math.PI / 2;
             roadEW.position.set(0, 0.01, 0);
-            roadEW.receiveShadow = true;
             townGroup.add(roadEW);
-
-            // Sidewalks
-            const sw1 = new THREE.Mesh(new THREE.PlaneGeometry(3.5, 240), concreteMat);
-            sw1.rotation.x = -Math.PI / 2;
-            sw1.position.set(-9.75, 0.02, 0);
-            sw1.receiveShadow = true;
-            townGroup.add(sw1);
-
-            const sw2 = new THREE.Mesh(new THREE.PlaneGeometry(3.5, 240), concreteMat);
-            sw2.rotation.x = -Math.PI / 2;
-            sw2.position.set(9.75, 0.02, 0);
-            sw2.receiveShadow = true;
-            townGroup.add(sw2);
 
             function createBuilding(x, z, w, h, d, wallMat, awningMat) {
                 const bld = new THREE.Group();
                 const body = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), wallMat);
                 body.position.set(0, h / 2, 0);
                 body.castShadow = true;
-                body.receiveShadow = true;
                 bld.add(body);
 
                 const winWidth = w * 0.7;
@@ -220,13 +200,8 @@
                     const awning = new THREE.Mesh(new THREE.BoxGeometry(w * 0.85, 0.35, 1.8), awningMat);
                     awning.position.set(0, winHeight + 0.9, d / 2 + 0.8);
                     awning.rotation.x = 0.25;
-                    awning.castShadow = true;
                     bld.add(awning);
                 }
-
-                const cornice = new THREE.Mesh(new THREE.BoxGeometry(w + 0.6, 0.6, d + 0.6), metalTrimMat);
-                cornice.position.set(0, h + 0.3, 0);
-                bld.add(cornice);
 
                 bld.position.set(x, 0, z);
                 townGroup.add(bld);
@@ -237,269 +212,63 @@
             createBuilding(35, -18, 20, 8, 16, concreteMat, awningGreen);
             createBuilding(-35, 18, 20, 7.5, 16, brickRedMat, awningRed);
             createBuilding(35, 18, 22, 9, 16, brickDarkMat, awningBlue);
-        }
 
-        buildDetailedEnvironment();
+            // Peanut Bird Model
+            const peanutGroup = new THREE.Group();
+            scene.add(peanutGroup);
 
-        // 4. Peanut Bird Model
-        const peanutGroup = new THREE.Group();
-        scene.add(peanutGroup);
+            const featherMat = new THREE.MeshStandardMaterial({ color: 0xff8c00, roughness: 0.3 });
+            const birdBody = new THREE.Mesh(new THREE.SphereGeometry(0.5, 16, 16), featherMat);
+            birdBody.scale.set(1, 0.8, 1.3);
+            birdBody.position.y = 0.6;
+            peanutGroup.add(birdBody);
 
-        const featherMat = new THREE.MeshStandardMaterial({ color: 0xff8c00, roughness: 0.3 });
-        const wingMat = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.3 });
-        const beakMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.2 });
-        const eyeMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.1 });
+            const birdHead = new THREE.Mesh(new THREE.SphereGeometry(0.3, 16, 16), featherMat);
+            birdHead.position.set(0, 0.95, 0.35);
+            peanutGroup.add(birdHead);
 
-        const birdBody = new THREE.Mesh(new THREE.SphereGeometry(0.5, 16, 16), featherMat);
-        birdBody.scale.set(1, 0.8, 1.3);
-        birdBody.position.y = 0.6;
-        birdBody.castShadow = true;
-        peanutGroup.add(birdBody);
+            // WebSocket Connection
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.host}`;
+            console.log("🔌 Connecting to:", wsUrl);
 
-        const birdHead = new THREE.Mesh(new THREE.SphereGeometry(0.3, 16, 16), featherMat);
-        birdHead.position.set(0, 0.95, 0.35);
-        birdHead.castShadow = true;
-        peanutGroup.add(birdHead);
+            const ws = new WebSocket(wsUrl);
 
-        const birdBeak = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.3, 8), beakMat);
-        birdBeak.rotateX(Math.PI / 2);
-        birdBeak.position.set(0, 0.95, 0.65);
-        peanutGroup.add(birdBeak);
+            ws.onopen = () => {
+                console.log("✅ Connected!");
+                statusEl.innerText = "Connected";
+                statusEl.style.color = "#55ff55";
+            };
 
-        [-0.15, 0.15].forEach(x => {
-            const eye = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 8), eyeMat);
-            eye.position.set(x, 1.02, 0.5);
-            peanutGroup.add(eye);
-        });
+            ws.onerror = (e) => {
+                console.error("❌ WS Error:", e);
+                statusEl.innerText = "Connection Error";
+                statusEl.style.color = "#ff5555";
+            };
 
-        const wingGeo = new THREE.BoxGeometry(0.15, 0.35, 0.7);
-        const leftWing = new THREE.Mesh(wingGeo, wingMat);
-        leftWing.position.set(-0.5, 0.6, 0);
-        peanutGroup.add(leftWing);
-
-        const rightWing = new THREE.Mesh(wingGeo, wingMat);
-        rightWing.position.set(0.5, 0.6, 0);
-        peanutGroup.add(rightWing);
-
-        // Stations Group
-        const stationsGroup = new THREE.Group();
-        scene.add(stationsGroup);
-
-        function createWorkbenchModel() {
-            const group = new THREE.Group();
-            const frameMat = new THREE.MeshStandardMaterial({ color: 0x1e1e26, metalness: 0.8, roughness: 0.3 });
-            const topMat = new THREE.MeshStandardMaterial({ color: 0x7c471b, roughness: 0.6 });
-            const screenMat = new THREE.MeshStandardMaterial({ color: 0x111111, emissive: 0x0055ff, emissiveIntensity: 0.8 });
-
-            const legGeo = new THREE.BoxGeometry(0.12, 0.9, 0.12);
-            [-0.5, 0.5].forEach(x => {
-                [-0.3, 0.3].forEach(z => {
-                    const leg = new THREE.Mesh(legGeo, frameMat);
-                    leg.position.set(x, 0.45, z);
-                    leg.castShadow = true;
-                    group.add(leg);
-                });
-            });
-
-            const top = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.1, 0.85), topMat);
-            top.position.set(0, 0.95, 0);
-            top.castShadow = true;
-            top.receiveShadow = true;
-            group.add(top);
-
-            const monitor = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.4, 0.1), screenMat);
-            monitor.position.set(0, 1.3, -0.3);
-            monitor.castShadow = true;
-            group.add(monitor);
-
-            return group;
-        }
-
-        function createCrateModel() {
-            const group = new THREE.Group();
-            const crateMat = new THREE.MeshStandardMaterial({ color: 0xbd7d4b, roughness: 0.85 });
-            const bandMat = new THREE.MeshStandardMaterial({ color: 0x2a2a33, metalness: 0.7, roughness: 0.4 });
-
-            [0.35, 1.05].forEach((y, i) => {
-                const size = i === 0 ? 0.85 : 0.65;
-                const crate = new THREE.Mesh(new THREE.BoxGeometry(size, size, size), crateMat);
-                crate.position.set((i * 0.1), y, (i * -0.05));
-                crate.castShadow = true;
-                crate.receiveShadow = true;
-                group.add(crate);
-
-                const band = new THREE.Mesh(new THREE.BoxGeometry(size + 0.02, 0.08, size + 0.02), bandMat);
-                band.position.set((i * 0.1), y, (i * -0.05));
-                group.add(band);
-            });
-
-            return group;
-        }
-
-        function createBedModel() {
-            const group = new THREE.Group();
-            const frameMat = new THREE.MeshStandardMaterial({ color: 0x2a2a35, metalness: 0.6, roughness: 0.4 });
-            const mattressMat = new THREE.MeshStandardMaterial({ color: 0x1b4d3e, roughness: 0.9 });
-            const pillowMat = new THREE.MeshStandardMaterial({ color: 0xe8e8e8, roughness: 0.9 });
-
-            const frame = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.3, 1.9), frameMat);
-            frame.position.set(0, 0.15, 0);
-            frame.castShadow = true;
-            group.add(frame);
-
-            const mattress = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.25, 1.8), mattressMat);
-            mattress.position.set(0, 0.35, 0);
-            mattress.castShadow = true;
-            group.add(mattress);
-
-            const pillow = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.12, 0.35), pillowMat);
-            pillow.position.set(0, 0.5, -0.65);
-            pillow.castShadow = true;
-            group.add(pillow);
-
-            return group;
-        }
-
-        // 5. WebSocket Connection & State Sync
-        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const wsUrl = `${protocol}//${window.location.host}`;
-        const ws = new WebSocket(wsUrl);
-
-        const statusEl = document.getElementById('status');
-        const coordsEl = document.getElementById('coords');
-
-        ws.onopen = () => {
-            statusEl.innerText = "Connected";
-            statusEl.style.color = "#55ff55";
-        };
-
-        ws.onclose = () => {
-            statusEl.innerText = "Disconnected";
-            statusEl.style.color = "#ff5555";
-        };
-
-        ws.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            if (data.type === 'init_world') {
-                updateStations(data.stations);
-                if (data.state?.bird) updatePeanut(data.state.bird);
-            }
-            if (data.type === 'world:stations_updated') {
-                updateStations(data.stations);
-            }
-            if (data.type === 'bird:position') {
-                updatePeanut(data.bird);
-            }
-        };
-
-        function updatePeanut(bird) {
-            const oldX = peanutGroup.position.x;
-            const oldZ = peanutGroup.position.z;
-
-            peanutGroup.position.x = bird.x;
-            peanutGroup.position.z = bird.z;
-            coordsEl.innerText = `X: ${bird.x.toFixed(2)}, Z: ${bird.z.toFixed(2)}`;
-
-            const moveX = bird.x - oldX;
-            const moveZ = bird.z - oldZ;
-            if (Math.abs(moveX) > 0.001 || Math.abs(moveZ) > 0.001) {
-                peanutGroup.rotation.y = Math.atan2(moveX, moveZ);
-            }
-        }
-
-        function updateStations(stations) {
-            while(stationsGroup.children.length > 0){ 
-                stationsGroup.remove(stationsGroup.children[0]); 
-            }
-            stations.forEach(st => {
-                let model;
-                if (st.type === 'workbench') model = createWorkbenchModel();
-                else if (st.type === 'crate') model = createCrateModel();
-                else if (st.type === 'bed') model = createBedModel();
-                else model = createWorkbenchModel();
-
-                model.position.set(st.gridX, 0, st.gridZ);
-                model.userData = { uid: st.uid };
-                stationsGroup.add(model);
-            });
-        }
-
-        // 6. Camera Mode
-        let followPeanut = false;
-
-        window.addEventListener('keydown', (e) => {
-            if (e.key === 'c' || e.key === 'C') {
-                followPeanut = !followPeanut;
-                document.getElementById('cam-mode').innerText = followPeanut ? "Peanut Follow Cam" : "God Mode Free Orbit";
-                document.getElementById('cam-mode').style.color = followPeanut ? "#ffaa00" : "#55ff55";
-            }
-        });
-
-        // 7. God Mode Placement & Deletion Logic
-        let selectedTool = null;
-        document.querySelectorAll('.station-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                document.querySelectorAll('.station-btn').forEach(b => b.classList.remove('active'));
-                const type = e.target.getAttribute('data-type');
-                if (type === 'none') {
-                    selectedTool = null;
-                } else {
-                    selectedTool = type;
-                    e.target.classList.add('active');
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                const birdData = data.bird || data.state?.bird;
+                if (birdData) {
+                    peanutGroup.position.x = birdData.x;
+                    peanutGroup.position.z = birdData.z;
+                    coordsEl.innerText = `X: ${birdData.x.toFixed(2)}, Z: ${birdData.z.toFixed(2)}`;
                 }
-            });
-        });
+            };
 
-        const raycaster = new THREE.Raycaster();
-        const mouse = new THREE.Vector2();
-
-        window.addEventListener('click', (event) => {
-            if (event.clientX > window.innerWidth - 260 && event.clientY < 240) return;
-            if (event.clientX < 320 && event.clientY < 180) return;
-
-            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-            raycaster.setFromCamera(mouse, camera);
-
-            const intersectsStations = raycaster.intersectObjects(stationsGroup.children, true);
-            if (intersectsStations.length > 0) {
-                if (!selectedTool) {
-                    let rootObj = intersectsStations[0].object;
-                    while (rootObj.parent && rootObj.parent !== stationsGroup) {
-                        rootObj = rootObj.parent;
-                    }
-                    const hitUid = rootObj.userData.uid;
-                    if (hitUid) {
-                        ws.send(JSON.stringify({ type: 'admin:delete_station', uid: hitUid }));
-                    }
-                    return;
-                }
+            // Animation Loop
+            function animate() {
+                requestAnimationFrame(animate);
+                controls.update();
+                renderer.render(scene, camera);
             }
+            animate();
 
-            if (selectedTool) {
-                const intersectsGround = raycaster.intersectObject(ground);
-                if (intersectsGround.length > 0) {
-                    const point = intersectsGround[0].point;
-                    const gridX = Math.round(point.x);
-                    const gridZ = Math.round(point.z);
-                    const uid = `station_${Date.now()}_${Math.floor(Math.random()*1000)}`
-
-                    const newStation = {
-                        uid,
-                        type: selectedTool,
-                        gridX,
-                        gridZ,
-                        rotation: 0,
-                        footprintX: 1,
-                        footprintZ: 1
-                    };
-                    ws.send(JSON.stringify({ type: 'admin:place_station', station: newStation }));
-                }
-            }
-        });
-
-        // 8. Animation & Camera Loop
-        const clock = new THREE.Clock();
-
-        function animate() {
+        } catch (err) {
+            console.error("💥 Critical Script Error:", err);
+            statusEl.innerText = "Script Error";
+            statusEl.style.color = "#ff0000";
+        }
+    </script>
+</body>
+</html>
