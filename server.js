@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import express from 'express';
 import { WebSocketServer } from 'ws';
 import http from 'http';
@@ -12,28 +11,41 @@ const wss = new WebSocketServer({ server });
 app.use(express.json());
 app.use(express.static('public'));
 
-let db;
+let db = null;
 
 async function initDB() {
-  db = await open({
-    filename: './database.sqlite',
-    driver: sqlite3.Database
-  });
+  try {
+    db = await open({
+      filename: './database.sqlite',
+      driver: sqlite3.Database
+    });
 
-  await db.exec(`
-    CREATE TABLE IF NOT EXISTS safehouse_stations (
-      uid TEXT PRIMARY KEY,
-      type TEXT NOT NULL,
-      gridX INTEGER NOT NULL,
-      gridZ INTEGER NOT NULL,
-      rotation INTEGER NOT NULL,
-      footprintX INTEGER NOT NULL,
-      footprintZ INTEGER NOT NULL
-    )
-  `);
+    await db.exec(`
+      CREATE TABLE IF NOT EXISTS safehouse_stations (
+        uid TEXT PRIMARY KEY,
+        type TEXT NOT NULL,
+        gridX INTEGER NOT NULL,
+        gridZ INTEGER NOT NULL,
+        rotation INTEGER NOT NULL,
+        footprintX INTEGER NOT NULL,
+        footprintZ INTEGER NOT NULL
+      )
+    `);
 
-  console.log("📦 SQLite Database Connected & The Badabing Tables Verified.");
+    console.log("📦 SQLite Database Connected & Tables Verified.");
+  } catch (err) {
+    console.error("⚠️ SQLite init warning:", err.message);
+  }
 }
+
+// Start server immediately so Render connects right away
+const PORT = process.env.PORT || 10000;
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`🦫 The Badabing server running on port ${PORT}`);
+});
+
+// Initialize DB in background
+initDB();
 
 const worldState = {
   bird: {
@@ -93,15 +105,25 @@ wss.on('connection', (ws) => {
   worldState.connectedClients++;
   console.log(`🔌 Client connected. Total: ${worldState.connectedClients}`);
 
-  db.all(`SELECT * FROM safehouse_stations`).then((stations) => {
+  const sendStations = async () => {
+    let stations = [];
+    if (db) {
+      try {
+        stations = await db.all(`SELECT * FROM safehouse_stations`);
+      } catch (e) {
+        stations = [];
+      }
+    }
     ws.send(JSON.stringify({ type: 'init_world', state: worldState, stations }));
-  });
+  };
+
+  sendStations();
 
   ws.on('message', async (message) => {
     try {
       const data = JSON.parse(message);
 
-      if (data.type === 'admin:place_station') {
+      if (data.type === 'admin:place_station' && db) {
         const { uid, type, gridX, gridZ, rotation, footprintX, footprintZ } = data.station;
         await db.run(
           `INSERT OR REPLACE INTO safehouse_stations (uid, type, gridX, gridZ, rotation, footprintX, footprintZ) 
@@ -112,7 +134,7 @@ wss.on('connection', (ws) => {
         broadcast({ type: 'world:stations_updated', stations: allStations });
       }
 
-      if (data.type === 'admin:delete_station') {
+      if (data.type === 'admin:delete_station' && db) {
         await db.run(`DELETE FROM safehouse_stations WHERE uid = ?`, [data.uid]);
         const allStations = await db.all(`SELECT * FROM safehouse_stations`);
         broadcast({ type: 'world:stations_updated', stations: allStations });
@@ -133,10 +155,3 @@ function broadcast(data) {
     if (client.readyState === 1) client.send(payload);
   });
 }
-
-initDB().then(() => {
-  const PORT = process.env.PORT || 10000;
-  server.listen(PORT, '0.0.0.0', () => {
-    console.log(`🦫 Peanut's server running at The Badabing on port ${PORT}`);
-  });
-});
