@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Badabing - Peanut with Animated Eyes</title>
+    <title>The Badabing - Peanut with Cute Animated Eyes</title>
     <style>
         body {
             margin: 0;
@@ -483,7 +483,7 @@
             createPeanutHouse(-32, -20);
 
             // ==========================================
-            // PEANUT THE BIRD WITH ANIMATED EYES
+            // PEANUT THE BIRD WITH CUTE ANIMATED EYES
             // ==========================================
             const peanutGroup = new THREE.Group();
             scene.add(peanutGroup);
@@ -505,26 +505,26 @@
             birdBeak.position.set(0, 0.95, 0.65);
             peanutGroup.add(birdBeak);
 
-            // Animated Eyes Setup
+            // Cute Animated Eyes (Blinking & Expression)
             const eyeGroup = new THREE.Group();
             eyeGroup.position.set(0, 0.98, 0.48);
             peanutGroup.add(eyeGroup);
 
-            const eyeballMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.1, metalness: 0.9 });
+            const eyeballMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.05, metalness: 0.9 });
             const pupilMat = new THREE.MeshBasicMaterial({ color: 0xffffff }); // Catchlight
 
             const leftEye = new THREE.Group();
             leftEye.position.set(-0.12, 0, 0);
-            const lBall = new THREE.Mesh(new THREE.SphereGeometry(0.06, 12, 12), eyeballMat);
-            const lPupil = new THREE.Mesh(new THREE.SphereGeometry(0.02, 8, 8), pupilMat);
-            lPupil.position.set(0.01, 0.02, 0.05);
+            const lBall = new THREE.Mesh(new THREE.SphereGeometry(0.065, 16, 16), eyeballMat);
+            const lPupil = new THREE.Mesh(new THREE.SphereGeometry(0.022, 8, 8), pupilMat);
+            lPupil.position.set(0.015, 0.02, 0.05);
             leftEye.add(lBall, lPupil);
 
             const rightEye = new THREE.Group();
             rightEye.position.set(0.12, 0, 0);
-            const rBall = new THREE.Mesh(new THREE.SphereGeometry(0.06, 12, 12), eyeballMat);
-            const rPupil = new THREE.Mesh(new THREE.SphereGeometry(0.02, 8, 8), pupilMat);
-            rPupil.position.set(-0.01, 0.02, 0.05);
+            const rBall = new THREE.Mesh(new THREE.SphereGeometry(0.065, 16, 16), eyeballMat);
+            const rPupil = new THREE.Mesh(new THREE.SphereGeometry(0.022, 8, 8), pupilMat);
+            rPupil.position.set(-0.015, 0.02, 0.05);
             rightEye.add(rBall, rPupil);
 
             eyeGroup.add(leftEye, rightEye);
@@ -668,17 +668,17 @@
                 // Peanut bobbing animation
                 peanutGroup.position.y = Math.abs(Math.sin(elapsed * 10)) * 0.15;
 
-                // Animated Blinking (scales eye height down briefly every few seconds)
-                const blinkCycle = elapsed % 4.0;
-                if (blinkCycle < 0.15) {
-                    eyeGroup.scale.y = 0.1;
+                // Cute Animated Blinking & Eye Darting
+                const blinkTimer = elapsed % 3.5;
+                if (blinkTimer < 0.12) {
+                    eyeGroup.scale.y = 0.08; // Blink closed
                 } else {
-                    eyeGroup.scale.y = 1.0;
+                    eyeGroup.scale.y = 1.0;  // Eyes open
                 }
 
-                // Subtle looking around for the eyes
-                leftEye.rotation.y = Math.sin(elapsed * 2) * 0.15;
-                rightEye.rotation.y = Math.sin(elapsed * 2) * 0.15;
+                // Subtle organic head/eye movement
+                leftEye.position.x = -0.12 + Math.sin(elapsed * 3) * 0.005;
+                rightEye.position.x = 0.12 + Math.sin(elapsed * 3) * 0.005;
 
                 if (controls.isLocked) {
                     direction.z = Number(keys.w) - Number(keys.s);
