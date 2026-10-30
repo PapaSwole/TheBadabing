@@ -30,17 +30,36 @@
         p { margin: 0 0 6px 0; font-size: 12px; color: #ccc; }
         #status { font-weight: bold; color: #55ff55; }
 
-        #god-mode-panel {
+        #toggle-god-btn {
             position: absolute;
             top: 20px;
+            right: 20px;
+            background: rgba(20, 20, 28, 0.95);
+            border: 1px solid #00aaff;
+            color: #00aaff;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            z-index: 15;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            transition: 0.2s;
+        }
+        #toggle-god-btn:hover { background: #00aaff; color: #fff; }
+
+        #god-mode-panel {
+            position: absolute;
+            top: 70px;
             right: 20px;
             background: rgba(20, 20, 28, 0.95);
             padding: 15px;
             border-radius: 8px;
             border: 1px solid #00aaff;
-            z-index: 10;
+            z-index: 15;
             width: 250px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            display: none;
         }
         #god-mode-panel h2 { margin: 0 0 10px 0; font-size: 15px; color: #00aaff; }
         .station-btn {
@@ -85,6 +104,51 @@
             line-height: 1.5;
         }
         #controls-hint span { color: #00aaff; font-weight: bold; }
+
+        #mobile-controls {
+            display: none;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 25;
+        }
+        #mobile-move-btns {
+            position: absolute;
+            bottom: 40px;
+            left: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            pointer-events: auto;
+        }
+        #mobile-action-btns {
+            position: absolute;
+            bottom: 40px;
+            right: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            pointer-events: auto;
+        }
+        .mob-btn {
+            width: 65px;
+            height: 65px;
+            background: rgba(0, 170, 255, 0.6);
+            border: 2px solid #fff;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            touch-action: manipulation;
+        }
+        .mob-btn:active { background: rgba(0, 170, 255, 0.9); }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
@@ -95,10 +159,12 @@
 
     <div id="info-panel">
         <h1>The Badabing 🦫</h1>
-        <p>Status: <span id="status">Active (Large House Added)</span></p>
+        <p>Status: <span id="status">Active (Fixed)</span></p>
         <p>Peanut's Pos: <span id="coords">X: 0, Z: 0</span></p>
         <p>Cam Mode: <span id="cam-mode" style="color: #00aaff;">1st-Person God Mode</span></p>
     </div>
+
+    <button id="toggle-god-btn">🛠️ God Mode</button>
 
     <div id="god-mode-panel">
         <h2>God Mode Inspector</h2>
@@ -111,14 +177,25 @@
         <button class="station-btn" data-type="none" style="background: #333;">✋ Hands Empty (Look)</button>
     </div>
 
+    <div id="mobile-controls">
+        <div id="mobile-move-btns">
+            <div class="mob-btn" id="btn-forward">🔼</div>
+            <div class="mob-btn" id="btn-backward">🔽</div>
+        </div>
+        <div id="mobile-action-btns">
+            <div class="mob-btn" id="btn-up">⬆️</div>
+            <div class="mob-btn" id="btn-down">⬇️</div>
+        </div>
+    </div>
+
     <div id="controls-hint">
-        Click Screen: <span>Lock Mouse Look</span> | Walk: <span>WASD</span><br>
-        Open Door: <span>Click on Front Door</span> | ESC: <span>Release Mouse</span>
+        Click Screen: <span>Lock Look</span> | Walk: <span>WASD</span><br>
+        Open Door: <span>Click Door</span> | ESC: <span>Release Mouse</span>
     </div>
 
     <script>
         try {
-            console.log("🚀 Initializing World with Large House & Openable Door...");
+            console.log("🚀 Initializing World...");
 
             const scene = new THREE.Scene();
             scene.background = new THREE.Color(0x87a8d0);
@@ -230,4 +307,141 @@
             officeBuilding.position.set(-16, 0, 135);
 
             const concreteMat = new THREE.MeshStandardMaterial({ color: 0x78828a, roughness: 0.7 });
-            const glassWallMat = new THREE.MeshStandardMaterial({ color: 0x1c3545, metalness: 0.85, roughness: 0.1, transparent: true, opacity:
+            const glassWallMat = new THREE.MeshStandardMaterial({ color: 0x1c3545, metalness: 0.85, roughness: 0.1, transparent: true, opacity: 0.85 });
+            const floorMat = new THREE.MeshStandardMaterial({ color: 0x555b61, roughness: 0.6 });
+            const stairMat = new THREE.MeshStandardMaterial({ color: 0x3d4247, roughness: 0.5 });
+            const trimMat = new THREE.MeshStandardMaterial({ color: 0x222528, metalness: 0.5 });
+            const signMat = new THREE.MeshStandardMaterial({ color: 0xff5555, emissive: 0xff2222, emissiveIntensity: 0.6 });
+
+            const oWidth = 22;
+            const oDepth = 18;
+            const oFloorHeight = 4.0;
+
+            for (let f = 0; f < 3; f++) {
+                const floorY = f * oFloorHeight;
+                const floorSlab = new THREE.Mesh(new THREE.BoxGeometry(oWidth, 0.3, oDepth), floorMat);
+                floorSlab.position.set(0, floorY + 0.15, 0);
+                floorSlab.receiveShadow = true;
+                officeBuilding.add(floorSlab);
+
+                const frontWall = new THREE.Mesh(new THREE.BoxGeometry(oWidth, oFloorHeight - 0.3, 0.4), glassWallMat);
+                frontWall.position.set(0, floorY + oFloorHeight / 2, oDepth / 2);
+                officeBuilding.add(frontWall);
+
+                const backWall = new THREE.Mesh(new THREE.BoxGeometry(oWidth, oFloorHeight - 0.3, 0.4), concreteMat);
+                backWall.position.set(0, floorY + oFloorHeight / 2, -oDepth / 2);
+                officeBuilding.add(backWall);
+
+                const leftWall = new THREE.Mesh(new THREE.BoxGeometry(0.4, oFloorHeight - 0.3, oDepth), glassWallMat);
+                leftWall.position.set(-oWidth / 2, floorY + oFloorHeight / 2, 0);
+                officeBuilding.add(leftWall);
+
+                const rightWall = new THREE.Mesh(new THREE.BoxGeometry(0.4, oFloorHeight - 0.3, oDepth), concreteMat);
+                rightWall.position.set(oWidth / 2, floorY + oFloorHeight / 2, 0);
+                officeBuilding.add(rightWall);
+            }
+
+            const roofSlab = new THREE.Mesh(new THREE.BoxGeometry(oWidth + 0.8, 0.4, oDepth + 0.8), trimMat);
+            roofSlab.position.set(0, 3 * oFloorHeight + 0.2, 0);
+            officeBuilding.add(roofSlab);
+
+            const signBoard = new THREE.Mesh(new THREE.BoxGeometry(16, 2.2, 0.6), signMat);
+            signBoard.position.set(0, 3 * oFloorHeight + 1.5, 0);
+            signBoard.castShadow = true;
+            officeBuilding.add(signBoard);
+
+            for (let s = 0; s < 2; s++) {
+                const stairStartY = s * oFloorHeight;
+                const stairGroup = new THREE.Group();
+                stairGroup.position.set(oWidth / 4, stairStartY, 0);
+                const numSteps = 12;
+                for (let i = 0; i < numSteps; i++) {
+                    const step = new THREE.Mesh(new THREE.BoxGeometry(2.5, oFloorHeight / numSteps, 0.8), stairMat);
+                    step.position.set(0, (i + 0.5) * (oFloorHeight / numSteps), (i - numSteps / 2) * 0.8);
+                    step.castShadow = true;
+                    stairGroup.add(step);
+                }
+                officeBuilding.add(stairGroup);
+            }
+            scene.add(officeBuilding);
+
+            // ==========================================
+            // LARGE HOUSE WITH OPENABLE DOOR AT X:-201, Z:-114
+            // ==========================================
+            const houseGroup = new THREE.Group();
+            houseGroup.position.set(-201, 0, -114);
+
+            const sidingMat = new THREE.MeshStandardMaterial({ color: 0x687685, roughness: 0.75 });
+            const houseRoofMat = new THREE.MeshStandardMaterial({ color: 0x26292e, roughness: 0.8 });
+            const woodFloorMat = new THREE.MeshStandardMaterial({ color: 0x7c5230, roughness: 0.55 });
+            const houseStairMat = new THREE.MeshStandardMaterial({ color: 0x4a3219, roughness: 0.6 });
+            const bedMat = new THREE.MeshStandardMaterial({ color: 0x256cb3, roughness: 0.5 });
+            const pillowMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9 });
+            const doorMat = new THREE.MeshStandardMaterial({ color: 0x4e311a, roughness: 0.6 });
+            const mailboxMat = new THREE.MeshStandardMaterial({ color: 0xb82e2e, metalness: 0.5 });
+            const postMat = new THREE.MeshStandardMaterial({ color: 0x111111 });
+
+            const hWidth = 28;
+            const hDepth = 24;
+            const hFloorHeight = 4.5;
+
+            const floor1 = new THREE.Mesh(new THREE.BoxGeometry(hWidth, 0.3, hDepth), woodFloorMat);
+            floor1.position.set(0, 0.15, 0);
+            houseGroup.add(floor1);
+
+            const floor2 = new THREE.Mesh(new THREE.BoxGeometry(hWidth, 0.3, hDepth), woodFloorMat);
+            floor2.position.set(0, hFloorHeight + 0.15, 0);
+            houseGroup.add(floor2);
+
+            const houseRoof = new THREE.Mesh(new THREE.ConeGeometry(20, 5, 4), houseRoofMat);
+            houseRoof.position.set(0, hFloorHeight * 2 + 2.5, 0);
+            houseRoof.rotation.y = Math.PI / 4;
+            houseGroup.add(houseRoof);
+
+            for (let f = 0; f < 2; f++) {
+                const fy = f * hFloorHeight;
+                const backWall = new THREE.Mesh(new THREE.BoxGeometry(hWidth, hFloorHeight, 0.4), sidingMat);
+                backWall.position.set(0, fy + hFloorHeight / 2, -hDepth / 2);
+                houseGroup.add(backWall);
+
+                const leftWall = new THREE.Mesh(new THREE.BoxGeometry(0.4, hFloorHeight, hDepth), sidingMat);
+                leftWall.position.set(-hWidth / 2, fy + hFloorHeight / 2, 0);
+                houseGroup.add(leftWall);
+
+                const rightWall = new THREE.Mesh(new THREE.BoxGeometry(0.4, hFloorHeight, hDepth), sidingMat);
+                rightWall.position.set(hWidth / 2, fy + hFloorHeight / 2, 0);
+                houseGroup.add(rightWall);
+            }
+
+            const frontWall1 = new THREE.Mesh(new THREE.BoxGeometry(11, hFloorHeight, 0.4), sidingMat);
+            frontWall1.position.set(-8.5, hFloorHeight / 2, hDepth / 2);
+            houseGroup.add(frontWall1);
+            
+            const frontWall2 = new THREE.Mesh(new THREE.BoxGeometry(11, hFloorHeight, 0.4), sidingMat);
+            frontWall2.position.set(8.5, hFloorHeight / 2, hDepth / 2);
+            houseGroup.add(frontWall2);
+
+            const frontWallHeader = new THREE.Mesh(new THREE.BoxGeometry(6, 1.5, 0.4), sidingMat);
+            frontWallHeader.position.set(0, hFloorHeight - 0.75, hDepth / 2);
+            houseGroup.add(frontWallHeader);
+
+            const frontWall2nd = new THREE.Mesh(new THREE.BoxGeometry(hWidth, hFloorHeight, 0.4), sidingMat);
+            frontWall2nd.position.set(0, hFloorHeight + hFloorHeight / 2, hDepth / 2);
+            houseGroup.add(frontWall2nd);
+
+            // Openable Door
+            const doorPivot = new THREE.Group();
+            doorPivot.position.set(-3, 0, hDepth / 2);
+            
+            const doorMesh = new THREE.Mesh(new THREE.BoxGeometry(3, 3.2, 0.2), doorMat);
+            doorMesh.position.set(1.5, 1.6, 0);
+            doorMesh.castShadow = true;
+            doorPivot.add(doorMesh);
+            houseGroup.add(doorPivot);
+
+            let doorOpen = false;
+            let doorTargetRotation = 0;
+
+            // Interior Stairs
+            const hNumSteps = 14;
+            for (let i = 0;
