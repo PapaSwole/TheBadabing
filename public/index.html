@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Badabing - Stable Park & Court</title>
+    <title>The Badabing - Office Building at X:-16, Z:135</title>
     <style>
         body {
             margin: 0;
@@ -95,7 +95,7 @@
 
     <div id="info-panel">
         <h1>The Badabing 🦫</h1>
-        <p>Status: <span id="status">Active (Stable Build)</span></p>
+        <p>Status: <span id="status">Active (Office Added)</span></p>
         <p>Peanut's Pos: <span id="coords">X: 0, Z: 0</span></p>
         <p>Cam Mode: <span id="cam-mode" style="color: #00aaff;">1st-Person God Mode</span></p>
     </div>
@@ -118,7 +118,7 @@
 
     <script>
         try {
-            console.log("🚀 Initializing Stable 3D World...");
+            console.log("🚀 Initializing Stable 3D World with Office Building...");
 
             const scene = new THREE.Scene();
             scene.background = new THREE.Color(0x87a8d0);
@@ -252,6 +252,67 @@
                 [-120, -50], [-120, 50], [120, -50], [120, 50]
             ];
             treeCoords.forEach(coord => createTree(coord[0], coord[1]));
+
+            // ==========================================
+            // 3-STORY ACCESSIBLE OFFICE BUILDING AT X:-16, Z:135
+            // ==========================================
+            const officeBuilding = new THREE.Group();
+            officeBuilding.position.set(-16, 0, 135);
+
+            const concreteMat = new THREE.MeshStandardMaterial({ color: 0x78828a, roughness: 0.7 });
+            const glassWallMat = new THREE.MeshStandardMaterial({ color: 0x1c3545, metalness: 0.85, roughness: 0.1, transparent: true, opacity: 0.85 });
+            const floorMat = new THREE.MeshStandardMaterial({ color: 0x555b61, roughness: 0.6 });
+            const stairMat = new THREE.MeshStandardMaterial({ color: 0x3d4247, roughness: 0.5 });
+            const trimMat = new THREE.MeshStandardMaterial({ color: 0x222528, metalness: 0.5 });
+
+            const oWidth = 22;
+            const oDepth = 18;
+            const oFloorHeight = 4.0;
+
+            for (let f = 0; f < 3; f++) {
+                const floorY = f * oFloorHeight;
+                const floorSlab = new THREE.Mesh(new THREE.BoxGeometry(oWidth, 0.3, oDepth), floorMat);
+                floorSlab.position.set(0, floorY + 0.15, 0);
+                floorSlab.receiveShadow = true;
+                officeBuilding.add(floorSlab);
+
+                const frontWall = new THREE.Mesh(new THREE.BoxGeometry(oWidth, oFloorHeight - 0.3, 0.4), glassWallMat);
+                frontWall.position.set(0, floorY + oFloorHeight / 2, oDepth / 2);
+                officeBuilding.add(frontWall);
+
+                const backWall = new THREE.Mesh(new THREE.BoxGeometry(oWidth, oFloorHeight - 0.3, 0.4), concreteMat);
+                backWall.position.set(0, floorY + oFloorHeight / 2, -oDepth / 2);
+                officeBuilding.add(backWall);
+
+                const leftWall = new THREE.Mesh(new THREE.BoxGeometry(0.4, oFloorHeight - 0.3, oDepth), glassWallMat);
+                leftWall.position.set(-oWidth / 2, floorY + oFloorHeight / 2, 0);
+                officeBuilding.add(leftWall);
+
+                const rightWall = new THREE.Mesh(new THREE.BoxGeometry(0.4, oFloorHeight - 0.3, oDepth), concreteMat);
+                rightWall.position.set(oWidth / 2, floorY + oFloorHeight / 2, 0);
+                officeBuilding.add(rightWall);
+            }
+
+            const roofSlab = new THREE.Mesh(new THREE.BoxGeometry(oWidth + 0.8, 0.4, oDepth + 0.8), trimMat);
+            roofSlab.position.set(0, 3 * oFloorHeight + 0.2, 0);
+            officeBuilding.add(roofSlab);
+
+            // Interior Stairs connecting each floor
+            for (let s = 0; s < 2; s++) {
+                const stairStartY = s * oFloorHeight;
+                const stairGroup = new THREE.Group();
+                stairGroup.position.set(oWidth / 4, stairStartY, 0);
+                const numSteps = 12;
+                for (let i = 0; i < numSteps; i++) {
+                    const step = new THREE.Mesh(new THREE.BoxGeometry(2.5, oFloorHeight / numSteps, 0.8), stairMat);
+                    step.position.set(0, (i + 0.5) * (oFloorHeight / numSteps), (i - numSteps / 2) * 0.8);
+                    step.castShadow = true;
+                    stairGroup.add(step);
+                }
+                officeBuilding.add(stairGroup);
+            }
+
+            scene.add(officeBuilding);
 
             // Peanut the Bird with Animated Eyes
             const peanutGroup = new THREE.Group();
