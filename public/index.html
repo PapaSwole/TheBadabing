@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Badabing - House at X:-201, Z:-114</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Badabing - Mobile & Desktop Controls</title>
     <style>
         body {
             margin: 0;
@@ -13,6 +13,7 @@
             font-family: sans-serif;
             color: #fff;
             user-select: none;
+            -webkit-user-select: none;
         }
         #info-panel {
             position: absolute;
@@ -85,6 +86,67 @@
             line-height: 1.5;
         }
         #controls-hint span { color: #00aaff; font-weight: bold; }
+
+        /* Virtual Mobile On-Screen Controls */
+        #mobile-controls {
+            display: none; /* Shown automatically on touch devices */
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 20;
+        }
+        #virtual-joystick {
+            position: absolute;
+            bottom: 40px;
+            left: 40px;
+            width: 130px;
+            height: 130px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            pointer-events: auto;
+            touch-action: none;
+        }
+        #joystick-thumb {
+            position: absolute;
+            top: 40px;
+            left: 40px;
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 170, 255, 0.7);
+            border: 2px solid #fff;
+            border-radius: 50%;
+            pointer-events: none;
+            transition: transform 0.05s linear;
+        }
+        #mobile-action-btns {
+            position: absolute;
+            bottom: 40px;
+            right: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            pointer-events: auto;
+        }
+        .mob-btn {
+            width: 65px;
+            height: 65px;
+            background: rgba(0, 170, 255, 0.6);
+            border: 2px solid #fff;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            touch-action: manipulation;
+        }
+        .mob-btn:active { background: rgba(0, 170, 255, 0.9); }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
@@ -95,9 +157,9 @@
 
     <div id="info-panel">
         <h1>The Badabing 🦫</h1>
-        <p>Status: <span id="status">Active (House Added)</span></p>
+        <p>Status: <span id="status">Active (Mobile Ready)</span></p>
         <p>Peanut's Pos: <span id="coords">X: 0, Z: 0</span></p>
-        <p>Cam Mode: <span id="cam-mode" style="color: #00aaff;">1st-Person God Mode</span></p>
+        <p>Cam Mode: <span id="cam-mode" style="color: #00aaff;">1st-Person Walkthrough</span></p>
     </div>
 
     <div id="god-mode-panel">
@@ -111,14 +173,25 @@
         <button class="station-btn" data-type="none" style="background: #333;">✋ Hands Empty (Look)</button>
     </div>
 
+    <!-- Virtual Touch Controls for Mobile / Tablets -->
+    <div id="mobile-controls">
+        <div id="virtual-joystick">
+            <div id="joystick-thumb"></div>
+        </div>
+        <div id="mobile-action-btns">
+            <div class="mob-btn" id="btn-up">⬆️</div>
+            <div class="mob-btn" id="btn-down">⬇️</div>
+        </div>
+    </div>
+
     <div id="controls-hint">
-        Click Screen: <span>Lock Mouse Look</span> | Walk: <span>WASD</span><br>
-        Fly Up/Down: <span>Space / Shift</span> | Release Mouse: <span>ESC</span>
+        Click Screen: <span>Lock Look</span> | Walk: <span>WASD</span><br>
+        Mobile: <span>Use Virtual D-Pad / Touch Drag to Look</span>
     </div>
 
     <script>
         try {
-            console.log("🚀 Initializing World with House at X:-201, Z:-114...");
+            console.log("🚀 Initializing Mobile-Ready 3D World...");
 
             const scene = new THREE.Scene();
             scene.background = new THREE.Color(0x87a8d0);
@@ -220,358 +293,4 @@
 
                 const rim = new THREE.Mesh(new THREE.TorusGeometry(0.8, 0.08, 8, 24), rimMat);
                 rim.rotation.x = Math.PI / 2;
-                rim.position.set(hx > 0 ? hx - 1.5 : hx + 1.5, 4, 0);
-                courtGroup.add(rim);
-            });
-            scene.add(courtGroup);
-
-            // APESHIT INC Office Building at X:-16, Z:135
-            const officeBuilding = new THREE.Group();
-            officeBuilding.position.set(-16, 0, 135);
-
-            const concreteMat = new THREE.MeshStandardMaterial({ color: 0x78828a, roughness: 0.7 });
-            const glassWallMat = new THREE.MeshStandardMaterial({ color: 0x1c3545, metalness: 0.85, roughness: 0.1, transparent: true, opacity: 0.85 });
-            const floorMat = new THREE.MeshStandardMaterial({ color: 0x555b61, roughness: 0.6 });
-            const stairMat = new THREE.MeshStandardMaterial({ color: 0x3d4247, roughness: 0.5 });
-            const trimMat = new THREE.MeshStandardMaterial({ color: 0x222528, metalness: 0.5 });
-            const signMat = new THREE.MeshStandardMaterial({ color: 0xff5555, emissive: 0xff2222, emissiveIntensity: 0.6 });
-
-            const oWidth = 22;
-            const oDepth = 18;
-            const oFloorHeight = 4.0;
-
-            for (let f = 0; f < 3; f++) {
-                const floorY = f * oFloorHeight;
-                const floorSlab = new THREE.Mesh(new THREE.BoxGeometry(oWidth, 0.3, oDepth), floorMat);
-                floorSlab.position.set(0, floorY + 0.15, 0);
-                floorSlab.receiveShadow = true;
-                officeBuilding.add(floorSlab);
-
-                const frontWall = new THREE.Mesh(new THREE.BoxGeometry(oWidth, oFloorHeight - 0.3, 0.4), glassWallMat);
-                frontWall.position.set(0, floorY + oFloorHeight / 2, oDepth / 2);
-                officeBuilding.add(frontWall);
-
-                const backWall = new THREE.Mesh(new THREE.BoxGeometry(oWidth, oFloorHeight - 0.3, 0.4), concreteMat);
-                backWall.position.set(0, floorY + oFloorHeight / 2, -oDepth / 2);
-                officeBuilding.add(backWall);
-
-                const leftWall = new THREE.Mesh(new THREE.BoxGeometry(0.4, oFloorHeight - 0.3, oDepth), glassWallMat);
-                leftWall.position.set(-oWidth / 2, floorY + oFloorHeight / 2, 0);
-                officeBuilding.add(leftWall);
-
-                const rightWall = new THREE.Mesh(new THREE.BoxGeometry(0.4, oFloorHeight - 0.3, oDepth), concreteMat);
-                rightWall.position.set(oWidth / 2, floorY + oFloorHeight / 2, 0);
-                officeBuilding.add(rightWall);
-            }
-
-            const roofSlab = new THREE.Mesh(new THREE.BoxGeometry(oWidth + 0.8, 0.4, oDepth + 0.8), trimMat);
-            roofSlab.position.set(0, 3 * oFloorHeight + 0.2, 0);
-            officeBuilding.add(roofSlab);
-
-            const signBoard = new THREE.Mesh(new THREE.BoxGeometry(16, 2.2, 0.6), signMat);
-            signBoard.position.set(0, 3 * oFloorHeight + 1.5, 0);
-            signBoard.castShadow = true;
-            officeBuilding.add(signBoard);
-
-            for (let s = 0; s < 2; s++) {
-                const stairStartY = s * oFloorHeight;
-                const stairGroup = new THREE.Group();
-                stairGroup.position.set(oWidth / 4, stairStartY, 0);
-                const numSteps = 12;
-                for (let i = 0; i < numSteps; i++) {
-                    const step = new THREE.Mesh(new THREE.BoxGeometry(2.5, oFloorHeight / numSteps, 0.8), stairMat);
-                    step.position.set(0, (i + 0.5) * (oFloorHeight / numSteps), (i - numSteps / 2) * 0.8);
-                    step.castShadow = true;
-                    stairGroup.add(step);
-                }
-                officeBuilding.add(stairGroup);
-            }
-            scene.add(officeBuilding);
-
-            // ==========================================
-            // TWO-STORY HOUSE AT X:-201, Z:-114
-            // ==========================================
-            const houseGroup = new THREE.Group();
-            houseGroup.position.set(-201, 0, -114);
-
-            const sidingMat = new THREE.MeshStandardMaterial({ color: 0x687685, roughness: 0.75 });
-            const houseRoofMat = new THREE.MeshStandardMaterial({ color: 0x26292e, roughness: 0.8 });
-            const woodFloorMat = new THREE.MeshStandardMaterial({ color: 0x7c5230, roughness: 0.55 });
-            const houseStairMat = new THREE.MeshStandardMaterial({ color: 0x4a3219, roughness: 0.6 });
-            const bedMat = new THREE.MeshStandardMaterial({ color: 0x256cb3, roughness: 0.5 });
-            const pillowMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9 });
-            const mailboxMat = new THREE.MeshStandardMaterial({ color: 0xb82e2e, metalness: 0.5 });
-
-            const hWidth = 16;
-            const hDepth = 12;
-            const hFloorHeight = 4.0;
-
-            const floor1 = new THREE.Mesh(new THREE.BoxGeometry(hWidth, 0.2, hDepth), woodFloorMat);
-            floor1.position.set(0, 0.1, 0);
-            houseGroup.add(floor1);
-
-            const floor2 = new THREE.Mesh(new THREE.BoxGeometry(hWidth, 0.2, hDepth), woodFloorMat);
-            floor2.position.set(0, hFloorHeight + 0.1, 0);
-            houseGroup.add(floor2);
-
-            const houseRoof = new THREE.Mesh(new THREE.ConeGeometry(11, 4, 4), houseRoofMat);
-            houseRoof.position.set(0, hFloorHeight * 2 + 2, 0);
-            houseRoof.rotation.y = Math.PI / 4;
-            houseGroup.add(houseRoof);
-
-            for (let f = 0; f < 2; f++) {
-                const fy = f * hFloorHeight;
-                const backWall = new THREE.Mesh(new THREE.BoxGeometry(hWidth, hFloorHeight, 0.4), sidingMat);
-                backWall.position.set(0, fy + hFloorHeight / 2, -hDepth / 2);
-                houseGroup.add(backWall);
-
-                const leftWall = new THREE.Mesh(new THREE.BoxGeometry(0.4, hFloorHeight, hDepth), sidingMat);
-                leftWall.position.set(-hWidth / 2, fy + hFloorHeight / 2, 0);
-                houseGroup.add(leftWall);
-
-                const rightWall = new THREE.Mesh(new THREE.BoxGeometry(0.4, hFloorHeight, hDepth), sidingMat);
-                rightWall.position.set(hWidth / 2, fy + hFloorHeight / 2, 0);
-                houseGroup.add(rightWall);
-            }
-
-            const frontWall1 = new THREE.Mesh(new THREE.BoxGeometry(6, hFloorHeight, 0.4), sidingMat);
-            frontWall1.position.set(-5, hFloorHeight / 2, hDepth / 2);
-            houseGroup.add(frontWall1);
-            const frontWall2 = new THREE.Mesh(new THREE.BoxGeometry(6, hFloorHeight, 0.4), sidingMat);
-            frontWall2.position.set(5, hFloorHeight / 2, hDepth / 2);
-            houseGroup.add(frontWall2);
-
-            const frontWall2nd = new THREE.Mesh(new THREE.BoxGeometry(hWidth, hFloorHeight, 0.4), sidingMat);
-            frontWall2nd.position.set(0, hFloorHeight + hFloorHeight / 2, hDepth / 2);
-            houseGroup.add(frontWall2nd);
-
-            // Interior Stairs
-            const hNumSteps = 12;
-            for (let i = 0; i < hNumSteps; i++) {
-                const step = new THREE.Mesh(new THREE.BoxGeometry(2.5, hFloorHeight / hNumSteps, 0.8), houseStairMat);
-                step.position.set(-4, (i + 0.5) * (hFloorHeight / hNumSteps), (i - hNumSteps / 2) * 0.8);
-                houseGroup.add(step);
-            }
-
-            // Upstairs Bedroom & Bed
-            const bedBase = new THREE.Mesh(new THREE.BoxGeometry(3, 0.8, 5), bedMat);
-            bedBase.position.set(4, hFloorHeight + 0.4, -3);
-            houseGroup.add(bedBase);
-
-            const pillow = new THREE.Mesh(new THREE.BoxGeometry(2, 0.3, 1), pillowMat);
-            pillow.position.set(4, hFloorHeight + 0.9, -5);
-            houseGroup.add(pillow);
-
-            // Mailbox
-            const post = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 2.5), poleMat);
-            post.position.set(6, 1.25, hDepth / 2 + 4);
-            houseGroup.add(post);
-
-            const box = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 1.2), mailboxMat);
-            box.position.set(6, 2.4, hDepth / 2 + 4);
-            houseGroup.add(box);
-
-            scene.add(houseGroup);
-
-            // Trees
-            const trunkMat = new THREE.MeshStandardMaterial({ color: 0x5c3a1e, roughness: 0.9 });
-            const leavesMat = new THREE.MeshStandardMaterial({ color: 0x2e6f40, roughness: 0.8 });
-
-            function createTree(x, z) {
-                const tree = new THREE.Group();
-                const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.8, 4), trunkMat);
-                trunk.position.y = 2;
-                trunk.castShadow = true;
-                tree.add(trunk);
-
-                const leaves = new THREE.Mesh(new THREE.ConeGeometry(3.5, 6, 6), leavesMat);
-                leaves.position.y = 6;
-                leaves.castShadow = true;
-                tree.add(leaves);
-
-                tree.position.set(x, 0, z);
-                scene.add(tree);
-            }
-
-            const treeCoords = [
-                [-50, -50], [-70, -30], [-30, -70],
-                [70, 30], [30, 70],
-                [-50, 50], [-70, 30], [50, -50], [70, -30],
-                [-120, -50], [-120, 50], [120, -50], [120, 50]
-            ];
-            treeCoords.forEach(coord => createTree(coord[0], coord[1]));
-
-            // Peanut the Bird with Animated Eyes
-            const peanutGroup = new THREE.Group();
-            scene.add(peanutGroup);
-
-            const featherMat = new THREE.MeshStandardMaterial({ color: 0xff8c00 });
-            const beakMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b });
-
-            const birdBody = new THREE.Mesh(new THREE.SphereGeometry(0.6, 16, 16), featherMat);
-            birdBody.scale.set(1, 0.8, 1.3);
-            birdBody.position.y = 0.6;
-            birdBody.castShadow = true;
-            peanutGroup.add(birdBody);
-
-            const birdHead = new THREE.Mesh(new THREE.SphereGeometry(0.4, 16, 16), featherMat);
-            birdHead.position.set(0, 1.1, 0.3);
-            peanutGroup.add(birdHead);
-
-            const birdBeak = new THREE.Mesh(new THREE.ConeGeometry(0.15, 0.4, 8), beakMat);
-            birdBeak.rotateX(Math.PI / 2);
-            birdBeak.position.set(0, 1.05, 0.7);
-            peanutGroup.add(birdBeak);
-
-            const eyeGroup = new THREE.Group();
-            peanutGroup.add(eyeGroup);
-
-            const eyeballMat = new THREE.MeshBasicMaterial({ color: 0x050505 });
-            const pupilMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-
-            [-0.16, 0.16].forEach(ex => {
-                const eye = new THREE.Group();
-                eye.position.set(ex, 1.18, 0.58);
-                eye.add(new THREE.Mesh(new THREE.SphereGeometry(0.09, 16, 16), eyeballMat));
-                const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 8), pupilMat);
-                pupil.position.set(ex > 0 ? -0.02 : 0.02, 0.02, 0.06);
-                eye.add(pupil);
-                eyeGroup.add(eye);
-            });
-
-            // God Mode Props Group
-            const propsGroup = new THREE.Group();
-            scene.add(propsGroup);
-
-            // Controls & Mouse Look
-            const controls = new THREE.PointerLockControls(camera, document.body);
-
-            document.body.addEventListener('click', (e) => {
-                if (e.clientX > window.innerWidth - 260 && e.clientY < 260) return;
-                if (!controls.isLocked) {
-                    controls.lock();
-                } else if (selectedTool) {
-                    const raycaster = new THREE.Raycaster();
-                    raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
-
-                    if (selectedTool === 'delete') {
-                        const hits = raycaster.intersectObjects(propsGroup.children, true);
-                        if (hits.length > 0) {
-                            propsGroup.remove(hits[0].object);
-                        }
-                    } else {
-                        const hits = raycaster.intersectObject(ground);
-                        if (hits.length > 0) {
-                            const pt = hits[0].point;
-                            let propGeo, propMat;
-                            if (selectedTool === 'workbench') {
-                                propGeo = new THREE.BoxGeometry(1.5, 1, 0.8);
-                                propMat = new THREE.MeshStandardMaterial({ color: 0x7c471b });
-                            } else if (selectedTool === 'crate') {
-                                propGeo = new THREE.BoxGeometry(0.9, 0.9, 0.9);
-                                propMat = new THREE.MeshStandardMaterial({ color: 0xbd7d4b });
-                            } else {
-                                propGeo = new THREE.BoxGeometry(1.2, 0.4, 2);
-                                propMat = new THREE.MeshStandardMaterial({ color: 0x1b4d3e });
-                            }
-                            const prop = new THREE.Mesh(propGeo, propMat);
-                            prop.position.set(Math.round(pt.x), 0.5, Math.round(pt.z));
-                            prop.castShadow = true;
-                            propsGroup.add(prop);
-                        }
-                    }
-                }
-            });
-
-            let selectedTool = null;
-            document.querySelectorAll('.station-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    document.querySelectorAll('.station-btn').forEach(b => b.classList.remove('active'));
-                    const type = e.currentTarget.getAttribute('data-type');
-                    selectedTool = (type === 'none') ? null : type;
-                    if (selectedTool) e.currentTarget.classList.add('active');
-                });
-            });
-
-            const keys = { w: false, a: false, s: false, d: false, space: false, shift: false };
-            window.addEventListener('keydown', (e) => {
-                const k = e.key.toLowerCase();
-                if (k === 'w' || e.key === 'ArrowUp') keys.w = true;
-                if (k === 's' || e.key === 'ArrowDown') keys.s = true;
-                if (k === 'a' || e.key === 'ArrowLeft') keys.a = true;
-                if (k === 'd' || e.key === 'ArrowRight') keys.d = true;
-                if (e.code === 'Space') keys.space = true;
-                if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') keys.shift = true;
-            });
-            window.addEventListener('keyup', (e) => {
-                const k = e.key.toLowerCase();
-                if (k === 'w' || e.key === 'ArrowUp') keys.w = false;
-                if (k === 's' || e.key === 'ArrowDown') keys.s = false;
-                if (k === 'a' || e.key === 'ArrowLeft') keys.a = false;
-                if (k === 'd' || e.key === 'ArrowRight') keys.d = false;
-                if (e.code === 'Space') keys.space = false;
-                if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') keys.shift = false;
-            });
-
-            const raycaster = new THREE.Raycaster();
-            const mouseCoordVector = new THREE.Vector2(0, 0);
-            const targetXEl = document.getElementById('target-x');
-            const targetZEl = document.getElementById('target-z');
-
-            const clock = new THREE.Clock();
-
-            function animate() {
-                requestAnimationFrame(animate);
-                const delta = clock.getDelta();
-                const elapsed = clock.getElapsedTime();
-
-                // Track Target Coordinates under crosshair
-                raycaster.setFromCamera(mouseCoordVector, camera);
-                const intersects = raycaster.intersectObject(ground);
-                if (intersects.length > 0) {
-                    targetXEl.innerText = Math.round(intersects[0].point.x);
-                    targetZEl.innerText = Math.round(intersects[0].point.z);
-                }
-
-                // Peanut wandering
-                const nextX = Math.sin((elapsed + 0.05) * 0.4) * 20;
-                const nextZ = Math.cos((elapsed + 0.05) * 0.35) * 20;
-                const currentX = Math.sin(elapsed * 0.4) * 20;
-                const currentZ = Math.cos(elapsed * 0.35) * 20;
-
-                peanutGroup.position.x = currentX;
-                peanutGroup.position.z = currentZ;
-                peanutGroup.position.y = Math.abs(Math.sin(elapsed * 10)) * 0.15;
-                peanutGroup.rotation.y = Math.atan2(nextX - currentX, nextZ - currentZ);
-
-                // Blinking
-                eyeGroup.scale.y = (elapsed % 3.5 < 0.12) ? 0.1 : 1.0;
-                document.getElementById('coords').innerText = `X: ${peanutGroup.position.x.toFixed(1)}, Z: ${peanutGroup.position.z.toFixed(1)}`;
-
-                // Camera Movement
-                const moveSpeed = 18.0 * delta;
-                if (keys.w) controls.moveForward(moveSpeed);
-                if (keys.s) controls.moveForward(-moveSpeed);
-                if (keys.a) controls.moveRight(-moveSpeed);
-                if (keys.d) controls.moveRight(moveSpeed);
-                if (keys.space) camera.position.y += moveSpeed;
-                if (keys.shift) camera.position.y = Math.max(1.8, camera.position.y - moveSpeed);
-
-                renderer.render(scene, camera);
-            }
-            animate();
-
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            });
-
-        } catch (err) {
-            console.error("💥 Critical Setup Error:", err);
-            statusEl.innerText = "Script Error: " + err.message;
-            statusEl.style.color = "#ff5555";
-        }
-    </script>
-</body>
-</html>
+                rim.position.set(
