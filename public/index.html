@@ -3,12 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Badabing - Town & Mansion</title>
+    <title>The Badabing - Apeshit Corp & Peanut's Mansion</title>
     <style>
-        body { margin: 0; padding: 0; overflow: hidden; background-color: #1a1a24; font-family: sans-serif; color: #fff; }
-        #info { position: absolute; top: 20px; left: 20px; background: rgba(0,0,0,0.8); padding: 15px; border-radius: 8px; z-index: 10; }
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #1a1a24;
+            font-family: sans-serif;
+            color: #fff;
+            user-select: none;
+        }
+        #info-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(20, 20, 28, 0.92);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            z-index: 10;
+            width: 310px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
         h1 { margin: 0 0 5px 0; font-size: 18px; color: #ff5555; }
-        #crosshair { position: absolute; top: 50%; left: 50%; width: 10px; height: 10px; transform: translate(-50%, -50%); border: 2px solid #fff; border-radius: 50%; pointer-events: none; }
+        p { margin: 0 0 6px 0; font-size: 12px; color: #ccc; }
+        #status { font-weight: bold; color: #55ff55; }
+
+        #god-mode-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(20, 20, 28, 0.92);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #00aaff;
+            z-index: 10;
+            width: 240px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+        #god-mode-panel h2 { margin: 0 0 10px 0; font-size: 15px; color: #00aaff; }
+        .station-btn {
+            display: block;
+            width: 100%;
+            padding: 9px;
+            margin-bottom: 8px;
+            background: #2a2a38;
+            border: 1px solid #4a4a5e;
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 13px;
+            transition: 0.2s;
+        }
+        .station-btn:hover { background: #00aaff; border-color: #00aaff; }
+        .station-btn.active { background: #0088cc; border-color: #fff; font-weight: bold; }
+        #crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 10px;
+            height: 10px;
+            transform: translate(-50%, -50%);
+            border: 2px solid rgba(255, 255, 255, 0.85);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 5;
+        }
+        #door-prompt {
+            position: absolute;
+            top: 56%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.85);
+            color: #00ffcc;
+            padding: 6px 14px;
+            border-radius: 6px;
+            border: 1px solid #00ffcc;
+            font-size: 13px;
+            font-weight: bold;
+            display: none;
+            pointer-events: none;
+            z-index: 6;
+        }
+        #controls-hint {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(20, 20, 28, 0.9);
+            padding: 12px 18px;
+            border-radius: 6px;
+            border: 1px solid #444;
+            font-size: 12px;
+            color: #ddd;
+            z-index: 10;
+            line-height: 1.5;
+        }
+        #controls-hint span { color: #00aaff; font-weight: bold; }
     </style>
     <script type="importmap">
       {
@@ -19,130 +111,92 @@
     </script>
 </head>
 <body>
+
     <div id="crosshair"></div>
-    <div id="info">
+    <div id="door-prompt">Press [E] or Left-Click to Open/Close Door</div>
+
+    <div id="info-panel">
         <h1>The Badabing 🦫</h1>
-        <p>Click screen to look around | WASD to walk</p>
+        <p>Status: <span id="status">Starting Engine...</span></p>
+        <p>Peanut's Pos: <span id="coords">X: 0.0, Z: -15.0</span></p>
+        <p>Your Floor: <span id="floor-level" style="color: #00ffcc;">Ground Level (1st Floor)</span></p>
+        <p>Door Log: <span id="peanut-door-log" style="color: #ffcc00;">All Doors Ready</span></p>
     </div>
+
+    <div id="god-mode-panel">
+        <h2>Admin Builder Tools</h2>
+        <p>Press <b>ESC</b> to unlock mouse & select:</p>
+        <button class="station-btn" data-type="workbench">🛠️ Industrial Workbench</button>
+        <button class="station-btn" data-type="crate">📦 Storage Crate Stack</button>
+        <button class="station-btn" data-type="bed">🛌 Recovery Pod</button>
+        <button class="station-btn" data-type="delete" style="background: #5a2e2e;">🗑️ Delete Mode</button>
+        <button class="station-btn active" data-type="none" style="background: #333;">✋ Hands Empty (Interact / Walk)</button>
+    </div>
+
+    <div id="controls-hint">
+        Click Scene: <span>Lock Mouse Look</span> | Walk Up Stairs: <span>WASD</span><br>
+        Open/Close Doors: <span>Press 'E' or Click Door</span> | Fly Up/Down: <span>Space / Shift</span><br>
+        Unlock Mouse for Menu: <span>ESC</span>
+    </div>
+
     <script type="module">
         import * as THREE from 'three';
 
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x87a8d0);
-        scene.fog = new THREE.FogExp2(0x87a8d0, 0.005);
+        const statusEl = document.getElementById('status');
+        const coordsEl = document.getElementById('coords');
+        const floorEl  = document.getElementById('floor-level');
+        const doorLogEl = document.getElementById('peanut-door-log');
+        const doorPromptEl = document.getElementById('door-prompt');
 
-        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 1.8, 10);
-
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
-
-        scene.add(new THREE.AmbientLight(0xffffff, 0.7));
-        const dirLight = new THREE.DirectionalLight(0xfff6e5, 1.2);
-        dirLight.position.set(50, 80, 50);
-        scene.add(dirLight);
-
-        const ground = new THREE.Mesh(
-            new THREE.PlaneGeometry(300, 300),
-            new THREE.MeshStandardMaterial({ color: 0x2d5a27 })
-        );
-        ground.rotation.x = -Math.PI / 2;
-        scene.add(ground);
-
-        const roadNS = new THREE.Mesh(
-            new THREE.PlaneGeometry(16, 300),
-            new THREE.MeshStandardMaterial({ color: 0x26292e })
-        );
-        roadNS.rotation.x = -Math.PI / 2;
-        roadNS.position.y = 0.01;
-        scene.add(roadNS);
-
-        const mansion = new THREE.Mesh(
-            new THREE.BoxGeometry(20, 8, 16),
-            new THREE.MeshStandardMaterial({ color: 0x5c6f84 })
-        );
-        mansion.position.set(-30, 4, -20);
-        scene.add(mansion);
-
-        const apeCorp = new THREE.Mesh(
-            new THREE.BoxGeometry(24, 9, 18),
-            new THREE.MeshStandardMaterial({ color: 0x2a2e36 })
-        );
-        apeCorp.position.set(0, 4.5, -40);
-        scene.add(apeCorp);
-
-        const gorilla = new THREE.Mesh(
-            new THREE.BoxGeometry(3, 4, 3),
-            new THREE.MeshStandardMaterial({ color: 0x1b1c1e })
-        );
-        gorilla.position.set(0, 2, -28);
-        scene.add(gorilla);
-
-        const peanut = new THREE.Mesh(
-            new THREE.SphereGeometry(0.5, 16, 16),
-            new THREE.MeshStandardMaterial({ color: 0xff8c00 })
-        );
-        peanut.position.set(0, 0.5, -15);
-        scene.add(peanut);
-
-        let isLocked = false;
-        let yaw = 0, pitch = 0;
-
-        renderer.domElement.addEventListener('click', () => {
-            renderer.domElement.requestPointerLock();
-        });
-        document.addEventListener('pointerlockchange', () => {
-            isLocked = (document.pointerLockElement === renderer.domElement);
-        });
-        document.addEventListener('mousemove', (e) => {
-            if (!isLocked) return;
-            yaw -= e.movementX * 0.002;
-            pitch -= e.movementY * 0.002;
-            pitch = Math.max(-1.5, Math.min(1.5, pitch));
-            camera.rotation.order = 'YXZ';
-            camera.rotation.y = yaw;
-            camera.rotation.x = pitch;
+        window.addEventListener('error', (e) => {
+            statusEl.innerText = "Error: " + (e.message || "Script error");
+            statusEl.style.color = "#ff4444";
         });
 
-        const keys = { w: false, a: false, s: false, d: false };
-        window.addEventListener('keydown', e => {
-            if (e.key.toLowerCase() === 'w') keys.w = true;
-            if (e.key.toLowerCase() === 's') keys.s = true;
-            if (e.key.toLowerCase() === 'a') keys.a = true;
-            if (e.key.toLowerCase() === 'd') keys.d = true;
-        });
-        window.addEventListener('keyup', e => {
-            if (e.key.toLowerCase() === 'w') keys.w = false;
-            if (e.key.toLowerCase() === 's') keys.s = false;
-            if (e.key.toLowerCase() === 'a') keys.a = false;
-            if (e.key.toLowerCase() === 'd') keys.d = false;
-        });
+        try {
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x87a8d0);
+            scene.fog = new THREE.FogExp2(0x87a8d0, 0.0038);
 
-        const clock = new THREE.Clock();
-        function animate() {
-            requestAnimationFrame(animate);
-            const delta = Math.min(clock.getDelta(), 0.1);
+            const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 1500);
+            camera.position.set(0, 1.8, 14);
 
-            if (isLocked) {
-                const forward = new THREE.Vector3(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw);
-                const right = new THREE.Vector3(1, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw);
-                const speed = 10;
-                if (keys.w) camera.position.addScaledVector(forward, speed * delta);
-                if (keys.s) camera.position.addScaledVector(forward, -speed * delta);
-                if (keys.a) camera.position.addScaledVector(right, -speed * delta);
-                if (keys.d) camera.position.addScaledVector(right, speed * delta);
+            const renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.1;
+            document.body.appendChild(renderer.domElement);
+
+            const maxAnisotropy = renderer.capabilities.getMaxAnisotropy();
+
+            // =========================================================
+            // FAST PROCEDURAL REALISTIC TEXTURE ENGINE (256x256)
+            // =========================================================
+            function makeSeamlessTexture(drawFn, repeatX = 1, repeatY = 1) {
+                const canvas = document.createElement('canvas');
+                canvas.width = 256;
+                canvas.height = 256;
+                const ctx = canvas.getContext('2d');
+                drawFn(ctx, 256, 256);
+                const tex = new THREE.CanvasTexture(canvas);
+                tex.wrapS = THREE.RepeatWrapping;
+                tex.wrapT = THREE.RepeatWrapping;
+                tex.repeat.set(repeatX, repeatY);
+                tex.anisotropy = maxAnisotropy;
+                tex.colorSpace = THREE.SRGBColorSpace;
+                return tex;
             }
 
-            renderer.render(scene, camera);
-        }
-        animate();
-
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-    </script>
-</body>
-</html>
+            function makeSignTexture(text, bgHex, textHex, subText = "") {
+                const canvas = document.createElement('canvas');
+                canvas.width = 1024;
+                canvas.height = 256;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = bgHex;
+                ctx.fillRect(0, 0, 1024, 256);
+                ctx.strokeStyle = textHex;
+                ctx.lineWidth = 10;
+                ctx.strokeRect
