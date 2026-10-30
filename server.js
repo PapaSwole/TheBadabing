@@ -1,19 +1,32 @@
 import express from 'express';
 import { WebSocketServer } from 'ws';
 import http from 'http';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
 
 app.use(express.json());
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Explicit health check route so Render knows the server is alive immediately
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
 
 const worldState = {
   bird: {
     name: "Peanut",
-    x: 0, y: 0, z: 0,
-    targetX: 0, targetZ: -15,
+    x: 0,
+    y: 0,
+    z: 0,
+    targetX: 0,
+    targetZ: -18,
     state: "wandering",
     mood: "exploring"
   },
@@ -22,19 +35,18 @@ const worldState = {
 
 let stationsList = [];
 
-// Updated waypoints: Peanut visits his Mansion, Backyard, Street Plaza, and Apeshit Corp!
 const waypoints = [
-  { x: 0, z: -18 },     // In front of Apeshit Corp Gorilla Statue
-  { x: 0, z: -34 },     // Inside Apeshit Corp 1st Floor Lobby
-  { x: 0, z: 0 },       // Center Intersection
-  { x: -22, z: -10 },   // Approaching Peanut's Mansion Front Door
-  { x: -30, z: -18 },   // Inside Peanut's Living Room
-  { x: -26, z: -26 },   // Inside Peanut's Kitchen
-  { x: -42, z: -20 },   // Inside Peanut's Garage
-  { x: -34, z: -38 },   // Out in Peanut's Fenced Backyard
-  { x: 25, z: -10 },    // East Street
-  { x: -25, z: 15 },    // Southwest Street
-  { x: 25, z: 15 }      // Southeast Street
+  { x: 0, z: -18 },
+  { x: 0, z: -34 },
+  { x: 0, z: 0 },
+  { x: -22, z: -10 },
+  { x: -30, z: -18 },
+  { x: -26, z: -26 },
+  { x: -42, z: -20 },
+  { x: -34, z: -38 },
+  { x: 25, z: -10 },
+  { x: -25, z: 15 },
+  { x: 25, z: 15 }
 ];
 
 function setRandomPeanutTarget() {
@@ -69,24 +81,29 @@ setInterval(() => {
 
 wss.on('connection', (ws) => {
   worldState.connectedClients++;
-  ws.send(JSON.stringify({ 
-    type: 'init_world', 
-    state: worldState, 
-    stations: stationsList 
-  }));
+
+  try {
+    ws.send(JSON.stringify({
+      type: 'init_world',
+      state: worldState,
+      stations: stationsList
+    }));
+  } catch (e) {
+    console.error("Send error:", e);
+  }
 
   ws.on('message', (message) => {
     try {
-      const data = JSON.parse(message);
+      const data = JSON.parse(message.toString());
 
-      if (data.type === 'admin:place_station') {
+      if (data.type === 'admin:place_station' && data.station) {
         const { uid, type, gridX, gridZ, rotation, footprintX, footprintZ } = data.station;
         stationsList = stationsList.filter(s => s.uid !== uid);
         stationsList.push({ uid, type, gridX, gridZ, rotation, footprintX, footprintZ });
         broadcast({ type: 'world:stations_updated', stations: stationsList });
       }
 
-      if (data.type === 'admin:delete_station') {
+      if (data.type === 'admin:delete_station' && data.uid) {
         stationsList = stationsList.filter(s => s.uid !== data.uid);
         broadcast({ type: 'world:stations_updated', stations: stationsList });
       }
@@ -96,15 +113,28 @@ wss.on('connection', (ws) => {
   });
 
   ws.on('close', () => {
-    worldState.connectedClients--;
+    worldState.connectedClients = Math.max(0, worldState.connectedClients - 1);
+  });
+
+  ws.on('error', (err) => {
+    console.error("WebSocket client error:", err.message);
   });
 });
 
 function broadcast(data) {
   const payload = JSON.stringify(data);
   wss.clients.forEach((client) => {
-    if (client.readyState === 1) client.send(payload);
+    if (client.readyState === 1) {
+      try {
+        client.send(payload);
+      } catch (e) {
+        // Ignore dropped socket errors
+      }
+    }
   });
 }
 
 const PORT = process.env.PORT || 10000;
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on port ${PORT}`);
+});
