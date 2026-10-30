@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>The Badabing - Town with House & Office</title>
+    <title>The Badabing - Town & House</title>
     <style>
         body {
             margin: 0;
@@ -171,3 +171,47 @@
     <button id="toggle-god-btn">🛠️ God Mode</button>
 
     <div id="god-mode-panel">
+        <h2>God Mode Inspector</h2>
+        <p style="color: #00aaff; font-weight: bold; margin-bottom: 8px;">Target: X: <span id="target-x">0</span>, Z: <span id="target-z">0</span></p>
+        <p>Select item to place / delete:</p>
+        <button class="station-btn" data-type="workbench">🛠️ Industrial Workbench</button>
+        <button class="station-btn" data-type="crate">📦 Storage Crate Stack</button>
+        <button class="station-btn" data-type="bed">🛌 Recovery Pod</button>
+        <button class="station-btn" data-type="delete" style="background: #5a2e2e;">🗑️ Delete Mode</button>
+        <button class="station-btn" data-type="none" style="background: #333;">✋ Hands Empty (Look)</button>
+    </div>
+
+    <!-- Virtual Touch Controls for Mobile / Tablets -->
+    <div id="mobile-controls">
+        <div id="mobile-move-btns">
+            <div class="mob-btn" id="btn-forward">🔼</div>
+            <div class="mob-btn" id="btn-backward">🔽</div>
+        </div>
+        <div id="mobile-action-btns">
+            <div class="mob-btn" id="btn-up">⬆️</div>
+            <div class="mob-btn" id="btn-down">⬇️</div>
+        </div>
+    </div>
+
+    <div id="controls-hint">
+        Click Screen: <span>Lock Look</span> | Walk: <span>WASD</span><br>
+        Mobile: <span>Use Forward/Backward Buttons & Touch Drag to Look</span>
+    </div>
+
+    <script>
+        try {
+            console.log("🚀 Initializing Stable World with House & Office...");
+
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x87a8d0);
+            scene.fog = new THREE.FogExp2(0x87a8d0, 0.0015);
+
+            const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 3000);
+            camera.position.set(0, 3, 20);
+
+            const renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMap.enabled = true;
+            document.body.appendChild(renderer.domElement);
+
+            // Sky Horizon Dome Gradient
