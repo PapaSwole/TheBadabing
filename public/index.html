@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Badabing - Realistic Textured World</title>
+    <title>The Badabing - Peanut with Animated Eyes</title>
     <style>
         body {
             margin: 0;
@@ -483,7 +483,7 @@
             createPeanutHouse(-32, -20);
 
             // ==========================================
-            // PEANUT THE BIRD & STATIONS
+            // PEANUT THE BIRD WITH ANIMATED EYES
             // ==========================================
             const peanutGroup = new THREE.Group();
             scene.add(peanutGroup);
@@ -504,6 +504,30 @@
             birdBeak.rotateX(Math.PI / 2);
             birdBeak.position.set(0, 0.95, 0.65);
             peanutGroup.add(birdBeak);
+
+            // Animated Eyes Setup
+            const eyeGroup = new THREE.Group();
+            eyeGroup.position.set(0, 0.98, 0.48);
+            peanutGroup.add(eyeGroup);
+
+            const eyeballMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.1, metalness: 0.9 });
+            const pupilMat = new THREE.MeshBasicMaterial({ color: 0xffffff }); // Catchlight
+
+            const leftEye = new THREE.Group();
+            leftEye.position.set(-0.12, 0, 0);
+            const lBall = new THREE.Mesh(new THREE.SphereGeometry(0.06, 12, 12), eyeballMat);
+            const lPupil = new THREE.Mesh(new THREE.SphereGeometry(0.02, 8, 8), pupilMat);
+            lPupil.position.set(0.01, 0.02, 0.05);
+            leftEye.add(lBall, lPupil);
+
+            const rightEye = new THREE.Group();
+            rightEye.position.set(0.12, 0, 0);
+            const rBall = new THREE.Mesh(new THREE.SphereGeometry(0.06, 12, 12), eyeballMat);
+            const rPupil = new THREE.Mesh(new THREE.SphereGeometry(0.02, 8, 8), pupilMat);
+            rPupil.position.set(-0.01, 0.02, 0.05);
+            rightEye.add(rBall, rPupil);
+
+            eyeGroup.add(leftEye, rightEye);
 
             const stationsGroup = new THREE.Group();
             scene.add(stationsGroup);
@@ -577,7 +601,6 @@
                     return;
                 }
 
-                // When locked in 1st-person, clicking uses the center crosshair to place/delete!
                 const raycaster = new THREE.Raycaster();
                 raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
 
@@ -610,7 +633,7 @@
                     const type = e.currentTarget.getAttribute('data-type');
                     selectedTool = (type === 'none') ? null : type;
                     if (selectedTool) e.currentTarget.classList.add('active');
-                    controls.lock(); // Lock back into 1st-person view after picking a tool
+                    controls.lock();
                 });
             });
 
@@ -642,7 +665,20 @@
                 const delta = clock.getDelta();
                 const elapsed = clock.getElapsedTime();
 
+                // Peanut bobbing animation
                 peanutGroup.position.y = Math.abs(Math.sin(elapsed * 10)) * 0.15;
+
+                // Animated Blinking (scales eye height down briefly every few seconds)
+                const blinkCycle = elapsed % 4.0;
+                if (blinkCycle < 0.15) {
+                    eyeGroup.scale.y = 0.1;
+                } else {
+                    eyeGroup.scale.y = 1.0;
+                }
+
+                // Subtle looking around for the eyes
+                leftEye.rotation.y = Math.sin(elapsed * 2) * 0.15;
+                rightEye.rotation.y = Math.sin(elapsed * 2) * 0.15;
 
                 if (controls.isLocked) {
                     direction.z = Number(keys.w) - Number(keys.s);
@@ -653,7 +689,6 @@
                     if (keys.w || keys.s) controls.moveForward(direction.z * speed * delta);
                     if (keys.a || keys.d) controls.moveRight(direction.x * speed * delta);
 
-                    // Fly up to inspect 2nd floor or drop back to eye-level (1.8m)
                     if (keys.up) camera.position.y += 8.0 * delta;
                     if (keys.down) camera.position.y = Math.max(1.8, camera.position.y - 8.0 * delta);
                 }
