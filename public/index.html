@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Badabing - Park, Trees & Basketball Court</title>
+    <title>The Badabing - Park & Basketball Court</title>
     <style>
         body {
             margin: 0;
@@ -95,7 +95,7 @@
 
     <div id="info-panel">
         <h1>The Badabing 🦫</h1>
-        <p>Status: <span id="status">Active (Park, Trees & Court)</span></p>
+        <p>Status: <span id="status">Active (Cleared Court)</span></p>
         <p>Peanut's Pos: <span id="coords">X: 0, Z: 0</span></p>
         <p>Cam Mode: <span id="cam-mode" style="color: #00aaff;">1st-Person God Mode</span></p>
     </div>
@@ -117,7 +117,7 @@
 
     <script>
         try {
-            console.log("🚀 Initializing Park, Trees & Basketball Court...");
+            console.log("🚀 Initializing Park with Cleared Court Area...");
 
             const scene = new THREE.Scene();
             scene.background = new THREE.Color(0x87a8d0);
@@ -224,7 +224,7 @@
             });
             scene.add(courtGroup);
 
-            // Trees
+            // Trees (Tree near [50, 50] removed for court clearance)
             const trunkMat = new THREE.MeshStandardMaterial({ color: 0x5c3a1e, roughness: 0.9 });
             const leavesMat = new THREE.MeshStandardMaterial({ color: 0x2e6f40, roughness: 0.8 });
 
@@ -246,7 +246,7 @@
 
             const treeCoords = [
                 [-50, -50], [-70, -30], [-30, -70],
-                [50, 50], [70, 30], [30, 70],
+                [70, 30], [30, 70],
                 [-50, 50], [-70, 30], [50, -50], [70, -30],
                 [-120, -50], [-120, 50], [120, -50], [120, 50]
             ];
