@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Badabing - Realistic Textured World</title>
+    <title>The Badabing - Apeshit Corp & Peanut's Mansion</title>
     <style>
         body {
             margin: 0;
@@ -23,7 +23,7 @@
             border-radius: 8px;
             border: 1px solid #444;
             z-index: 10;
-            width: 290px;
+            width: 300px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
         }
         h1 { margin: 0 0 5px 0; font-size: 18px; color: #ff5555; }
@@ -66,10 +66,26 @@
             width: 10px;
             height: 10px;
             transform: translate(-50%, -50%);
-            border: 2px solid rgba(255, 255, 255, 0.7);
+            border: 2px solid rgba(255, 255, 255, 0.8);
             border-radius: 50%;
             pointer-events: none;
             z-index: 5;
+        }
+        #door-prompt {
+            position: absolute;
+            top: 56%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: #00ffcc;
+            padding: 6px 14px;
+            border-radius: 6px;
+            border: 1px solid #00ffcc;
+            font-size: 13px;
+            font-weight: bold;
+            display: none;
+            pointer-events: none;
+            z-index: 6;
         }
         #controls-hint {
             position: absolute;
@@ -90,12 +106,14 @@
 <body>
 
     <div id="crosshair"></div>
+    <div id="door-prompt">Press [E] or Left-Click to Open/Close Door</div>
 
     <div id="info-panel">
         <h1>The Badabing 🦫</h1>
         <p>Status: <span id="status">Connecting...</span></p>
         <p>Peanut's Pos: <span id="coords">X: 0, Z: 0</span></p>
-        <p>Cam Mode: <span id="cam-mode" style="color: #00aaff;">1st-Person God Mode</span></p>
+        <p>Your Floor: <span id="floor-level" style="color: #00ffcc;">Ground Level</span></p>
+        <p>Door Status: <span id="peanut-door-log" style="color: #ffcc00;">All Doors Ready</span></p>
     </div>
 
     <div id="god-mode-panel">
@@ -105,13 +123,13 @@
         <button class="station-btn" data-type="crate">📦 Storage Crate Stack</button>
         <button class="station-btn" data-type="bed">🛌 Recovery Pod</button>
         <button class="station-btn" data-type="delete" style="background: #5a2e2e;">🗑️ Delete Mode</button>
-        <button class="station-btn" data-type="none" style="background: #333;">✋ Hands Empty (Look Mode)</button>
+        <button class="station-btn active" data-type="none" style="background: #333;">✋ Hands Empty (Interact / Walk)</button>
     </div>
 
     <div id="controls-hint">
-        Click Scene: <span>Lock Mouse Look</span> | Walk: <span>WASD / Arrows</span><br>
-        Up/Down (Fly): <span>Space / Shift</span> | Unlock UI: <span>ESC</span><br>
-        Place / Delete Prop: <span>Left Click Aimed Spot</span>
+        Click Scene: <span>Lock Mouse Look</span> | Walk Up Stairs: <span>WASD</span><br>
+        Open/Close Doors: <span>Press 'E' or Click Door</span> | Fly Up/Down: <span>Space / Shift</span><br>
+        Unlock Mouse for Menu: <span>ESC</span>
     </div>
 
     <script type="importmap">
@@ -129,550 +147,21 @@
 
         const statusEl = document.getElementById('status');
         const coordsEl = document.getElementById('coords');
+        const floorEl  = document.getElementById('floor-level');
+        const doorLogEl = document.getElementById('peanut-door-log');
+        const doorPromptEl = document.getElementById('door-prompt');
 
         try {
             const scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x87a8d0); // Crisp daylight sky
-            scene.fog = new THREE.FogExp2(0x87a8d0, 0.006);
+            scene.background = new THREE.Color(0x87a8d0);
+            scene.fog = new THREE.FogExp2(0x87a8d0, 0.0045);
 
             const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 1500);
-            camera.position.set(0, 2.0, 18);
+            camera.position.set(0, 1.8, 12);
 
             const renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             renderer.shadowMap.enabled = true;
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-            renderer.toneMapping = THREE.ACESFilmicToneMapping;
-            renderer.toneMappingExposure = 1.1;
-            document.body.appendChild(renderer.domElement);
-
-            const maxAnisotropy = renderer.capabilities.getMaxAnisotropy();
-
-            // =========================================================
-            // PROCEDURAL REALISTIC TEXTURE ENGINE (CORS-FREE & CRISP)
-            // =========================================================
-            function makeSeamlessTexture(drawFn, repeatX = 1, repeatY = 1) {
-                const canvas = document.createElement('canvas');
-                canvas.width = 512;
-                canvas.height = 512;
-                const ctx = canvas.getContext('2d');
-                drawFn(ctx, 512, 512);
-                const tex = new THREE.CanvasTexture(canvas);
-                tex.wrapS = THREE.RepeatWrapping;
-                tex.wrapT = THREE.RepeatWrapping;
-                tex.repeat.set(repeatX, repeatY);
-                tex.anisotropy = maxAnisotropy;
-                tex.colorSpace = THREE.SRGBColorSpace;
-                return tex;
-            }
-
-            // 1. Lush Multi-Blade Grass Texture
-            function createGrassTexture(repX, repY) {
-                return makeSeamlessTexture((ctx, w, h) => {
-                    ctx.fillStyle = '#2d5a27';
-                    ctx.fillRect(0, 0, w, h);
-                    const colors = ['#244d1e', '#35682d', '#3e7835', '#1f421a', '#4a853b'];
-                    for (let i = 0; i < 35000; i++) {
-                        ctx.fillStyle = colors[i % colors.length];
-                        const x = Math.random() * w;
-                        const y = Math.random() * h;
-                        ctx.fillRect(x, y, 2, 5);
-                    }
-                }, repX, repY);
-            }
-
-            // 2. Weathered Asphalt Texture
-            function createAsphaltTexture(repX, repY) {
-                return makeSeamlessTexture((ctx, w, h) => {
-                    ctx.fillStyle = '#26292e';
-                    ctx.fillRect(0, 0, w, h);
-                    for (let i = 0; i < 45000; i++) {
-                        const v = 25 + Math.floor(Math.random() * 38);
-                        ctx.fillStyle = `rgb(${v},${v},${v + 3})`;
-                        ctx.fillRect(Math.random() * w, Math.random() * h, 2, 2);
-                    }
-                }, repX, repY);
-            }
-
-            // 3. Pitted Sidewalk Concrete Texture
-            function createConcreteTexture(repX, repY) {
-                return makeSeamlessTexture((ctx, w, h) => {
-                    ctx.fillStyle = '#8c9298';
-                    ctx.fillRect(0, 0, w, h);
-                    for (let i = 0; i < 25000; i++) {
-                        const v = 120 + Math.floor(Math.random() * 45);
-                        ctx.fillStyle = `rgb(${v},${v},${v})`;
-                        ctx.fillRect(Math.random() * w, Math.random() * h, 2, 2);
-                    }
-                    ctx.strokeStyle = '#686d73';
-                    ctx.lineWidth = 4;
-                    ctx.strokeRect(2, 2, w - 4, h - 4);
-                }, repX, repY);
-            }
-
-            // 4. Running-Bond Masonry Brick Texture
-            function createBrickTexture(baseR, baseG, baseB, repX, repY) {
-                return makeSeamlessTexture((ctx, w, h) => {
-                    // Mortar background
-                    ctx.fillStyle = '#b5b0a8';
-                    ctx.fillRect(0, 0, w, h);
-                    const rows = 16;
-                    const cols = 8;
-                    const brickH = h / rows;
-                    const brickW = w / cols;
-                    const mortar = 4;
-
-                    for (let r = 0; r < rows; r++) {
-                        const offset = (r % 2 === 1) ? brickW / 2 : 0;
-                        for (let c = -1; c <= cols; c++) {
-                            const shift = (Math.random() * 26) - 13;
-                            const br = Math.min(255, Math.max(0, baseR + shift));
-                            const bg = Math.min(255, Math.max(0, baseG + shift));
-                            const bb = Math.min(255, Math.max(0, baseB + shift));
-                            ctx.fillStyle = `rgb(${br},${bg},${bb})`;
-                            const bx = c * brickW + offset + mortar / 2;
-                            const by = r * brickH + mortar / 2;
-                            ctx.fillRect(bx, by, brickW - mortar, brickH - mortar);
-
-                            // Subtle brick surface grain
-                            ctx.fillStyle = 'rgba(0,0,0,0.12)';
-                            for (let s = 0; s < 18; s++) {
-                                ctx.fillRect(
-                                    bx + Math.random() * (brickW - mortar),
-                                    by + Math.random() * (brickH - mortar),
-                                    3, 3
-                                );
-                            }
-                        }
-                    }
-                }, repX, repY);
-            }
-
-            // 5. Realistic Clapboard House Siding Texture
-            function createSidingTexture(repX, repY) {
-                return makeSeamlessTexture((ctx, w, h) => {
-                    const planks = 16;
-                    const pH = h / planks;
-                    for (let i = 0; i < planks; i++) {
-                        ctx.fillStyle = i % 2 === 0 ? '#687685' : '#62707e';
-                        ctx.fillRect(0, i * pH, w, pH);
-                        ctx.fillStyle = '#45505b';
-                        ctx.fillRect(0, (i + 1) * pH - 3, w, 3);
-                    }
-                }, repX, repY);
-            }
-
-            // 6. Hardwood Plank Flooring Texture
-            function createWoodTexture(repX, repY) {
-                return makeSeamlessTexture((ctx, w, h) => {
-                    ctx.fillStyle = '#7c5230';
-                    ctx.fillRect(0, 0, w, h);
-                    const planks = 8;
-                    const pW = w / planks;
-                    for (let i = 0; i < planks; i++) {
-                        const shade = (Math.random() * 16) - 8;
-                        ctx.fillStyle = `rgb(${124 + shade}, ${82 + shade}, ${48 + shade})`;
-                        ctx.fillRect(i * pW, 0, pW - 2, h);
-                        ctx.fillStyle = '#3d2614';
-                        ctx.fillRect((i + 1) * pW - 2, 0, 2, h);
-                        // Wood grain lines
-                        ctx.fillStyle = 'rgba(40, 20, 5, 0.14)';
-                        for (let g = 0; g < 60; g++) {
-                            ctx.fillRect(i * pW + Math.random() * (pW - 4), Math.random() * h, 2, 28);
-                        }
-                    }
-                }, repX, repY);
-            }
-
-            // Instantiate Shared Materials
-            const grassGroundMat = new THREE.MeshStandardMaterial({ map: createGrassTexture(45, 45), roughness: 0.95 });
-            const yardGrassMat   = new THREE.MeshStandardMaterial({ map: createGrassTexture(6, 6), roughness: 0.9 });
-            const asphaltMat     = new THREE.MeshStandardMaterial({ map: createAsphaltTexture(4, 50), roughness: 0.85 });
-            const asphaltEWMat   = new THREE.MeshStandardMaterial({ map: createAsphaltTexture(50, 4), roughness: 0.85 });
-            const sidewalkMat    = new THREE.MeshStandardMaterial({ map: createConcreteTexture(2, 60), roughness: 0.8 });
-            const redBrickMat    = new THREE.MeshStandardMaterial({ map: createBrickTexture(145, 62, 48, 4, 2.5), roughness: 0.85 });
-            const brownBrickMat  = new THREE.MeshStandardMaterial({ map: createBrickTexture(95, 78, 68, 4, 2.5), roughness: 0.85 });
-            const creamBrickMat  = new THREE.MeshStandardMaterial({ map: createBrickTexture(165, 150, 130, 4, 2.5), roughness: 0.85 });
-            const sidingMat      = new THREE.MeshStandardMaterial({ map: createSidingTexture(3, 2), roughness: 0.75 });
-            const woodFloorMat   = new THREE.MeshStandardMaterial({ map: createWoodTexture(4, 4), roughness: 0.55 });
-            const fenceWoodMat   = new THREE.MeshStandardMaterial({ map: createWoodTexture(6, 1), roughness: 0.85 });
-
-            // Lighting
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
-            scene.add(ambientLight);
-
-            const sunLight = new THREE.DirectionalLight(0xfff6e5, 1.4);
-            sunLight.position.set(55, 85, 45);
-            sunLight.castShadow = true;
-            sunLight.shadow.mapSize.width = 2048;
-            sunLight.shadow.mapSize.height = 2048;
-            const d = 80;
-            sunLight.shadow.camera.left = -d;
-            sunLight.shadow.camera.right = d;
-            sunLight.shadow.camera.top = d;
-            sunLight.shadow.camera.bottom = -d;
-            scene.add(sunLight);
-
-            // Lush Grass World Ground
-            const groundGeo = new THREE.PlaneGeometry(350, 350);
-            const ground = new THREE.Mesh(groundGeo, grassGroundMat);
-            ground.rotation.x = -Math.PI / 2;
-            ground.receiveShadow = true;
-            scene.add(ground);
-
-            // ==========================================
-            // TOWN ROADS, SIDEWALKS & BUILDINGS
-            // ==========================================
-            const townGroup = new THREE.Group();
-            scene.add(townGroup);
-
-            const roadLineMat = new THREE.MeshBasicMaterial({ color: 0xf5b700 });
-            const crosswalkMat = new THREE.MeshBasicMaterial({ color: 0xeeeeee });
-            const metalTrimMat = new THREE.MeshStandardMaterial({ color: 0x333840, metalness: 0.6, roughness: 0.4 });
-            const windowGlassMat = new THREE.MeshStandardMaterial({ color: 0x1c3545, metalness: 0.85, roughness: 0.1 });
-            const awningRed = new THREE.MeshStandardMaterial({ color: 0xb82e2e, roughness: 0.6 });
-            const awningBlue = new THREE.MeshStandardMaterial({ color: 0x256cb3, roughness: 0.6 });
-            const awningGreen = new THREE.MeshStandardMaterial({ color: 0x2e8540, roughness: 0.6 });
-
-            // Textured Asphalt Roads
-            const roadNS = new THREE.Mesh(new THREE.PlaneGeometry(16, 260), asphaltMat);
-            roadNS.rotation.x = -Math.PI / 2;
-            roadNS.position.set(0, 0.02, 0);
-            roadNS.receiveShadow = true;
-            townGroup.add(roadNS);
-
-            const roadEW = new THREE.Mesh(new THREE.PlaneGeometry(260, 16), asphaltEWMat);
-            roadEW.rotation.x = -Math.PI / 2;
-            roadEW.position.set(0, 0.025, 0);
-            roadEW.receiveShadow = true;
-            townGroup.add(roadEW);
-
-            // Raised Concrete Sidewalks along the streets
-            [-9.75, 9.75].forEach(offset => {
-                const swNS = new THREE.Mesh(new THREE.BoxGeometry(3.5, 0.16, 260), sidewalkMat);
-                swNS.position.set(offset, 0.08, 0);
-                swNS.receiveShadow = true;
-                townGroup.add(swNS);
-
-                const swEW = new THREE.Mesh(new THREE.BoxGeometry(260, 0.16, 3.5), sidewalkMat);
-                swEW.position.set(0, 0.08, offset);
-                swEW.receiveShadow = true;
-                townGroup.add(swEW);
-            });
-
-            // Dashed Road Markings & Crosswalks
-            for (let i = -115; i < 115; i += 8) {
-                if (Math.abs(i) > 12) {
-                    const lineNS = new THREE.Mesh(new THREE.PlaneGeometry(0.35, 4), roadLineMat);
-                    lineNS.rotation.x = -Math.PI / 2;
-                    lineNS.position.set(0, 0.04, i);
-                    townGroup.add(lineNS);
-
-                    const lineEW = new THREE.Mesh(new THREE.PlaneGeometry(4, 0.35), roadLineMat);
-                    lineEW.rotation.x = -Math.PI / 2;
-                    lineEW.position.set(i, 0.04, 0);
-                    townGroup.add(lineEW);
-                }
-            }
-
-            for (let i = -6; i <= 6; i += 2) {
-                [-9.5, 9.5].forEach(pos => {
-                    const cwNS = new THREE.Mesh(new THREE.PlaneGeometry(1, 3), crosswalkMat);
-                    cwNS.rotation.x = -Math.PI / 2;
-                    cwNS.position.set(i, 0.04, pos);
-                    townGroup.add(cwNS);
-
-                    const cwEW = new THREE.Mesh(new THREE.PlaneGeometry(3, 1), crosswalkMat);
-                    cwEW.rotation.x = -Math.PI / 2;
-                    cwEW.position.set(pos, 0.04, i);
-                    townGroup.add(cwEW);
-                });
-            }
-
-            // Detailed Textured Storefronts
-            function createBuilding(x, z, w, h, d, wallMaterial, awningMat) {
-                const bld = new THREE.Group();
-
-                const body = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), wallMaterial);
-                body.position.set(0, h / 2, 0);
-                body.castShadow = true;
-                body.receiveShadow = true;
-                bld.add(body);
-
-                const cornice = new THREE.Mesh(new THREE.BoxGeometry(w + 0.5, 0.55, d + 0.5), metalTrimMat);
-                cornice.position.set(0, h + 0.25, 0);
-                bld.add(cornice);
-
-                const winWidth = w * 0.5, winHeight = h * 0.35;
-                const glass = new THREE.Mesh(new THREE.BoxGeometry(winWidth, winHeight, 0.12), windowGlassMat);
-                glass.position.set(-w * 0.12, winHeight / 2 + 0.3, d / 2 + 0.03);
-                bld.add(glass);
-
-                const door = new THREE.Mesh(new THREE.BoxGeometry(w * 0.16, h * 0.38, 0.12), windowGlassMat);
-                door.position.set(w * 0.28, (h * 0.38) / 2, d / 2 + 0.03);
-                bld.add(door);
-
-                if (awningMat) {
-                    const awning = new THREE.Mesh(new THREE.BoxGeometry(w * 0.85, 0.35, 1.9), awningMat);
-                    awning.position.set(0, winHeight + 0.8, d / 2 + 0.85);
-                    awning.rotation.x = 0.25;
-                    awning.castShadow = true;
-                    bld.add(awning);
-                }
-
-                bld.position.set(x, 0, z);
-                townGroup.add(bld);
-            }
-
-            createBuilding(0, -35, 24, 9, 16, redBrickMat, awningRed);
-            createBuilding(35, -18, 20, 8, 16, creamBrickMat, awningGreen);
-            createBuilding(-35, 18, 20, 7.5, 16, redBrickMat, awningRed);
-            createBuilding(35, 18, 22, 9, 16, brownBrickMat, awningBlue);
-
-            // ==========================================
-            // PEANUT'S ACCESSIBLE 2-STORY HOUSE & YARD
-            // ==========================================
-            function createPeanutHouse(x, z) {
-                const house = new THREE.Group();
-                const intWallMat = new THREE.MeshStandardMaterial({ color: 0xf2efe9, roughness: 0.9 });
-                const roofMat = new THREE.MeshStandardMaterial({ color: 0x26292e, roughness: 0.8 });
-
-                function addWall(w, h, d, px, py, pz, mat) {
-                    const wall = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
-                    wall.position.set(px, py, pz);
-                    wall.castShadow = true;
-                    wall.receiveShadow = true;
-                    house.add(wall);
-                }
-
-                // Hardwood Floors & Shingle Roof
-                addWall(16, 0.2, 12, 0, 0.1, 0, woodFloorMat);
-                addWall(16, 0.2, 12, 0, 4.1, 0, woodFloorMat);
-                addWall(17, 0.6, 13, 0, 8.3, 0, roofMat);
-
-                // Ground Floor Clapboard Siding Walls
-                addWall(0.5, 4, 12, -7.75, 2.1, 0, sidingMat);
-                addWall(0.5, 4, 12, 7.75, 2.1, 0, sidingMat);
-                addWall(16, 4, 0.5, 0, 2.1, -5.75, sidingMat);
-                addWall(4, 4, 0.5, 5.75, 2.1, 5.75, sidingMat);
-                addWall(2, 4, 0.5, 0.5, 2.1, 5.75, sidingMat);
-                addWall(0.5, 4, 11.5, -0.5, 2.1, -0.25, intWallMat);
-
-                // Second Floor Walls
-                addWall(0.5, 4, 12, -7.75, 6.2, 0, sidingMat);
-                addWall(0.5, 4, 12, 7.75, 6.2, 0, sidingMat);
-                addWall(16, 4, 0.5, 0, 6.2, -5.75, sidingMat);
-                addWall(16, 4, 0.5, 0, 6.2, 5.75, sidingMat);
-                addWall(0.5, 4, 11.5, -0.5, 6.2, -0.25, intWallMat);
-
-                // Lush Backyard Lawn & Wood Fence
-                const yard = new THREE.Mesh(new THREE.PlaneGeometry(16, 16), yardGrassMat);
-                yard.rotation.x = -Math.PI / 2;
-                yard.position.set(0, 0.04, -14);
-                yard.receiveShadow = true;
-                house.add(yard);
-
-                addWall(0.25, 2.2, 16, -7.9, 1.1, -14, fenceWoodMat);
-                addWall(0.25, 2.2, 16, 7.9, 1.1, -14, fenceWoodMat);
-                addWall(16, 2.2, 0.25, 0, 1.1, -21.9, fenceWoodMat);
-
-                house.position.set(x, 0, z);
-                townGroup.add(house);
-            }
-            createPeanutHouse(-32, -20);
-
-            // ==========================================
-            // PEANUT THE BIRD & STATIONS
-            // ==========================================
-            const peanutGroup = new THREE.Group();
-            scene.add(peanutGroup);
-            const featherMat = new THREE.MeshStandardMaterial({ color: 0xff8c00, roughness: 0.35 });
-            const beakMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.2 });
-
-            const birdBody = new THREE.Mesh(new THREE.SphereGeometry(0.5, 16, 16), featherMat);
-            birdBody.scale.set(1, 0.8, 1.3);
-            birdBody.position.y = 0.6;
-            birdBody.castShadow = true;
-            peanutGroup.add(birdBody);
-
-            const birdHead = new THREE.Mesh(new THREE.SphereGeometry(0.3, 16, 16), featherMat);
-            birdHead.position.set(0, 0.95, 0.35);
-            peanutGroup.add(birdHead);
-
-            const birdBeak = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.3, 8), beakMat);
-            birdBeak.rotateX(Math.PI / 2);
-            birdBeak.position.set(0, 0.95, 0.65);
-            peanutGroup.add(birdBeak);
-
-            const stationsGroup = new THREE.Group();
-            scene.add(stationsGroup);
-
-            function updateStations(stations) {
-                while (stationsGroup.children.length > 0) stationsGroup.remove(stationsGroup.children[0]);
-                stations.forEach(st => {
-                    let mesh;
-                    if (st.type === 'workbench') {
-                        mesh = new THREE.Mesh(new THREE.BoxGeometry(1.5, 1, 0.8), woodFloorMat);
-                        mesh.position.y = 0.5;
-                    } else if (st.type === 'crate') {
-                        mesh = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.9, 0.9), fenceWoodMat);
-                        mesh.position.y = 0.45;
-                    } else {
-                        mesh = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.4, 2), new THREE.MeshStandardMaterial({ color: 0x1b4d3e }));
-                        mesh.position.y = 0.2;
-                    }
-                    mesh.castShadow = true;
-                    mesh.position.x = st.gridX;
-                    mesh.position.z = st.gridZ;
-                    mesh.userData = { uid: st.uid };
-                    stationsGroup.add(mesh);
-                });
-            }
-
-            // ==========================================
-            // WEBSOCKET CONNECTION
-            // ==========================================
-            let ws;
-            function connectWebSocket() {
-                const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-                ws = new WebSocket(`${protocol}//${window.location.host}`);
-
-                ws.onopen = () => {
-                    statusEl.innerText = "Connected (Click Scene to Walk)";
-                    statusEl.style.color = "#55ff55";
-                };
-                ws.onclose = () => {
-                    statusEl.innerText = "Reconnecting...";
-                    statusEl.style.color = "#ffaa00";
-                    setTimeout(connectWebSocket, 3000);
-                };
-                ws.onmessage = (event) => {
-                    const data = JSON.parse(event.data);
-                    if (data.stations) updateStations(data.stations);
-                    const birdData = data.bird || data.state?.bird;
-                    if (birdData) {
-                        const moveX = birdData.x - peanutGroup.position.x;
-                        const moveZ = birdData.z - peanutGroup.position.z;
-                        peanutGroup.position.x = birdData.x;
-                        peanutGroup.position.z = birdData.z;
-                        coordsEl.innerText = `X: ${birdData.x.toFixed(1)}, Z: ${birdData.z.toFixed(1)}`;
-                        if (Math.abs(moveX) > 0.001 || Math.abs(moveZ) > 0.001) {
-                            peanutGroup.rotation.y = Math.atan2(moveX, moveZ);
-                        }
-                    }
-                };
-            }
-            connectWebSocket();
-
-            // ==========================================
-            // 1ST-PERSON POINTER LOCK & GOD MODE BUILDER
-            // ==========================================
-            const controls = new PointerLockControls(camera, renderer.domElement);
-            let selectedTool = null;
-
-            renderer.domElement.addEventListener('click', () => {
-                if (!controls.isLocked) {
-                    controls.lock();
-                    return;
-                }
-
-                // When locked in 1st-person, clicking uses the center crosshair to place/delete!
-                const raycaster = new THREE.Raycaster();
-                raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
-
-                if (selectedTool === 'delete') {
-                    const hits = raycaster.intersectObjects(stationsGroup.children, true);
-                    if (hits.length > 0 && ws?.readyState === WebSocket.OPEN) {
-                        ws.send(JSON.stringify({ type: 'admin:delete_station', uid: hits[0].object.userData.uid }));
-                    }
-                } else if (selectedTool) {
-                    const hits = raycaster.intersectObject(ground);
-                    if (hits.length > 0 && ws?.readyState === WebSocket.OPEN) {
-                        const pt = hits[0].point;
-                        ws.send(JSON.stringify({
-                            type: 'admin:place_station',
-                            station: {
-                                uid: `st_${Date.now()}`,
-                                type: selectedTool,
-                                gridX: Math.round(pt.x),
-                                gridZ: Math.round(pt.z),
-                                rotation: 0, footprintX: 1, footprintZ: 1
-                            }
-                        }));
-                    }
-                }
-            });
-
-            document.querySelectorAll('.station-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    document.querySelectorAll('.station-btn').forEach(b => b.classList.remove('active'));
-                    const type = e.currentTarget.getAttribute('data-type');
-                    selectedTool = (type === 'none') ? null : type;
-                    if (selectedTool) e.currentTarget.classList.add('active');
-                    controls.lock(); // Lock back into 1st-person view after picking a tool
-                });
-            });
-
-            const keys = { w: false, a: false, s: false, d: false, up: false, down: false };
-            window.addEventListener('keydown', (e) => {
-                const k = e.key.toLowerCase();
-                if (k === 'w' || e.key === 'ArrowUp') keys.w = true;
-                if (k === 's' || e.key === 'ArrowDown') keys.s = true;
-                if (k === 'a' || e.key === 'ArrowLeft') keys.a = true;
-                if (k === 'd' || e.key === 'ArrowRight') keys.d = true;
-                if (e.code === 'Space') keys.up = true;
-                if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') keys.down = true;
-            });
-            window.addEventListener('keyup', (e) => {
-                const k = e.key.toLowerCase();
-                if (k === 'w' || e.key === 'ArrowUp') keys.w = false;
-                if (k === 's' || e.key === 'ArrowDown') keys.s = false;
-                if (k === 'a' || e.key === 'ArrowLeft') keys.a = false;
-                if (k === 'd' || e.key === 'ArrowRight') keys.d = false;
-                if (e.code === 'Space') keys.up = false;
-                if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') keys.down = false;
-            });
-
-            const clock = new THREE.Clock();
-            const direction = new THREE.Vector3();
-
-            function animate() {
-                requestAnimationFrame(animate);
-                const delta = clock.getDelta();
-                const elapsed = clock.getElapsedTime();
-
-                peanutGroup.position.y = Math.abs(Math.sin(elapsed * 10)) * 0.15;
-
-                if (controls.isLocked) {
-                    direction.z = Number(keys.w) - Number(keys.s);
-                    direction.x = Number(keys.d) - Number(keys.a);
-                    direction.normalize();
-
-                    const speed = 12.0;
-                    if (keys.w || keys.s) controls.moveForward(direction.z * speed * delta);
-                    if (keys.a || keys.d) controls.moveRight(direction.x * speed * delta);
-
-                    // Fly up to inspect 2nd floor or drop back to eye-level (1.8m)
-                    if (keys.up) camera.position.y += 8.0 * delta;
-                    if (keys.down) camera.position.y = Math.max(1.8, camera.position.y - 8.0 * delta);
-                }
-
-                renderer.render(scene, camera);
-            }
-            animate();
-
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            });
-
-        } catch (err) {
-            console.error("💥 Critical Script Error:", err);
-            statusEl.innerText = "Script Error";
-            statusEl.style.color = "#ff0000";
-        }
-    </script>
-</body>
-</html>
+            renderer.toneMapping = THREE.ACESFilmicToneMapping
