@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Badabing - First-Person God View</title>
+    <title>The Badabing - Textured God View</title>
     <style>
         body {
             margin: 0;
@@ -81,7 +81,7 @@
         <h1>The Badabing 🦫</h1>
         <p>Status: <span id="status">Connecting...</span></p>
         <p>Peanut's Pos: <span id="coords">X: 0, Z: 0</span></p>
-        <p>Cam Mode: <span id="cam-mode" style="color: #00aaff;">God View Strategy Cam</span></p>
+        <p>Cam Mode: <span id="cam-mode" style="color: #00aaff;">Textured God View</span></p>
     </div>
 
     <div id="god-mode-panel">
@@ -115,13 +115,12 @@
         const coordsEl = document.getElementById('coords');
 
         try {
-            console.log("🚀 Starting God View Scene Setup...");
+            console.log("🚀 Starting Textured God View Setup...");
 
             const scene = new THREE.Scene();
             scene.background = new THREE.Color(0x1e222a);
             scene.fog = new THREE.FogExp2(0x1e222a, 0.012);
 
-            // High overhead perspective camera for God View
             const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1500);
             camera.position.set(0, 40, 30); 
 
@@ -131,22 +130,39 @@
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
             document.body.appendChild(renderer.domElement);
 
-            // Orbit controls configured for a God/Strategy overhead view (Right-click rotates, left-click can be used for world interaction)
             const controls = new OrbitControls(camera, renderer.domElement);
             controls.enableDamping = true;
             controls.dampingFactor = 0.05;
-            controls.maxPolarAngle = Math.PI / 2.2; // Don't let camera go below ground
+            controls.maxPolarAngle = Math.PI / 2.2; 
             controls.minDistance = 5;
             controls.maxDistance = 120;
             controls.target.set(0, 0, 0);
             controls.mouseButtons = {
-                LEFT: THREE.MOUSE.NONE, // Free up left-click exclusively for building selection & raycasting
+                LEFT: THREE.MOUSE.NONE, 
                 MIDDLE: THREE.MOUSE.DOLLY,
                 RIGHT: THREE.MOUSE.ROTATE
             };
 
+            // Texture Loader setup with repeating wraps
+            const textureLoader = new THREE.TextureLoader();
+
+            function loadTexture(url, repeatX = 1, repeatY = 1) {
+                const tex = textureLoader.load(url);
+                tex.wrapS = THREE.RepeatWrapping;
+                tex.wrapT = THREE.RepeatWrapping;
+                tex.repeat.set(repeatX, repeatY);
+                return tex;
+            }
+
+            // High quality web textures
+            const groundTex = loadTexture('https://images.unsplash.com/photo-1558449028-b53a39d100fc?w=512', 40, 40); // Asphalt/Ground texture
+            const grassTex = loadTexture('https://images.unsplash.com/photo-1589135069168-12c5b8b931dd?w=512', 4, 4);   // Lush lawn grass
+            const brickTex = loadTexture('https://images.unsplash.com/photo-1590073242678-70ee3fc28e8e?w=512', 3, 3);   // Red brick wall
+            const concreteTex = loadTexture('https://images.unsplash.com/photo-1518640467707-6811f4a6ab73?w=512', 3, 3); // Concrete store wall
+            const woodTex = loadTexture('https://images.unsplash.com/photo-1546484396-fb3fc6f95f98?w=512', 2, 2);     // Wood flooring
+
             // Lighting
-            const ambientLight = new THREE.AmbientLight(0xddeeff, 0.6);
+            const ambientLight = new THREE.AmbientLight(0xddeeff, 0.65);
             scene.add(ambientLight);
 
             const sunLight = new THREE.DirectionalLight(0xfff8ee, 1.3);
@@ -156,44 +172,40 @@
             sunLight.shadow.mapSize.height = 2048;
             scene.add(sunLight);
 
-            // Ground
+            // Ground with texture
             const groundGeo = new THREE.PlaneGeometry(300, 300);
-            const groundMat = new THREE.MeshStandardMaterial({ color: 0x2b2f38, roughness: 0.9 });
+            const groundMat = new THREE.MeshStandardMaterial({ map: groundTex, roughness: 0.8 });
             const ground = new THREE.Mesh(groundGeo, groundMat);
             ground.rotation.x = -Math.PI / 2;
             ground.receiveShadow = true;
             scene.add(ground);
 
             // ==========================================
-            // DETAILED CITY & STREET INFRASTRUCTURE
+            // TEXTURED CITY & BUILDINGS
             // ==========================================
             const townGroup = new THREE.Group();
             scene.add(townGroup);
 
-            const asphaltMat = new THREE.MeshStandardMaterial({ color: 0x21252b });
-            const concreteMat = new THREE.MeshStandardMaterial({ color: 0x545b6b });
             const roadLineMat = new THREE.MeshBasicMaterial({ color: 0xddaa00 });
             const crosswalkMat = new THREE.MeshBasicMaterial({ color: 0xdddddd });
-            
-            const brickRedMat = new THREE.MeshStandardMaterial({ color: 0x6e3b30, roughness: 0.9 });
-            const brickDarkMat = new THREE.MeshStandardMaterial({ color: 0x423d42, roughness: 0.9 });
             const metalTrimMat = new THREE.MeshStandardMaterial({ color: 0x3e424b, metalness: 0.6, roughness: 0.5 });
             const windowGlassMat = new THREE.MeshStandardMaterial({ color: 0x1f3b4f, metalness: 0.9, roughness: 0.1 });
             const awningRed = new THREE.MeshStandardMaterial({ color: 0xb82e2e });
             const awningBlue = new THREE.MeshStandardMaterial({ color: 0x256cb3 });
             const awningGreen = new THREE.MeshStandardMaterial({ color: 0x2e8540 });
 
-            // Roads & Sidewalks
-            const roadNS = new THREE.Mesh(new THREE.PlaneGeometry(16, 240), asphaltMat);
+            // Roads
+            const roadNS = new THREE.Mesh(new THREE.PlaneGeometry(16, 240), new THREE.MeshStandardMaterial({ map: groundTex, roughness: 0.6 }));
             roadNS.rotation.x = -Math.PI / 2;
             roadNS.position.set(0, 0.01, 0);
             townGroup.add(roadNS);
 
-            const roadEW = new THREE.Mesh(new THREE.PlaneGeometry(240, 16), asphaltMat);
+            const roadEW = new THREE.Mesh(new THREE.PlaneGeometry(240, 16), new THREE.MeshStandardMaterial({ map: groundTex, roughness: 0.6 }));
             roadEW.rotation.x = -Math.PI / 2;
             roadEW.position.set(0, 0.01, 0);
             townGroup.add(roadEW);
 
+            // Street lines & crosswalks
             for (let i = -100; i < 100; i += 8) {
                 if (Math.abs(i) > 10) { 
                     const lineNS = new THREE.Mesh(new THREE.PlaneGeometry(0.4, 4), roadLineMat);
@@ -222,41 +234,11 @@
                 });
             }
 
-            // Streetlamps
-            function createStreetlamp(x, z) {
-                const lampGroup = new THREE.Group();
-                const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.2, 7), metalTrimMat);
-                pole.position.y = 3.5;
-                pole.castShadow = true;
-                lampGroup.add(pole);
-                
-                const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.4), new THREE.MeshStandardMaterial({color: 0xffffee, emissive: 0xffffee, emissiveIntensity: 1.5}));
-                bulb.position.y = 7;
-                lampGroup.add(bulb);
-
-                lampGroup.position.set(x, 0, z);
-                townGroup.add(lampGroup);
-            }
-            createStreetlamp(-9.5, -9.5);
-            createStreetlamp(9.5, -9.5);
-            createStreetlamp(-9.5, 9.5);
-            createStreetlamp(9.5, 9.5);
-
-            // Dumpsters
-            function createDumpster(x, z, rot) {
-                const dumpMat = new THREE.MeshStandardMaterial({ color: 0x2e4c33, metalness: 0.5, roughness: 0.7 });
-                const dumpster = new THREE.Mesh(new THREE.BoxGeometry(2.5, 1.8, 1.5), dumpMat);
-                dumpster.position.set(x, 0.9, z);
-                dumpster.rotation.y = rot;
-                dumpster.castShadow = true;
-                townGroup.add(dumpster);
-            }
-            createDumpster(12, -28, 0);
-            createDumpster(-14, 28, Math.PI/2);
-
-            // Buildings
-            function createBuilding(x, z, w, h, d, wallMat, awningMat, name) {
+            // Buildings with loaded brick/concrete textures
+            function createBuilding(x, z, w, h, d, wallTexMap, awningMat) {
                 const bld = new THREE.Group();
+                const wallMat = new THREE.MeshStandardMaterial({ map: wallTexMap, roughness: 0.8 });
+                
                 const body = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), wallMat);
                 body.position.set(0, h / 2, 0);
                 body.castShadow = true;
@@ -296,19 +278,19 @@
                 townGroup.add(bld);
             }
 
-            createBuilding(0, -35, 24, 9, 16, brickRedMat, awningRed, "HQ");
-            createBuilding(35, -18, 20, 8, 16, concreteMat, awningGreen, "Deli");
-            createBuilding(-35, 18, 20, 7.5, 16, brickRedMat, awningRed, "Hardware");
-            createBuilding(35, 18, 22, 9, 16, brickDarkMat, awningBlue, "Arms");
+            createBuilding(0, -35, 24, 9, 16, brickTex, awningRed);
+            createBuilding(35, -18, 20, 8, 16, concreteTex, awningGreen);
+            createBuilding(-35, 18, 20, 7.5, 16, brickTex, awningRed);
+            createBuilding(35, 18, 22, 9, 16, concreteTex, awningBlue);
 
-            // Peanut's House
+            // Peanut's House with Textured Wood Floors & Grass Yard
             function createPeanutHouse(x, z) {
                 const house = new THREE.Group();
-                const extWall = new THREE.MeshStandardMaterial({ color: 0x5a6370 }); 
-                const intWall = new THREE.MeshStandardMaterial({ color: 0xeaeaea }); 
-                const woodFloor = new THREE.MeshStandardMaterial({ color: 0x6e4e32 });
-                const roofMat = new THREE.MeshStandardMaterial({ color: 0x222222 });
-                const fenceMat = new THREE.MeshStandardMaterial({ color: 0x5c4033 });
+                const extWallMat = new THREE.MeshStandardMaterial({ map: concreteTex, roughness: 0.8 });
+                const intWallMat = new THREE.MeshStandardMaterial({ color: 0xeaeaea, roughness: 0.9 });
+                const woodFloorMat = new THREE.MeshStandardMaterial({ map: woodTex, roughness: 0.6 });
+                const roofMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.8 });
+                const fenceMat = new THREE.MeshStandardMaterial({ color: 0x5c4033, roughness: 0.9 });
 
                 function addWall(w, h, d, px, py, pz, mat) {
                     const wall = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
@@ -317,25 +299,31 @@
                     house.add(wall);
                 }
 
-                addWall(16, 0.2, 12, 0, 0.1, 0, woodFloor); 
-                addWall(16, 0.2, 12, 0, 4.1, 0, woodFloor); 
+                addWall(16, 0.2, 12, 0, 0.1, 0, woodFloorMat); 
+                addWall(16, 0.2, 12, 0, 4.1, 0, woodFloorMat); 
                 addWall(17, 0.6, 13, 0, 8.3, 0, roofMat);   
-                addWall(0.5, 4, 12, -7.75, 2.1, 0, extWall); 
-                addWall(0.5, 4, 12, 7.75, 2.1, 0, extWall);  
-                addWall(16, 4, 0.5, 0, 2.1, -5.75, extWall); 
-                addWall(4, 4, 0.5, 5.75, 2.1, 5.75, extWall); 
-                addWall(2, 4, 0.5, 0.5, 2.1, 5.75, extWall);  
-                addWall(0.5, 4, 11.5, -0.5, 2.1, -0.25, intWall); 
-                addWall(0.5, 4, 12, -7.75, 6.2, 0, extWall);
-                addWall(0.5, 4, 12, 7.75, 6.2, 0, extWall);
-                addWall(16, 4, 0.5, 0, 6.2, -5.75, extWall);
-                addWall(16, 4, 0.5, 0, 6.2, 5.75, extWall);
-                addWall(0.5, 4, 11.5, -0.5, 6.2, -0.25, intWall);
 
-                const yard = new THREE.Mesh(new THREE.PlaneGeometry(16, 16), new THREE.MeshStandardMaterial({ color: 0x2d4c1e }));
+                addWall(0.5, 4, 12, -7.75, 2.1, 0, extWallMat); 
+                addWall(0.5, 4, 12, 7.75, 2.1, 0, extWallMat);  
+                addWall(16, 4, 0.5, 0, 2.1, -5.75, extWallMat); 
+                addWall(4, 4, 0.5, 5.75, 2.1, 5.75, extWallMat); 
+                addWall(2, 4, 0.5, 0.5, 2.1, 5.75, extWallMat);  
+                addWall(0.5, 4, 11.5, -0.5, 2.1, -0.25, intWallMat); 
+
+                addWall(0.5, 4, 12, -7.75, 6.2, 0, extWallMat);
+                addWall(0.5, 4, 12, 7.75, 6.2, 0, extWallMat);
+                addWall(16, 4, 0.5, 0, 6.2, -5.75, extWallMat);
+                addWall(16, 4, 0.5, 0, 6.2, 5.75, extWallMat);
+                addWall(0.5, 4, 11.5, -0.5, 6.2, -0.25, intWallMat);
+
+                // Textured Lush Lawn Backyard
+                const yardMat = new THREE.MeshStandardMaterial({ map: grassTex, roughness: 0.9 });
+                const yard = new THREE.Mesh(new THREE.PlaneGeometry(16, 16), yardMat);
                 yard.rotation.x = -Math.PI/2;
                 yard.position.set(0, 0.05, -14);
+                yard.receiveShadow = true;
                 house.add(yard);
+
                 addWall(0.2, 2, 16, -7.9, 1, -14, fenceMat);
                 addWall(0.2, 2, 16, 7.9, 1, -14, fenceMat);
                 addWall(16, 2, 0.2, 0, 1, -21.9, fenceMat);
@@ -348,8 +336,8 @@
             // Peanut Bird Model
             const peanutGroup = new THREE.Group();
             scene.add(peanutGroup);
-            const featherMat = new THREE.MeshStandardMaterial({ color: 0xff8c00 });
-            const beakMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b });
+            const featherMat = new THREE.MeshStandardMaterial({ color: 0xff8c00, roughness: 0.3 });
+            const beakMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.2 });
             const birdBody = new THREE.Mesh(new THREE.SphereGeometry(0.5, 16, 16), featherMat);
             birdBody.scale.set(1, 0.8, 1.3);
             birdBody.position.y = 0.6;
@@ -366,7 +354,7 @@
             const stationsGroup = new THREE.Group();
             scene.add(stationsGroup);
             function createBoxModel(colorHex, w, h, d, yOffset) {
-                const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshStandardMaterial({ color: colorHex }));
+                const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshStandardMaterial({ color: colorHex, roughness: 0.5 }));
                 mesh.position.y = yOffset;
                 mesh.castShadow = true;
                 return mesh;
@@ -417,7 +405,7 @@
             }
             connectWebSocket();
 
-            // WASD Camera Panning for God View
+            // WASD Camera Panning
             const keys = { w: false, a: false, s: false, d: false };
             window.addEventListener('keydown', (e) => {
                 const k = e.key.toLowerCase();
@@ -434,7 +422,7 @@
                 if (k === 'd' || e.key === 'arrowright') keys.d = false;
             });
 
-            // Building Logic (Left Click)
+            // Building Logic
             let selectedTool = null;
             document.querySelectorAll('.station-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
@@ -488,18 +476,17 @@
                 }
             });
 
-            // Animation Loop & Camera Pan
+            // Animation Loop
             const clock = new THREE.Clock();
             function animate() {
                 requestAnimationFrame(animate);
                 const elapsedTime = clock.getElapsedTime();
                 peanutGroup.position.y = Math.abs(Math.sin(elapsedTime * 10)) * 0.15;
 
-                // Move camera target with WASD keys for smooth strategy panning
                 const panSpeed = 0.6;
                 const dir = new THREE.Vector3();
                 camera.getWorldDirection(dir);
-                dir.y = 0; // Lock to horizontal plane
+                dir.y = 0; 
                 dir.normalize();
                 const sideDir = new THREE.Vector3(-dir.z, 0, dir.x);
 
