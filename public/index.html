@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Badabing - Stable Town & Office</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Badabing - Mobile & Desktop Ready</title>
     <style>
         body {
             margin: 0;
@@ -13,6 +13,7 @@
             font-family: sans-serif;
             color: #fff;
             user-select: none;
+            -webkit-user-select: none;
         }
         #info-panel {
             position: absolute;
@@ -85,6 +86,67 @@
             line-height: 1.5;
         }
         #controls-hint span { color: #00aaff; font-weight: bold; }
+
+        /* Virtual Mobile On-Screen Controls */
+        #mobile-controls {
+            display: none; /* Shown automatically on touch devices */
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 25;
+        }
+        #virtual-joystick {
+            position: absolute;
+            bottom: 40px;
+            left: 40px;
+            width: 130px;
+            height: 130px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            pointer-events: auto;
+            touch-action: none;
+        }
+        #joystick-thumb {
+            position: absolute;
+            top: 40px;
+            left: 40px;
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 170, 255, 0.7);
+            border: 2px solid #fff;
+            border-radius: 50%;
+            pointer-events: none;
+            transition: transform 0.05s linear;
+        }
+        #mobile-action-btns {
+            position: absolute;
+            bottom: 40px;
+            right: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            pointer-events: auto;
+        }
+        .mob-btn {
+            width: 65px;
+            height: 65px;
+            background: rgba(0, 170, 255, 0.6);
+            border: 2px solid #fff;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            touch-action: manipulation;
+        }
+        .mob-btn:active { background: rgba(0, 170, 255, 0.9); }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
@@ -95,9 +157,9 @@
 
     <div id="info-panel">
         <h1>The Badabing 🦫</h1>
-        <p>Status: <span id="status">Active (Stable Build)</span></p>
+        <p>Status: <span id="status">Active (Mobile & Desktop)</span></p>
         <p>Peanut's Pos: <span id="coords">X: 0, Z: 0</span></p>
-        <p>Cam Mode: <span id="cam-mode" style="color: #00aaff;">1st-Person God Mode</span></p>
+        <p>Cam Mode: <span id="cam-mode" style="color: #00aaff;">1st-Person Walkthrough</span></p>
     </div>
 
     <div id="god-mode-panel">
@@ -111,14 +173,25 @@
         <button class="station-btn" data-type="none" style="background: #333;">✋ Hands Empty (Look)</button>
     </div>
 
+    <!-- Virtual Touch Controls for Mobile / Tablets -->
+    <div id="mobile-controls">
+        <div id="virtual-joystick">
+            <div id="joystick-thumb"></div>
+        </div>
+        <div id="mobile-action-btns">
+            <div class="mob-btn" id="btn-up">⬆️</div>
+            <div class="mob-btn" id="btn-down">⬇️</div>
+        </div>
+    </div>
+
     <div id="controls-hint">
-        Click Screen: <span>Lock Mouse Look</span> | Walk: <span>WASD</span><br>
-        Fly Up/Down: <span>Space / Shift</span> | Release Mouse: <span>ESC</span>
+        Click Screen: <span>Lock Look</span> | Walk: <span>WASD</span><br>
+        Mobile: <span>Use Virtual D-Pad / Touch Drag to Look</span>
     </div>
 
     <script>
         try {
-            console.log("🚀 Initializing Stable 3D World...");
+            console.log("🚀 Initializing Mobile-Ready 3D World...");
 
             const scene = new THREE.Scene();
             scene.background = new THREE.Color(0x87a8d0);
@@ -363,7 +436,7 @@
 
             document.body.addEventListener('click', (e) => {
                 if (e.clientX > window.innerWidth - 260 && e.clientY < 260) return;
-                if (!controls.isLocked) {
+                if (!controls.isLocked && !isTouchDevice) {
                     controls.lock();
                 } else if (selectedTool) {
                     const raycaster = new THREE.Raycaster();
@@ -428,6 +501,87 @@
                 if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') keys.shift = false;
             });
 
+            // ==========================================
+            // MOBILE TOUCH CONTROLS & VIRTUAL JOYSTICK
+            // ==========================================
+            const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+            if (isTouchDevice) {
+                document.getElementById('mobile-controls').style.display = 'block';
+            }
+
+            const joystick = document.getElementById('virtual-joystick');
+            const thumb = document.getElementById('joystick-thumb');
+            let touchMoveVector = { x: 0, y: 0 };
+
+            joystick.addEventListener('touchstart', (e) => { e.stopPropagation(); handleTouch(e); }, { passive: false });
+            joystick.addEventListener('touchmove', (e) => { e.stopPropagation(); handleTouch(e); }, { passive: false });
+            joystick.addEventListener('touchend', (e) => {
+                e.stopPropagation();
+                touchMoveVector = { x: 0, y: 0 };
+                thumb.style.transform = `translate(0px, 0px)`;
+                keys.w = keys.s = keys.a = keys.d = false;
+            }, { passive: false });
+
+            function handleTouch(e) {
+                const rect = joystick.getBoundingClientRect();
+                const touch = e.touches[0];
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                
+                let dx = touch.clientX - centerX;
+                let dy = touch.clientY - centerY;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                const maxDist = 45;
+
+                if (dist > maxDist) {
+                    dx = (dx / dist) * maxDist;
+                    dy = (dy / dist) * maxDist;
+                }
+
+                thumb.style.transform = `translate(${dx}px, ${dy}px)`;
+
+                touchMoveVector.x = dx / maxDist;
+                touchMoveVector.y = dy / maxDist;
+
+                keys.w = touchMoveVector.y < -0.25;
+                keys.s = touchMoveVector.y > 0.25;
+                keys.a = touchMoveVector.x < -0.25;
+                keys.d = touchMoveVector.x > 0.25;
+            }
+
+            // Touch look around screen dragging (non-UI area)
+            let isDragging = false;
+            let prevTouchX = 0, prevTouchY = 0;
+            window.addEventListener('touchstart', (e) => {
+                if (e.target.closest('#god-mode-panel') || e.target.closest('#mobile-controls') || e.target.closest('#info-panel')) return;
+                isDragging = true;
+                prevTouchX = e.touches[0].clientX;
+                prevTouchY = e.touches[0].clientY;
+            });
+            window.addEventListener('touchmove', (e) => {
+                if (!isDragging) return;
+                const touchX = e.touches[0].clientX;
+                const touchY = e.touches[0].clientY;
+                const deltaX = touchX - prevTouchX;
+                const deltaY = touchY - prevTouchY;
+
+                camera.rotation.y -= deltaX * 0.005;
+                camera.rotation.x -= deltaY * 0.005;
+                camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.x));
+
+                prevTouchX = touchX;
+                prevTouchY = touchY;
+            });
+            window.addEventListener('touchend', () => { isDragging = false; });
+
+            // Space / Shift buttons for mobile elevation
+            const btnUp = document.getElementById('btn-up');
+            const btnDown = document.getElementById('btn-down');
+            btnUp.addEventListener('touchstart', (e) => { e.preventDefault(); keys.space = true; });
+            btnUp.addEventListener('touchend', (e) => { e.preventDefault(); keys.space = false; });
+            btnDown.addEventListener('touchstart', (e) => { e.preventDefault(); keys.shift = true; });
+            btnDown.addEventListener('touchend', (e) => { e.preventDefault(); keys.shift = false; });
+
             const raycaster = new THREE.Raycaster();
             const mouseCoordVector = new THREE.Vector2(0, 0);
             const targetXEl = document.getElementById('target-x');
@@ -465,10 +619,25 @@
 
                 // Camera Movement
                 const moveSpeed = 18.0 * delta;
-                if (keys.w) controls.moveForward(moveSpeed);
-                if (keys.s) controls.moveForward(-moveSpeed);
-                if (keys.a) controls.moveRight(-moveSpeed);
-                if (keys.d) controls.moveRight(moveSpeed);
+                if (controls.isLocked) {
+                    if (keys.w) controls.moveForward(moveSpeed);
+                    if (keys.s) controls.moveForward(-moveSpeed);
+                    if (keys.a) controls.moveRight(-moveSpeed);
+                    if (keys.d) controls.moveRight(moveSpeed);
+                } else {
+                    // Free move for mobile touch joystick
+                    const dir = new THREE.Vector3();
+                    camera.getWorldDirection(dir);
+                    dir.y = 0;
+                    dir.normalize();
+                    const sideDir = new THREE.Vector3(-dir.z, 0, dir.x);
+
+                    if (keys.w) camera.position.addScaledVector(dir, moveSpeed);
+                    if (keys.s) camera.position.addScaledVector(dir, -moveSpeed);
+                    if (keys.a) camera.position.addScaledVector(sideDir, moveSpeed);
+                    if (keys.d) camera.position.addScaledVector(sideDir, -moveSpeed);
+                }
+
                 if (keys.space) camera.position.y += moveSpeed;
                 if (keys.shift) camera.position.y = Math.max(1.8, camera.position.y - moveSpeed);
 
