@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>The Badabing - God Mode Toggle</title>
+    <title>The Badabing - Mobile Controls & God Mode</title>
     <style>
         body {
             margin: 0;
@@ -58,10 +58,10 @@
             padding: 15px;
             border-radius: 8px;
             border: 1px solid #00aaff;
-            z-index: 10;
+            z-index: 15;
             width: 250px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            display: none; /* Hidden by default, toggled via button */
+            display: none; /* Toggled via button */
         }
         #god-mode-panel h2 { margin: 0 0 10px 0; font-size: 15px; color: #00aaff; }
         .station-btn {
@@ -177,7 +177,7 @@
 
     <div id="info-panel">
         <h1>The Badabing 🦫</h1>
-        <p>Status: <span id="status">Active (Toggle Ready)</span></p>
+        <p>Status: <span id="status">Active (Mobile & God Mode)</span></p>
         <p>Peanut's Pos: <span id="coords">X: 0, Z: 0</span></p>
         <p>Cam Mode: <span id="cam-mode" style="color: #00aaff;">1st-Person Walkthrough</span></p>
     </div>
@@ -191,77 +191,4 @@
         <p>Select item to place / delete:</p>
         <button class="station-btn" data-type="workbench">🛠️ Industrial Workbench</button>
         <button class="station-btn" data-type="crate">📦 Storage Crate Stack</button>
-        <button class="station-btn" data-type="bed">🛌 Recovery Pod</button>
-        <button class="station-btn" data-type="delete" style="background: #5a2e2e;">🗑️ Delete Mode</button>
-        <button class="station-btn" data-type="none" style="background: #333;">✋ Hands Empty (Look)</button>
-    </div>
-
-    <!-- Virtual Touch Controls for Mobile / Tablets -->
-    <div id="mobile-controls">
-        <div id="virtual-joystick">
-            <div id="joystick-thumb"></div>
-        </div>
-        <div id="mobile-action-btns">
-            <div class="mob-btn" id="btn-up">⬆️</div>
-            <div class="mob-btn" id="btn-down">⬇️</div>
-        </div>
-    </div>
-
-    <div id="controls-hint">
-        Click Screen: <span>Lock Look</span> | Walk: <span>WASD</span><br>
-        Mobile: <span>Use Virtual D-Pad / Touch Drag to Look</span>
-    </div>
-
-    <script>
-        try {
-            console.log("🚀 Initializing World with God Mode Toggle...");
-
-            const scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x87a8d0);
-            scene.fog = new THREE.FogExp2(0x87a8d0, 0.0015);
-
-            const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 3000);
-            camera.position.set(0, 3, 20);
-
-            const renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.shadowMap.enabled = true;
-            document.body.appendChild(renderer.domElement);
-
-            // Sky Horizon Dome Gradient
-            const skyGeo = new THREE.SphereGeometry(1500, 32, 15);
-            const skyMat = new THREE.ShaderMaterial({
-                uniforms: {
-                    topColor: { value: new THREE.Color(0x3a7bd5) },
-                    bottomColor: { value: new THREE.Color(0xdbe9f6) },
-                    offset: { value: 33 },
-                    exponent: { value: 0.6 }
-                },
-                vertexShader: `
-                    varying vec3 vWorldPosition;
-                    void main() {
-                        vec4 worldPosition = modelMatrix * vec4(position, 1.0);
-                        vWorldPosition = worldPosition.xyz;
-                        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-                    }
-                `,
-                fragmentShader: `
-                    uniform vec3 topColor;
-                    uniform vec3 bottomColor;
-                    uniform float offset;
-                    uniform float exponent;
-                    varying vec3 vWorldPosition;
-                    void main() {
-                        float h = normalize(vWorldPosition + offset).y;
-                        gl_FragColor = vec4(mix(bottomColor, topColor, max(pow(max(h, 0.0), exponent), 0.0)), 1.0);
-                    }
-                `,
-                side: THREE.BackSide
-            });
-            const skyBox = new THREE.Mesh(skyGeo, skyMat);
-            scene.add(skyBox);
-
-            // Lighting
-            scene.add(new THREE.AmbientLight(0xffffff, 0.8));
-            const sunLight = new THREE.DirectionalLight(0xfff6e5, 1.4);
-            sunLight.position.set(100, 1
+        <button class="station-btn" data-type="bed
