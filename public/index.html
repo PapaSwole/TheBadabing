@@ -134,10 +134,10 @@
             console.log("🚀 Starting Full Textured Town Setup...");
             const scene = new THREE.Scene();
             scene.background = new THREE.Color(0x87a8d0);
-            scene.fog = new THREE.FogExp2(0x87a8d0, 0.005);
+            scene.fog = new THREE.FogExp2(0x87a8d0, 0.003);
 
             const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 1500);
-            camera.position.set(0, 2.0, 18);
+            camera.position.set(0, 2.5, 25);
 
             const renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
@@ -145,7 +145,7 @@
             renderer.shadowMap.enabled = true;
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
             renderer.toneMapping = THREE.ACESFilmicToneMapping;
-            renderer.toneMappingExposure = 1.1;
+            renderer.toneMappingExposure = 1.2;
             document.body.appendChild(renderer.domElement);
 
             // Procedural Texture Engine
@@ -164,4 +164,134 @@
             }
 
             const grassTex = makeTexture('#2d5a27', (ctx) => {
-                ctx.
+                ctx.fillStyle = '#244d1e';
+                for (let i = 0; i < 4000; i++) ctx.fillRect(Math.random() * 256, Math.random() * 256, 2, 4);
+            });
+            grassTex.repeat.set(50, 50);
+
+            const yardGrassTex = makeTexture('#2d5a27', (ctx) => {
+                ctx.fillStyle = '#244d1e';
+                for (let i = 0; i < 4000; i++) ctx.fillRect(Math.random() * 256, Math.random() * 256, 2, 4);
+            });
+            yardGrassTex.repeat.set(4, 4);
+
+            const asphaltTex = makeTexture('#26292e', (ctx) => {
+                ctx.fillStyle = '#363a40';
+                for (let i = 0; i < 5000; i++) ctx.fillRect(Math.random() * 256, Math.random() * 256, 2, 2);
+            });
+            asphaltTex.repeat.set(4, 60);
+
+            const concreteTex = makeTexture('#8c9298', (ctx) => {
+                ctx.strokeStyle = '#686d73';
+                ctx.lineWidth = 4;
+                ctx.strokeRect(2, 2, 252, 252);
+            });
+            concreteTex.repeat.set(2, 60);
+
+            const redBrickTex = makeTexture('#8f3b2e', (ctx) => {
+                ctx.strokeStyle = '#b5b0a8';
+                ctx.lineWidth = 4;
+                for (let y = 0; y < 256; y += 32) {
+                    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(256, y); ctx.stroke();
+                }
+            });
+            redBrickTex.repeat.set(4, 3);
+
+            const brownBrickTex = makeTexture('#5e4c42', (ctx) => {
+                ctx.strokeStyle = '#3a2e28';
+                ctx.lineWidth = 4;
+                for (let y = 0; y < 256; y += 32) {
+                    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(256, y); ctx.stroke();
+                }
+            });
+            brownBrickTex.repeat.set(4, 3);
+
+            const sidingTex = makeTexture('#687685', (ctx) => {
+                ctx.fillStyle = '#45505b';
+                for (let y = 0; y < 256; y += 16) ctx.fillRect(0, y, 256, 2);
+            });
+            sidingTex.repeat.set(3, 2);
+
+            const woodTex = makeTexture('#7c5230', (ctx) => {
+                ctx.fillStyle = '#5c3a1e';
+                for (let x = 0; x < 256; x += 32) ctx.fillRect(x, 0, 2, 256);
+            });
+            woodTex.repeat.set(4, 4);
+
+            // Materials
+            const groundMat = new THREE.MeshStandardMaterial({ map: grassTex, roughness: 0.95 });
+            const yardGrassMat = new THREE.MeshStandardMaterial({ map: yardGrassTex, roughness: 0.9 });
+            const asphaltMat = new THREE.MeshStandardMaterial({ map: asphaltTex, roughness: 0.85 });
+            const sidewalkMat = new THREE.MeshStandardMaterial({ map: concreteTex, roughness: 0.8 });
+            const redBrickMat = new THREE.MeshStandardMaterial({ map: redBrickTex, roughness: 0.85 });
+            const brownBrickMat = new THREE.MeshStandardMaterial({ map: brownBrickTex, roughness: 0.85 });
+            const sidingMat = new THREE.MeshStandardMaterial({ map: sidingTex, roughness: 0.75 });
+            const woodFloorMat = new THREE.MeshStandardMaterial({ map: woodTex, roughness: 0.55 });
+
+            // Lighting
+            scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+            const sunLight = new THREE.DirectionalLight(0xfff6e5, 1.5);
+            sunLight.position.set(50, 100, 50);
+            sunLight.castShadow = true;
+            sunLight.shadow.mapSize.width = 2048;
+            sunLight.shadow.mapSize.height = 2048;
+            scene.add(sunLight);
+
+            // Ground & Roads
+            const ground = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), groundMat);
+            ground.rotation.x = -Math.PI / 2;
+            ground.receiveShadow = true;
+            scene.add(ground);
+
+            const townGroup = new THREE.Group();
+            scene.add(townGroup);
+
+            const roadNS = new THREE.Mesh(new THREE.PlaneGeometry(16, 300), asphaltMat);
+            roadNS.rotation.x = -Math.PI / 2;
+            roadNS.position.set(0, 0.02, 0);
+            townGroup.add(roadNS);
+
+            const roadEW = new THREE.Mesh(new THREE.PlaneGeometry(300, 16), asphaltMat);
+            roadEW.rotation.x = -Math.PI / 2;
+            roadEW.position.set(0, 0.025, 0);
+            townGroup.add(roadEW);
+
+            [-9.75, 9.75].forEach(offset => {
+                const swNS = new THREE.Mesh(new THREE.BoxGeometry(3.5, 0.16, 300), sidewalkMat);
+                swNS.position.set(offset, 0.08, 0);
+                townGroup.add(swNS);
+                const swEW = new THREE.Mesh(new THREE.BoxGeometry(300, 0.16, 3.5), sidewalkMat);
+                swEW.position.set(0, 0.08, offset);
+                townGroup.add(swEW);
+            });
+
+            // Storefront Buildings
+            const metalTrimMat = new THREE.MeshStandardMaterial({ color: 0x333840, metalness: 0.6, roughness: 0.4 });
+            const windowGlassMat = new THREE.MeshStandardMaterial({ color: 0x1c3545, metalness: 0.85, roughness: 0.1 });
+            const awningRed = new THREE.MeshStandardMaterial({ color: 0xb82e2e, roughness: 0.6 });
+            const awningBlue = new THREE.MeshStandardMaterial({ color: 0x256cb3, roughness: 0.6 });
+            const awningGreen = new THREE.MeshStandardMaterial({ color: 0x2e8540, roughness: 0.6 });
+
+            function createBuilding(x, z, w, h, d, wallMaterial, awningMat) {
+                const bld = new THREE.Group();
+                const body = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), wallMaterial);
+                body.position.set(0, h / 2, 0);
+                body.castShadow = true;
+                body.receiveShadow = true;
+                bld.add(body);
+
+                const cornice = new THREE.Mesh(new THREE.BoxGeometry(w + 0.5, 0.55, d + 0.5), metalTrimMat);
+                cornice.position.set(0, h + 0.25, 0);
+                bld.add(cornice);
+
+                const winWidth = w * 0.5, winHeight = h * 0.35;
+                const glass = new THREE.Mesh(new THREE.BoxGeometry(winWidth, winHeight, 0.12), windowGlassMat);
+                glass.position.set(-w * 0.12, winHeight / 2 + 0.3, d / 2 + 0.03);
+                bld.add(glass);
+
+                const door = new THREE.Mesh(new THREE.BoxGeometry(w * 0.16, h * 0.38, 0.12), windowGlassMat);
+                door.position.set(w * 0.28, (h * 0.38) / 2, d / 2 + 0.03);
+                bld.add(door);
+
+                if (awningMat) {
+                    const awning = new THREE.Mesh(new THREE.BoxGeometry(w * 0.85
