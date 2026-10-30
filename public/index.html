@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Badabing - Stable Town with House</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Badabing - Forward/Backward Touch Buttons</title>
     <style>
         body {
             margin: 0;
@@ -13,6 +13,7 @@
             font-family: sans-serif;
             color: #fff;
             user-select: none;
+            -webkit-user-select: none;
         }
         #info-panel {
             position: absolute;
@@ -30,17 +31,37 @@
         p { margin: 0 0 6px 0; font-size: 12px; color: #ccc; }
         #status { font-weight: bold; color: #55ff55; }
 
-        #god-mode-panel {
+        /* Toggle Button */
+        #toggle-god-btn {
             position: absolute;
             top: 20px;
+            right: 20px;
+            background: rgba(20, 20, 28, 0.95);
+            border: 1px solid #00aaff;
+            color: #00aaff;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            z-index: 15;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            transition: 0.2s;
+        }
+        #toggle-god-btn:hover { background: #00aaff; color: #fff; }
+
+        #god-mode-panel {
+            position: absolute;
+            top: 70px;
             right: 20px;
             background: rgba(20, 20, 28, 0.95);
             padding: 15px;
             border-radius: 8px;
             border: 1px solid #00aaff;
-            z-index: 10;
+            z-index: 15;
             width: 250px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            display: none;
         }
         #god-mode-panel h2 { margin: 0 0 10px 0; font-size: 15px; color: #00aaff; }
         .station-btn {
@@ -85,6 +106,52 @@
             line-height: 1.5;
         }
         #controls-hint span { color: #00aaff; font-weight: bold; }
+
+        /* Virtual Mobile On-Screen Controls (Forward/Backward & Elevation) */
+        #mobile-controls {
+            display: none;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 25;
+        }
+        #mobile-move-btns {
+            position: absolute;
+            bottom: 40px;
+            left: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            pointer-events: auto;
+        }
+        #mobile-action-btns {
+            position: absolute;
+            bottom: 40px;
+            right: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            pointer-events: auto;
+        }
+        .mob-btn {
+            width: 65px;
+            height: 65px;
+            background: rgba(0, 170, 255, 0.6);
+            border: 2px solid #fff;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            touch-action: manipulation;
+        }
+        .mob-btn:active { background: rgba(0, 170, 255, 0.9); }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
@@ -95,10 +162,13 @@
 
     <div id="info-panel">
         <h1>The Badabing 🦫</h1>
-        <p>Status: <span id="status">Active (Stable Build)</span></p>
+        <p>Status: <span id="status">Active (Simple Move Buttons)</span></p>
         <p>Peanut's Pos: <span id="coords">X: 0, Z: 0</span></p>
-        <p>Cam Mode: <span id="cam-mode" style="color: #00aaff;">1st-Person God Mode</span></p>
+        <p>Cam Mode: <span id="cam-mode" style="color: #00aaff;">1st-Person Walkthrough</span></p>
     </div>
+
+    <!-- Toggle Button -->
+    <button id="toggle-god-btn">🛠️ God Mode</button>
 
     <div id="god-mode-panel">
         <h2>God Mode Inspector</h2>
@@ -111,14 +181,26 @@
         <button class="station-btn" data-type="none" style="background: #333;">✋ Hands Empty (Look)</button>
     </div>
 
+    <!-- Virtual Touch Controls for Mobile / Tablets -->
+    <div id="mobile-controls">
+        <div id="mobile-move-btns">
+            <div class="mob-btn" id="btn-forward">🔼</div>
+            <div class="mob-btn" id="btn-backward">🔽</div>
+        </div>
+        <div id="mobile-action-btns">
+            <div class="mob-btn" id="btn-up">⬆️</div>
+            <div class="mob-btn" id="btn-down">⬇️</div>
+        </div>
+    </div>
+
     <div id="controls-hint">
-        Click Screen: <span>Lock Mouse Look</span> | Walk: <span>WASD</span><br>
-        Fly Up/Down: <span>Space / Shift</span> | Release Mouse: <span>ESC</span>
+        Click Screen: <span>Lock Look</span> | Walk: <span>WASD</span><br>
+        Mobile: <span>Use Forward/Backward Buttons & Touch Drag to Look</span>
     </div>
 
     <script>
         try {
-            console.log("🚀 Initializing Stable 3D World with House...");
+            console.log("🚀 Initializing World with Forward/Backward Buttons...");
 
             const scene = new THREE.Scene();
             scene.background = new THREE.Color(0x87a8d0);
@@ -288,41 +370,6 @@
             }
             scene.add(officeBuilding);
 
-            // ==========================================
-            // SAFE TWO-STORY HOUSE AT X:-201, Z:-114
-            // ==========================================
-            const houseGroup = new THREE.Group();
-            houseGroup.position.set(-201, 0, -114);
-
-            const houseMat = new THREE.MeshStandardMaterial({ color: 0x687685, roughness: 0.7 });
-            const roofMat = new THREE.MeshStandardMaterial({ color: 0x333333, roughness: 0.8 });
-            const bedMat = new THREE.MeshStandardMaterial({ color: 0x256cb3, roughness: 0.5 });
-            const mailMat = new THREE.MeshStandardMaterial({ color: 0xb82e2e });
-
-            // Main structure block (2 stories high)
-            const houseBody = new THREE.Mesh(new THREE.BoxGeometry(14, 8, 12), houseMat);
-            houseBody.position.y = 4;
-            houseBody.castShadow = true;
-            houseGroup.add(houseBody);
-
-            // Roof
-            const houseRoof = new THREE.Mesh(new THREE.ConeGeometry(10, 4, 4), roofMat);
-            houseRoof.position.y = 10;
-            houseRoof.rotation.y = Math.PI / 4;
-            houseGroup.add(houseRoof);
-
-            // Bed upstairs
-            const bed = new THREE.Mesh(new THREE.BoxGeometry(3, 1, 4), bedMat);
-            bed.position.set(3, 5, -3);
-            houseGroup.add(bed);
-
-            // Mailbox out front
-            const mailbox = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1, 1.2), mailMat);
-            mailbox.position.set(5, 1, 7);
-            houseGroup.add(mailbox);
-
-            scene.add(houseGroup);
-
             // Trees
             const trunkMat = new THREE.MeshStandardMaterial({ color: 0x5c3a1e, roughness: 0.9 });
             const leavesMat = new THREE.MeshStandardMaterial({ color: 0x2e6f40, roughness: 0.8 });
@@ -393,11 +440,25 @@
             const propsGroup = new THREE.Group();
             scene.add(propsGroup);
 
+            // Toggle God Mode Panel Logic
+            const godPanel = document.getElementById('god-mode-panel');
+            const toggleGodBtn = document.getElementById('toggle-god-btn');
+            let godModeOpen = false;
+
+            toggleGodBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                godModeOpen = !godModeOpen;
+                godPanel.style.display = godModeOpen ? 'block' : 'none';
+                toggleGodBtn.style.background = godModeOpen ? '#00aaff' : 'rgba(20, 20, 28, 0.95)';
+                toggleGodBtn.style.color = godModeOpen ? '#fff' : '#00aaff';
+            });
+
             // Controls & Mouse Look
             const controls = new THREE.PointerLockControls(camera, document.body);
 
             document.body.addEventListener('click', (e) => {
-                if (e.clientX > window.innerWidth - 260 && e.clientY < 260) return;
+                if (e.target.closest('#god-mode-panel') || e.target.closest('#toggle-god-btn') || e.target.closest('#info-panel') || e.target.closest('#mobile-controls')) return;
+                
                 if (!controls.isLocked) {
                     controls.lock();
                 } else if (selectedTool) {
@@ -437,9 +498,13 @@
             document.querySelectorAll('.station-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     document.querySelectorAll('.station-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.station-btn').forEach(b => b.style.borderColor = '#4a4a5e');
                     const type = e.currentTarget.getAttribute('data-type');
                     selectedTool = (type === 'none') ? null : type;
-                    if (selectedTool) e.currentTarget.classList.add('active');
+                    if (selectedTool) {
+                        e.currentTarget.classList.add('active');
+                        e.currentTarget.style.borderColor = '#fff';
+                    }
                 });
             });
 
@@ -462,6 +527,50 @@
                 if (e.code === 'Space') keys.space = false;
                 if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') keys.shift = false;
             });
+
+            // Mobile touch forward/backward & elevation buttons
+            const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+            if (isTouchDevice) {
+                document.getElementById('mobile-controls').style.display = 'block';
+            }
+
+            const btnForward = document.getElementById('btn-forward');
+            const btnBackward = document.getElementById('btn-backward');
+            btnForward.addEventListener('touchstart', (e) => { e.preventDefault(); keys.w = true; });
+            btnForward.addEventListener('touchend', (e) => { e.preventDefault(); keys.w = false; });
+            btnBackward.addEventListener('touchstart', (e) => { e.preventDefault(); keys.s = true; });
+            btnBackward.addEventListener('touchend', (e) => { e.preventDefault(); keys.s = false; });
+
+            let isDragging = false;
+            let prevTouchX = 0, prevTouchY = 0;
+            window.addEventListener('touchstart', (e) => {
+                if (e.target.closest('#god-mode-panel') || e.target.closest('#toggle-god-btn') || e.target.closest('#mobile-controls') || e.target.closest('#info-panel')) return;
+                isDragging = true;
+                prevTouchX = e.touches[0].clientX;
+                prevTouchY = e.touches[0].clientY;
+            });
+            window.addEventListener('touchmove', (e) => {
+                if (!isDragging) return;
+                const touchX = e.touches[0].clientX;
+                const touchY = e.touches[0].clientY;
+                const deltaX = touchX - prevTouchX;
+                const deltaY = touchY - prevTouchY;
+
+                camera.rotation.y -= deltaX * 0.005;
+                camera.rotation.x -= deltaY * 0.005;
+                camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.x));
+
+                prevTouchX = touchX;
+                prevTouchY = touchY;
+            });
+            window.addEventListener('touchend', () => { isDragging = false; });
+
+            const btnUp = document.getElementById('btn-up');
+            const btnDown = document.getElementById('btn-down');
+            btnUp.addEventListener('touchstart', (e) => { e.preventDefault(); keys.space = true; });
+            btnUp.addEventListener('touchend', (e) => { e.preventDefault(); keys.space = false; });
+            btnDown.addEventListener('touchstart', (e) => { e.preventDefault(); keys.shift = true; });
+            btnDown.addEventListener('touchend', (e) => { e.preventDefault(); keys.shift = false; });
 
             const raycaster = new THREE.Raycaster();
             const mouseCoordVector = new THREE.Vector2(0, 0);
@@ -500,10 +609,24 @@
 
                 // Camera Movement
                 const moveSpeed = 18.0 * delta;
-                if (keys.w) controls.moveForward(moveSpeed);
-                if (keys.s) controls.moveForward(-moveSpeed);
-                if (keys.a) controls.moveRight(-moveSpeed);
-                if (keys.d) controls.moveRight(moveSpeed);
+                if (controls.isLocked) {
+                    if (keys.w) controls.moveForward(moveSpeed);
+                    if (keys.s) controls.moveForward(-moveSpeed);
+                    if (keys.a) controls.moveRight(-moveSpeed);
+                    if (keys.d) controls.moveRight(moveSpeed);
+                } else {
+                    const dir = new THREE.Vector3();
+                    camera.getWorldDirection(dir);
+                    dir.y = 0;
+                    dir.normalize();
+                    const sideDir = new THREE.Vector3(-dir.z, 0, dir.x);
+
+                    if (keys.w) camera.position.addScaledVector(dir, moveSpeed);
+                    if (keys.s) camera.position.addScaledVector(dir, -moveSpeed);
+                    if (keys.a) camera.position.addScaledVector(sideDir, moveSpeed);
+                    if (keys.d) camera.position.addScaledVector(sideDir, -moveSpeed);
+                }
+
                 if (keys.space) camera.position.y += moveSpeed;
                 if (keys.shift) camera.position.y = Math.max(1.8, camera.position.y - moveSpeed);
 
