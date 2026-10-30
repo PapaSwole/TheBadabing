@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Badabing - Smooth Mouse Look</title>
+    <title>The Badabing - Peanut Facing Direction</title>
     <style>
         body {
             margin: 0;
@@ -86,7 +86,6 @@
         }
         #controls-hint span { color: #00aaff; font-weight: bold; }
     </style>
-    <!-- Three.js and PointerLockControls from CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
 </head>
@@ -96,9 +95,9 @@
 
     <div id="info-panel">
         <h1>The Badabing 🦫</h1>
-        <p>Status: <span id="status">Active (Click to Look)</span></p>
+        <p>Status: <span id="status">Active (Facing Direction)</span></p>
         <p>Peanut's Pos: <span id="coords">X: 0, Z: 0</span></p>
-        <p>Cam Mode: <span id="cam-mode" style="color: #00aaff;">1st-Person Walkthrough</span></p>
+        <p>Cam Mode: <span id="cam-mode" style="color: #00aaff;">1st-Person God Mode</span></p>
     </div>
 
     <div id="god-mode-panel">
@@ -118,7 +117,7 @@
 
     <script>
         try {
-            console.log("🚀 Initializing Smooth Mouse Look Experience...");
+            console.log("🚀 Initializing Peanut Directional Facing...");
 
             const scene = new THREE.Scene();
             scene.background = new THREE.Color(0x87a8d0);
@@ -243,7 +242,9 @@
             }
             createPeanutHouse(-30, -25);
 
-            // Peanut the Bird with Animated Eyes
+            // ==========================================
+            // PEANUT THE BIRD WITH DIRECTIONAL FACING
+            // ==========================================
             const peanutGroup = new THREE.Group();
             scene.add(peanutGroup);
 
@@ -266,146 +267,4 @@
             peanutGroup.add(birdBeak);
 
             // Animated Eyes
-            const eyeGroup = new THREE.Group();
-            peanutGroup.add(eyeGroup);
-
-            const eyeballMat = new THREE.MeshBasicMaterial({ color: 0x050505 });
-            const pupilMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-
-            const leftEye = new THREE.Group();
-            leftEye.position.set(-0.16, 1.18, 0.58);
-            leftEye.add(new THREE.Mesh(new THREE.SphereGeometry(0.09, 16, 16), eyeballMat));
-            const lPupil = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 8), pupilMat);
-            lPupil.position.set(0.02, 0.02, 0.06);
-            leftEye.add(lPupil);
-
-            const rightEye = new THREE.Group();
-            rightEye.position.set(0.16, 1.18, 0.58);
-            rightEye.add(new THREE.Mesh(new THREE.SphereGeometry(0.09, 16, 16), eyeballMat));
-            const rPupil = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 8), pupilMat);
-            rPupil.position.set(-0.02, 0.02, 0.06);
-            rightEye.add(rPupil);
-
-            eyeGroup.add(leftEye, rightEye);
-
-            // God Mode Props Group
-            const propsGroup = new THREE.Group();
-            scene.add(propsGroup);
-
-            // Native Three.js PointerLockControls for buttery-smooth FPS mouse look
-            const controls = new THREE.PointerLockControls(camera, document.body);
-
-            document.body.addEventListener('click', (e) => {
-                if (e.clientX > window.innerWidth - 260 && e.clientY < 260) return; // UI guard
-                if (!controls.isLocked) {
-                    controls.lock();
-                } else if (selectedTool) {
-                    const raycaster = new THREE.Raycaster();
-                    raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
-
-                    if (selectedTool === 'delete') {
-                        const hits = raycaster.intersectObjects(propsGroup.children, true);
-                        if (hits.length > 0) {
-                            propsGroup.remove(hits[0].object);
-                        }
-                    } else {
-                        const hits = raycaster.intersectObject(ground);
-                        if (hits.length > 0) {
-                            const pt = hits[0].point;
-                            let propGeo, propMat;
-                            if (selectedTool === 'workbench') {
-                                propGeo = new THREE.BoxGeometry(1.5, 1, 0.8);
-                                propMat = new THREE.MeshStandardMaterial({ color: 0x7c471b });
-                            } else if (selectedTool === 'crate') {
-                                propGeo = new THREE.BoxGeometry(0.9, 0.9, 0.9);
-                                propMat = new THREE.MeshStandardMaterial({ color: 0xbd7d4b });
-                            } else {
-                                propGeo = new THREE.BoxGeometry(1.2, 0.4, 2);
-                                propMat = new THREE.MeshStandardMaterial({ color: 0x1b4d3e });
-                            }
-                            const prop = new THREE.Mesh(propGeo, propMat);
-                            prop.position.set(Math.round(pt.x), 0.5, Math.round(pt.z));
-                            prop.castShadow = true;
-                            propsGroup.add(prop);
-                        }
-                    }
-                }
-            });
-
-            let selectedTool = null;
-            document.querySelectorAll('.station-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    document.querySelectorAll('.station-btn').forEach(b => b.classList.remove('active'));
-                    const type = e.currentTarget.getAttribute('data-type');
-                    selectedTool = (type === 'none') ? null : type;
-                    if (selectedTool) e.currentTarget.classList.add('active');
-                });
-            });
-
-            const keys = { w: false, a: false, s: false, d: false, space: false, shift: false };
-            window.addEventListener('keydown', (e) => {
-                const k = e.key.toLowerCase();
-                if (k === 'w' || e.key === 'ArrowUp') keys.w = true;
-                if (k === 's' || e.key === 'ArrowDown') keys.s = true;
-                if (k === 'a' || e.key === 'ArrowLeft') keys.a = true;
-                if (k === 'd' || e.key === 'ArrowRight') keys.d = true;
-                if (e.code === 'Space') keys.space = true;
-                if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') keys.shift = true;
-            });
-            window.addEventListener('keyup', (e) => {
-                const k = e.key.toLowerCase();
-                if (k === 'w' || e.key === 'ArrowUp') keys.w = false;
-                if (k === 's' || e.key === 'ArrowDown') keys.s = false;
-                if (k === 'a' || e.key === 'ArrowLeft') keys.a = false;
-                if (k === 'd' || e.key === 'ArrowRight') keys.d = false;
-                if (e.code === 'Space') keys.space = false;
-                if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') keys.shift = false;
-            });
-
-            const clock = new THREE.Clock();
-
-            function animate() {
-                requestAnimationFrame(animate);
-                const delta = clock.getDelta();
-                const elapsed = clock.getElapsedTime();
-
-                // Peanut wandering & blinking
-                peanutGroup.position.y = Math.abs(Math.sin(elapsed * 10)) * 0.15;
-                peanutGroup.position.x = Math.sin(elapsed * 0.5) * 10;
-                peanutGroup.position.z = Math.cos(elapsed * 0.4) * 10;
-
-                const blinkTimer = elapsed % 3.5;
-                if (blinkTimer < 0.12) {
-                    eyeGroup.scale.y = 0.1;
-                } else {
-                    eyeGroup.scale.y = 1.0;
-                }
-                document.getElementById('coords').innerText = `X: ${peanutGroup.position.x.toFixed(1)}, Z: ${peanutGroup.position.z.toFixed(1)}`;
-
-                // Smooth FPS Camera Movement via PointerLockControls
-                const moveSpeed = 15.0 * delta;
-                if (keys.w) controls.moveForward(moveSpeed);
-                if (keys.s) controls.moveForward(-moveSpeed);
-                if (keys.a) controls.moveRight(-moveSpeed);
-                if (keys.d) controls.moveRight(moveSpeed);
-                if (keys.space) camera.position.y += moveSpeed;
-                if (keys.shift) camera.position.y = Math.max(1.8, camera.position.y - moveSpeed);
-
-                renderer.render(scene, camera);
-            }
-            animate();
-
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            });
-
-        } catch (err) {
-            console.error("💥 Critical Setup Error:", err);
-            document.getElementById('status').innerText = "Script Error: " + err.message;
-            document.getElementById('status').style.color = "#ff5555";
-        }
-    </script>
-</body>
-</html>
+            const eyeGroup
