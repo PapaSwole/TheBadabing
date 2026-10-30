@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Badabing - Peanut with Visible Cute Eyes</title>
+    <title>The Badabing - Bulletproof Textured World</title>
     <style>
         body {
             margin: 0;
@@ -394,13 +394,104 @@
             createPeanutHouse(-32, -20);
 
             // ==========================================
-            // PEANUT THE BIRD WITH GUARANTEED VISIBLE EYES
+            // PEANUT THE BIRD WITH VISIBLE EYES
             // ==========================================
             const peanutGroup = new THREE.Group();
             scene.add(peanutGroup);
-
             const featherMat = new THREE.MeshStandardMaterial({ color: 0xff8c00, roughness: 0.35 });
             const beakMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.2 });
 
             const birdBody = new THREE.Mesh(new THREE.SphereGeometry(0.5, 16, 16), featherMat);
-            birdBody.scale.set(1, 0.8, 1.
+            birdBody.scale.set(1, 0.8, 1.3);
+            birdBody.position.y = 0.6;
+            birdBody.castShadow = true;
+            peanutGroup.add(birdBody);
+
+            const birdHead = new THREE.Mesh(new THREE.SphereGeometry(0.35, 16, 16), featherMat);
+            birdHead.position.set(0, 1.0, 0.3);
+            peanutGroup.add(birdHead);
+
+            const birdBeak = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.35, 8), beakMat);
+            birdBeak.rotateX(Math.PI / 2);
+            birdBeak.position.set(0, 0.95, 0.62);
+            peanutGroup.add(birdBeak);
+
+            // Animated Eyes
+            const eyeGroup = new THREE.Group();
+            peanutGroup.add(eyeGroup);
+
+            const eyeballMat = new THREE.MeshBasicMaterial({ color: 0x050505 });
+            const pupilMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+
+            const leftEye = new THREE.Group();
+            leftEye.position.set(-0.13, 1.05, 0.52);
+            const lBall = new THREE.Mesh(new THREE.SphereGeometry(0.08, 16, 16), eyeballMat);
+            const lPupil = new THREE.Mesh(new THREE.SphereGeometry(0.03, 8, 8), pupilMat);
+            lPupil.position.set(0.02, 0.02, 0.05);
+            leftEye.add(lBall, lPupil);
+
+            const rightEye = new THREE.Group();
+            rightEye.position.set(0.13, 1.05, 0.52);
+            const rBall = new THREE.Mesh(new THREE.SphereGeometry(0.08, 16, 16), eyeballMat);
+            const rPupil = new THREE.Mesh(new THREE.SphereGeometry(0.03, 8, 8), pupilMat);
+            rPupil.position.set(-0.02, 0.02, 0.05);
+            rightEye.add(rBall, rPupil);
+
+            eyeGroup.add(leftEye, rightEye);
+
+            const stationsGroup = new THREE.Group();
+            scene.add(stationsGroup);
+
+            function updateStations(stations) {
+                while (stationsGroup.children.length > 0) stationsGroup.remove(stationsGroup.children[0]);
+                stations.forEach(st => {
+                    let mesh;
+                    if (st.type === 'workbench') {
+                        mesh = new THREE.Mesh(new THREE.BoxGeometry(1.5, 1, 0.8), woodFloorMat);
+                        mesh.position.y = 0.5;
+                    } else if (st.type === 'crate') {
+                        mesh = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.9, 0.9), fenceWoodMat);
+                        mesh.position.y = 0.45;
+                    } else {
+                        mesh = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.4, 2), new THREE.MeshStandardMaterial({ color: 0x1b4d3e }));
+                        mesh.position.y = 0.2;
+                    }
+                    mesh.castShadow = true;
+                    mesh.position.x = st.gridX;
+                    mesh.position.z = st.gridZ;
+                    mesh.userData = { uid: st.uid };
+                    stationsGroup.add(mesh);
+                });
+            }
+
+            // ==========================================
+            // BULLETPROOF WEBSOCKET WITH LOCAL FALLBACK
+            // ==========================================
+            let ws;
+            let localSimTimer = 0;
+
+            function connectWebSocket() {
+                const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+                ws = new WebSocket(`${protocol}//${window.location.host}`);
+
+                // Connection Timeout Fallback (3 seconds)
+                const connTimeout = setTimeout(() => {
+                    if (ws.readyState !== WebSocket.OPEN) {
+                        statusEl.innerText = "Offline Mode (Local Sim Active)";
+                        statusEl.style.color = "#ffaa00";
+                    }
+                }, 3000);
+
+                ws.onopen = () => {
+                    clearTimeout(connTimeout);
+                    statusEl.innerText = "Connected (Click Scene to Walk)";
+                    statusEl.style.color = "#55ff55";
+                };
+                ws.onclose = () => {
+                    statusEl.innerText = "Offline Mode (Local Sim Active)";
+                    statusEl.style.color = "#ffaa00";
+                    setTimeout(connectWebSocket, 4000);
+                };
+                ws.onerror = () => {
+                    statusEl.innerText = "Offline Mode (Local Sim Active)";
+                    statusEl.style.
