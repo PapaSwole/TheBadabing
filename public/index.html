@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Badabing - Grid Aligned & Cul-de-sac</title>
+    <title>The Badabing - Stable Town</title>
     <style>
         body {
             margin: 0;
@@ -95,35 +95,35 @@
 
     <div id="info-panel">
         <h1>The Badabing 🦫</h1>
-        <p>Status: <span id="status">Active (Grid Aligned & Cul-de-sac)</span></p>
+        <p>Status: <span id="status">Active (Stable)</span></p>
         <p>Peanut's Pos: <span id="coords">X: 0, Z: 0</span></p>
-        <p>Placed Items: <span id="item-count">0</span></p>
+        <p>Cam Mode: <span id="cam-mode" style="color: #00aaff;">1st-Person God Mode</span></p>
     </div>
 
     <div id="god-mode-panel">
-        <h2>God Mode Tools</h2>
+        <h2>Admin Builder Tools</h2>
         <p>Select item to place / delete:</p>
-        <button class="station-btn" data-type="house">🏠 Place Aligned House</button>
         <button class="station-btn" data-type="workbench">🛠️ Industrial Workbench</button>
-        <button class="station-btn" data-type="crate">📦 Storage Crate</button>
+        <button class="station-btn" data-type="crate">📦 Storage Crate Stack</button>
+        <button class="station-btn" data-type="bed">🛌 Recovery Pod</button>
         <button class="station-btn" data-type="delete" style="background: #5a2e2e;">🗑️ Delete Mode</button>
         <button class="station-btn" data-type="none" style="background: #333;">✋ Hands Empty (Look)</button>
     </div>
 
     <div id="controls-hint">
         Click Screen: <span>Lock Mouse Look</span> | Walk: <span>WASD</span><br>
-        Place Item: <span>Snaps to Grid / Cul-de-sac</span> | ESC: <span>Unlock Mouse</span>
+        Fly Up/Down: <span>Space / Shift</span> | Release Mouse: <span>ESC</span>
     </div>
 
     <script>
         try {
-            console.log("🚀 Initializing Grid Aligned Town with Cul-de-sac...");
+            console.log("🚀 Initializing Stable 3D World...");
 
             const scene = new THREE.Scene();
             scene.background = new THREE.Color(0x87a8d0);
-            scene.fog = new THREE.FogExp2(0x87a8d0, 0.0025);
+            scene.fog = new THREE.FogExp2(0x87a8d0, 0.003);
 
-            const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2000);
+            const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1500);
             camera.position.set(0, 3, 20);
 
             const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -133,14 +133,14 @@
 
             // Lighting
             scene.add(new THREE.AmbientLight(0xffffff, 0.75));
-            const sunLight = new THREE.DirectionalLight(0xfff6e5, 1.4);
-            sunLight.position.set(80, 140, 80);
+            const sunLight = new THREE.DirectionalLight(0xfff6e5, 1.3);
+            sunLight.position.set(50, 100, 50);
             sunLight.castShadow = true;
             scene.add(sunLight);
 
             // Ground & Roads
             const ground = new THREE.Mesh(
-                new THREE.PlaneGeometry(800, 800),
+                new THREE.PlaneGeometry(400, 400),
                 new THREE.MeshStandardMaterial({ color: 0x2d5a27, roughness: 0.9 })
             );
             ground.rotation.x = -Math.PI / 2;
@@ -148,49 +148,28 @@
             scene.add(ground);
 
             const roadMat = new THREE.MeshStandardMaterial({ color: 0x26292e, roughness: 0.8 });
-            
-            // Standard Grid Roads
-            [-160, -80, 0, 80, 160].forEach(pos => {
-                const roadNS = new THREE.Mesh(new THREE.PlaneGeometry(16, 600), roadMat);
-                roadNS.rotation.x = -Math.PI / 2;
-                roadNS.position.set(pos, 0.02, 0);
-                scene.add(roadNS);
+            const roadNS = new THREE.Mesh(new THREE.PlaneGeometry(16, 300), roadMat);
+            roadNS.rotation.x = -Math.PI / 2;
+            roadNS.position.set(0, 0.02, 0);
+            scene.add(roadNS);
 
-                const roadEW = new THREE.Mesh(new THREE.PlaneGeometry(600, 16), roadMat);
-                roadEW.rotation.x = -Math.PI / 2;
-                roadEW.position.set(0, 0.03, pos);
-                scene.add(roadEW);
-            });
-
-            // ==========================================
-            // EAST CORNER CUL-DE-SAC
-            // ==========================================
-            const culDeSacGroup = new THREE.Group();
-            culDeSacGroup.position.set(160, 0.04, -120); // East corner neighborhood loop
-
-            // Circular Cul-de-sac asphalt bulb
-            const bulbGeo = new THREE.CircleGeometry(24, 32);
-            const bulbMesh = new THREE.Mesh(bulbGeo, roadMat);
-            bulbMesh.rotation.x = -Math.PI / 2;
-            culDeSacGroup.add(bulbMesh);
-
-            // Connecting street stub back to main grid
-            const stubGeo = new THREE.PlaneGeometry(16, 45);
-            const stubMesh = new THREE.Mesh(stubGeo, roadMat);
-            stubMesh.rotation.x = -Math.PI / 2;
-            stubMesh.position.set(0, 0, 25);
-            culDeSacGroup.add(stubMesh);
-
-            scene.add(culDeSacGroup);
+            const roadEW = new THREE.Mesh(new THREE.PlaneGeometry(300, 16), roadMat);
+            roadEW.rotation.x = -Math.PI / 2;
+            roadEW.position.set(0, 0.03, 0);
+            scene.add(roadEW);
 
             // Storefront Buildings
             const buildingMat = new THREE.MeshStandardMaterial({ color: 0x8f3b2e, roughness: 0.85 });
+            const brownBuildingMat = new THREE.MeshStandardMaterial({ color: 0x5e4c42, roughness: 0.85 });
             const metalTrimMat = new THREE.MeshStandardMaterial({ color: 0x333840, metalness: 0.6 });
             const windowGlassMat = new THREE.MeshStandardMaterial({ color: 0x1c3545, metalness: 0.85, roughness: 0.1 });
+            const awningRed = new THREE.MeshStandardMaterial({ color: 0xb82e2e });
+            const awningBlue = new THREE.MeshStandardMaterial({ color: 0x256cb3 });
+            const awningGreen = new THREE.MeshStandardMaterial({ color: 0x2e8540 });
 
-            function createBuilding(x, z, w, h, d) {
+            function createBuilding(x, z, w, h, d, wallMat, awningMat) {
                 const bld = new THREE.Group();
-                const body = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), buildingMat);
+                const body = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), wallMat);
                 body.position.set(0, h / 2, 0);
                 body.castShadow = true;
                 body.receiveShadow = true;
@@ -204,18 +183,203 @@
                 glass.position.set(-w * 0.12, h * 0.35, d / 2 + 0.03);
                 bld.add(glass);
 
+                const door = new THREE.Mesh(new THREE.BoxGeometry(w * 0.16, h * 0.38, 0.12), windowGlassMat);
+                door.position.set(w * 0.28, (h * 0.38) / 2, d / 2 + 0.03);
+                bld.add(door);
+
+                if (awningMat) {
+                    const awning = new THREE.Mesh(new THREE.BoxGeometry(w * 0.85, 0.35, 1.9), awningMat);
+                    awning.position.set(0, h * 0.35 + 0.8, d / 2 + 0.85);
+                    awning.rotation.x = 0.25;
+                    bld.add(awning);
+                }
+
                 bld.position.set(x, 0, z);
                 scene.add(bld);
             }
 
-            // Populate clean grid blocks
-            const blockPositions = [-120, -40, 40, 120];
-            for (let xi of blockPositions) {
-                for (let zi of blockPositions) {
-                    if (Math.abs(xi) < 25 && Math.abs(zi) < 25) continue;
-                    createBuilding(xi - 25, zi - 45, 22, 10, 16);
-                }
-            }
+            createBuilding(0, -45, 24, 10, 16, buildingMat, awningRed);
+            createBuilding(45, 0, 20, 9, 16, brownBuildingMat, awningGreen);
+            createBuilding(-45, 0, 20, 9, 16, buildingMat, awningRed);
+            createBuilding(0, 45, 22, 10, 16, brownBuildingMat, awningBlue);
 
-            // Props & Houses Group (LocalStorage Persistence)
+            // Peanut the Bird with Animated Eyes
+            const peanutGroup = new THREE.Group();
+            scene.add(peanutGroup);
+
+            const featherMat = new THREE.MeshStandardMaterial({ color: 0xff8c00 });
+            const beakMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b });
+
+            const birdBody = new THREE.Mesh(new THREE.SphereGeometry(0.6, 16, 16), featherMat);
+            birdBody.scale.set(1, 0.8, 1.3);
+            birdBody.position.y = 0.6;
+            birdBody.castShadow = true;
+            peanutGroup.add(birdBody);
+
+            const birdHead = new THREE.Mesh(new THREE.SphereGeometry(0.4, 16, 16), featherMat);
+            birdHead.position.set(0, 1.1, 0.3);
+            peanutGroup.add(birdHead);
+
+            const birdBeak = new THREE.Mesh(new THREE.ConeGeometry(0.15, 0.4, 8), beakMat);
+            birdBeak.rotateX(Math.PI / 2);
+            birdBeak.position.set(0, 1.05, 0.7);
+            peanutGroup.add(birdBeak);
+
+            // Animated Eyes
+            const eyeGroup = new THREE.Group();
+            peanutGroup.add(eyeGroup);
+
+            const eyeballMat = new THREE.MeshBasicMaterial({ color: 0x050505 });
+            const pupilMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+
+            const leftEye = new THREE.Group();
+            leftEye.position.set(-0.16, 1.18, 0.58);
+            leftEye.add(new THREE.Mesh(new THREE.SphereGeometry(0.09, 16, 16), eyeballMat));
+            const lPupil = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 8), pupilMat);
+            lPupil.position.set(0.02, 0.02, 0.06);
+            leftEye.add(lPupil);
+
+            const rightEye = new THREE.Group();
+            rightEye.position.set(0.16, 1.18, 0.58);
+            rightEye.add(new THREE.Mesh(new THREE.SphereGeometry(0.09, 16, 16), eyeballMat));
+            const rPupil = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 8), pupilMat);
+            rPupil.position.set(-0.02, 0.02, 0.06);
+            rightEye.add(rPupil);
+
+            eyeGroup.add(leftEye, rightEye);
+
+            // God Mode Props Group
             const propsGroup = new THREE.Group();
+            scene.add(propsGroup);
+
+            // Controls & Mouse Look
+            const controls = new THREE.PointerLockControls(camera, document.body);
+
+            document.body.addEventListener('click', (e) => {
+                if (e.clientX > window.innerWidth - 260 && e.clientY < 260) return;
+                if (!controls.isLocked) {
+                    controls.lock();
+                } else if (selectedTool) {
+                    const raycaster = new THREE.Raycaster();
+                    raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+
+                    if (selectedTool === 'delete') {
+                        const hits = raycaster.intersectObjects(propsGroup.children, true);
+                        if (hits.length > 0) {
+                            propsGroup.remove(hits[0].object);
+                        }
+                    } else {
+                        const hits = raycaster.intersectObject(ground);
+                        if (hits.length > 0) {
+                            const pt = hits[0].point;
+                            let propGeo, propMat;
+                            if (selectedTool === 'workbench') {
+                                propGeo = new THREE.BoxGeometry(1.5, 1, 0.8);
+                                propMat = new THREE.MeshStandardMaterial({ color: 0x7c471b });
+                            } else if (selectedTool === 'crate') {
+                                propGeo = new THREE.BoxGeometry(0.9, 0.9, 0.9);
+                                propMat = new THREE.MeshStandardMaterial({ color: 0xbd7d4b });
+                            } else {
+                                propGeo = new THREE.BoxGeometry(1.2, 0.4, 2);
+                                propMat = new THREE.MeshStandardMaterial({ color: 0x1b4d3e });
+                            }
+                            const prop = new THREE.Mesh(propGeo, propMat);
+                            prop.position.set(Math.round(pt.x), 0.5, Math.round(pt.z));
+                            prop.castShadow = true;
+                            propsGroup.add(prop);
+                        }
+                    }
+                }
+            });
+
+            let selectedTool = null;
+            document.querySelectorAll('.station-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.station-btn').forEach(b => b.classList.remove('active'));
+                    const type = e.currentTarget.getAttribute('data-type');
+                    selectedTool = (type === 'none') ? null : type;
+                    if (selectedTool) e.currentTarget.classList.add('active');
+                });
+            });
+
+            const keys = { w: false, a: false, s: false, d: false, space: false, shift: false };
+            window.addEventListener('keydown', (e) => {
+                const k = e.key.toLowerCase();
+                if (k === 'w' || e.key === 'ArrowUp') keys.w = true;
+                if (k === 's' || e.key === 'ArrowDown') keys.s = true;
+                if (k === 'a' || e.key === 'ArrowLeft') keys.a = true;
+                if (k === 'd' || e.key === 'ArrowRight') keys.d = true;
+                if (e.code === 'Space') keys.space = true;
+                if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') keys.shift = true;
+            });
+            window.addEventListener('keyup', (e) => {
+                const k = e.key.toLowerCase();
+                if (k === 'w' || e.key === 'ArrowUp') keys.w = false;
+                if (k === 's' || e.key === 'ArrowDown') keys.s = false;
+                if (k === 'a' || e.key === 'ArrowLeft') keys.a = false;
+                if (k === 'd' || e.key === 'ArrowRight') keys.d = false;
+                if (e.code === 'Space') keys.space = false;
+                if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') keys.shift = false;
+            });
+
+            const clock = new THREE.Clock();
+
+            function animate() {
+                requestAnimationFrame(animate);
+                const delta = clock.getDelta();
+                const elapsed = clock.getElapsedTime();
+
+                // Peanut wandering & facing direction
+                const nextX = Math.sin((elapsed + 0.05) * 0.5) * 10;
+                const nextZ = Math.cos((elapsed + 0.05) * 0.4) * 10;
+                
+                const currentX = Math.sin(elapsed * 0.5) * 10;
+                const currentZ = Math.cos(elapsed * 0.4) * 10;
+
+                const moveX = nextX - currentX;
+                const moveZ = nextZ - currentZ;
+
+                peanutGroup.position.x = currentX;
+                peanutGroup.position.z = currentZ;
+                peanutGroup.position.y = Math.abs(Math.sin(elapsed * 10)) * 0.15;
+
+                if (Math.abs(moveX) > 0.0001 || Math.abs(moveZ) > 0.0001) {
+                    peanutGroup.rotation.y = Math.atan2(moveX, moveZ);
+                }
+
+                // Blinking animation
+                const blinkTimer = elapsed % 3.5;
+                if (blinkTimer < 0.12) {
+                    eyeGroup.scale.y = 0.1;
+                } else {
+                    eyeGroup.scale.y = 1.0;
+                }
+                document.getElementById('coords').innerText = `X: ${peanutGroup.position.x.toFixed(1)}, Z: ${peanutGroup.position.z.toFixed(1)}`;
+
+                // Camera Movement
+                const moveSpeed = 15.0 * delta;
+                if (keys.w) controls.moveForward(moveSpeed);
+                if (keys.s) controls.moveForward(-moveSpeed);
+                if (keys.a) controls.moveRight(-moveSpeed);
+                if (keys.d) controls.moveRight(moveSpeed);
+                if (keys.space) camera.position.y += moveSpeed;
+                if (keys.shift) camera.position.y = Math.max(1.8, camera.position.y - moveSpeed);
+
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+        } catch (err) {
+            console.error("💥 Critical Setup Error:", err);
+            statusEl.innerText = "Script Error: " + err.message;
+            statusEl.style.color = "#ff5555";
+        }
+    </script>
+</body>
+</html>
