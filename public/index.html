@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Badabing - Stable Town with Large House</title>
+    <title>The Badabing - Town & House</title>
     <style>
         body {
             margin: 0;
@@ -114,7 +114,7 @@
 
     <div id="info-panel">
         <h1>The Badabing 🦫</h1>
-        <p>Status: <span id="status">Active (Stable Build)</span></p>
+        <p>Status: <span id="status">Active (Stable)</span></p>
         <p>Peanut's Pos: <span id="coords">X: 0, Z: 0</span></p>
         <p>Cam Mode: <span id="cam-mode" style="color: #00aaff;">1st-Person God Mode</span></p>
     </div>
@@ -138,3 +138,262 @@
     </div>
 
     <script>
+        try {
+            console.log("🚀 Initializing World...");
+
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x87a8d0);
+            scene.fog = new THREE.FogExp2(0x87a8d0, 0.0015);
+
+            const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 3000);
+            camera.position.set(0, 3, 20);
+
+            const renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMap.enabled = true;
+            document.body.appendChild(renderer.domElement);
+
+            // Sky Horizon Dome Gradient
+            const skyGeo = new THREE.SphereGeometry(1500, 32, 15);
+            const skyMat = new THREE.ShaderMaterial({
+                uniforms: {
+                    topColor: { value: new THREE.Color(0x3a7bd5) },
+                    bottomColor: { value: new THREE.Color(0xdbe9f6) },
+                    offset: { value: 33 },
+                    exponent: { value: 0.6 }
+                },
+                vertexShader: `
+                    varying vec3 vWorldPosition;
+                    void main() {
+                        vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+                        vWorldPosition = worldPosition.xyz;
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                    }
+                `,
+                fragmentShader: `
+                    uniform vec3 topColor;
+                    uniform vec3 bottomColor;
+                    uniform float offset;
+                    uniform float exponent;
+                    varying vec3 vWorldPosition;
+                    void main() {
+                        float h = normalize(vWorldPosition + offset).y;
+                        gl_FragColor = vec4(mix(bottomColor, topColor, max(pow(max(h, 0.0), exponent), 0.0)), 1.0);
+                    }
+                `,
+                side: THREE.BackSide
+            });
+            const skyBox = new THREE.Mesh(skyGeo, skyMat);
+            scene.add(skyBox);
+
+            // Lighting
+            scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+            const sunLight = new THREE.DirectionalLight(0xfff6e5, 1.4);
+            sunLight.position.set(100, 160, 100);
+            sunLight.castShadow = true;
+            scene.add(sunLight);
+
+            // Ground & Roads
+            const ground = new THREE.Mesh(
+                new THREE.PlaneGeometry(800, 800),
+                new THREE.MeshStandardMaterial({ color: 0x2d5a27, roughness: 0.9 })
+            );
+            ground.rotation.x = -Math.PI / 2;
+            ground.receiveShadow = true;
+            scene.add(ground);
+
+            const roadMat = new THREE.MeshStandardMaterial({ color: 0x26292e, roughness: 0.8 });
+            [-180, -90, 0, 90, 180].forEach(pos => {
+                const roadNS = new THREE.Mesh(new THREE.PlaneGeometry(16, 700), roadMat);
+                roadNS.rotation.x = -Math.PI / 2;
+                roadNS.position.set(pos, 0.02, 0);
+                scene.add(roadNS);
+
+                const roadEW = new THREE.Mesh(new THREE.PlaneGeometry(700, 16), roadMat);
+                roadEW.rotation.x = -Math.PI / 2;
+                roadEW.position.set(0, 0.03, pos);
+                scene.add(roadEW);
+            });
+
+            // Basketball Court
+            const courtGroup = new THREE.Group();
+            courtGroup.position.set(60, 0.04, 60);
+
+            const courtSurface = new THREE.Mesh(
+                new THREE.PlaneGeometry(30, 20),
+                new THREE.MeshStandardMaterial({ color: 0xd97736, roughness: 0.7 })
+            );
+            courtSurface.rotation.x = -Math.PI / 2;
+            courtGroup.add(courtSurface);
+
+            const poleMat = new THREE.MeshStandardMaterial({ color: 0x111111 });
+            const backboardMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
+            const rimMat = new THREE.MeshStandardMaterial({ color: 0xff4500 });
+
+            [-14, 14].forEach(hx => {
+                const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 6), poleMat);
+                pole.position.set(hx, 3, 0);
+                courtGroup.add(pole);
+
+                const backboard = new THREE.Mesh(new THREE.BoxGeometry(0.3, 2, 3), backboardMat);
+                backboard.position.set(hx > 0 ? hx - 0.5 : hx + 0.5, 4.5, 0);
+                courtGroup.add(backboard);
+
+                const rim = new THREE.Mesh(new THREE.TorusGeometry(0.8, 0.08, 8, 24), rimMat);
+                rim.rotation.x = Math.PI / 2;
+                rim.position.set(hx > 0 ? hx - 1.5 : hx + 1.5, 4, 0);
+                courtGroup.add(rim);
+            });
+            scene.add(courtGroup);
+
+            // APESHIT INC Office Building at X:-16, Z:135
+            const officeBuilding = new THREE.Group();
+            officeBuilding.position.set(-16, 0, 135);
+
+            const concreteMat = new THREE.MeshStandardMaterial({ color: 0x78828a, roughness: 0.7 });
+            const glassWallMat = new THREE.MeshStandardMaterial({ color: 0x1c3545, metalness: 0.85, roughness: 0.1, transparent: true, opacity: 0.85 });
+            const floorMat = new THREE.MeshStandardMaterial({ color: 0x555b61, roughness: 0.6 });
+            const stairMat = new THREE.MeshStandardMaterial({ color: 0x3d4247, roughness: 0.5 });
+            const trimMat = new THREE.MeshStandardMaterial({ color: 0x222528, metalness: 0.5 });
+            const signMat = new THREE.MeshStandardMaterial({ color: 0xff5555, emissive: 0xff2222, emissiveIntensity: 0.6 });
+
+            const oWidth = 22;
+            const oDepth = 18;
+            const oFloorHeight = 4.0;
+
+            for (let f = 0; f < 3; f++) {
+                const floorY = f * oFloorHeight;
+                const floorSlab = new THREE.Mesh(new THREE.BoxGeometry(oWidth, 0.3, oDepth), floorMat);
+                floorSlab.position.set(0, floorY + 0.15, 0);
+                floorSlab.receiveShadow = true;
+                officeBuilding.add(floorSlab);
+
+                const frontWall = new THREE.Mesh(new THREE.BoxGeometry(oWidth, oFloorHeight - 0.3, 0.4), glassWallMat);
+                frontWall.position.set(0, floorY + oFloorHeight / 2, oDepth / 2);
+                officeBuilding.add(frontWall);
+
+                const backWall = new THREE.Mesh(new THREE.BoxGeometry(oWidth, oFloorHeight - 0.3, 0.4), concreteMat);
+                backWall.position.set(0, floorY + oFloorHeight / 2, -oDepth / 2);
+                officeBuilding.add(backWall);
+
+                const leftWall = new THREE.Mesh(new THREE.BoxGeometry(0.4, oFloorHeight - 0.3, oDepth), glassWallMat);
+                leftWall.position.set(-oWidth / 2, floorY + oFloorHeight / 2, 0);
+                officeBuilding.add(leftWall);
+
+                const rightWall = new THREE.Mesh(new THREE.BoxGeometry(0.4, oFloorHeight - 0.3, oDepth), concreteMat);
+                rightWall.position.set(oWidth / 2, floorY + oFloorHeight / 2, 0);
+                officeBuilding.add(rightWall);
+            }
+
+            const roofSlab = new THREE.Mesh(new THREE.BoxGeometry(oWidth + 0.8, 0.4, oDepth + 0.8), trimMat);
+            roofSlab.position.set(0, 3 * oFloorHeight + 0.2, 0);
+            officeBuilding.add(roofSlab);
+
+            const signBoard = new THREE.Mesh(new THREE.BoxGeometry(16, 2.2, 0.6), signMat);
+            signBoard.position.set(0, 3 * oFloorHeight + 1.5, 0);
+            signBoard.castShadow = true;
+            officeBuilding.add(signBoard);
+
+            for (let s = 0; s < 2; s++) {
+                const stairStartY = s * oFloorHeight;
+                const stairGroup = new THREE.Group();
+                stairGroup.position.set(oWidth / 4, stairStartY, 0);
+                const numSteps = 12;
+                for (let i = 0; i < numSteps; i++) {
+                    const step = new THREE.Mesh(new THREE.BoxGeometry(2.5, oFloorHeight / numSteps, 0.8), stairMat);
+                    step.position.set(0, (i + 0.5) * (oFloorHeight / numSteps), (i - numSteps / 2) * 0.8);
+                    step.castShadow = true;
+                    stairGroup.add(step);
+                }
+                officeBuilding.add(stairGroup);
+            }
+            scene.add(officeBuilding);
+
+            // ==========================================
+            // LARGE HOUSE AT X:-201, Z:-114
+            // ==========================================
+            const houseGroup = new THREE.Group();
+            houseGroup.position.set(-201, 0, -114);
+
+            const hMat = new THREE.MeshStandardMaterial({ color: 0x687685, roughness: 0.75 });
+            const rMat = new THREE.MeshStandardMaterial({ color: 0x26292e, roughness: 0.8 });
+            const bMat = new THREE.MeshStandardMaterial({ color: 0x256cb3 });
+            const mMat = new THREE.MeshStandardMaterial({ color: 0xb82e2e });
+
+            // 1st Floor
+            const floor1 = new THREE.Mesh(new THREE.BoxGeometry(28, 0.4, 24), hMat);
+            floor1.position.y = 0.2;
+            houseGroup.add(floor1);
+
+            // 2nd Floor
+            const floor2 = new THREE.Mesh(new THREE.BoxGeometry(28, 0.4, 24), hMat);
+            floor2.position.y = 5.2;
+            houseGroup.add(floor2);
+
+            // Walls 1st floor
+            const wall1 = new THREE.Mesh(new THREE.BoxGeometry(28, 5, 24), hMat);
+            wall1.position.y = 2.7;
+            houseGroup.add(wall1);
+
+            // Walls 2nd floor
+            const wall2 = new THREE.Mesh(new THREE.BoxGeometry(28, 5, 24), hMat);
+            wall2.position.y = 7.7;
+            houseGroup.add(wall2);
+
+            // Roof
+            const roof = new THREE.Mesh(new THREE.ConeGeometry(20, 5, 4), rMat);
+            roof.position.y = 12.5;
+            roof.rotation.y = Math.PI / 4;
+            houseGroup.add(roof);
+
+            // Bed upstairs
+            const bed = new THREE.Mesh(new THREE.BoxGeometry(4, 1.5, 6), bMat);
+            bed.position.set(6, 6, -5);
+            houseGroup.add(bed);
+
+            // Mailbox
+            const mailbox = new THREE.Mesh(new THREE.BoxGeometry(1, 1.2, 1.5), mMat);
+            mailbox.position.set(10, 1.5, 14);
+            houseGroup.add(mailbox);
+
+            scene.add(houseGroup);
+
+            // Trees
+            const trunkMat = new THREE.MeshStandardMaterial({ color: 0x5c3a1e, roughness: 0.9 });
+            const leavesMat = new THREE.MeshStandardMaterial({ color: 0x2e6f40, roughness: 0.8 });
+
+            function createTree(x, z) {
+                const tree = new THREE.Group();
+                const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.8, 4), trunkMat);
+                trunk.position.y = 2;
+                trunk.castShadow = true;
+                tree.add(trunk);
+
+                const leaves = new THREE.Mesh(new THREE.ConeGeometry(3.5, 6, 6), leavesMat);
+                leaves.position.y = 6;
+                leaves.castShadow = true;
+                tree.add(leaves);
+
+                tree.position.set(x, 0, z);
+                scene.add(tree);
+            }
+
+            const treeCoords = [
+                [-50, -50], [-70, -30], [-30, -70],
+                [70, 30], [30, 70],
+                [-50, 50], [-70, 30], [50, -50], [70, -30],
+                [-120, -50], [-120, 50], [120, -50], [120, 50]
+            ];
+            treeCoords.forEach(coord => createTree(coord[0], coord[1]));
+
+            // Peanut the Bird with Animated Eyes
+            const peanutGroup = new THREE.Group();
+            scene.add(peanutGroup);
+
+            const featherMat = new THREE.MeshStandardMaterial({ color: 0xff8c00 });
+            const beakMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b });
+
+            const birdBody = new THREE.Mesh(new THREE.SphereGeometry(0.6, 16, 16), featherMat);
+            birdBody.scale.set(1, 0.8, 1.3);
+            birdBody.position.y = 0.6;
+            birdBody.castShadow = true;
