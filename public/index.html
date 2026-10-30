@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Badabing - Textured World & Peanut</title>
+    <title>The Badabing - Full Textured Town</title>
     <style>
         body {
             margin: 0;
@@ -131,10 +131,10 @@
         const coordsEl = document.getElementById('coords');
 
         try {
-            console.log("🚀 Starting Scene Setup...");
+            console.log("🚀 Starting Full Textured Town Setup...");
             const scene = new THREE.Scene();
             scene.background = new THREE.Color(0x87a8d0);
-            scene.fog = new THREE.FogExp2(0x87a8d0, 0.006);
+            scene.fog = new THREE.FogExp2(0x87a8d0, 0.005);
 
             const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 1500);
             camera.position.set(0, 2.0, 18);
@@ -148,7 +148,7 @@
             renderer.toneMappingExposure = 1.1;
             document.body.appendChild(renderer.domElement);
 
-            // Safe Procedural Textures (Optimized)
+            // Procedural Texture Engine
             function makeTexture(colorHex, patternFn) {
                 const canvas = document.createElement('canvas');
                 canvas.width = 256;
@@ -167,22 +167,56 @@
                 ctx.fillStyle = '#244d1e';
                 for (let i = 0; i < 4000; i++) ctx.fillRect(Math.random() * 256, Math.random() * 256, 2, 4);
             });
-            grassTex.repeat.set(30, 30);
+            grassTex.repeat.set(40, 40);
+
+            const yardGrassTex = makeTexture('#2d5a27', (ctx) => {
+                ctx.fillStyle = '#244d1e';
+                for (let i = 0; i < 4000; i++) ctx.fillRect(Math.random() * 256, Math.random() * 256, 2, 4);
+            });
+            yardGrassTex.repeat.set(4, 4);
 
             const asphaltTex = makeTexture('#26292e', (ctx) => {
                 ctx.fillStyle = '#363a40';
                 for (let i = 0; i < 5000; i++) ctx.fillRect(Math.random() * 256, Math.random() * 256, 2, 2);
             });
-            asphaltTex.repeat.set(4, 40);
+            asphaltTex.repeat.set(4, 50);
 
-            const brickTex = makeTexture('#8f3b2e', (ctx) => {
+            const asphaltEWTex = makeTexture('#26292e', (ctx) => {
+                ctx.fillStyle = '#363a40';
+                for (let i = 0; i < 5000; i++) ctx.fillRect(Math.random() * 256, Math.random() * 256, 2, 2);
+            });
+            asphaltEWTex.repeat.set(50, 4);
+
+            const concreteTex = makeTexture('#8c9298', (ctx) => {
+                ctx.strokeStyle = '#686d73';
+                ctx.lineWidth = 4;
+                ctx.strokeRect(2, 2, 252, 252);
+            });
+            concreteTex.repeat.set(2, 50);
+
+            const redBrickTex = makeTexture('#8f3b2e', (ctx) => {
                 ctx.strokeStyle = '#b5b0a8';
                 ctx.lineWidth = 4;
                 for (let y = 0; y < 256; y += 32) {
                     ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(256, y); ctx.stroke();
                 }
             });
-            brickTex.repeat.set(3, 3);
+            redBrickTex.repeat.set(4, 2.5);
+
+            const brownBrickTex = makeTexture('#5e4c42', (ctx) => {
+                ctx.strokeStyle = '#3a2e28';
+                ctx.lineWidth = 4;
+                for (let y = 0; y < 256; y += 32) {
+                    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(256, y); ctx.stroke();
+                }
+            });
+            brownBrickTex.repeat.set(4, 2.5);
+
+            const sidingTex = makeTexture('#687685', (ctx) => {
+                ctx.fillStyle = '#45505b';
+                for (let y = 0; y < 256; y += 16) ctx.fillRect(0, y, 256, 2);
+            });
+            sidingTex.repeat.set(3, 2);
 
             const woodTex = makeTexture('#7c5230', (ctx) => {
                 ctx.fillStyle = '#5c3a1e';
@@ -190,190 +224,45 @@
             });
             woodTex.repeat.set(4, 4);
 
+            const fenceWoodTex = makeTexture('#5c3a1e', (ctx) => {
+                ctx.fillStyle = '#3d2614';
+                for (let x = 0; x < 256; x += 32) ctx.fillRect(x, 0, 2, 256);
+            });
+            fenceWoodTex.repeat.set(6, 1);
+
             // Materials
             const groundMat = new THREE.MeshStandardMaterial({ map: grassTex, roughness: 0.95 });
+            const yardGrassMat = new THREE.MeshStandardMaterial({ map: yardGrassTex, roughness: 0.9 });
             const asphaltMat = new THREE.MeshStandardMaterial({ map: asphaltTex, roughness: 0.85 });
-            const brickMat = new THREE.MeshStandardMaterial({ map: brickTex, roughness: 0.8 });
-            const woodMat = new THREE.MeshStandardMaterial({ map: woodTex, roughness: 0.6 });
+            const asphaltEWMat = new THREE.MeshStandardMaterial({ map: asphaltEWTex, roughness: 0.85 });
+            const sidewalkMat = new THREE.MeshStandardMaterial({ map: concreteTex, roughness: 0.8 });
+            const redBrickMat = new THREE.MeshStandardMaterial({ map: redBrickTex, roughness: 0.85 });
+            const brownBrickMat = new THREE.MeshStandardMaterial({ map: brownBrickTex, roughness: 0.85 });
+            const sidingMat = new THREE.MeshStandardMaterial({ map: sidingTex, roughness: 0.75 });
+            const woodFloorMat = new THREE.MeshStandardMaterial({ map: woodTex, roughness: 0.55 });
+            const fenceWoodMat = new THREE.MeshStandardMaterial({ map: fenceWoodTex, roughness: 0.85 });
 
             // Lighting
             scene.add(new THREE.AmbientLight(0xffffff, 0.7));
-            const sunLight = new THREE.DirectionalLight(0xfff6e5, 1.3);
+            const sunLight = new THREE.DirectionalLight(0xfff6e5, 1.4);
             sunLight.position.set(55, 85, 45);
             sunLight.castShadow = true;
+            sunLight.shadow.mapSize.width = 2048;
+            sunLight.shadow.mapSize.height = 2048;
             scene.add(sunLight);
 
-            // Ground
-            const ground = new THREE.Mesh(new THREE.PlaneGeometry(300, 300), groundMat);
+            // Ground & Roads
+            const ground = new THREE.Mesh(new THREE.PlaneGeometry(350, 350), groundMat);
             ground.rotation.x = -Math.PI / 2;
             ground.receiveShadow = true;
             scene.add(ground);
 
-            // Road
-            const road = new THREE.Mesh(new THREE.PlaneGeometry(16, 250), asphaltMat);
-            road.rotation.x = -Math.PI / 2;
-            road.position.set(0, 0.02, 0);
-            scene.add(road);
+            const townGroup = new THREE.Group();
+            scene.add(townGroup);
 
-            // Building
-            const building = new THREE.Mesh(new THREE.BoxGeometry(20, 10, 16), brickMat);
-            building.position.set(0, 5, -25);
-            building.castShadow = true;
-            scene.add(building);
+            const roadNS = new THREE.Mesh(new THREE.PlaneGeometry(16, 260), asphaltMat);
+            roadNS.rotation.x = -Math.PI / 2;
+            roadNS.position.set(0, 0.02, 0);
+            townGroup.add(roadNS);
 
-            // Peanut the Bird with Visible Animated Eyes
-            const peanutGroup = new THREE.Group();
-            scene.add(peanutGroup);
-            peanutGroup.position.set(0, 0, 5);
-
-            const featherMat = new THREE.MeshStandardMaterial({ color: 0xff8c00, roughness: 0.35 });
-            const beakMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.2 });
-
-            const birdBody = new THREE.Mesh(new THREE.SphereGeometry(0.5, 16, 16), featherMat);
-            birdBody.scale.set(1, 0.8, 1.3);
-            birdBody.position.y = 0.6;
-            birdBody.castShadow = true;
-            peanutGroup.add(birdBody);
-
-            const birdHead = new THREE.Mesh(new THREE.SphereGeometry(0.35, 16, 16), featherMat);
-            birdHead.position.set(0, 1.0, 0.3);
-            peanutGroup.add(birdHead);
-
-            const birdBeak = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.35, 8), beakMat);
-            birdBeak.rotateX(Math.PI / 2);
-            birdBeak.position.set(0, 0.95, 0.62);
-            peanutGroup.add(birdBeak);
-
-            // Animated Eyes
-            const eyeGroup = new THREE.Group();
-            peanutGroup.add(eyeGroup);
-
-            const eyeballMat = new THREE.MeshBasicMaterial({ color: 0x050505 });
-            const pupilMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-
-            const leftEye = new THREE.Group();
-            leftEye.position.set(-0.13, 1.05, 0.52);
-            const lBall = new THREE.Mesh(new THREE.SphereGeometry(0.08, 16, 16), eyeballMat);
-            const lPupil = new THREE.Mesh(new THREE.SphereGeometry(0.03, 8, 8), pupilMat);
-            lPupil.position.set(0.02, 0.02, 0.05);
-            leftEye.add(lBall, lPupil);
-
-            const rightEye = new THREE.Group();
-            rightEye.position.set(0.13, 1.05, 0.52);
-            const rBall = new THREE.Mesh(new THREE.SphereGeometry(0.08, 16, 16), eyeballMat);
-            const rPupil = new THREE.Mesh(new THREE.SphereGeometry(0.03, 8, 8), pupilMat);
-            rPupil.position.set(-0.02, 0.02, 0.05);
-            rightEye.add(rBall, rPupil);
-
-            eyeGroup.add(leftEye, rightEye);
-
-            // Stations Group (Builder props)
-            const stationsGroup = new THREE.Group();
-            scene.add(stationsGroup);
-
-            // Controls & Movement
-            const controls = new PointerLockControls(camera, renderer.domElement);
-            let selectedTool = null;
-
-            renderer.domElement.addEventListener('click', () => {
-                if (!controls.isLocked) {
-                    controls.lock();
-                    return;
-                }
-
-                if (selectedTool) {
-                    const raycaster = new THREE.Raycaster();
-                    raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
-                    const hits = raycaster.intersectObject(ground);
-                    if (hits.length > 0) {
-                        const pt = hits[0].point;
-                        const mesh = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.8, 1.2), woodMat);
-                        mesh.position.set(Math.round(pt.x), 0.4, Math.round(pt.z));
-                        mesh.castShadow = true;
-                        stationsGroup.add(mesh);
-                    }
-                }
-            });
-
-            document.querySelectorAll('.station-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    document.querySelectorAll('.station-btn').forEach(b => b.classList.remove('active'));
-                    const type = e.currentTarget.getAttribute('data-type');
-                    selectedTool = (type === 'none' || type === 'delete') ? null : type;
-                    if (selectedTool) e.currentTarget.classList.add('active');
-                    controls.lock();
-                });
-            });
-
-            const keys = { w: false, a: false, s: false, d: false, up: false, down: false };
-            window.addEventListener('keydown', (e) => {
-                const k = e.key.toLowerCase();
-                if (k === 'w' || e.key === 'ArrowUp') keys.w = true;
-                if (k === 's' || e.key === 'ArrowDown') keys.s = true;
-                if (k === 'a' || e.key === 'ArrowLeft') keys.a = true;
-                if (k === 'd' || e.key === 'ArrowRight') keys.d = true;
-                if (e.code === 'Space') keys.up = true;
-                if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') keys.down = true;
-            });
-            window.addEventListener('keyup', (e) => {
-                const k = e.key.toLowerCase();
-                if (k === 'w' || e.key === 'ArrowUp') keys.w = false;
-                if (k === 's' || e.key === 'ArrowDown') keys.s = false;
-                if (k === 'a' || e.key === 'ArrowLeft') keys.a = false;
-                if (k === 'd' || e.key === 'ArrowRight') keys.d = false;
-                if (e.code === 'Space') keys.up = false;
-                if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') keys.down = false;
-            });
-
-            const clock = new THREE.Clock();
-            const direction = new THREE.Vector3();
-
-            function animate() {
-                requestAnimationFrame(animate);
-                const delta = clock.getDelta();
-                const elapsed = clock.getElapsedTime();
-
-                // Peanut wandering animation
-                peanutGroup.position.y = Math.abs(Math.sin(elapsed * 10)) * 0.15;
-                peanutGroup.position.x = Math.sin(elapsed * 0.6) * 10;
-
-                // Blinking animation
-                const blinkTimer = elapsed % 3.5;
-                if (blinkTimer < 0.12) {
-                    eyeGroup.scale.y = 0.1;
-                } else {
-                    eyeGroup.scale.y = 1.0;
-                }
-                coordsEl.innerText = `X: ${peanutGroup.position.x.toFixed(1)}, Z: ${peanutGroup.position.z.toFixed(1)}`;
-
-                if (controls.isLocked) {
-                    direction.z = Number(keys.w) - Number(keys.s);
-                    direction.x = Number(keys.d) - Number(keys.a);
-                    direction.normalize();
-
-                    const speed = 12.0;
-                    if (keys.w || keys.s) controls.moveForward(direction.z * speed * delta);
-                    if (keys.a || keys.d) controls.moveRight(direction.x * speed * delta);
-
-                    if (keys.up) camera.position.y += 8.0 * delta;
-                    if (keys.down) camera.position.y = Math.max(1.8, camera.position.y - 8.0 * delta);
-                }
-
-                renderer.render(scene, camera);
-            }
-            animate();
-
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            });
-
-        } catch (err) {
-            console.error("💥 Critical Script Error:", err);
-            statusEl.innerText = "Script Error";
-            statusEl.style.color = "#ff0000";
-        }
-    </script>
-</body>
-</html>
+            const roadEW = new THREE.Mesh(new THREE.
