@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>The Badabing - Forward/Backward Mobile Controls</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Badabing - Town with Office & House</title>
     <style>
         body {
             margin: 0;
@@ -13,7 +13,6 @@
             font-family: sans-serif;
             color: #fff;
             user-select: none;
-            -webkit-user-select: none;
         }
         #info-panel {
             position: absolute;
@@ -31,37 +30,17 @@
         p { margin: 0 0 6px 0; font-size: 12px; color: #ccc; }
         #status { font-weight: bold; color: #55ff55; }
 
-        /* Toggle Button */
-        #toggle-god-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(20, 20, 28, 0.95);
-            border: 1px solid #00aaff;
-            color: #00aaff;
-            padding: 10px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 14px;
-            z-index: 15;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
-            transition: 0.2s;
-        }
-        #toggle-god-btn:hover { background: #00aaff; color: #fff; }
-
         #god-mode-panel {
             position: absolute;
-            top: 70px;
+            top: 20px;
             right: 20px;
             background: rgba(20, 20, 28, 0.95);
             padding: 15px;
             border-radius: 8px;
             border: 1px solid #00aaff;
-            z-index: 15;
+            z-index: 10;
             width: 250px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            display: none;
         }
         #god-mode-panel h2 { margin: 0 0 10px 0; font-size: 15px; color: #00aaff; }
         .station-btn {
@@ -106,11 +85,114 @@
             line-height: 1.5;
         }
         #controls-hint span { color: #00aaff; font-weight: bold; }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
+</head>
+<body>
 
-        /* Virtual Mobile On-Screen Controls */
-        #mobile-controls {
-            display: none;
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width:
+    <div id="crosshair"></div>
+
+    <div id="info-panel">
+        <h1>The Badabing 🦫</h1>
+        <p>Status: <span id="status">Active (Stable Build)</span></p>
+        <p>Peanut's Pos: <span id="coords">X: 0, Z: 0</span></p>
+        <p>Cam Mode: <span id="cam-mode" style="color: #00aaff;">1st-Person God Mode</span></p>
+    </div>
+
+    <div id="god-mode-panel">
+        <h2>God Mode Inspector</h2>
+        <p style="color: #00aaff; font-weight: bold; margin-bottom: 8px;">Target: X: <span id="target-x">0</span>, Z: <span id="target-z">0</span></p>
+        <p>Select item to place / delete:</p>
+        <button class="station-btn" data-type="workbench">🛠️ Industrial Workbench</button>
+        <button class="station-btn" data-type="crate">📦 Storage Crate Stack</button>
+        <button class="station-btn" data-type="bed">🛌 Recovery Pod</button>
+        <button class="station-btn" data-type="delete" style="background: #5a2e2e;">🗑️ Delete Mode</button>
+        <button class="station-btn" data-type="none" style="background: #333;">✋ Hands Empty (Look)</button>
+    </div>
+
+    <div id="controls-hint">
+        Click Screen: <span>Lock Mouse Look</span> | Walk: <span>WASD</span><br>
+        Fly Up/Down: <span>Space / Shift</span> | Release Mouse: <span>ESC</span>
+    </div>
+
+    <script>
+        try {
+            console.log("🚀 Initializing Stable 3D World with Office & House...");
+
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x87a8d0);
+            scene.fog = new THREE.FogExp2(0x87a8d0, 0.0015);
+
+            const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 3000);
+            camera.position.set(0, 3, 20);
+
+            const renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMap.enabled = true;
+            document.body.appendChild(renderer.domElement);
+
+            // Sky Horizon Dome Gradient
+            const skyGeo = new THREE.SphereGeometry(1500, 32, 15);
+            const skyMat = new THREE.ShaderMaterial({
+                uniforms: {
+                    topColor: { value: new THREE.Color(0x3a7bd5) },
+                    bottomColor: { value: new THREE.Color(0xdbe9f6) },
+                    offset: { value: 33 },
+                    exponent: { value: 0.6 }
+                },
+                vertexShader: `
+                    varying vec3 vWorldPosition;
+                    void main() {
+                        vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+                        vWorldPosition = worldPosition.xyz;
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                    }
+                `,
+                fragmentShader: `
+                    uniform vec3 topColor;
+                    uniform vec3 bottomColor;
+                    uniform float offset;
+                    uniform float exponent;
+                    varying vec3 vWorldPosition;
+                    void main() {
+                        float h = normalize(vWorldPosition + offset).y;
+                        gl_FragColor = vec4(mix(bottomColor, topColor, max(pow(max(h, 0.0), exponent), 0.0)), 1.0);
+                    }
+                `,
+                side: THREE.BackSide
+            });
+            const skyBox = new THREE.Mesh(skyGeo, skyMat);
+            scene.add(skyBox);
+
+            // Lighting
+            scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+            const sunLight = new THREE.DirectionalLight(0xfff6e5, 1.4);
+            sunLight.position.set(100, 160, 100);
+            sunLight.castShadow = true;
+            scene.add(sunLight);
+
+            // Ground & Roads
+            const ground = new THREE.Mesh(
+                new THREE.PlaneGeometry(800, 800),
+                new THREE.MeshStandardMaterial({ color: 0x2d5a27, roughness: 0.9 })
+            );
+            ground.rotation.x = -Math.PI / 2;
+            ground.receiveShadow = true;
+            scene.add(ground);
+
+            const roadMat = new THREE.MeshStandardMaterial({ color: 0x26292e, roughness: 0.8 });
+            [-180, -90, 0, 90, 180].forEach(pos => {
+                const roadNS = new THREE.Mesh(new THREE.PlaneGeometry(16, 700), roadMat);
+                roadNS.rotation.x = -Math.PI / 2;
+                roadNS.position.set(pos, 0.02, 0);
+                scene.add(roadNS);
+
+                const roadEW = new THREE.Mesh(new THREE.PlaneGeometry(700, 16), roadMat);
+                roadEW.rotation.x = -Math.PI / 2;
+                roadEW.position.set(0, 0.03, pos);
+                scene.add(roadEW);
+            });
+
+            // Basketball Court
+            const court
