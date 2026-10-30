@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Badabing - Full Town & Peanut</title>
+    <title>The Badabing - Smooth Mouse Look</title>
     <style>
         body {
             margin: 0;
@@ -86,7 +86,9 @@
         }
         #controls-hint span { color: #00aaff; font-weight: bold; }
     </style>
+    <!-- Three.js and PointerLockControls from CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
 </head>
 <body>
 
@@ -94,9 +96,9 @@
 
     <div id="info-panel">
         <h1>The Badabing 🦫</h1>
-        <p>Status: <span id="status">Active (Full Town)</span></p>
+        <p>Status: <span id="status">Active (Click to Look)</span></p>
         <p>Peanut's Pos: <span id="coords">X: 0, Z: 0</span></p>
-        <p>Cam Mode: <span id="cam-mode" style="color: #00aaff;">1st-Person God Mode</span></p>
+        <p>Cam Mode: <span id="cam-mode" style="color: #00aaff;">1st-Person Walkthrough</span></p>
     </div>
 
     <div id="god-mode-panel">
@@ -110,13 +112,13 @@
     </div>
 
     <div id="controls-hint">
-        Look Around: <span>Mouse Drag</span> | Walk: <span>WASD</span><br>
-        Fly Up/Down: <span>Space / Shift</span> | Place/Delete: <span>Left Click</span>
+        Click Screen: <span>Lock Mouse Look</span> | Walk: <span>WASD</span><br>
+        Fly Up/Down: <span>Space / Shift</span> | Release Mouse: <span>ESC</span>
     </div>
 
     <script>
         try {
-            console.log("🚀 Initializing The Badabing Full Experience...");
+            console.log("🚀 Initializing Smooth Mouse Look Experience...");
 
             const scene = new THREE.Scene();
             scene.background = new THREE.Color(0x87a8d0);
@@ -241,12 +243,9 @@
             }
             createPeanutHouse(-30, -25);
 
-            // ==========================================
-            // PEANUT THE BIRD WITH ANIMATED EYES
-            // ==========================================
+            // Peanut the Bird with Animated Eyes
             const peanutGroup = new THREE.Group();
             scene.add(peanutGroup);
-            peanutGroup.position.set(0, 0, 0); // Directly in the center intersection
 
             const featherMat = new THREE.MeshStandardMaterial({ color: 0xff8c00 });
             const beakMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b });
@@ -266,7 +265,7 @@
             birdBeak.position.set(0, 1.05, 0.7);
             peanutGroup.add(birdBeak);
 
-            // Large, highly visible animated eyes with catchlights
+            // Animated Eyes
             const eyeGroup = new THREE.Group();
             peanutGroup.add(eyeGroup);
 
@@ -293,22 +292,44 @@
             const propsGroup = new THREE.Group();
             scene.add(propsGroup);
 
-            // Controls & Mouse Look
-            let isMouseDown = false;
-            let mouseX = 0, mouseY = 0;
-            let cameraRotationY = 0, cameraRotationX = 0;
+            // Native Three.js PointerLockControls for buttery-smooth FPS mouse look
+            const controls = new THREE.PointerLockControls(camera, document.body);
 
-            window.addEventListener('mousedown', () => { isMouseDown = true; });
-            window.addEventListener('mouseup', () => { isMouseDown = false; });
-            window.addEventListener('mousemove', (e) => {
-                if (!isMouseDown) return;
-                const deltaX = e.movementX || e.clientX - mouseX;
-                const deltaY = e.movementY || e.clientY - mouseY;
-                cameraRotationY -= deltaX * 0.003;
-                cameraRotationX -= deltaY * 0.003;
-                cameraRotationX = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, cameraRotationX));
-                mouseX = e.clientX;
-                mouseY = e.clientY;
+            document.body.addEventListener('click', (e) => {
+                if (e.clientX > window.innerWidth - 260 && e.clientY < 260) return; // UI guard
+                if (!controls.isLocked) {
+                    controls.lock();
+                } else if (selectedTool) {
+                    const raycaster = new THREE.Raycaster();
+                    raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+
+                    if (selectedTool === 'delete') {
+                        const hits = raycaster.intersectObjects(propsGroup.children, true);
+                        if (hits.length > 0) {
+                            propsGroup.remove(hits[0].object);
+                        }
+                    } else {
+                        const hits = raycaster.intersectObject(ground);
+                        if (hits.length > 0) {
+                            const pt = hits[0].point;
+                            let propGeo, propMat;
+                            if (selectedTool === 'workbench') {
+                                propGeo = new THREE.BoxGeometry(1.5, 1, 0.8);
+                                propMat = new THREE.MeshStandardMaterial({ color: 0x7c471b });
+                            } else if (selectedTool === 'crate') {
+                                propGeo = new THREE.BoxGeometry(0.9, 0.9, 0.9);
+                                propMat = new THREE.MeshStandardMaterial({ color: 0xbd7d4b });
+                            } else {
+                                propGeo = new THREE.BoxGeometry(1.2, 0.4, 2);
+                                propMat = new THREE.MeshStandardMaterial({ color: 0x1b4d3e });
+                            }
+                            const prop = new THREE.Mesh(propGeo, propMat);
+                            prop.position.set(Math.round(pt.x), 0.5, Math.round(pt.z));
+                            prop.castShadow = true;
+                            propsGroup.add(prop);
+                        }
+                    }
+                }
             });
 
             let selectedTool = null;
@@ -321,56 +342,22 @@
                 });
             });
 
-            window.addEventListener('click', (e) => {
-                if (e.clientX > window.innerWidth - 260 && e.clientY < 260) return;
-
-                const raycaster = new THREE.Raycaster();
-                raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
-
-                if (selectedTool === 'delete') {
-                    const hits = raycaster.intersectObjects(propsGroup.children, true);
-                    if (hits.length > 0) {
-                        propsGroup.remove(hits[0].object);
-                    }
-                } else if (selectedTool) {
-                    const hits = raycaster.intersectObject(ground);
-                    if (hits.length > 0) {
-                        const pt = hits[0].point;
-                        let propGeo, propMat;
-                        if (selectedTool === 'workbench') {
-                            propGeo = new THREE.BoxGeometry(1.5, 1, 0.8);
-                            propMat = new THREE.MeshStandardMaterial({ color: 0x7c471b });
-                        } else if (selectedTool === 'crate') {
-                            propGeo = new THREE.BoxGeometry(0.9, 0.9, 0.9);
-                            propMat = new THREE.MeshStandardMaterial({ color: 0xbd7d4b });
-                        } else {
-                            propGeo = new THREE.BoxGeometry(1.2, 0.4, 2);
-                            propMat = new THREE.MeshStandardMaterial({ color: 0x1b4d3e });
-                        }
-                        const prop = new THREE.Mesh(propGeo, propMat);
-                        prop.position.set(Math.round(pt.x), 0.5, Math.round(pt.z));
-                        prop.castShadow = true;
-                        propsGroup.add(prop);
-                    }
-                }
-            });
-
             const keys = { w: false, a: false, s: false, d: false, space: false, shift: false };
             window.addEventListener('keydown', (e) => {
                 const k = e.key.toLowerCase();
-                if (k === 'w') keys.w = true;
-                if (k === 's') keys.s = true;
-                if (k === 'a') keys.a = true;
-                if (k === 'd') keys.d = true;
+                if (k === 'w' || e.key === 'ArrowUp') keys.w = true;
+                if (k === 's' || e.key === 'ArrowDown') keys.s = true;
+                if (k === 'a' || e.key === 'ArrowLeft') keys.a = true;
+                if (k === 'd' || e.key === 'ArrowRight') keys.d = true;
                 if (e.code === 'Space') keys.space = true;
                 if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') keys.shift = true;
             });
             window.addEventListener('keyup', (e) => {
                 const k = e.key.toLowerCase();
-                if (k === 'w') keys.w = false;
-                if (k === 's') keys.s = false;
-                if (k === 'a') keys.a = false;
-                if (k === 'd') keys.d = false;
+                if (k === 'w' || e.key === 'ArrowUp') keys.w = false;
+                if (k === 's' || e.key === 'ArrowDown') keys.s = false;
+                if (k === 'a' || e.key === 'ArrowLeft') keys.a = false;
+                if (k === 'd' || e.key === 'ArrowRight') keys.d = false;
                 if (e.code === 'Space') keys.space = false;
                 if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') keys.shift = false;
             });
@@ -395,33 +382,14 @@
                 }
                 document.getElementById('coords').innerText = `X: ${peanutGroup.position.x.toFixed(1)}, Z: ${peanutGroup.position.z.toFixed(1)}`;
 
-                // Camera Movement
+                // Smooth FPS Camera Movement via PointerLockControls
                 const moveSpeed = 15.0 * delta;
-                if (keys.w) {
-                    camera.position.x -= Math.sin(cameraRotationY) * moveSpeed;
-                    camera.position.z -= Math.cos(cameraRotationY) * moveSpeed;
-                }
-                if (keys.s) {
-                    camera.position.x += Math.sin(cameraRotationY) * moveSpeed;
-                    camera.position.z += Math.cos(cameraRotationY) * moveSpeed;
-                }
-                if (keys.a) {
-                    camera.position.x -= Math.cos(cameraRotationY) * moveSpeed;
-                    camera.position.z += Math.sin(cameraRotationY) * moveSpeed;
-                }
-                if (keys.d) {
-                    camera.position.x += Math.cos(cameraRotationY) * moveSpeed;
-                    camera.position.z -= Math.cos(cameraRotationY) * moveSpeed;
-                }
+                if (keys.w) controls.moveForward(moveSpeed);
+                if (keys.s) controls.moveForward(-moveSpeed);
+                if (keys.a) controls.moveRight(-moveSpeed);
+                if (keys.d) controls.moveRight(moveSpeed);
                 if (keys.space) camera.position.y += moveSpeed;
                 if (keys.shift) camera.position.y = Math.max(1.8, camera.position.y - moveSpeed);
-
-                const targetLook = new THREE.Vector3(
-                    camera.position.x - Math.sin(cameraRotationY),
-                    camera.position.y + Math.sin(cameraRotationX),
-                    camera.position.z - Math.cos(cameraRotationY)
-                );
-                camera.lookAt(targetLook);
 
                 renderer.render(scene, camera);
             }
