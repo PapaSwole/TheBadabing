@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>The Badabing - Mobile Controls & God Mode</title>
+    <title>The Badabing - God Mode Toggle</title>
     <style>
         body {
             margin: 0;
@@ -61,7 +61,7 @@
             z-index: 15;
             width: 250px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            display: none; /* Toggled via button */
+            display: none; /* Hidden by default, toggled via button */
         }
         #god-mode-panel h2 { margin: 0 0 10px 0; font-size: 15px; color: #00aaff; }
         .station-btn {
@@ -177,7 +177,7 @@
 
     <div id="info-panel">
         <h1>The Badabing 🦫</h1>
-        <p>Status: <span id="status">Active (Mobile & God Mode)</span></p>
+        <p>Status: <span id="status">Active (Toggle Ready)</span></p>
         <p>Peanut's Pos: <span id="coords">X: 0, Z: 0</span></p>
         <p>Cam Mode: <span id="cam-mode" style="color: #00aaff;">1st-Person Walkthrough</span></p>
     </div>
@@ -191,4 +191,507 @@
         <p>Select item to place / delete:</p>
         <button class="station-btn" data-type="workbench">🛠️ Industrial Workbench</button>
         <button class="station-btn" data-type="crate">📦 Storage Crate Stack</button>
-        <button class="station-btn" data-type="bed
+        <button class="station-btn" data-type="bed">🛌 Recovery Pod</button>
+        <button class="station-btn" data-type="delete" style="background: #5a2e2e;">🗑️ Delete Mode</button>
+        <button class="station-btn" data-type="none" style="background: #333;">✋ Hands Empty (Look)</button>
+    </div>
+
+    <!-- Virtual Touch Controls for Mobile / Tablets -->
+    <div id="mobile-controls">
+        <div id="virtual-joystick">
+            <div id="joystick-thumb"></div>
+        </div>
+        <div id="mobile-action-btns">
+            <div class="mob-btn" id="btn-up">⬆️</div>
+            <div class="mob-btn" id="btn-down">⬇️</div>
+        </div>
+    </div>
+
+    <div id="controls-hint">
+        Click Screen: <span>Lock Look</span> | Walk: <span>WASD</span><br>
+        Mobile: <span>Use Virtual D-Pad / Touch Drag to Look</span>
+    </div>
+
+    <script>
+        try {
+            console.log("🚀 Initializing World with God Mode Toggle...");
+
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x87a8d0);
+            scene.fog = new THREE.FogExp2(0x87a8d0, 0.0015);
+
+            const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 3000);
+            camera.position.set(0, 3, 20);
+
+            const renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMap.enabled = true;
+            document.body.appendChild(renderer.domElement);
+
+            // Sky Horizon Dome Gradient
+            const skyGeo = new THREE.SphereGeometry(1500, 32, 15);
+            const skyMat = new THREE.ShaderMaterial({
+                uniforms: {
+                    topColor: { value: new THREE.Color(0x3a7bd5) },
+                    bottomColor: { value: new THREE.Color(0xdbe9f6) },
+                    offset: { value: 33 },
+                    exponent: { value: 0.6 }
+                },
+                vertexShader: `
+                    varying vec3 vWorldPosition;
+                    void main() {
+                        vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+                        vWorldPosition = worldPosition.xyz;
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                    }
+                `,
+                fragmentShader: `
+                    uniform vec3 topColor;
+                    uniform vec3 bottomColor;
+                    uniform float offset;
+                    uniform float exponent;
+                    varying vec3 vWorldPosition;
+                    void main() {
+                        float h = normalize(vWorldPosition + offset).y;
+                        gl_FragColor = vec4(mix(bottomColor, topColor, max(pow(max(h, 0.0), exponent), 0.0)), 1.0);
+                    }
+                `,
+                side: THREE.BackSide
+            });
+            const skyBox = new THREE.Mesh(skyGeo, skyMat);
+            scene.add(skyBox);
+
+            // Lighting
+            scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+            const sunLight = new THREE.DirectionalLight(0xfff6e5, 1.4);
+            sunLight.position.set(100, 160, 100);
+            sunLight.castShadow = true;
+            scene.add(sunLight);
+
+            // Ground & Roads
+            const ground = new THREE.Mesh(
+                new THREE.PlaneGeometry(800, 800),
+                new THREE.MeshStandardMaterial({ color: 0x2d5a27, roughness: 0.9 })
+            );
+            ground.rotation.x = -Math.PI / 2;
+            ground.receiveShadow = true;
+            scene.add(ground);
+
+            const roadMat = new THREE.MeshStandardMaterial({ color: 0x26292e, roughness: 0.8 });
+            [-180, -90, 0, 90, 180].forEach(pos => {
+                const roadNS = new THREE.Mesh(new THREE.PlaneGeometry(16, 700), roadMat);
+                roadNS.rotation.x = -Math.PI / 2;
+                roadNS.position.set(pos, 0.02, 0);
+                scene.add(roadNS);
+
+                const roadEW = new THREE.Mesh(new THREE.PlaneGeometry(700, 16), roadMat);
+                roadEW.rotation.x = -Math.PI / 2;
+                roadEW.position.set(0, 0.03, pos);
+                scene.add(roadEW);
+            });
+
+            // Basketball Court
+            const courtGroup = new THREE.Group();
+            courtGroup.position.set(60, 0.04, 60);
+
+            const courtSurface = new THREE.Mesh(
+                new THREE.PlaneGeometry(30, 20),
+                new THREE.MeshStandardMaterial({ color: 0xd97736, roughness: 0.7 })
+            );
+            courtSurface.rotation.x = -Math.PI / 2;
+            courtGroup.add(courtSurface);
+
+            const poleMat = new THREE.MeshStandardMaterial({ color: 0x111111 });
+            const backboardMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
+            const rimMat = new THREE.MeshStandardMaterial({ color: 0xff4500 });
+
+            [-14, 14].forEach(hx => {
+                const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 6), poleMat);
+                pole.position.set(hx, 3, 0);
+                courtGroup.add(pole);
+
+                const backboard = new THREE.Mesh(new THREE.BoxGeometry(0.3, 2, 3), backboardMat);
+                backboard.position.set(hx > 0 ? hx - 0.5 : hx + 0.5, 4.5, 0);
+                courtGroup.add(backboard);
+
+                const rim = new THREE.Mesh(new THREE.TorusGeometry(0.8, 0.08, 8, 24), rimMat);
+                rim.rotation.x = Math.PI / 2;
+                rim.position.set(hx > 0 ? hx - 1.5 : hx + 1.5, 4, 0);
+                courtGroup.add(rim);
+            });
+            scene.add(courtGroup);
+
+            // APESHIT INC Office Building at X:-16, Z:135
+            const officeBuilding = new THREE.Group();
+            officeBuilding.position.set(-16, 0, 135);
+
+            const concreteMat = new THREE.MeshStandardMaterial({ color: 0x78828a, roughness: 0.7 });
+            const glassWallMat = new THREE.MeshStandardMaterial({ color: 0x1c3545, metalness: 0.85, roughness: 0.1, transparent: true, opacity: 0.85 });
+            const floorMat = new THREE.MeshStandardMaterial({ color: 0x555b61, roughness: 0.6 });
+            const stairMat = new THREE.MeshStandardMaterial({ color: 0x3d4247, roughness: 0.5 });
+            const trimMat = new THREE.MeshStandardMaterial({ color: 0x222528, metalness: 0.5 });
+            const signMat = new THREE.MeshStandardMaterial({ color: 0xff5555, emissive: 0xff2222, emissiveIntensity: 0.6 });
+
+            const oWidth = 22;
+            const oDepth = 18;
+            const oFloorHeight = 4.0;
+
+            for (let f = 0; f < 3; f++) {
+                const floorY = f * oFloorHeight;
+                const floorSlab = new THREE.Mesh(new THREE.BoxGeometry(oWidth, 0.3, oDepth), floorMat);
+                floorSlab.position.set(0, floorY + 0.15, 0);
+                floorSlab.receiveShadow = true;
+                officeBuilding.add(floorSlab);
+
+                const frontWall = new THREE.Mesh(new THREE.BoxGeometry(oWidth, oFloorHeight - 0.3, 0.4), glassWallMat);
+                frontWall.position.set(0, floorY + oFloorHeight / 2, oDepth / 2);
+                officeBuilding.add(frontWall);
+
+                const backWall = new THREE.Mesh(new THREE.BoxGeometry(oWidth, oFloorHeight - 0.3, 0.4), concreteMat);
+                backWall.position.set(0, floorY + oFloorHeight / 2, -oDepth / 2);
+                officeBuilding.add(backWall);
+
+                const leftWall = new THREE.Mesh(new THREE.BoxGeometry(0.4, oFloorHeight - 0.3, oDepth), glassWallMat);
+                leftWall.position.set(-oWidth / 2, floorY + oFloorHeight / 2, 0);
+                officeBuilding.add(leftWall);
+
+                const rightWall = new THREE.Mesh(new THREE.BoxGeometry(0.4, oFloorHeight - 0.3, oDepth), concreteMat);
+                rightWall.position.set(oWidth / 2, floorY + oFloorHeight / 2, 0);
+                officeBuilding.add(rightWall);
+            }
+
+            const roofSlab = new THREE.Mesh(new THREE.BoxGeometry(oWidth + 0.8, 0.4, oDepth + 0.8), trimMat);
+            roofSlab.position.set(0, 3 * oFloorHeight + 0.2, 0);
+            officeBuilding.add(roofSlab);
+
+            const signBoard = new THREE.Mesh(new THREE.BoxGeometry(16, 2.2, 0.6), signMat);
+            signBoard.position.set(0, 3 * oFloorHeight + 1.5, 0);
+            signBoard.castShadow = true;
+            officeBuilding.add(signBoard);
+
+            for (let s = 0; s < 2; s++) {
+                const stairStartY = s * oFloorHeight;
+                const stairGroup = new THREE.Group();
+                stairGroup.position.set(oWidth / 4, stairStartY, 0);
+                const numSteps = 12;
+                for (let i = 0; i < numSteps; i++) {
+                    const step = new THREE.Mesh(new THREE.BoxGeometry(2.5, oFloorHeight / numSteps, 0.8), stairMat);
+                    step.position.set(0, (i + 0.5) * (oFloorHeight / numSteps), (i - numSteps / 2) * 0.8);
+                    step.castShadow = true;
+                    stairGroup.add(step);
+                }
+                officeBuilding.add(stairGroup);
+            }
+            scene.add(officeBuilding);
+
+            // Trees
+            const trunkMat = new THREE.MeshStandardMaterial({ color: 0x5c3a1e, roughness: 0.9 });
+            const leavesMat = new THREE.MeshStandardMaterial({ color: 0x2e6f40, roughness: 0.8 });
+
+            function createTree(x, z) {
+                const tree = new THREE.Group();
+                const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.8, 4), trunkMat);
+                trunk.position.y = 2;
+                trunk.castShadow = true;
+                tree.add(trunk);
+
+                const leaves = new THREE.Mesh(new THREE.ConeGeometry(3.5, 6, 6), leavesMat);
+                leaves.position.y = 6;
+                leaves.castShadow = true;
+                tree.add(leaves);
+
+                tree.position.set(x, 0, z);
+                scene.add(tree);
+            }
+
+            const treeCoords = [
+                [-50, -50], [-70, -30], [-30, -70],
+                [70, 30], [30, 70],
+                [-50, 50], [-70, 30], [50, -50], [70, -30],
+                [-120, -50], [-120, 50], [120, -50], [120, 50]
+            ];
+            treeCoords.forEach(coord => createTree(coord[0], coord[1]));
+
+            // Peanut the Bird with Animated Eyes
+            const peanutGroup = new THREE.Group();
+            scene.add(peanutGroup);
+
+            const featherMat = new THREE.MeshStandardMaterial({ color: 0xff8c00 });
+            const beakMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b });
+
+            const birdBody = new THREE.Mesh(new THREE.SphereGeometry(0.6, 16, 16), featherMat);
+            birdBody.scale.set(1, 0.8, 1.3);
+            birdBody.position.y = 0.6;
+            birdBody.castShadow = true;
+            peanutGroup.add(birdBody);
+
+            const birdHead = new THREE.Mesh(new THREE.SphereGeometry(0.4, 16, 16), featherMat);
+            birdHead.position.set(0, 1.1, 0.3);
+            peanutGroup.add(birdHead);
+
+            const birdBeak = new THREE.Mesh(new THREE.ConeGeometry(0.15, 0.4, 8), beakMat);
+            birdBeak.rotateX(Math.PI / 2);
+            birdBeak.position.set(0, 1.05, 0.7);
+            peanutGroup.add(birdBeak);
+
+            const eyeGroup = new THREE.Group();
+            peanutGroup.add(eyeGroup);
+
+            const eyeballMat = new THREE.MeshBasicMaterial({ color: 0x050505 });
+            const pupilMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+
+            [-0.16, 0.16].forEach(ex => {
+                const eye = new THREE.Group();
+                eye.position.set(ex, 1.18, 0.58);
+                eye.add(new THREE.Mesh(new THREE.SphereGeometry(0.09, 16, 16), eyeballMat));
+                const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 8), pupilMat);
+                pupil.position.set(ex > 0 ? -0.02 : 0.02, 0.02, 0.06);
+                eye.add(pupil);
+                eyeGroup.add(eye);
+            });
+
+            // God Mode Props Group
+            const propsGroup = new THREE.Group();
+            scene.add(propsGroup);
+
+            // Toggle God Mode Panel Logic
+            const godPanel = document.getElementById('god-mode-panel');
+            const toggleGodBtn = document.getElementById('toggle-god-btn');
+            let godModeOpen = false;
+
+            toggleGodBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                godModeOpen = !godModeOpen;
+                godPanel.style.display = godModeOpen ? 'block' : 'none';
+                toggleGodBtn.style.background = godModeOpen ? '#00aaff' : 'rgba(20, 20, 28, 0.95)';
+                toggleGodBtn.style.color = godModeOpen ? '#fff' : '#00aaff';
+            });
+
+            // Controls & Mouse Look
+            const controls = new THREE.PointerLockControls(camera, document.body);
+
+            document.body.addEventListener('click', (e) => {
+                if (e.target.closest('#god-mode-panel') || e.target.closest('#toggle-god-btn') || e.target.closest('#info-panel') || e.target.closest('#mobile-controls')) return;
+                
+                if (!controls.isLocked) {
+                    controls.lock();
+                } else if (selectedTool) {
+                    const raycaster = new THREE.Raycaster();
+                    raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+
+                    if (selectedTool === 'delete') {
+                        const hits = raycaster.intersectObjects(propsGroup.children, true);
+                        if (hits.length > 0) {
+                            propsGroup.remove(hits[0].object);
+                        }
+                    } else {
+                        const hits = raycaster.intersectObject(ground);
+                        if (hits.length > 0) {
+                            const pt = hits[0].point;
+                            let propGeo, propMat;
+                            if (selectedTool === 'workbench') {
+                                propGeo = new THREE.BoxGeometry(1.5, 1, 0.8);
+                                propMat = new THREE.MeshStandardMaterial({ color: 0x7c471b });
+                            } else if (selectedTool === 'crate') {
+                                propGeo = new THREE.BoxGeometry(0.9, 0.9, 0.9);
+                                propMat = new THREE.MeshStandardMaterial({ color: 0xbd7d4b });
+                            } else {
+                                propGeo = new THREE.BoxGeometry(1.2, 0.4, 2);
+                                propMat = new THREE.MeshStandardMaterial({ color: 0x1b4d3e });
+                            }
+                            const prop = new THREE.Mesh(propGeo, propMat);
+                            prop.position.set(Math.round(pt.x), 0.5, Math.round(pt.z));
+                            prop.castShadow = true;
+                            propsGroup.add(prop);
+                        }
+                    }
+                }
+            });
+
+            let selectedTool = null;
+            document.querySelectorAll('.station-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.station-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.station-btn').forEach(b => b.style.borderColor = '#4a4a5e');
+                    const type = e.currentTarget.getAttribute('data-type');
+                    selectedTool = (type === 'none') ? null : type;
+                    if (selectedTool) {
+                        e.currentTarget.classList.add('active');
+                        e.currentTarget.style.borderColor = '#fff';
+                    }
+                });
+            });
+
+            const keys = { w: false, a: false, s: false, d: false, space: false, shift: false };
+            window.addEventListener('keydown', (e) => {
+                const k = e.key.toLowerCase();
+                if (k === 'w' || e.key === 'ArrowUp') keys.w = true;
+                if (k === 's' || e.key === 'ArrowDown') keys.s = true;
+                if (k === 'a' || e.key === 'ArrowLeft') keys.a = true;
+                if (k === 'd' || e.key === 'ArrowRight') keys.d = true;
+                if (e.code === 'Space') keys.space = true;
+                if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') keys.shift = true;
+            });
+            window.addEventListener('keyup', (e) => {
+                const k = e.key.toLowerCase();
+                if (k === 'w' || e.key === 'ArrowUp') keys.w = false;
+                if (k === 's' || e.key === 'ArrowDown') keys.s = false;
+                if (k === 'a' || e.key === 'ArrowLeft') keys.a = false;
+                if (k === 'd' || e.key === 'ArrowRight') keys.d = false;
+                if (e.code === 'Space') keys.space = false;
+                if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') keys.shift = false;
+            });
+
+            // Mobile touch joystick
+            const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+            if (isTouchDevice) {
+                document.getElementById('mobile-controls').style.display = 'block';
+            }
+
+            const joystick = document.getElementById('virtual-joystick');
+            const thumb = document.getElementById('joystick-thumb');
+            let touchMoveVector = { x: 0, y: 0 };
+
+            joystick.addEventListener('touchstart', (e) => { e.stopPropagation(); handleTouch(e); }, { passive: false });
+            joystick.addEventListener('touchmove', (e) => { e.stopPropagation(); handleTouch(e); }, { passive: false });
+            joystick.addEventListener('touchend', (e) => {
+                e.stopPropagation();
+                touchMoveVector = { x: 0, y: 0 };
+                thumb.style.transform = `translate(0px, 0px)`;
+                keys.w = keys.s = keys.a = keys.d = false;
+            }, { passive: false });
+
+            function handleTouch(e) {
+                const rect = joystick.getBoundingClientRect();
+                const touch = e.touches[0];
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                
+                let dx = touch.clientX - centerX;
+                let dy = touch.clientY - centerY;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                const maxDist = 45;
+
+                if (dist > maxDist) {
+                    dx = (dx / dist) * maxDist;
+                    dy = (dy / dist) * maxDist;
+                }
+
+                thumb.style.transform = `translate(${dx}px, ${dy}px)`;
+
+                touchMoveVector.x = dx / maxDist;
+                touchMoveVector.y = dy / maxDist;
+
+                keys.w = touchMoveVector.y < -0.25;
+                keys.s = touchMoveVector.y > 0.25;
+                keys.a = touchMoveVector.x < -0.25;
+                keys.d = touchMoveVector.x > 0.25;
+            }
+
+            let isDragging = false;
+            let prevTouchX = 0, prevTouchY = 0;
+            window.addEventListener('touchstart', (e) => {
+                if (e.target.closest('#god-mode-panel') || e.target.closest('#toggle-god-btn') || e.target.closest('#mobile-controls') || e.target.closest('#info-panel')) return;
+                isDragging = true;
+                prevTouchX = e.touches[0].clientX;
+                prevTouchY = e.touches[0].clientY;
+            });
+            window.addEventListener('touchmove', (e) => {
+                if (!isDragging) return;
+                const touchX = e.touches[0].clientX;
+                const touchY = e.touches[0].clientY;
+                const deltaX = touchX - prevTouchX;
+                const deltaY = touchY - prevTouchY;
+
+                camera.rotation.y -= deltaX * 0.005;
+                camera.rotation.x -= deltaY * 0.005;
+                camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.x));
+
+                prevTouchX = touchX;
+                prevTouchY = touchY;
+            });
+            window.addEventListener('touchend', () => { isDragging = false; });
+
+            const btnUp = document.getElementById('btn-up');
+            const btnDown = document.getElementById('btn-down');
+            btnUp.addEventListener('touchstart', (e) => { e.preventDefault(); keys.space = true; });
+            btnUp.addEventListener('touchend', (e) => { e.preventDefault(); keys.space = false; });
+            btnDown.addEventListener('touchstart', (e) => { e.preventDefault(); keys.shift = true; });
+            btnDown.addEventListener('touchend', (e) => { e.preventDefault(); keys.shift = false; });
+
+            const raycaster = new THREE.Raycaster();
+            const mouseCoordVector = new THREE.Vector2(0, 0);
+            const targetXEl = document.getElementById('target-x');
+            const targetZEl = document.getElementById('target-z');
+
+            const clock = new THREE.Clock();
+
+            function animate() {
+                requestAnimationFrame(animate);
+                const delta = clock.getDelta();
+                const elapsed = clock.getElapsedTime();
+
+                // Track Target Coordinates under crosshair
+                raycaster.setFromCamera(mouseCoordVector, camera);
+                const intersects = raycaster.intersectObject(ground);
+                if (intersects.length > 0) {
+                    targetXEl.innerText = Math.round(intersects[0].point.x);
+                    targetZEl.innerText = Math.round(intersects[0].point.z);
+                }
+
+                // Peanut wandering
+                const nextX = Math.sin((elapsed + 0.05) * 0.4) * 20;
+                const nextZ = Math.cos((elapsed + 0.05) * 0.35) * 20;
+                const currentX = Math.sin(elapsed * 0.4) * 20;
+                const currentZ = Math.cos(elapsed * 0.35) * 20;
+
+                peanutGroup.position.x = currentX;
+                peanutGroup.position.z = currentZ;
+                peanutGroup.position.y = Math.abs(Math.sin(elapsed * 10)) * 0.15;
+                peanutGroup.rotation.y = Math.atan2(nextX - currentX, nextZ - currentZ);
+
+                // Blinking
+                eyeGroup.scale.y = (elapsed % 3.5 < 0.12) ? 0.1 : 1.0;
+                document.getElementById('coords').innerText = `X: ${peanutGroup.position.x.toFixed(1)}, Z: ${peanutGroup.position.z.toFixed(1)}`;
+
+                // Camera Movement
+                const moveSpeed = 18.0 * delta;
+                if (controls.isLocked) {
+                    if (keys.w) controls.moveForward(moveSpeed);
+                    if (keys.s) controls.moveForward(-moveSpeed);
+                    if (keys.a) controls.moveRight(-moveSpeed);
+                    if (keys.d) controls.moveRight(moveSpeed);
+                } else {
+                    const dir = new THREE.Vector3();
+                    camera.getWorldDirection(dir);
+                    dir.y = 0;
+                    dir.normalize();
+                    const sideDir = new THREE.Vector3(-dir.z, 0, dir.x);
+
+                    if (keys.w) camera.position.addScaledVector(dir, moveSpeed);
+                    if (keys.s) camera.position.addScaledVector(dir, -moveSpeed);
+                    if (keys.a) camera.position.addScaledVector(sideDir, moveSpeed);
+                    if (keys.d) camera.position.addScaledVector(sideDir, -moveSpeed);
+                }
+
+                if (keys.space) camera.position.y += moveSpeed;
+                if (keys.shift) camera.position.y = Math.max(1.8, camera.position.y - moveSpeed);
+
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+        } catch (err) {
+            console.error("💥 Critical Setup Error:", err);
+            document.getElementById('status').innerText = "Script Error: " + err.message;
+            document.getElementById('status').style.color = "#ff5555";
+        }
+    </script>
+</body>
+</html>
