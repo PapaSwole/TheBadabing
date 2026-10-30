@@ -13,33 +13,34 @@ const worldState = {
   bird: {
     name: "Peanut",
     x: 0, y: 0, z: 0,
-    targetX: 5, targetZ: 5,
+    targetX: 0, targetZ: -15,
     state: "wandering",
     mood: "exploring"
   },
   connectedClients: 0
 };
 
-// In-memory stations array instead of SQLite for testing
 let stationsList = [];
 
+// Updated waypoints: Peanut visits his Mansion, Backyard, Street Plaza, and Apeshit Corp!
 const waypoints = [
-  { x: 0, z: -30 },
-  { x: 0, z: -10 },
-  { x: 0, z: 10 },
-  { x: 0, z: 30 },
-  { x: -25, z: -20 },
-  { x: 25, z: -20 },
-  { x: -25, z: 20 },
-  { x: 25, z: 20 },
-  { x: -40, z: 0 },
-  { x: 40, z: 0 }
+  { x: 0, z: -18 },     // In front of Apeshit Corp Gorilla Statue
+  { x: 0, z: -34 },     // Inside Apeshit Corp 1st Floor Lobby
+  { x: 0, z: 0 },       // Center Intersection
+  { x: -22, z: -10 },   // Approaching Peanut's Mansion Front Door
+  { x: -30, z: -18 },   // Inside Peanut's Living Room
+  { x: -26, z: -26 },   // Inside Peanut's Kitchen
+  { x: -42, z: -20 },   // Inside Peanut's Garage
+  { x: -34, z: -38 },   // Out in Peanut's Fenced Backyard
+  { x: 25, z: -10 },    // East Street
+  { x: -25, z: 15 },    // Southwest Street
+  { x: 25, z: 15 }      // Southeast Street
 ];
 
 function setRandomPeanutTarget() {
   const wp = waypoints[Math.floor(Math.random() * waypoints.length)];
-  worldState.bird.targetX = wp.x + (Math.random() * 6 - 3);
-  worldState.bird.targetZ = wp.z + (Math.random() * 6 - 3);
+  worldState.bird.targetX = wp.x + (Math.random() * 3 - 1.5);
+  worldState.bird.targetZ = wp.z + (Math.random() * 3 - 1.5);
 }
 
 setRandomPeanutTarget();
@@ -59,8 +60,8 @@ setInterval(() => {
       lastWaypointTime = now;
     }
   } else {
-    bird.x += (dx / dist) * 0.08;
-    bird.z += (dz / dist) * 0.08;
+    bird.x += (dx / dist) * 0.11;
+    bird.z += (dz / dist) * 0.11;
   }
 
   broadcast({ type: 'bird:position', bird: worldState.bird });
@@ -68,8 +69,6 @@ setInterval(() => {
 
 wss.on('connection', (ws) => {
   worldState.connectedClients++;
-  console.log(`🔌 Client connected. Total: ${worldState.connectedClients}`);
-
   ws.send(JSON.stringify({ 
     type: 'init_world', 
     state: worldState, 
@@ -82,7 +81,6 @@ wss.on('connection', (ws) => {
 
       if (data.type === 'admin:place_station') {
         const { uid, type, gridX, gridZ, rotation, footprintX, footprintZ } = data.station;
-        // Remove existing if duplicate, then push
         stationsList = stationsList.filter(s => s.uid !== uid);
         stationsList.push({ uid, type, gridX, gridZ, rotation, footprintX, footprintZ });
         broadcast({ type: 'world:stations_updated', stations: stationsList });
@@ -110,6 +108,3 @@ function broadcast(data) {
 }
 
 const PORT = process.env.PORT || 10000;
-server.listen(PORT, '0.0.0.0', () => {
-  console.log(`🦫 The Badabing server running on port ${PORT}`);
-});
