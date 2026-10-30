@@ -244,25 +244,4 @@
 
             // Lighting
             scene.add(new THREE.AmbientLight(0xffffff, 0.7));
-            const sunLight = new THREE.DirectionalLight(0xfff6e5, 1.4);
-            sunLight.position.set(55, 85, 45);
-            sunLight.castShadow = true;
-            sunLight.shadow.mapSize.width = 2048;
-            sunLight.shadow.mapSize.height = 2048;
-            scene.add(sunLight);
-
-            // Ground & Roads
-            const ground = new THREE.Mesh(new THREE.PlaneGeometry(350, 350), groundMat);
-            ground.rotation.x = -Math.PI / 2;
-            ground.receiveShadow = true;
-            scene.add(ground);
-
-            const townGroup = new THREE.Group();
-            scene.add(townGroup);
-
-            const roadNS = new THREE.Mesh(new THREE.PlaneGeometry(16, 260), asphaltMat);
-            roadNS.rotation.x = -Math.PI / 2;
-            roadNS.position.set(0, 0.02, 0);
-            townGroup.add(roadNS);
-
-            const roadEW = new THREE.Mesh(new THREE.
+            const sunLight = new THREE.DirectionalLight(0xfff6e5, 1.
