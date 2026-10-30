@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Badabing - Stable Town</title>
+    <title>The Badabing - Doubled Town & Sky Horizon</title>
     <style>
         body {
             margin: 0;
@@ -95,7 +95,7 @@
 
     <div id="info-panel">
         <h1>The Badabing 🦫</h1>
-        <p>Status: <span id="status">Active (Stable)</span></p>
+        <p>Status: <span id="status">Active (Doubled Mega Town)</span></p>
         <p>Peanut's Pos: <span id="coords">X: 0, Z: 0</span></p>
         <p>Cam Mode: <span id="cam-mode" style="color: #00aaff;">1st-Person God Mode</span></p>
     </div>
@@ -117,13 +117,13 @@
 
     <script>
         try {
-            console.log("🚀 Initializing Stable 3D World...");
+            console.log("🚀 Initializing Doubled Town with Horizon Sky...");
 
             const scene = new THREE.Scene();
             scene.background = new THREE.Color(0x87a8d0);
-            scene.fog = new THREE.FogExp2(0x87a8d0, 0.003);
+            scene.fog = new THREE.FogExp2(0x87a8d0, 0.0015); // Soft distant fog for smooth horizon
 
-            const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1500);
+            const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 3000);
             camera.position.set(0, 3, 20);
 
             const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -131,16 +131,51 @@
             renderer.shadowMap.enabled = true;
             document.body.appendChild(renderer.domElement);
 
+            // ==========================================
+            // SKY HORIZON (Dome Gradient)
+            // ==========================================
+            const skyGeo = new THREE.SphereGeometry(1500, 32, 15);
+            const skyMat = new THREE.ShaderMaterial({
+                uniforms: {
+                    topColor: { value: new THREE.Color(0x3a7bd5) },
+                    bottomColor: { value: new THREE.Color(0xdbe9f6) },
+                    offset: { value: 33 },
+                    exponent: { value: 0.6 }
+                },
+                vertexShader: `
+                    varying vec3 vWorldPosition;
+                    void main() {
+                        vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+                        vWorldPosition = worldPosition.xyz;
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                    }
+                `,
+                fragmentShader: `
+                    uniform vec3 topColor;
+                    uniform vec3 bottomColor;
+                    uniform float offset;
+                    uniform float exponent;
+                    varying vec3 vWorldPosition;
+                    void main() {
+                        float h = normalize(vWorldPosition + offset).y;
+                        gl_FragColor = vec4(mix(bottomColor, topColor, max(pow(max(h, 0.0), exponent), 0.0)), 1.0);
+                    }
+                `,
+                side: THREE.BackSide
+            });
+            const skyBox = new THREE.Mesh(skyGeo, skyMat);
+            scene.add(skyBox);
+
             // Lighting
-            scene.add(new THREE.AmbientLight(0xffffff, 0.75));
-            const sunLight = new THREE.DirectionalLight(0xfff6e5, 1.3);
-            sunLight.position.set(50, 100, 50);
+            scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+            const sunLight = new THREE.DirectionalLight(0xfff6e5, 1.4);
+            sunLight.position.set(100, 160, 100);
             sunLight.castShadow = true;
             scene.add(sunLight);
 
-            // Ground & Roads
+            // Doubled Ground & Roads (600x600 size)
             const ground = new THREE.Mesh(
-                new THREE.PlaneGeometry(400, 400),
+                new THREE.PlaneGeometry(800, 800),
                 new THREE.MeshStandardMaterial({ color: 0x2d5a27, roughness: 0.9 })
             );
             ground.rotation.x = -Math.PI / 2;
@@ -148,17 +183,19 @@
             scene.add(ground);
 
             const roadMat = new THREE.MeshStandardMaterial({ color: 0x26292e, roughness: 0.8 });
-            const roadNS = new THREE.Mesh(new THREE.PlaneGeometry(16, 300), roadMat);
-            roadNS.rotation.x = -Math.PI / 2;
-            roadNS.position.set(0, 0.02, 0);
-            scene.add(roadNS);
+            [-180, -90, 0, 90, 180].forEach(pos => {
+                const roadNS = new THREE.Mesh(new THREE.PlaneGeometry(16, 700), roadMat);
+                roadNS.rotation.x = -Math.PI / 2;
+                roadNS.position.set(pos, 0.02, 0);
+                scene.add(roadNS);
 
-            const roadEW = new THREE.Mesh(new THREE.PlaneGeometry(300, 16), roadMat);
-            roadEW.rotation.x = -Math.PI / 2;
-            roadEW.position.set(0, 0.03, 0);
-            scene.add(roadEW);
+                const roadEW = new THREE.Mesh(new THREE.PlaneGeometry(700, 16), roadMat);
+                roadEW.rotation.x = -Math.PI / 2;
+                roadEW.position.set(0, 0.03, pos);
+                scene.add(roadEW);
+            });
 
-            // Storefront Buildings
+            // Storefront Buildings spread across the doubled grid
             const buildingMat = new THREE.MeshStandardMaterial({ color: 0x8f3b2e, roughness: 0.85 });
             const brownBuildingMat = new THREE.MeshStandardMaterial({ color: 0x5e4c42, roughness: 0.85 });
             const metalTrimMat = new THREE.MeshStandardMaterial({ color: 0x333840, metalness: 0.6 });
@@ -198,10 +235,14 @@
                 scene.add(bld);
             }
 
-            createBuilding(0, -45, 24, 10, 16, buildingMat, awningRed);
-            createBuilding(45, 0, 20, 9, 16, brownBuildingMat, awningGreen);
-            createBuilding(-45, 0, 20, 9, 16, buildingMat, awningRed);
-            createBuilding(0, 45, 22, 10, 16, brownBuildingMat, awningBlue);
+            const blockPositions = [-135, -45, 45, 135];
+            for (let xi of blockPositions) {
+                for (let zi of blockPositions) {
+                    if (Math.abs(xi) < 30 && Math.abs(zi) < 30) continue;
+                    createBuilding(xi - 25, zi - 45, 22, 10, 16, buildingMat, awningRed);
+                    createBuilding(xi + 25, zi + 45, 20, 9, 16, brownBuildingMat, awningGreen);
+                }
+            }
 
             // Peanut the Bird with Animated Eyes
             const peanutGroup = new THREE.Group();
@@ -232,21 +273,15 @@
             const eyeballMat = new THREE.MeshBasicMaterial({ color: 0x050505 });
             const pupilMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
 
-            const leftEye = new THREE.Group();
-            leftEye.position.set(-0.16, 1.18, 0.58);
-            leftEye.add(new THREE.Mesh(new THREE.SphereGeometry(0.09, 16, 16), eyeballMat));
-            const lPupil = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 8), pupilMat);
-            lPupil.position.set(0.02, 0.02, 0.06);
-            leftEye.add(lPupil);
-
-            const rightEye = new THREE.Group();
-            rightEye.position.set(0.16, 1.18, 0.58);
-            rightEye.add(new THREE.Mesh(new THREE.SphereGeometry(0.09, 16, 16), eyeballMat));
-            const rPupil = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 8), pupilMat);
-            rPupil.position.set(-0.02, 0.02, 0.06);
-            rightEye.add(rPupil);
-
-            eyeGroup.add(leftEye, rightEye);
+            [-0.16, 0.16].forEach(ex => {
+                const eye = new THREE.Group();
+                eye.position.set(ex, 1.18, 0.58);
+                eye.add(new THREE.Mesh(new THREE.SphereGeometry(0.09, 16, 16), eyeballMat));
+                const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 8), pupilMat);
+                pupil.position.set(ex > 0 ? -0.02 : 0.02, 0.02, 0.06);
+                eye.add(pupil);
+                eyeGroup.add(eye);
+            });
 
             // God Mode Props Group
             const propsGroup = new THREE.Group();
@@ -329,35 +364,23 @@
                 const delta = clock.getDelta();
                 const elapsed = clock.getElapsedTime();
 
-                // Peanut wandering & facing direction
-                const nextX = Math.sin((elapsed + 0.05) * 0.5) * 10;
-                const nextZ = Math.cos((elapsed + 0.05) * 0.4) * 10;
-                
-                const currentX = Math.sin(elapsed * 0.5) * 10;
-                const currentZ = Math.cos(elapsed * 0.4) * 10;
-
-                const moveX = nextX - currentX;
-                const moveZ = nextZ - currentZ;
+                // Peanut wandering across a wider radius
+                const nextX = Math.sin((elapsed + 0.05) * 0.4) * 20;
+                const nextZ = Math.cos((elapsed + 0.05) * 0.35) * 20;
+                const currentX = Math.sin(elapsed * 0.4) * 20;
+                const currentZ = Math.cos(elapsed * 0.35) * 20;
 
                 peanutGroup.position.x = currentX;
                 peanutGroup.position.z = currentZ;
                 peanutGroup.position.y = Math.abs(Math.sin(elapsed * 10)) * 0.15;
+                peanutGroup.rotation.y = Math.atan2(nextX - currentX, nextZ - currentZ);
 
-                if (Math.abs(moveX) > 0.0001 || Math.abs(moveZ) > 0.0001) {
-                    peanutGroup.rotation.y = Math.atan2(moveX, moveZ);
-                }
-
-                // Blinking animation
-                const blinkTimer = elapsed % 3.5;
-                if (blinkTimer < 0.12) {
-                    eyeGroup.scale.y = 0.1;
-                } else {
-                    eyeGroup.scale.y = 1.0;
-                }
+                // Blinking
+                eyeGroup.scale.y = (elapsed % 3.5 < 0.12) ? 0.1 : 1.0;
                 document.getElementById('coords').innerText = `X: ${peanutGroup.position.x.toFixed(1)}, Z: ${peanutGroup.position.z.toFixed(1)}`;
 
                 // Camera Movement
-                const moveSpeed = 15.0 * delta;
+                const moveSpeed = 18.0 * delta;
                 if (keys.w) controls.moveForward(moveSpeed);
                 if (keys.s) controls.moveForward(-moveSpeed);
                 if (keys.a) controls.moveRight(-moveSpeed);
