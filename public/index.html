@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Badabing - Two Story House at X:-201, Z:-114</title>
+    <title>The Badabing - Stable Park & Court</title>
     <style>
         body {
             margin: 0;
@@ -95,7 +95,7 @@
 
     <div id="info-panel">
         <h1>The Badabing 🦫</h1>
-        <p>Status: <span id="status">Active (House Added)</span></p>
+        <p>Status: <span id="status">Active (Stable Build)</span></p>
         <p>Peanut's Pos: <span id="coords">X: 0, Z: 0</span></p>
         <p>Cam Mode: <span id="cam-mode" style="color: #00aaff;">1st-Person God Mode</span></p>
     </div>
@@ -118,14 +118,14 @@
 
     <script>
         try {
-            console.log("🚀 Initializing Two-Story House at X:-201, Z:-114...");
+            console.log("🚀 Initializing Stable 3D World...");
 
             const scene = new THREE.Scene();
             scene.background = new THREE.Color(0x87a8d0);
             scene.fog = new THREE.FogExp2(0x87a8d0, 0.0015);
 
             const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 3000);
-            camera.position.set(-201, 3, -95);
+            camera.position.set(0, 3, 20);
 
             const renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
@@ -253,95 +253,6 @@
             ];
             treeCoords.forEach(coord => createTree(coord[0], coord[1]));
 
-            // ==========================================
-            // TWO-STORY HOUSE WITH BEDROOM & MAILBOX AT X:-201, Z:-114
-            // ==========================================
-            const houseGroup = new THREE.Group();
-            houseGroup.position.set(-201, 0, -114);
-
-            const sidingMat = new THREE.MeshStandardMaterial({ color: 0x687685, roughness: 0.75 });
-            const roofMat = new THREE.MeshStandardMaterial({ color: 0x26292e, roughness: 0.8 });
-            const floorMat = new THREE.MeshStandardMaterial({ color: 0x7c5230, roughness: 0.55 });
-            const stairMat = new THREE.MeshStandardMaterial({ color: 0x4a3219, roughness: 0.6 });
-            const bedMat = new THREE.MeshStandardMaterial({ color: 0x256cb3, roughness: 0.5 });
-            const pillowMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9 });
-            const mailboxMat = new THREE.MeshStandardMaterial({ color: 0xb82e2e, metalness: 0.5 });
-
-            const hWidth = 16;
-            const hDepth = 12;
-            const hFloorHeight = 4.0;
-
-            // 1st and 2nd Floor Slabs
-            const floor1 = new THREE.Mesh(new THREE.BoxGeometry(hWidth, 0.2, hDepth), floorMat);
-            floor1.position.set(0, 0.1, 0);
-            houseGroup.add(floor1);
-
-            const floor2 = new THREE.Mesh(new THREE.BoxGeometry(hWidth, 0.2, hDepth), floorMat);
-            floor2.position.set(0, hFloorHeight + 0.1, 0);
-            houseGroup.add(floor2);
-
-            // Roof
-            const roof = new THREE.Mesh(new THREE.ConeGeometry(11, 4, 4), roofMat);
-            roof.position.set(0, hFloorHeight * 2 + 2, 0);
-            roof.rotation.y = Math.PI / 4;
-            houseGroup.add(roof);
-
-            // Walls (Floor 1 & Floor 2)
-            for (let f = 0; f < 2; f++) {
-                const fy = f * hFloorHeight;
-                const backWall = new THREE.Mesh(new THREE.BoxGeometry(hWidth, hFloorHeight, 0.4), sidingMat);
-                backWall.position.set(0, fy + hFloorHeight / 2, -hDepth / 2);
-                houseGroup.add(backWall);
-
-                const leftWall = new THREE.Mesh(new THREE.BoxGeometry(0.4, hFloorHeight, hDepth), sidingMat);
-                leftWall.position.set(-hWidth / 2, fy + hFloorHeight / 2, 0);
-                houseGroup.add(leftWall);
-
-                const rightWall = new THREE.Mesh(new THREE.BoxGeometry(0.4, hFloorHeight, hDepth), sidingMat);
-                rightWall.position.set(hWidth / 2, fy + hFloorHeight / 2, 0);
-                houseGroup.add(rightWall);
-            }
-
-            // Front walls with open entry
-            const frontWall1 = new THREE.Mesh(new THREE.BoxGeometry(6, hFloorHeight, 0.4), sidingMat);
-            frontWall1.position.set(-5, hFloorHeight / 2, hDepth / 2);
-            houseGroup.add(frontWall1);
-            const frontWall2 = new THREE.Mesh(new THREE.BoxGeometry(6, hFloorHeight, 0.4), sidingMat);
-            frontWall2.position.set(5, hFloorHeight / 2, hDepth / 2);
-            houseGroup.add(frontWall2);
-
-            const frontWall2nd = new THREE.Mesh(new THREE.BoxGeometry(hWidth, hFloorHeight, 0.4), sidingMat);
-            frontWall2nd.position.set(0, hFloorHeight + hFloorHeight / 2, hDepth / 2);
-            houseGroup.add(frontWall2nd);
-
-            // Interior Stairs from 1st to 2nd floor
-            const numSteps = 12;
-            for (let i = 0; i < numSteps; i++) {
-                const step = new THREE.Mesh(new THREE.BoxGeometry(2.5, hFloorHeight / numSteps, 0.8), stairMat);
-                step.position.set(-4, (i + 0.5) * (hFloorHeight / numSteps), (i - numSteps / 2) * 0.8);
-                houseGroup.add(step);
-            }
-
-            // Upstairs Bedroom (Bed and Pillow)
-            const bedBase = new THREE.Mesh(new THREE.BoxGeometry(3, 0.8, 5), bedMat);
-            bedBase.position.set(4, hFloorHeight + 0.4, -3);
-            houseGroup.add(bedBase);
-
-            const pillow = new THREE.Mesh(new THREE.BoxGeometry(2, 0.3, 1), pillowMat);
-            pillow.position.set(4, hFloorHeight + 0.9, -5);
-            houseGroup.add(pillow);
-
-            // Mailbox out front
-            const post = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 2.5), poleMat);
-            post.position.set(6, 1.25, hDepth / 2 + 4);
-            houseGroup.add(post);
-
-            const box = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 1.2), mailboxMat);
-            box.position.set(6, 2.4, hDepth / 2 + 4);
-            houseGroup.add(box);
-
-            scene.add(houseExperience = houseGroup);
-
             // Peanut the Bird with Animated Eyes
             const peanutGroup = new THREE.Group();
             scene.add(peanutGroup);
@@ -436,3 +347,83 @@
 
             const keys = { w: false, a: false, s: false, d: false, space: false, shift: false };
             window.addEventListener('keydown', (e) => {
+                const k = e.key.toLowerCase();
+                if (k === 'w' || e.key === 'ArrowUp') keys.w = true;
+                if (k === 's' || e.key === 'ArrowDown') keys.s = true;
+                if (k === 'a' || e.key === 'ArrowLeft') keys.a = true;
+                if (k === 'd' || e.key === 'ArrowRight') keys.d = true;
+                if (e.code === 'Space') keys.space = true;
+                if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') keys.shift = true;
+            });
+            window.addEventListener('keyup', (e) => {
+                const k = e.key.toLowerCase();
+                if (k === 'w' || e.key === 'ArrowUp') keys.w = false;
+                if (k === 's' || e.key === 'ArrowDown') keys.s = false;
+                if (k === 'a' || e.key === 'ArrowLeft') keys.a = false;
+                if (k === 'd' || e.key === 'ArrowRight') keys.d = false;
+                if (e.code === 'Space') keys.space = false;
+                if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') keys.shift = false;
+            });
+
+            const raycaster = new THREE.Raycaster();
+            const mouseCoordVector = new THREE.Vector2(0, 0);
+            const targetXEl = document.getElementById('target-x');
+            const targetZEl = document.getElementById('target-z');
+
+            const clock = new THREE.Clock();
+
+            function animate() {
+                requestAnimationFrame(animate);
+                const delta = clock.getDelta();
+                const elapsed = clock.getElapsedTime();
+
+                // Track Target Coordinates under crosshair
+                raycaster.setFromCamera(mouseCoordVector, camera);
+                const intersects = raycaster.intersectObject(ground);
+                if (intersects.length > 0) {
+                    targetXEl.innerText = Math.round(intersects[0].point.x);
+                    targetZEl.innerText = Math.round(intersects[0].point.z);
+                }
+
+                // Peanut wandering
+                const nextX = Math.sin((elapsed + 0.05) * 0.4) * 20;
+                const nextZ = Math.cos((elapsed + 0.05) * 0.35) * 20;
+                const currentX = Math.sin(elapsed * 0.4) * 20;
+                const currentZ = Math.cos(elapsed * 0.35) * 20;
+
+                peanutGroup.position.x = currentX;
+                peanutGroup.position.z = currentZ;
+                peanutGroup.position.y = Math.abs(Math.sin(elapsed * 10)) * 0.15;
+                peanutGroup.rotation.y = Math.atan2(nextX - currentX, nextZ - currentZ);
+
+                // Blinking
+                eyeGroup.scale.y = (elapsed % 3.5 < 0.12) ? 0.1 : 1.0;
+                document.getElementById('coords').innerText = `X: ${peanutGroup.position.x.toFixed(1)}, Z: ${peanutGroup.position.z.toFixed(1)}`;
+
+                // Camera Movement
+                const moveSpeed = 18.0 * delta;
+                if (keys.w) controls.moveForward(moveSpeed);
+                if (keys.s) controls.moveForward(-moveSpeed);
+                if (keys.a) controls.moveRight(-moveSpeed);
+                if (keys.d) controls.moveRight(moveSpeed);
+                if (keys.space) camera.position.y += moveSpeed;
+                if (keys.shift) camera.position.y = Math.max(1.8, camera.position.y - moveSpeed);
+
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+        } catch (err) {
+            console.error("💥 Critical Setup Error:", err);
+            document.getElementById('status').innerText = "Script Error: " + err.message;
+            document.getElementById('status').style.color = "#ff5555";
+        }
+    </script>
+</body>
+</html>
