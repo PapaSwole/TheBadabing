@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Badabing - Office Building at X:-16, Z:135</title>
+    <title>The Badabing - House at X:-201, Z:-114</title>
     <style>
         body {
             margin: 0;
@@ -95,7 +95,7 @@
 
     <div id="info-panel">
         <h1>The Badabing 🦫</h1>
-        <p>Status: <span id="status">Active (Office Added)</span></p>
+        <p>Status: <span id="status">Active (House Added)</span></p>
         <p>Peanut's Pos: <span id="coords">X: 0, Z: 0</span></p>
         <p>Cam Mode: <span id="cam-mode" style="color: #00aaff;">1st-Person God Mode</span></p>
     </div>
@@ -118,7 +118,7 @@
 
     <script>
         try {
-            console.log("🚀 Initializing Stable 3D World with Office Building...");
+            console.log("🚀 Initializing World with House at X:-201, Z:-114...");
 
             const scene = new THREE.Scene();
             scene.background = new THREE.Color(0x87a8d0);
@@ -225,37 +225,7 @@
             });
             scene.add(courtGroup);
 
-            // Trees
-            const trunkMat = new THREE.MeshStandardMaterial({ color: 0x5c3a1e, roughness: 0.9 });
-            const leavesMat = new THREE.MeshStandardMaterial({ color: 0x2e6f40, roughness: 0.8 });
-
-            function createTree(x, z) {
-                const tree = new THREE.Group();
-                const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.8, 4), trunkMat);
-                trunk.position.y = 2;
-                trunk.castShadow = true;
-                tree.add(trunk);
-
-                const leaves = new THREE.Mesh(new THREE.ConeGeometry(3.5, 6, 6), leavesMat);
-                leaves.position.y = 6;
-                leaves.castShadow = true;
-                tree.add(leaves);
-
-                tree.position.set(x, 0, z);
-                scene.add(tree);
-            }
-
-            const treeCoords = [
-                [-50, -50], [-70, -30], [-30, -70],
-                [70, 30], [30, 70],
-                [-50, 50], [-70, 30], [50, -50], [70, -30],
-                [-120, -50], [-120, 50], [120, -50], [120, 50]
-            ];
-            treeCoords.forEach(coord => createTree(coord[0], coord[1]));
-
-            // ==========================================
-            // 3-STORY ACCESSIBLE OFFICE BUILDING AT X:-16, Z:135
-            // ==========================================
+            // APESHIT INC Office Building at X:-16, Z:135
             const officeBuilding = new THREE.Group();
             officeBuilding.position.set(-16, 0, 135);
 
@@ -264,6 +234,7 @@
             const floorMat = new THREE.MeshStandardMaterial({ color: 0x555b61, roughness: 0.6 });
             const stairMat = new THREE.MeshStandardMaterial({ color: 0x3d4247, roughness: 0.5 });
             const trimMat = new THREE.MeshStandardMaterial({ color: 0x222528, metalness: 0.5 });
+            const signMat = new THREE.MeshStandardMaterial({ color: 0xff5555, emissive: 0xff2222, emissiveIntensity: 0.6 });
 
             const oWidth = 22;
             const oDepth = 18;
@@ -297,7 +268,11 @@
             roofSlab.position.set(0, 3 * oFloorHeight + 0.2, 0);
             officeBuilding.add(roofSlab);
 
-            // Interior Stairs connecting each floor
+            const signBoard = new THREE.Mesh(new THREE.BoxGeometry(16, 2.2, 0.6), signMat);
+            signBoard.position.set(0, 3 * oFloorHeight + 1.5, 0);
+            signBoard.castShadow = true;
+            officeBuilding.add(signBoard);
+
             for (let s = 0; s < 2; s++) {
                 const stairStartY = s * oFloorHeight;
                 const stairGroup = new THREE.Group();
@@ -311,8 +286,120 @@
                 }
                 officeBuilding.add(stairGroup);
             }
-
             scene.add(officeBuilding);
+
+            // ==========================================
+            // TWO-STORY HOUSE AT X:-201, Z:-114
+            // ==========================================
+            const houseGroup = new THREE.Group();
+            houseGroup.position.set(-201, 0, -114);
+
+            const sidingMat = new THREE.MeshStandardMaterial({ color: 0x687685, roughness: 0.75 });
+            const houseRoofMat = new THREE.MeshStandardMaterial({ color: 0x26292e, roughness: 0.8 });
+            const woodFloorMat = new THREE.MeshStandardMaterial({ color: 0x7c5230, roughness: 0.55 });
+            const houseStairMat = new THREE.MeshStandardMaterial({ color: 0x4a3219, roughness: 0.6 });
+            const bedMat = new THREE.MeshStandardMaterial({ color: 0x256cb3, roughness: 0.5 });
+            const pillowMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9 });
+            const mailboxMat = new THREE.MeshStandardMaterial({ color: 0xb82e2e, metalness: 0.5 });
+
+            const hWidth = 16;
+            const hDepth = 12;
+            const hFloorHeight = 4.0;
+
+            const floor1 = new THREE.Mesh(new THREE.BoxGeometry(hWidth, 0.2, hDepth), woodFloorMat);
+            floor1.position.set(0, 0.1, 0);
+            houseGroup.add(floor1);
+
+            const floor2 = new THREE.Mesh(new THREE.BoxGeometry(hWidth, 0.2, hDepth), woodFloorMat);
+            floor2.position.set(0, hFloorHeight + 0.1, 0);
+            houseGroup.add(floor2);
+
+            const houseRoof = new THREE.Mesh(new THREE.ConeGeometry(11, 4, 4), houseRoofMat);
+            houseRoof.position.set(0, hFloorHeight * 2 + 2, 0);
+            houseRoof.rotation.y = Math.PI / 4;
+            houseGroup.add(houseRoof);
+
+            for (let f = 0; f < 2; f++) {
+                const fy = f * hFloorHeight;
+                const backWall = new THREE.Mesh(new THREE.BoxGeometry(hWidth, hFloorHeight, 0.4), sidingMat);
+                backWall.position.set(0, fy + hFloorHeight / 2, -hDepth / 2);
+                houseGroup.add(backWall);
+
+                const leftWall = new THREE.Mesh(new THREE.BoxGeometry(0.4, hFloorHeight, hDepth), sidingMat);
+                leftWall.position.set(-hWidth / 2, fy + hFloorHeight / 2, 0);
+                houseGroup.add(leftWall);
+
+                const rightWall = new THREE.Mesh(new THREE.BoxGeometry(0.4, hFloorHeight, hDepth), sidingMat);
+                rightWall.position.set(hWidth / 2, fy + hFloorHeight / 2, 0);
+                houseGroup.add(rightWall);
+            }
+
+            const frontWall1 = new THREE.Mesh(new THREE.BoxGeometry(6, hFloorHeight, 0.4), sidingMat);
+            frontWall1.position.set(-5, hFloorHeight / 2, hDepth / 2);
+            houseGroup.add(frontWall1);
+            const frontWall2 = new THREE.Mesh(new THREE.BoxGeometry(6, hFloorHeight, 0.4), sidingMat);
+            frontWall2.position.set(5, hFloorHeight / 2, hDepth / 2);
+            houseGroup.add(frontWall2);
+
+            const frontWall2nd = new THREE.Mesh(new THREE.BoxGeometry(hWidth, hFloorHeight, 0.4), sidingMat);
+            frontWall2nd.position.set(0, hFloorHeight + hFloorHeight / 2, hDepth / 2);
+            houseGroup.add(frontWall2nd);
+
+            // Interior Stairs
+            const hNumSteps = 12;
+            for (let i = 0; i < hNumSteps; i++) {
+                const step = new THREE.Mesh(new THREE.BoxGeometry(2.5, hFloorHeight / hNumSteps, 0.8), houseStairMat);
+                step.position.set(-4, (i + 0.5) * (hFloorHeight / hNumSteps), (i - hNumSteps / 2) * 0.8);
+                houseGroup.add(step);
+            }
+
+            // Upstairs Bedroom & Bed
+            const bedBase = new THREE.Mesh(new THREE.BoxGeometry(3, 0.8, 5), bedMat);
+            bedBase.position.set(4, hFloorHeight + 0.4, -3);
+            houseGroup.add(bedBase);
+
+            const pillow = new THREE.Mesh(new THREE.BoxGeometry(2, 0.3, 1), pillowMat);
+            pillow.position.set(4, hFloorHeight + 0.9, -5);
+            houseGroup.add(pillow);
+
+            // Mailbox
+            const post = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 2.5), poleMat);
+            post.position.set(6, 1.25, hDepth / 2 + 4);
+            houseGroup.add(post);
+
+            const box = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 1.2), mailboxMat);
+            box.position.set(6, 2.4, hDepth / 2 + 4);
+            houseGroup.add(box);
+
+            scene.add(houseGroup);
+
+            // Trees
+            const trunkMat = new THREE.MeshStandardMaterial({ color: 0x5c3a1e, roughness: 0.9 });
+            const leavesMat = new THREE.MeshStandardMaterial({ color: 0x2e6f40, roughness: 0.8 });
+
+            function createTree(x, z) {
+                const tree = new THREE.Group();
+                const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.8, 4), trunkMat);
+                trunk.position.y = 2;
+                trunk.castShadow = true;
+                tree.add(trunk);
+
+                const leaves = new THREE.Mesh(new THREE.ConeGeometry(3.5, 6, 6), leavesMat);
+                leaves.position.y = 6;
+                leaves.castShadow = true;
+                tree.add(leaves);
+
+                tree.position.set(x, 0, z);
+                scene.add(tree);
+            }
+
+            const treeCoords = [
+                [-50, -50], [-70, -30], [-30, -70],
+                [70, 30], [30, 70],
+                [-50, 50], [-70, 30], [50, -50], [70, -30],
+                [-120, -50], [-120, 50], [120, -50], [120, 50]
+            ];
+            treeCoords.forEach(coord => createTree(coord[0], coord[1]));
 
             // Peanut the Bird with Animated Eyes
             const peanutGroup = new THREE.Group();
@@ -482,8 +569,8 @@
 
         } catch (err) {
             console.error("💥 Critical Setup Error:", err);
-            document.getElementById('status').innerText = "Script Error: " + err.message;
-            document.getElementById('status').style.color = "#ff5555";
+            statusEl.innerText = "Script Error: " + err.message;
+            statusEl.style.color = "#ff5555";
         }
     </script>
 </body>
