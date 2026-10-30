@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Badabing - Park & Basketball Court</title>
+    <title>The Badabing - God Mode Coordinate Inspector</title>
     <style>
         body {
             margin: 0;
@@ -39,7 +39,7 @@
             border-radius: 8px;
             border: 1px solid #00aaff;
             z-index: 10;
-            width: 240px;
+            width: 250px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
         }
         #god-mode-panel h2 { margin: 0 0 10px 0; font-size: 15px; color: #00aaff; }
@@ -95,13 +95,14 @@
 
     <div id="info-panel">
         <h1>The Badabing 🦫</h1>
-        <p>Status: <span id="status">Active (Cleared Court)</span></p>
+        <p>Status: <span id="status">Active (God Mode Inspector)</span></p>
         <p>Peanut's Pos: <span id="coords">X: 0, Z: 0</span></p>
         <p>Cam Mode: <span id="cam-mode" style="color: #00aaff;">1st-Person God Mode</span></p>
     </div>
 
     <div id="god-mode-panel">
-        <h2>Admin Builder Tools</h2>
+        <h2>God Mode Inspector</h2>
+        <p style="color: #00aaff; font-weight: bold; margin-bottom: 8px;">Target: X: <span id="target-x">0</span>, Z: <span id="target-z">0</span></p>
         <p>Select item to place / delete:</p>
         <button class="station-btn" data-type="workbench">🛠️ Industrial Workbench</button>
         <button class="station-btn" data-type="crate">📦 Storage Crate Stack</button>
@@ -117,7 +118,7 @@
 
     <script>
         try {
-            console.log("🚀 Initializing Park with Cleared Court Area...");
+            console.log("🚀 Initializing God Mode with Coordinate Inspector...");
 
             const scene = new THREE.Scene();
             scene.background = new THREE.Color(0x87a8d0);
@@ -224,7 +225,7 @@
             });
             scene.add(courtGroup);
 
-            // Trees (Tree near [50, 50] removed for court clearance)
+            // Trees
             const trunkMat = new THREE.MeshStandardMaterial({ color: 0x5c3a1e, roughness: 0.9 });
             const leavesMat = new THREE.MeshStandardMaterial({ color: 0x2e6f40, roughness: 0.8 });
 
@@ -364,12 +365,25 @@
                 if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') keys.shift = false;
             });
 
+            const raycaster = new THREE.Raycaster();
+            const mouseCoordVector = new THREE.Vector2(0, 0);
+            const targetXEl = document.getElementById('target-x');
+            const targetZEl = document.getElementById('target-z');
+
             const clock = new THREE.Clock();
 
             function animate() {
                 requestAnimationFrame(animate);
                 const delta = clock.getDelta();
                 const elapsed = clock.getElapsedTime();
+
+                // Track Target Coordinates under crosshair
+                raycaster.setFromCamera(mouseCoordVector, camera);
+                const intersects = raycaster.intersectObject(ground);
+                if (intersects.length > 0) {
+                    targetXEl.innerText = Math.round(intersects[0].point.x);
+                    targetZEl.innerText = Math.round(intersects[0].point.z);
+                }
 
                 // Peanut wandering
                 const nextX = Math.sin((elapsed + 0.05) * 0.4) * 20;
