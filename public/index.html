@@ -133,9 +133,9 @@
         try {
             const scene = new THREE.Scene();
             scene.background = new THREE.Color(0x87a8d0); // Crisp daylight sky
-            scene.fog = new THREE.FogExp2(0x87a8d0, 0.006);
+            scene.fog = new THREE.FogExp2(0x87a8d0, 0.003); // Adjusted fog density for expanded world size
 
-            const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 1500);
+            const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 3000);
             camera.position.set(0, 2.0, 18);
 
             const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -285,12 +285,12 @@
                 }, repX, repY);
             }
 
-            // Instantiate Shared Materials
-            const grassGroundMat = new THREE.MeshStandardMaterial({ map: createGrassTexture(45, 45), roughness: 0.95 });
+            // Instantiate Shared Materials (scaled grass repetition for doubled ground size)
+            const grassGroundMat = new THREE.MeshStandardMaterial({ map: createGrassTexture(90, 90), roughness: 0.95 });
             const yardGrassMat   = new THREE.MeshStandardMaterial({ map: createGrassTexture(6, 6), roughness: 0.9 });
-            const asphaltMat     = new THREE.MeshStandardMaterial({ map: createAsphaltTexture(4, 50), roughness: 0.85 });
-            const asphaltEWMat   = new THREE.MeshStandardMaterial({ map: createAsphaltTexture(50, 4), roughness: 0.85 });
-            const sidewalkMat    = new THREE.MeshStandardMaterial({ map: createConcreteTexture(2, 60), roughness: 0.8 });
+            const asphaltMat     = new THREE.MeshStandardMaterial({ map: createAsphaltTexture(4, 100), roughness: 0.85 });
+            const asphaltEWMat   = new THREE.MeshStandardMaterial({ map: createAsphaltTexture(100, 4), roughness: 0.85 });
+            const sidewalkMat    = new THREE.MeshStandardMaterial({ map: createConcreteTexture(2, 120), roughness: 0.8 });
             const redBrickMat    = new THREE.MeshStandardMaterial({ map: createBrickTexture(145, 62, 48, 4, 2.5), roughness: 0.85 });
             const brownBrickMat  = new THREE.MeshStandardMaterial({ map: createBrickTexture(95, 78, 68, 4, 2.5), roughness: 0.85 });
             const creamBrickMat  = new THREE.MeshStandardMaterial({ map: createBrickTexture(165, 150, 130, 4, 2.5), roughness: 0.85 });
@@ -303,19 +303,19 @@
             scene.add(ambientLight);
 
             const sunLight = new THREE.DirectionalLight(0xfff6e5, 1.4);
-            sunLight.position.set(55, 85, 45);
+            sunLight.position.set(110, 170, 90);
             sunLight.castShadow = true;
             sunLight.shadow.mapSize.width = 2048;
             sunLight.shadow.mapSize.height = 2048;
-            const d = 80;
+            const d = 160; // Doubled shadow range for the expanded world
             sunLight.shadow.camera.left = -d;
             sunLight.shadow.camera.right = d;
             sunLight.shadow.camera.top = d;
             sunLight.shadow.camera.bottom = -d;
             scene.add(sunLight);
 
-            // Lush Grass World Ground
-            const groundGeo = new THREE.PlaneGeometry(350, 350);
+            // Doubled Lush Grass World Ground (700 x 700)
+            const groundGeo = new THREE.PlaneGeometry(700, 700);
             const ground = new THREE.Mesh(groundGeo, grassGroundMat);
             ground.rotation.x = -Math.PI / 2;
             ground.receiveShadow = true;
@@ -335,34 +335,34 @@
             const awningBlue = new THREE.MeshStandardMaterial({ color: 0x256cb3, roughness: 0.6 });
             const awningGreen = new THREE.MeshStandardMaterial({ color: 0x2e8540, roughness: 0.6 });
 
-            // Textured Asphalt Roads
-            const roadNS = new THREE.Mesh(new THREE.PlaneGeometry(16, 260), asphaltMat);
+            // Doubled Length Textured Asphalt Roads (520 length)
+            const roadNS = new THREE.Mesh(new THREE.PlaneGeometry(16, 520), asphaltMat);
             roadNS.rotation.x = -Math.PI / 2;
             roadNS.position.set(0, 0.02, 0);
             roadNS.receiveShadow = true;
             townGroup.add(roadNS);
 
-            const roadEW = new THREE.Mesh(new THREE.PlaneGeometry(260, 16), asphaltEWMat);
+            const roadEW = new THREE.Mesh(new THREE.PlaneGeometry(520, 16), asphaltEWMat);
             roadEW.rotation.x = -Math.PI / 2;
             roadEW.position.set(0, 0.025, 0);
             roadEW.receiveShadow = true;
             townGroup.add(roadEW);
 
-            // Raised Concrete Sidewalks along the streets
+            // Raised Concrete Sidewalks along the doubled streets
             [-9.75, 9.75].forEach(offset => {
-                const swNS = new THREE.Mesh(new THREE.BoxGeometry(3.5, 0.16, 260), sidewalkMat);
+                const swNS = new THREE.Mesh(new THREE.BoxGeometry(3.5, 0.16, 520), sidewalkMat);
                 swNS.position.set(offset, 0.08, 0);
                 swNS.receiveShadow = true;
                 townGroup.add(swNS);
 
-                const swEW = new THREE.Mesh(new THREE.BoxGeometry(260, 0.16, 3.5), sidewalkMat);
+                const swEW = new THREE.Mesh(new THREE.BoxGeometry(520, 0.16, 3.5), sidewalkMat);
                 swEW.position.set(0, 0.08, offset);
                 swEW.receiveShadow = true;
                 townGroup.add(swEW);
             });
 
-            // Dashed Road Markings & Crosswalks
-            for (let i = -115; i < 115; i += 8) {
+            // Dashed Road Markings & Crosswalks for Doubled Roads
+            for (let i = -245; i < 245; i += 8) {
                 if (Math.abs(i) > 12) {
                     const lineNS = new THREE.Mesh(new THREE.PlaneGeometry(0.35, 4), roadLineMat);
                     lineNS.rotation.x = -Math.PI / 2;
@@ -390,7 +390,7 @@
                 });
             }
 
-            // Detailed Textured Storefronts
+            // Detailed Textured Storefronts (Count and positions preserved without adding new buildings)
             function createBuilding(x, z, w, h, d, wallMaterial, awningMat) {
                 const bld = new THREE.Group();
 
@@ -577,137 +577,4 @@
                     const birdData = data.bird || data.state?.bird;
                     if (birdData) {
                         const moveX = birdData.x - peanutGroup.position.x;
-                        const moveZ = birdData.z - peanutGroup.position.z;
-                        peanutGroup.position.x = birdData.x;
-                        peanutGroup.position.z = birdData.z;
-                        coordsEl.innerText = `X: ${birdData.x.toFixed(1)}, Z: ${birdData.z.toFixed(1)}`;
-                        if (Math.abs(moveX) > 0.001 || Math.abs(moveZ) > 0.001) {
-                            peanutGroup.rotation.y = Math.atan2(moveX, moveZ);
-                        }
-                    }
-                };
-            }
-            connectWebSocket();
-
-            // ==========================================
-            // 1ST-PERSON POINTER LOCK & GOD MODE BUILDER
-            // ==========================================
-            const controls = new PointerLockControls(camera, renderer.domElement);
-            let selectedTool = null;
-
-            renderer.domElement.addEventListener('click', () => {
-                if (!controls.isLocked) {
-                    controls.lock();
-                    return;
-                }
-
-                const raycaster = new THREE.Raycaster();
-                raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
-
-                if (selectedTool === 'delete') {
-                    const hits = raycaster.intersectObjects(stationsGroup.children, true);
-                    if (hits.length > 0 && ws?.readyState === WebSocket.OPEN) {
-                        ws.send(JSON.stringify({ type: 'admin:delete_station', uid: hits[0].object.userData.uid }));
-                    }
-                } else if (selectedTool) {
-                    const hits = raycaster.intersectObject(ground);
-                    if (hits.length > 0 && ws?.readyState === WebSocket.OPEN) {
-                        const pt = hits[0].point;
-                        ws.send(JSON.stringify({
-                            type: 'admin:place_station',
-                            station: {
-                                uid: `st_${Date.now()}`,
-                                type: selectedTool,
-                                gridX: Math.round(pt.x),
-                                gridZ: Math.round(pt.z),
-                                rotation: 0, footprintX: 1, footprintZ: 1
-                            }
-                        }));
-                    }
-                }
-            });
-
-            document.querySelectorAll('.station-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    document.querySelectorAll('.station-btn').forEach(b => b.classList.remove('active'));
-                    const type = e.currentTarget.getAttribute('data-type');
-                    selectedTool = (type === 'none') ? null : type;
-                    if (selectedTool) e.currentTarget.classList.add('active');
-                    controls.lock();
-                });
-            });
-
-            const keys = { w: false, a: false, s: false, d: false, up: false, down: false };
-            window.addEventListener('keydown', (e) => {
-                const k = e.key.toLowerCase();
-                if (k === 'w' || e.key === 'ArrowUp') keys.w = true;
-                if (k === 's' || e.key === 'ArrowDown') keys.s = true;
-                if (k === 'a' || e.key === 'ArrowLeft') keys.a = true;
-                if (k === 'd' || e.key === 'ArrowRight') keys.d = true;
-                if (e.code === 'Space') keys.up = true;
-                if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') keys.down = true;
-            });
-            window.addEventListener('keyup', (e) => {
-                const k = e.key.toLowerCase();
-                if (k === 'w' || e.key === 'ArrowUp') keys.w = false;
-                if (k === 's' || e.key === 'ArrowDown') keys.s = false;
-                if (k === 'a' || e.key === 'ArrowLeft') keys.a = false;
-                if (k === 'd' || e.key === 'ArrowRight') keys.d = false;
-                if (e.code === 'Space') keys.up = false;
-                if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') keys.down = false;
-            });
-
-            const clock = new THREE.Clock();
-            const direction = new THREE.Vector3();
-
-            function animate() {
-                requestAnimationFrame(animate);
-                const delta = clock.getDelta();
-                const elapsed = clock.getElapsedTime();
-
-                // Peanut bobbing animation
-                peanutGroup.position.y = Math.abs(Math.sin(elapsed * 10)) * 0.15;
-
-                // Animated Blinking (scales eye height down briefly every few seconds)
-                const blinkCycle = elapsed % 4.0;
-                if (blinkCycle < 0.15) {
-                    eyeGroup.scale.y = 0.1;
-                } else {
-                    eyeGroup.scale.y = 1.0;
-                }
-
-                // Subtle looking around for the eyes
-                leftEye.rotation.y = Math.sin(elapsed * 2) * 0.15;
-                rightEye.rotation.y = Math.sin(elapsed * 2) * 0.15;
-
-                if (controls.isLocked) {
-                    direction.z = Number(keys.w) - Number(keys.s);
-                    direction.x = Number(keys.d) - Number(keys.a);
-                    direction.normalize();
-
-                    const speed = 12.0;
-                    if (keys.w || keys.s) controls.moveForward(direction.z * speed * delta);
-                    if (keys.a || keys.d) controls.moveRight(direction.x * speed * delta);
-
-                    if (keys.up) camera.position.y += 8.0 * delta;
-                    if (keys.down) camera.position.y = Math.max(1.8, camera.position.y - 8.0 * delta);
-                }
-
-                renderer.render(scene, camera);
-            }
-            animate();
-
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            });
-
-        } catch (err) {
-            console.error("💥 Critical Script Error:", err);
-            statusEl.innerText = "Script Error";
-            statusEl.style.color = "#ff0000";
-        }
-    </script>
-</body>
-</html>
+                        const moveZ = birdData.z - peanutGroup.position
