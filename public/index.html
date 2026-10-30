@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Badabing - Bulletproof Textured World</title>
+    <title>The Badabing - Textured World & Peanut</title>
     <style>
         body {
             margin: 0;
@@ -93,9 +93,9 @@
 
     <div id="info-panel">
         <h1>The Badabing 🦫</h1>
-        <p>Status: <span id="status">Connecting...</span></p>
+        <p>Status: <span id="status">Initializing...</span></p>
         <p>Peanut's Pos: <span id="coords">X: 0, Z: 0</span></p>
-        <p>Cam Mode: <span id="cam-mode" style="color: #00aaff;">1st-Person God Mode</span></p>
+        <p>Cam Mode: <span id="cam-mode" style="color: #00aaff;">1st-Person Walkthrough</span></p>
     </div>
 
     <div id="god-mode-panel">
@@ -355,143 +355,4 @@
                 const intWallMat = new THREE.MeshStandardMaterial({ color: 0xf2efe9, roughness: 0.9 });
                 const roofMat = new THREE.MeshStandardMaterial({ color: 0x26292e, roughness: 0.8 });
 
-                function addWall(w, h, d, px, py, pz, mat) {
-                    const wall = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
-                    wall.position.set(px, py, pz);
-                    wall.castShadow = true;
-                    house.add(wall);
-                }
-
-                addWall(16, 0.2, 12, 0, 0.1, 0, woodFloorMat);
-                addWall(16, 0.2, 12, 0, 4.1, 0, woodFloorMat);
-                addWall(17, 0.6, 13, 0, 8.3, 0, roofMat);
-
-                addWall(0.5, 4, 12, -7.75, 2.1, 0, sidingMat);
-                addWall(0.5, 4, 12, 7.75, 2.1, 0, sidingMat);
-                addWall(16, 4, 0.5, 0, 2.1, -5.75, sidingMat);
-                addWall(4, 4, 0.5, 5.75, 2.1, 5.75, sidingMat);
-                addWall(2, 4, 0.5, 0.5, 2.1, 5.75, sidingMat);
-                addWall(0.5, 4, 11.5, -0.5, 2.1, -0.25, intWallMat);
-
-                addWall(0.5, 4, 12, -7.75, 6.2, 0, sidingMat);
-                addWall(0.5, 4, 12, 7.75, 6.2, 0, sidingMat);
-                addWall(16, 4, 0.5, 0, 6.2, -5.75, sidingMat);
-                addWall(16, 4, 0.5, 0, 6.2, 5.75, sidingMat);
-                addWall(0.5, 4, 11.5, -0.5, 6.2, -0.25, intWallMat);
-
-                const yard = new THREE.Mesh(new THREE.PlaneGeometry(16, 16), yardGrassMat);
-                yard.rotation.x = -Math.PI / 2;
-                yard.position.set(0, 0.04, -14);
-                house.add(yard);
-
-                addWall(0.25, 2.2, 16, -7.9, 1.1, -14, fenceWoodMat);
-                addWall(0.25, 2.2, 16, 7.9, 1.1, -14, fenceWoodMat);
-                addWall(16, 2.2, 0.25, 0, 1.1, -21.9, fenceWoodMat);
-
-                house.position.set(x, 0, z);
-                townGroup.add(house);
-            }
-            createPeanutHouse(-32, -20);
-
-            // ==========================================
-            // PEANUT THE BIRD WITH VISIBLE EYES
-            // ==========================================
-            const peanutGroup = new THREE.Group();
-            scene.add(peanutGroup);
-            const featherMat = new THREE.MeshStandardMaterial({ color: 0xff8c00, roughness: 0.35 });
-            const beakMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.2 });
-
-            const birdBody = new THREE.Mesh(new THREE.SphereGeometry(0.5, 16, 16), featherMat);
-            birdBody.scale.set(1, 0.8, 1.3);
-            birdBody.position.y = 0.6;
-            birdBody.castShadow = true;
-            peanutGroup.add(birdBody);
-
-            const birdHead = new THREE.Mesh(new THREE.SphereGeometry(0.35, 16, 16), featherMat);
-            birdHead.position.set(0, 1.0, 0.3);
-            peanutGroup.add(birdHead);
-
-            const birdBeak = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.35, 8), beakMat);
-            birdBeak.rotateX(Math.PI / 2);
-            birdBeak.position.set(0, 0.95, 0.62);
-            peanutGroup.add(birdBeak);
-
-            // Animated Eyes
-            const eyeGroup = new THREE.Group();
-            peanutGroup.add(eyeGroup);
-
-            const eyeballMat = new THREE.MeshBasicMaterial({ color: 0x050505 });
-            const pupilMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-
-            const leftEye = new THREE.Group();
-            leftEye.position.set(-0.13, 1.05, 0.52);
-            const lBall = new THREE.Mesh(new THREE.SphereGeometry(0.08, 16, 16), eyeballMat);
-            const lPupil = new THREE.Mesh(new THREE.SphereGeometry(0.03, 8, 8), pupilMat);
-            lPupil.position.set(0.02, 0.02, 0.05);
-            leftEye.add(lBall, lPupil);
-
-            const rightEye = new THREE.Group();
-            rightEye.position.set(0.13, 1.05, 0.52);
-            const rBall = new THREE.Mesh(new THREE.SphereGeometry(0.08, 16, 16), eyeballMat);
-            const rPupil = new THREE.Mesh(new THREE.SphereGeometry(0.03, 8, 8), pupilMat);
-            rPupil.position.set(-0.02, 0.02, 0.05);
-            rightEye.add(rBall, rPupil);
-
-            eyeGroup.add(leftEye, rightEye);
-
-            const stationsGroup = new THREE.Group();
-            scene.add(stationsGroup);
-
-            function updateStations(stations) {
-                while (stationsGroup.children.length > 0) stationsGroup.remove(stationsGroup.children[0]);
-                stations.forEach(st => {
-                    let mesh;
-                    if (st.type === 'workbench') {
-                        mesh = new THREE.Mesh(new THREE.BoxGeometry(1.5, 1, 0.8), woodFloorMat);
-                        mesh.position.y = 0.5;
-                    } else if (st.type === 'crate') {
-                        mesh = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.9, 0.9), fenceWoodMat);
-                        mesh.position.y = 0.45;
-                    } else {
-                        mesh = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.4, 2), new THREE.MeshStandardMaterial({ color: 0x1b4d3e }));
-                        mesh.position.y = 0.2;
-                    }
-                    mesh.castShadow = true;
-                    mesh.position.x = st.gridX;
-                    mesh.position.z = st.gridZ;
-                    mesh.userData = { uid: st.uid };
-                    stationsGroup.add(mesh);
-                });
-            }
-
-            // ==========================================
-            // BULLETPROOF WEBSOCKET WITH LOCAL FALLBACK
-            // ==========================================
-            let ws;
-            let localSimTimer = 0;
-
-            function connectWebSocket() {
-                const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-                ws = new WebSocket(`${protocol}//${window.location.host}`);
-
-                // Connection Timeout Fallback (3 seconds)
-                const connTimeout = setTimeout(() => {
-                    if (ws.readyState !== WebSocket.OPEN) {
-                        statusEl.innerText = "Offline Mode (Local Sim Active)";
-                        statusEl.style.color = "#ffaa00";
-                    }
-                }, 3000);
-
-                ws.onopen = () => {
-                    clearTimeout(connTimeout);
-                    statusEl.innerText = "Connected (Click Scene to Walk)";
-                    statusEl.style.color = "#55ff55";
-                };
-                ws.onclose = () => {
-                    statusEl.innerText = "Offline Mode (Local Sim Active)";
-                    statusEl.style.color = "#ffaa00";
-                    setTimeout(connectWebSocket, 4000);
-                };
-                ws.onerror = () => {
-                    statusEl.innerText = "Offline Mode (Local Sim Active)";
-                    statusEl.style.
+                function addWall(w, h, d, px, py
