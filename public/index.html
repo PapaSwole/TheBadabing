@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Badabing - 3-Story Office Building at X:-16, Z:135</title>
+    <title>The Badabing - Two Story House at X:-201, Z:-114</title>
     <style>
         body {
             margin: 0;
@@ -95,7 +95,7 @@
 
     <div id="info-panel">
         <h1>The Badabing 🦫</h1>
-        <p>Status: <span id="status">Active (Office Building Added)</span></p>
+        <p>Status: <span id="status">Active (House Added)</span></p>
         <p>Peanut's Pos: <span id="coords">X: 0, Z: 0</span></p>
         <p>Cam Mode: <span id="cam-mode" style="color: #00aaff;">1st-Person God Mode</span></p>
     </div>
@@ -118,14 +118,14 @@
 
     <script>
         try {
-            console.log("🚀 Initializing 3-Story Office Building at X:-16, Z:135...");
+            console.log("🚀 Initializing Two-Story House at X:-201, Z:-114...");
 
             const scene = new THREE.Scene();
             scene.background = new THREE.Color(0x87a8d0);
             scene.fog = new THREE.FogExp2(0x87a8d0, 0.0015);
 
             const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 3000);
-            camera.position.set(-16, 3, 155);
+            camera.position.set(-201, 3, -95);
 
             const renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
@@ -254,30 +254,185 @@
             treeCoords.forEach(coord => createTree(coord[0], coord[1]));
 
             // ==========================================
-            // 3-STORY ACCESSIBLE OFFICE BUILDING AT X:-16, Z:135
+            // TWO-STORY HOUSE WITH BEDROOM & MAILBOX AT X:-201, Z:-114
             // ==========================================
-            const officeBuilding = new THREE.Group();
-            officeBuilding.position.set(-16, 0, 135);
+            const houseGroup = new THREE.Group();
+            houseGroup.position.set(-201, 0, -114);
 
-            const concreteMat = new THREE.MeshStandardMaterial({ color: 0x78828a, roughness: 0.7 });
-            const glassWallMat = new THREE.MeshStandardMaterial({ color: 0x1c3545, metalness: 0.85, roughness: 0.1, transparent: true, opacity: 0.85 });
-            const floorMat = new THREE.MeshStandardMaterial({ color: 0x555b61, roughness: 0.6 });
-            const stairMat = new THREE.MeshStandardMaterial({ color: 0x3d4247, roughness: 0.5 });
-            const trimMat = new THREE.MeshStandardMaterial({ color: 0x222528, metalness: 0.5 });
+            const sidingMat = new THREE.MeshStandardMaterial({ color: 0x687685, roughness: 0.75 });
+            const roofMat = new THREE.MeshStandardMaterial({ color: 0x26292e, roughness: 0.8 });
+            const floorMat = new THREE.MeshStandardMaterial({ color: 0x7c5230, roughness: 0.55 });
+            const stairMat = new THREE.MeshStandardMaterial({ color: 0x4a3219, roughness: 0.6 });
+            const bedMat = new THREE.MeshStandardMaterial({ color: 0x256cb3, roughness: 0.5 });
+            const pillowMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9 });
+            const mailboxMat = new THREE.MeshStandardMaterial({ color: 0xb82e2e, metalness: 0.5 });
 
-            const width = 24;
-            const depth = 20;
-            const floorHeight = 4.2;
+            const hWidth = 16;
+            const hDepth = 12;
+            const hFloorHeight = 4.0;
 
-            // 1st, 2nd, and 3rd Floor Plates & Ceilings
-            for (let f = 0; f < 3; f++) {
-                const floorY = f * floorHeight;
+            // 1st and 2nd Floor Slabs
+            const floor1 = new THREE.Mesh(new THREE.BoxGeometry(hWidth, 0.2, hDepth), floorMat);
+            floor1.position.set(0, 0.1, 0);
+            houseGroup.add(floor1);
 
-                // Floor Slab
-                const floorSlab = new THREE.Mesh(new THREE.BoxGeometry(width, 0.3, depth), floorMat);
-                floorSlab.position.set(0, floorY + 0.15, 0);
-                floorSlab.receiveShadow = true;
-                officeBuilding.add(floorSlab);
+            const floor2 = new THREE.Mesh(new THREE.BoxGeometry(hWidth, 0.2, hDepth), floorMat);
+            floor2.position.set(0, hFloorHeight + 0.1, 0);
+            houseGroup.add(floor2);
 
-                // Exterior glass/concrete walls for each floor
-                const frontWall = new
+            // Roof
+            const roof = new THREE.Mesh(new THREE.ConeGeometry(11, 4, 4), roofMat);
+            roof.position.set(0, hFloorHeight * 2 + 2, 0);
+            roof.rotation.y = Math.PI / 4;
+            houseGroup.add(roof);
+
+            // Walls (Floor 1 & Floor 2)
+            for (let f = 0; f < 2; f++) {
+                const fy = f * hFloorHeight;
+                const backWall = new THREE.Mesh(new THREE.BoxGeometry(hWidth, hFloorHeight, 0.4), sidingMat);
+                backWall.position.set(0, fy + hFloorHeight / 2, -hDepth / 2);
+                houseGroup.add(backWall);
+
+                const leftWall = new THREE.Mesh(new THREE.BoxGeometry(0.4, hFloorHeight, hDepth), sidingMat);
+                leftWall.position.set(-hWidth / 2, fy + hFloorHeight / 2, 0);
+                houseGroup.add(leftWall);
+
+                const rightWall = new THREE.Mesh(new THREE.BoxGeometry(0.4, hFloorHeight, hDepth), sidingMat);
+                rightWall.position.set(hWidth / 2, fy + hFloorHeight / 2, 0);
+                houseGroup.add(rightWall);
+            }
+
+            // Front walls with open entry
+            const frontWall1 = new THREE.Mesh(new THREE.BoxGeometry(6, hFloorHeight, 0.4), sidingMat);
+            frontWall1.position.set(-5, hFloorHeight / 2, hDepth / 2);
+            houseGroup.add(frontWall1);
+            const frontWall2 = new THREE.Mesh(new THREE.BoxGeometry(6, hFloorHeight, 0.4), sidingMat);
+            frontWall2.position.set(5, hFloorHeight / 2, hDepth / 2);
+            houseGroup.add(frontWall2);
+
+            const frontWall2nd = new THREE.Mesh(new THREE.BoxGeometry(hWidth, hFloorHeight, 0.4), sidingMat);
+            frontWall2nd.position.set(0, hFloorHeight + hFloorHeight / 2, hDepth / 2);
+            houseGroup.add(frontWall2nd);
+
+            // Interior Stairs from 1st to 2nd floor
+            const numSteps = 12;
+            for (let i = 0; i < numSteps; i++) {
+                const step = new THREE.Mesh(new THREE.BoxGeometry(2.5, hFloorHeight / numSteps, 0.8), stairMat);
+                step.position.set(-4, (i + 0.5) * (hFloorHeight / numSteps), (i - numSteps / 2) * 0.8);
+                houseGroup.add(step);
+            }
+
+            // Upstairs Bedroom (Bed and Pillow)
+            const bedBase = new THREE.Mesh(new THREE.BoxGeometry(3, 0.8, 5), bedMat);
+            bedBase.position.set(4, hFloorHeight + 0.4, -3);
+            houseGroup.add(bedBase);
+
+            const pillow = new THREE.Mesh(new THREE.BoxGeometry(2, 0.3, 1), pillowMat);
+            pillow.position.set(4, hFloorHeight + 0.9, -5);
+            houseGroup.add(pillow);
+
+            // Mailbox out front
+            const post = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 2.5), poleMat);
+            post.position.set(6, 1.25, hDepth / 2 + 4);
+            houseGroup.add(post);
+
+            const box = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 1.2), mailboxMat);
+            box.position.set(6, 2.4, hDepth / 2 + 4);
+            houseGroup.add(box);
+
+            scene.add(houseExperience = houseGroup);
+
+            // Peanut the Bird with Animated Eyes
+            const peanutGroup = new THREE.Group();
+            scene.add(peanutGroup);
+
+            const featherMat = new THREE.MeshStandardMaterial({ color: 0xff8c00 });
+            const beakMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b });
+
+            const birdBody = new THREE.Mesh(new THREE.SphereGeometry(0.6, 16, 16), featherMat);
+            birdBody.scale.set(1, 0.8, 1.3);
+            birdBody.position.y = 0.6;
+            birdBody.castShadow = true;
+            peanutGroup.add(birdBody);
+
+            const birdHead = new THREE.Mesh(new THREE.SphereGeometry(0.4, 16, 16), featherMat);
+            birdHead.position.set(0, 1.1, 0.3);
+            peanutGroup.add(birdHead);
+
+            const birdBeak = new THREE.Mesh(new THREE.ConeGeometry(0.15, 0.4, 8), beakMat);
+            birdBeak.rotateX(Math.PI / 2);
+            birdBeak.position.set(0, 1.05, 0.7);
+            peanutGroup.add(birdBeak);
+
+            const eyeGroup = new THREE.Group();
+            peanutGroup.add(eyeGroup);
+
+            const eyeballMat = new THREE.MeshBasicMaterial({ color: 0x050505 });
+            const pupilMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+
+            [-0.16, 0.16].forEach(ex => {
+                const eye = new THREE.Group();
+                eye.position.set(ex, 1.18, 0.58);
+                eye.add(new THREE.Mesh(new THREE.SphereGeometry(0.09, 16, 16), eyeballMat));
+                const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 8), pupilMat);
+                pupil.position.set(ex > 0 ? -0.02 : 0.02, 0.02, 0.06);
+                eye.add(pupil);
+                eyeGroup.add(eye);
+            });
+
+            // God Mode Props Group
+            const propsGroup = new THREE.Group();
+            scene.add(propsGroup);
+
+            // Controls & Mouse Look
+            const controls = new THREE.PointerLockControls(camera, document.body);
+
+            document.body.addEventListener('click', (e) => {
+                if (e.clientX > window.innerWidth - 260 && e.clientY < 260) return;
+                if (!controls.isLocked) {
+                    controls.lock();
+                } else if (selectedTool) {
+                    const raycaster = new THREE.Raycaster();
+                    raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+
+                    if (selectedTool === 'delete') {
+                        const hits = raycaster.intersectObjects(propsGroup.children, true);
+                        if (hits.length > 0) {
+                            propsGroup.remove(hits[0].object);
+                        }
+                    } else {
+                        const hits = raycaster.intersectObject(ground);
+                        if (hits.length > 0) {
+                            const pt = hits[0].point;
+                            let propGeo, propMat;
+                            if (selectedTool === 'workbench') {
+                                propGeo = new THREE.BoxGeometry(1.5, 1, 0.8);
+                                propMat = new THREE.MeshStandardMaterial({ color: 0x7c471b });
+                            } else if (selectedTool === 'crate') {
+                                propGeo = new THREE.BoxGeometry(0.9, 0.9, 0.9);
+                                propMat = new THREE.MeshStandardMaterial({ color: 0xbd7d4b });
+                            } else {
+                                propGeo = new THREE.BoxGeometry(1.2, 0.4, 2);
+                                propMat = new THREE.MeshStandardMaterial({ color: 0x1b4d3e });
+                            }
+                            const prop = new THREE.Mesh(propGeo, propMat);
+                            prop.position.set(Math.round(pt.x), 0.5, Math.round(pt.z));
+                            prop.castShadow = true;
+                            propsGroup.add(prop);
+                        }
+                    }
+                }
+            });
+
+            let selectedTool = null;
+            document.querySelectorAll('.station-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.station-btn').forEach(b => b.classList.remove('active'));
+                    const type = e.currentTarget.getAttribute('data-type');
+                    selectedTool = (type === 'none') ? null : type;
+                    if (selectedTool) e.currentTarget.classList.add('active');
+                });
+            });
+
+            const keys = { w: false, a: false, s: false, d: false, space: false, shift: false };
+            window.addEventListener('keydown', (e) => {
