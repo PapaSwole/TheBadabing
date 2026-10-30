@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Badabing - Textured God View</title>
+    <title>The Badabing - First-Person Walkthrough</title>
     <style>
         body {
             margin: 0;
@@ -59,6 +59,18 @@
         }
         .station-btn:hover { background: #00aaff; border-color: #00aaff; }
         .station-btn.active { background: #0088cc; border-color: #fff; font-weight: bold; }
+        #crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 10px;
+            height: 10px;
+            transform: translate(-50%, -50%);
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 5;
+        }
         #controls-hint {
             position: absolute;
             bottom: 20px;
@@ -77,11 +89,13 @@
 </head>
 <body>
 
+    <div id="crosshair"></div>
+
     <div id="info-panel">
         <h1>The Badabing 🦫</h1>
         <p>Status: <span id="status">Connecting...</span></p>
         <p>Peanut's Pos: <span id="coords">X: 0, Z: 0</span></p>
-        <p>Cam Mode: <span id="cam-mode" style="color: #00aaff;">Textured God View</span></p>
+        <p>Cam Mode: <span id="cam-mode" style="color: #00aaff;">First-Person Walkthrough</span></p>
     </div>
 
     <div id="god-mode-panel">
@@ -94,8 +108,9 @@
     </div>
 
     <div id="controls-hint">
-        Pan View: <span>WASD / Arrow Keys</span> | Zoom: <span>Scroll Wheel</span><br>
-        Rotate View: <span>Right-Click Drag</span> | Build: <span>Left Click Ground</span>
+        Click screen to lock mouse & look around<br>
+        Walk: <span>WASD</span> | Exit Mouse Lock: <span>ESC</span><br>
+        Build Asset: <span>Left Click on Ground</span>
     </div>
 
     <script type="importmap">
@@ -109,20 +124,20 @@
 
     <script type="module">
         import * as THREE from 'three';
-        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 
         const statusEl = document.getElementById('status');
         const coordsEl = document.getElementById('coords');
 
         try {
-            console.log("🚀 Starting Textured God View Setup...");
+            console.log("🚀 Starting First-Person Walkthrough Setup...");
 
             const scene = new THREE.Scene();
             scene.background = new THREE.Color(0x1e222a);
-            scene.fog = new THREE.FogExp2(0x1e222a, 0.012);
+            scene.fog = new THREE.FogExp2(0x1e222a, 0.015);
 
-            const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1500);
-            camera.position.set(0, 40, 30); 
+            const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 1500);
+            camera.position.set(0, 1.7, 10); // Eye-level view in the street
 
             const renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
@@ -130,36 +145,14 @@
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
             document.body.appendChild(renderer.domElement);
 
-            const controls = new OrbitControls(camera, renderer.domElement);
-            controls.enableDamping = true;
-            controls.dampingFactor = 0.05;
-            controls.maxPolarAngle = Math.PI / 2.2; 
-            controls.minDistance = 5;
-            controls.maxDistance = 120;
-            controls.target.set(0, 0, 0);
-            controls.mouseButtons = {
-                LEFT: THREE.MOUSE.NONE, 
-                MIDDLE: THREE.MOUSE.DOLLY,
-                RIGHT: THREE.MOUSE.ROTATE
-            };
+            // First-person pointer lock controls
+            const controls = new PointerLockControls(camera, document.body);
 
-            // Texture Loader setup with repeating wraps
-            const textureLoader = new THREE.TextureLoader();
-
-            function loadTexture(url, repeatX = 1, repeatY = 1) {
-                const tex = textureLoader.load(url);
-                tex.wrapS = THREE.RepeatWrapping;
-                tex.wrapT = THREE.RepeatWrapping;
-                tex.repeat.set(repeatX, repeatY);
-                return tex;
-            }
-
-            // High quality web textures
-            const groundTex = loadTexture('https://images.unsplash.com/photo-1558449028-b53a39d100fc?w=512', 40, 40); // Asphalt/Ground texture
-            const grassTex = loadTexture('https://images.unsplash.com/photo-1589135069168-12c5b8b931dd?w=512', 4, 4);   // Lush lawn grass
-            const brickTex = loadTexture('https://images.unsplash.com/photo-1590073242678-70ee3fc28e8e?w=512', 3, 3);   // Red brick wall
-            const concreteTex = loadTexture('https://images.unsplash.com/photo-1518640467707-6811f4a6ab73?w=512', 3, 3); // Concrete store wall
-            const woodTex = loadTexture('https://images.unsplash.com/photo-1546484396-fb3fc6f95f98?w=512', 2, 2);     // Wood flooring
+            document.body.addEventListener('click', () => {
+                if (selectedTool === null) {
+                    controls.lock();
+                }
+            });
 
             // Lighting
             const ambientLight = new THREE.AmbientLight(0xddeeff, 0.65);
@@ -172,7 +165,23 @@
             sunLight.shadow.mapSize.height = 2048;
             scene.add(sunLight);
 
-            // Ground with texture
+            // Texture Loader
+            const textureLoader = new THREE.TextureLoader();
+            function loadTexture(url, repeatX = 1, repeatY = 1) {
+                const tex = textureLoader.load(url);
+                tex.wrapS = THREE.RepeatWrapping;
+                tex.wrapT = THREE.RepeatWrapping;
+                tex.repeat.set(repeatX, repeatY);
+                return tex;
+            }
+
+            const groundTex = loadTexture('https://images.unsplash.com/photo-1558449028-b53a39d100fc?w=512', 40, 40);
+            const grassTex = loadTexture('https://images.unsplash.com/photo-1589135069168-12c5b8b931dd?w=512', 4, 4);
+            const brickTex = loadTexture('https://images.unsplash.com/photo-1590073242678-70ee3fc28e8e?w=512', 3, 3);
+            const concreteTex = loadTexture('https://images.unsplash.com/photo-1518640467707-6811f4a6ab73?w=512', 3, 3);
+            const woodTex = loadTexture('https://images.unsplash.com/photo-1546484396-fb3fc6f95f98?w=512', 2, 2);
+
+            // Ground
             const groundGeo = new THREE.PlaneGeometry(300, 300);
             const groundMat = new THREE.MeshStandardMaterial({ map: groundTex, roughness: 0.8 });
             const ground = new THREE.Mesh(groundGeo, groundMat);
@@ -180,9 +189,7 @@
             ground.receiveShadow = true;
             scene.add(ground);
 
-            // ==========================================
-            // TEXTURED CITY & BUILDINGS
-            // ==========================================
+            // Town & Buildings
             const townGroup = new THREE.Group();
             scene.add(townGroup);
 
@@ -194,7 +201,6 @@
             const awningBlue = new THREE.MeshStandardMaterial({ color: 0x256cb3 });
             const awningGreen = new THREE.MeshStandardMaterial({ color: 0x2e8540 });
 
-            // Roads
             const roadNS = new THREE.Mesh(new THREE.PlaneGeometry(16, 240), new THREE.MeshStandardMaterial({ map: groundTex, roughness: 0.6 }));
             roadNS.rotation.x = -Math.PI / 2;
             roadNS.position.set(0, 0.01, 0);
@@ -205,36 +211,6 @@
             roadEW.position.set(0, 0.01, 0);
             townGroup.add(roadEW);
 
-            // Street lines & crosswalks
-            for (let i = -100; i < 100; i += 8) {
-                if (Math.abs(i) > 10) { 
-                    const lineNS = new THREE.Mesh(new THREE.PlaneGeometry(0.4, 4), roadLineMat);
-                    lineNS.rotation.x = -Math.PI / 2;
-                    lineNS.position.set(0, 0.02, i);
-                    townGroup.add(lineNS);
-                    
-                    const lineEW = new THREE.Mesh(new THREE.PlaneGeometry(4, 0.4), roadLineMat);
-                    lineEW.rotation.x = -Math.PI / 2;
-                    lineEW.position.set(i, 0.02, 0);
-                    townGroup.add(lineEW);
-                }
-            }
-
-            for (let i = -6; i <= 6; i += 2) {
-                [-9, 9].forEach(pos => {
-                    const cwNS = new THREE.Mesh(new THREE.PlaneGeometry(1, 3), crosswalkMat);
-                    cwNS.rotation.x = -Math.PI / 2;
-                    cwNS.position.set(i, 0.02, pos);
-                    townGroup.add(cwNS);
-
-                    const cwEW = new THREE.Mesh(new THREE.PlaneGeometry(3, 1), crosswalkMat);
-                    cwEW.rotation.x = -Math.PI / 2;
-                    cwEW.position.set(pos, 0.02, i);
-                    townGroup.add(cwEW);
-                });
-            }
-
-            // Buildings with loaded brick/concrete textures
             function createBuilding(x, z, w, h, d, wallTexMap, awningMat) {
                 const bld = new THREE.Group();
                 const wallMat = new THREE.MeshStandardMaterial({ map: wallTexMap, roughness: 0.8 });
@@ -248,10 +224,6 @@
                 cornice.position.set(0, h + 0.25, 0);
                 bld.add(cornice);
 
-                const hvac = new THREE.Mesh(new THREE.BoxGeometry(2, 1.5, 2.5), metalTrimMat);
-                hvac.position.set(-w/4, h + 0.75, 0);
-                bld.add(hvac);
-
                 const winWidth = w * 0.5, winHeight = h * 0.35;
                 const glass = new THREE.Mesh(new THREE.BoxGeometry(winWidth, winHeight, 0.1), windowGlassMat);
                 glass.position.set(-w*0.1, winHeight / 2 + 0.2, d / 2 + 0.03);
@@ -260,12 +232,6 @@
                 const door = new THREE.Mesh(new THREE.BoxGeometry(w * 0.18, h * 0.4, 0.1), windowGlassMat);
                 door.position.set(w*0.3, h * 0.2, d / 2 + 0.03);
                 bld.add(door);
-
-                const glowColor = awningMat ? awningMat.color : 0x00aaff;
-                const signMat = new THREE.MeshStandardMaterial({color: 0x111, emissive: glowColor, emissiveIntensity: 0.8});
-                const sign = new THREE.Mesh(new THREE.BoxGeometry(w * 0.6, 0.8, 0.4), signMat);
-                sign.position.set(0, h * 0.45 + 1.2, d / 2 + 0.1);
-                bld.add(sign);
 
                 if (awningMat) {
                     const awning = new THREE.Mesh(new THREE.BoxGeometry(w * 0.85, 0.35, 1.8), awningMat);
@@ -283,7 +249,7 @@
             createBuilding(-35, 18, 20, 7.5, 16, brickTex, awningRed);
             createBuilding(35, 18, 22, 9, 16, concreteTex, awningBlue);
 
-            // Peanut's House with Textured Wood Floors & Grass Yard
+            // Peanut's Accessible 2-Story House
             function createPeanutHouse(x, z) {
                 const house = new THREE.Group();
                 const extWallMat = new THREE.MeshStandardMaterial({ map: concreteTex, roughness: 0.8 });
@@ -316,7 +282,6 @@
                 addWall(16, 4, 0.5, 0, 6.2, 5.75, extWallMat);
                 addWall(0.5, 4, 11.5, -0.5, 6.2, -0.25, intWallMat);
 
-                // Textured Lush Lawn Backyard
                 const yardMat = new THREE.MeshStandardMaterial({ map: grassTex, roughness: 0.9 });
                 const yard = new THREE.Mesh(new THREE.PlaneGeometry(16, 16), yardMat);
                 yard.rotation.x = -Math.PI/2;
@@ -380,7 +345,7 @@
                 const wsUrl = `${protocol}//${window.location.host}`;
                 ws = new WebSocket(wsUrl);
                 
-                ws.onopen = () => { statusEl.innerText = "Connected"; statusEl.style.color = "#55ff55"; };
+                ws.onopen = () => { statusEl.innerText = "Connected (Click to Walk)"; statusEl.style.color = "#55ff55"; };
                 ws.onclose = () => { 
                     statusEl.innerText = "Connecting..."; 
                     setTimeout(connectWebSocket, 3000); 
@@ -405,7 +370,7 @@
             }
             connectWebSocket();
 
-            // WASD Camera Panning
+            // First-Person WASD Movement
             const keys = { w: false, a: false, s: false, d: false };
             window.addEventListener('keydown', (e) => {
                 const k = e.key.toLowerCase();
@@ -433,6 +398,8 @@
                     } else {
                         selectedTool = type;
                         e.target.classList.add('active');
+                        // Unlock pointer so user can click UI buttons easily
+                        if (controls.isLocked) controls.unlock();
                     }
                 });
             });
@@ -444,21 +411,11 @@
                 if (event.clientX > window.innerWidth - 260 && event.clientY < 240) return;
                 if (event.clientX < 320 && event.clientY < 180) return;
 
-                mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-                mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-                raycaster.setFromCamera(mouse, camera);
-
-                const intersectsStations = raycaster.intersectObjects(stationsGroup.children, true);
-                if (intersectsStations.length > 0 && !selectedTool) {
-                    let rootObj = intersectsStations[0].object;
-                    const hitUid = rootObj.userData.uid;
-                    if (hitUid && ws && ws.readyState === WebSocket.OPEN) {
-                        ws.send(JSON.stringify({ type: 'admin:delete_station', uid: hitUid }));
-                    }
-                    return;
-                }
-
                 if (selectedTool) {
+                    mouse.x = 0; // Center of screen for first-person placement
+                    mouse.y = 0;
+                    raycaster.setFromCamera(mouse, camera);
+
                     const intersectsGround = raycaster.intersectObject(ground);
                     if (intersectsGround.length > 0) {
                         const point = intersectsGround[0].point;
@@ -476,29 +433,40 @@
                 }
             });
 
-            // Animation Loop
+            // Animation Loop & First-Person Movement Physics
             const clock = new THREE.Clock();
+            const velocity = new THREE.Vector3();
+            const direction = new THREE.Vector3();
+
             function animate() {
                 requestAnimationFrame(animate);
+                const delta = clock.getDelta();
                 const elapsedTime = clock.getElapsedTime();
+
                 peanutGroup.position.y = Math.abs(Math.sin(elapsedTime * 10)) * 0.15;
 
-                const panSpeed = 0.6;
-                const dir = new THREE.Vector3();
-                camera.getWorldDirection(dir);
-                dir.y = 0; 
-                dir.normalize();
-                const sideDir = new THREE.Vector3(-dir.z, 0, dir.x);
+                if (controls.isLocked === true) {
+                    direction.z = Number(keys.w) - Number(keys.s);
+                    direction.x = Number(keys.d) - Number(keys.a);
+                    direction.normalize();
 
-                if (keys.w) { controls.target.addScaledVector(dir, panSpeed); camera.position.addScaledVector(dir, panSpeed); }
-                if (keys.s) { controls.target.addScaledVector(dir, -panSpeed); camera.position.addScaledVector(dir, -panSpeed); }
-                if (keys.a) { controls.target.addScaledVector(sideDir, panSpeed); camera.position.addScaledVector(sideDir, panSpeed); }
-                if (keys.d) { controls.target.addScaledVector(sideDir, -panSpeed); camera.position.addScaledVector(sideDir, -panSpeed); }
+                    const moveSpeed = 8.0;
+                    if (keys.w || keys.s) controls.moveForward(direction.z * moveSpeed * delta);
+                    if (keys.a || keys.d) controls.moveRight(direction.x * moveSpeed * delta);
 
-                controls.update();
+                    // Keep camera locked at eye level height
+                    camera.position.y = 1.7;
+                }
+
                 renderer.render(scene, camera);
             }
             animate();
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
 
         } catch (err) {
             console.error("💥 Critical Script Error:", err);
