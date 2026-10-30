@@ -102,7 +102,6 @@
         }
         #controls-hint span { color: #00aaff; font-weight: bold; }
     </style>
-    <!-- Ultra-reliable jsDelivr CDN instead of unpkg -->
     <script type="importmap">
       {
         "imports": {
@@ -119,7 +118,7 @@
 
     <div id="info-panel">
         <h1>The Badabing 🦫</h1>
-        <p>Status: <span id="status">Online (Click Scene to Walk)</span></p>
+        <p>Status: <span id="status">Initializing...</span></p>
         <p>Peanut's Pos: <span id="coords">X: 0.0, Z: -15.0</span></p>
         <p>Your Floor: <span id="floor-level" style="color: #00ffcc;">Ground Level (1st Floor)</span></p>
         <p>Door Log: <span id="peanut-door-log" style="color: #ffcc00;">All Doors Ready</span></p>
@@ -152,285 +151,307 @@
         const doorPromptEl = document.getElementById('door-prompt');
 
         window.addEventListener('error', (e) => {
-            statusEl.innerText = "Error: " + e.message;
+            statusEl.innerText = "Script Error: " + (e.message || "Unknown");
             statusEl.style.color = "#ff4444";
+            console.error("Window Error:", e);
         });
 
-        // 1. Scene & Renderer Setup
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x87a8d0);
-        scene.fog = new THREE.FogExp2(0x87a8d0, 0.004);
+        try {
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x87a8d0);
+            scene.fog = new THREE.FogExp2(0x87a8d0, 0.004);
 
-        const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 1500);
-        camera.position.set(0, 1.8, 12);
+            const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 1500);
+            camera.position.set(0, 1.8, 12);
 
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = 1.1;
-        document.body.appendChild(renderer.domElement);
+            const renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.1;
+            document.body.appendChild(renderer.domElement);
 
-        const maxAnisotropy = renderer.capabilities.getMaxAnisotropy();
+            const maxAnisotropy = renderer.capabilities.getMaxAnisotropy();
 
-        // =========================================================
-        // PROCEDURAL REALISTIC TEXTURE ENGINE
-        // =========================================================
-        function makeSeamlessTexture(drawFn, repeatX = 1, repeatY = 1) {
-            const canvas = document.createElement('canvas');
-            canvas.width = 512;
-            canvas.height = 512;
-            const ctx = canvas.getContext('2d');
-            drawFn(ctx, 512, 512);
-            const tex = new THREE.CanvasTexture(canvas);
-            tex.wrapS = THREE.RepeatWrapping;
-            tex.wrapT = THREE.RepeatWrapping;
-            tex.repeat.set(repeatX, repeatY);
-            tex.anisotropy = maxAnisotropy;
-            tex.colorSpace = THREE.SRGBColorSpace;
-            return tex;
-        }
-
-        function makeSignTexture(text, bgHex, textHex, subText = "") {
-            const canvas = document.createElement('canvas');
-            canvas.width = 1024;
-            canvas.height = 256;
-            const ctx = canvas.getContext('2d');
-            ctx.fillStyle = bgHex;
-            ctx.fillRect(0, 0, 1024, 256);
-            ctx.strokeStyle = textHex;
-            ctx.lineWidth = 10;
-            ctx.strokeRect(12, 12, 1000, 232);
-            ctx.fillStyle = textHex;
-            ctx.font = 'bold 92px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(text, 512, subText ? 105 : 128);
-            if (subText) {
-                ctx.font = 'bold 36px sans-serif';
-                ctx.fillStyle = '#ffffff';
-                ctx.fillText(subText, 512, 190);
+            // Procedural Texture Engine
+            function makeSeamlessTexture(drawFn, repeatX = 1, repeatY = 1) {
+                const canvas = document.createElement('canvas');
+                canvas.width = 512;
+                canvas.height = 512;
+                const ctx = canvas.getContext('2d');
+                drawFn(ctx, 512, 512);
+                const tex = new THREE.CanvasTexture(canvas);
+                tex.wrapS = THREE.RepeatWrapping;
+                tex.wrapT = THREE.RepeatWrapping;
+                tex.repeat.set(repeatX, repeatY);
+                tex.anisotropy = maxAnisotropy;
+                tex.colorSpace = THREE.SRGBColorSpace;
+                return tex;
             }
-            const tex = new THREE.CanvasTexture(canvas);
-            tex.colorSpace = THREE.SRGBColorSpace;
-            return tex;
-        }
 
-        const createGrassTexture = (rx, ry) => makeSeamlessTexture((ctx, w, h) => {
-            ctx.fillStyle = '#2d5a27';
-            ctx.fillRect(0, 0, w, h);
-            const cols = ['#244d1e', '#35682d', '#3e7835', '#1f421a', '#4a853b'];
-            for (let i = 0; i < 30000; i++) {
-                ctx.fillStyle = cols[i % cols.length];
-                ctx.fillRect(Math.random() * w, Math.random() * h, 2, 5);
-            }
-        }, rx, ry);
-
-        const createAsphaltTexture = (rx, ry) => makeSeamlessTexture((ctx, w, h) => {
-            ctx.fillStyle = '#26292e';
-            ctx.fillRect(0, 0, w, h);
-            for (let i = 0; i < 35000; i++) {
-                const v = 25 + Math.floor(Math.random() * 38);
-                ctx.fillStyle = `rgb(${v},${v},${v + 3})`;
-                ctx.fillRect(Math.random() * w, Math.random() * h, 2, 2);
-            }
-        }, rx, ry);
-
-        const createConcreteTexture = (rx, ry) => makeSeamlessTexture((ctx, w, h) => {
-            ctx.fillStyle = '#8c9298';
-            ctx.fillRect(0, 0, w, h);
-            for (let i = 0; i < 18000; i++) {
-                const v = 120 + Math.floor(Math.random() * 45);
-                ctx.fillStyle = `rgb(${v},${v},${v})`;
-                ctx.fillRect(Math.random() * w, Math.random() * h, 2, 2);
-            }
-            ctx.strokeStyle = '#686d73';
-            ctx.lineWidth = 4;
-            ctx.strokeRect(2, 2, w - 4, h - 4);
-        }, rx, ry);
-
-        const createBrickTexture = (r0, g0, b0, rx, ry) => makeSeamlessTexture((ctx, w, h) => {
-            ctx.fillStyle = '#b5b0a8';
-            ctx.fillRect(0, 0, w, h);
-            const rows = 16, cols = 8, bH = h / rows, bW = w / cols, m = 4;
-            for (let r = 0; r < rows; r++) {
-                const off = (r % 2 === 1) ? bW / 2 : 0;
-                for (let c = -1; c <= cols; c++) {
-                    const s = (Math.random() * 24) - 12;
-                    ctx.fillStyle = `rgb(${Math.min(255,Math.max(0,r0+s))},${Math.min(255,Math.max(0,g0+s))},${Math.min(255,Math.max(0,b0+s))})`;
-                    ctx.fillRect(c * bW + off + m/2, r * bH + m/2, bW - m, bH - m);
+            function makeSignTexture(text, bgHex, textHex, subText = "") {
+                const canvas = document.createElement('canvas');
+                canvas.width = 1024;
+                canvas.height = 256;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = bgHex;
+                ctx.fillRect(0, 0, 1024, 256);
+                ctx.strokeStyle = textHex;
+                ctx.lineWidth = 10;
+                ctx.strokeRect(12, 12, 1000, 232);
+                ctx.fillStyle = textHex;
+                ctx.font = 'bold 92px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(text, 512, subText ? 105 : 128);
+                if (subText) {
+                    ctx.font = 'bold 36px sans-serif';
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillText(subText, 512, 190);
                 }
+                const tex = new THREE.CanvasTexture(canvas);
+                tex.colorSpace = THREE.SRGBColorSpace;
+                return tex;
             }
-        }, rx, ry);
 
-        const createSidingTexture = (rx, ry) => makeSeamlessTexture((ctx, w, h) => {
-            const planks = 16, pH = h / planks;
-            for (let i = 0; i < planks; i++) {
-                ctx.fillStyle = i % 2 === 0 ? '#5c6f84' : '#536579';
-                ctx.fillRect(0, i * pH, w, pH);
-                ctx.fillStyle = '#394654';
-                ctx.fillRect(0, (i + 1) * pH - 3, w, 3);
-            }
-        }, rx, ry);
-
-        const createWoodTexture = (rx, ry) => makeSeamlessTexture((ctx, w, h) => {
-            ctx.fillStyle = '#7c5230';
-            ctx.fillRect(0, 0, w, h);
-            const planks = 8, pW = w / planks;
-            for (let i = 0; i < planks; i++) {
-                const s = (Math.random() * 16) - 8;
-                ctx.fillStyle = `rgb(${124 + s}, ${82 + s}, ${48 + s})`;
-                ctx.fillRect(i * pW, 0, pW - 2, h);
-                ctx.fillStyle = '#3d2614';
-                ctx.fillRect((i + 1) * pW - 2, 0, 2, h);
-            }
-        }, rx, ry);
-
-        const createTileTexture = (rx, ry) => makeSeamlessTexture((ctx, w, h) => {
-            ctx.fillStyle = '#d8dee3';
-            ctx.fillRect(0, 0, w, h);
-            const tiles = 8, tS = w / tiles;
-            ctx.strokeStyle = '#9aa4ad';
-            ctx.lineWidth = 4;
-            for (let r = 0; r < tiles; r++) {
-                for (let c = 0; c < tiles; c++) {
-                    ctx.strokeRect(c * tS, r * tS, tS, tS);
+            const createGrassTexture = (rx, ry) => makeSeamlessTexture((ctx, w, h) => {
+                ctx.fillStyle = '#2d5a27';
+                ctx.fillRect(0, 0, w, h);
+                const cols = ['#244d1e', '#35682d', '#3e7835', '#1f421a', '#4a853b'];
+                for (let i = 0; i < 30000; i++) {
+                    ctx.fillStyle = cols[i % cols.length];
+                    ctx.fillRect(Math.random() * w, Math.random() * h, 2, 5);
                 }
+            }, rx, ry);
+
+            const createAsphaltTexture = (rx, ry) => makeSeamlessTexture((ctx, w, h) => {
+                ctx.fillStyle = '#26292e';
+                ctx.fillRect(0, 0, w, h);
+                for (let i = 0; i < 35000; i++) {
+                    const v = 25 + Math.floor(Math.random() * 38);
+                    ctx.fillStyle = `rgb(${v},${v},${v + 3})`;
+                    ctx.fillRect(Math.random() * w, Math.random() * h, 2, 2);
+                }
+            }, rx, ry);
+
+            const createConcreteTexture = (rx, ry) => makeSeamlessTexture((ctx, w, h) => {
+                ctx.fillStyle = '#8c9298';
+                ctx.fillRect(0, 0, w, h);
+                for (let i = 0; i < 18000; i++) {
+                    const v = 120 + Math.floor(Math.random() * 45);
+                    ctx.fillStyle = `rgb(${v},${v},${v})`;
+                    ctx.fillRect(Math.random() * w, Math.random() * h, 2, 2);
+                }
+                ctx.strokeStyle = '#686d73';
+                ctx.lineWidth = 4;
+                ctx.strokeRect(2, 2, w - 4, h - 4);
+            }, rx, ry);
+
+            const createBrickTexture = (r0, g0, b0, rx, ry) => makeSeamlessTexture((ctx, w, h) => {
+                ctx.fillStyle = '#b5b0a8';
+                ctx.fillRect(0, 0, w, h);
+                const rows = 16, cols = 8, bH = h / rows, bW = w / cols, m = 4;
+                for (let r = 0; r < rows; r++) {
+                    const off = (r % 2 === 1) ? bW / 2 : 0;
+                    for (let c = -1; c <= cols; c++) {
+                        const s = (Math.random() * 24) - 12;
+                        ctx.fillStyle = `rgb(${Math.min(255,Math.max(0,r0+s))},${Math.min(255,Math.max(0,g0+s))},${Math.min(255,Math.max(0,b0+s))})`;
+                        ctx.fillRect(c * bW + off + m/2, r * bH + m/2, bW - m, bH - m);
+                    }
+                }
+            }, rx, ry);
+
+            const createSidingTexture = (rx, ry) => makeSeamlessTexture((ctx, w, h) => {
+                const planks = 16, pH = h / planks;
+                for (let i = 0; i < planks; i++) {
+                    ctx.fillStyle = i % 2 === 0 ? '#5c6f84' : '#536579';
+                    ctx.fillRect(0, i * pH, w, pH);
+                    ctx.fillStyle = '#394654';
+                    ctx.fillRect(0, (i + 1) * pH - 3, w, 3);
+                }
+            }, rx, ry);
+
+            const createWoodTexture = (rx, ry) => makeSeamlessTexture((ctx, w, h) => {
+                ctx.fillStyle = '#7c5230';
+                ctx.fillRect(0, 0, w, h);
+                const planks = 8, pW = w / planks;
+                for (let i = 0; i < planks; i++) {
+                    const s = (Math.random() * 16) - 8;
+                    ctx.fillStyle = `rgb(${124 + s}, ${82 + s}, ${48 + s})`;
+                    ctx.fillRect(i * pW, 0, pW - 2, h);
+                    ctx.fillStyle = '#3d2614';
+                    ctx.fillRect((i + 1) * pW - 2, 0, 2, h);
+                }
+            }, rx, ry);
+
+            const createTileTexture = (rx, ry) => makeSeamlessTexture((ctx, w, h) => {
+                ctx.fillStyle = '#d8dee3';
+                ctx.fillRect(0, 0, w, h);
+                const tiles = 8, tS = w / tiles;
+                ctx.strokeStyle = '#9aa4ad';
+                ctx.lineWidth = 4;
+                for (let r = 0; r < tiles; r++) {
+                    for (let c = 0; c < tiles; c++) {
+                        ctx.strokeRect(c * tS, r * tS, tS, tS);
+                    }
+                }
+            }, rx, ry);
+
+            // Materials
+            const grassGroundMat = new THREE.MeshStandardMaterial({ map: createGrassTexture(55, 55), roughness: 0.95 });
+            const yardGrassMat   = new THREE.MeshStandardMaterial({ map: createGrassTexture(8, 8), roughness: 0.9 });
+            const asphaltMat     = new THREE.MeshStandardMaterial({ map: createAsphaltTexture(4, 55), roughness: 0.85 });
+            const asphaltEWMat   = new THREE.MeshStandardMaterial({ map: createAsphaltTexture(55, 4), roughness: 0.85 });
+            const sidewalkMat    = new THREE.MeshStandardMaterial({ map: createConcreteTexture(2, 60), roughness: 0.8 });
+            const redBrickMat    = new THREE.MeshStandardMaterial({ map: createBrickTexture(145, 62, 48, 4, 2.5), roughness: 0.85 });
+            const brownBrickMat  = new THREE.MeshStandardMaterial({ map: createBrickTexture(95, 78, 68, 4, 2.5), roughness: 0.85 });
+            const darkCorpMat    = new THREE.MeshStandardMaterial({ map: createBrickTexture(42, 46, 54, 5, 3), roughness: 0.65, metalness: 0.2 });
+            const sidingMat      = new THREE.MeshStandardMaterial({ map: createSidingTexture(4, 2), roughness: 0.75 });
+            const woodFloorMat   = new THREE.MeshStandardMaterial({ map: createWoodTexture(5, 5), roughness: 0.55 });
+            const tileFloorMat   = new THREE.MeshStandardMaterial({ map: createTileTexture(6, 6), roughness: 0.35 });
+            const fenceWoodMat   = new THREE.MeshStandardMaterial({ map: createWoodTexture(6, 1), roughness: 0.85 });
+            const intWallMat     = new THREE.MeshStandardMaterial({ color: 0xf4f1ea, roughness: 0.9 });
+            const roofMat        = new THREE.MeshStandardMaterial({ color: 0x242830, roughness: 0.8 });
+            const metalTrimMat   = new THREE.MeshStandardMaterial({ color: 0x333840, metalness: 0.7, roughness: 0.35 });
+            const windowGlassMat = new THREE.MeshStandardMaterial({ color: 0x88ccff, metalness: 0.2, roughness: 0.1, transparent: true, opacity: 0.42 });
+
+            // Lighting
+            scene.add(new THREE.AmbientLight(0xffffff, 0.75));
+            const sunLight = new THREE.DirectionalLight(0xfff6e5, 1.4);
+            sunLight.position.set(60, 95, 50);
+            sunLight.castShadow = true;
+            sunLight.shadow.mapSize.width = 2048;
+            sunLight.shadow.mapSize.height = 2048;
+            const camBound = 95;
+            sunLight.shadow.camera.left = -camBound;
+            sunLight.shadow.camera.right = camBound;
+            sunLight.shadow.camera.top = camBound;
+            sunLight.shadow.camera.bottom = -camBound;
+            scene.add(sunLight);
+
+            // Ground
+            const ground = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), grassGroundMat);
+            ground.rotation.x = -Math.PI / 2;
+            ground.receiveShadow = true;
+            scene.add(ground);
+
+            const townGroup = new THREE.Group();
+            scene.add(townGroup);
+
+            // Doors & Ramps
+            const interactiveDoors = [];
+            const doorMeshes = [];
+            const walkableRamps = [];
+            const elevatedFloors = [];
+
+            function createHingedDoor({ name, hingeX, hingeY, hingeZ, width, height, depth, mat, closedAngle = 0, openAngle = Math.PI * 0.55, isRollUp = false }) {
+                const pivot = new THREE.Group();
+                pivot.position.set(hingeX, hingeY, hingeZ);
+
+                const mesh = new THREE.Mesh(new THREE.BoxGeometry(width, height, depth), mat);
+                if (isRollUp) {
+                    mesh.position.set(0, -height / 2, 0);
+                } else {
+                    mesh.position.set(width / 2, height / 2, 0);
+                }
+                mesh.castShadow = true;
+                mesh.receiveShadow = true;
+                pivot.add(mesh);
+
+                if (!isRollUp) {
+                    const knob = new THREE.Mesh(new THREE.SphereGeometry(0.09, 8, 8), new THREE.MeshStandardMaterial({ color: 0xd4af37, metalness: 0.9, roughness: 0.2 }));
+                    knob.position.set(width - 0.25, height * 0.45, depth / 2 + 0.06);
+                    const knobBack = knob.clone();
+                    knobBack.position.z = -depth / 2 - 0.06;
+                    pivot.add(knob, knobBack);
+                }
+
+                scene.add(pivot);
+
+                const doorObj = {
+                    name, pivot, mesh, isOpen: false, isRollUp, closedAngle, openAngle,
+                    baseY: hingeY, openY: hingeY + height * 0.88,
+                    worldCenter: new THREE.Vector3(hingeX + (isRollUp ? 0 : width / 2), hingeY + height / 2, hingeZ),
+                    peanutOpened: false
+                };
+
+                mesh.userData.doorRef = doorObj;
+                interactiveDoors.push(doorObj);
+                doorMeshes.push(mesh);
+                return doorObj;
             }
-        }, rx, ry);
 
-        // Materials
-        const grassGroundMat = new THREE.MeshStandardMaterial({ map: createGrassTexture(55, 55), roughness: 0.95 });
-        const yardGrassMat   = new THREE.MeshStandardMaterial({ map: createGrassTexture(8, 8), roughness: 0.9 });
-        const asphaltMat     = new THREE.MeshStandardMaterial({ map: createAsphaltTexture(4, 55), roughness: 0.85 });
-        const asphaltEWMat   = new THREE.MeshStandardMaterial({ map: createAsphaltTexture(55, 4), roughness: 0.85 });
-        const sidewalkMat    = new THREE.MeshStandardMaterial({ map: createConcreteTexture(2, 60), roughness: 0.8 });
-        const redBrickMat    = new THREE.MeshStandardMaterial({ map: createBrickTexture(145, 62, 48, 4, 2.5), roughness: 0.85 });
-        const brownBrickMat  = new THREE.MeshStandardMaterial({ map: createBrickTexture(95, 78, 68, 4, 2.5), roughness: 0.85 });
-        const darkCorpMat    = new THREE.MeshStandardMaterial({ map: createBrickTexture(42, 46, 54, 5, 3), roughness: 0.65, metalness: 0.2 });
-        const sidingMat      = new THREE.MeshStandardMaterial({ map: createSidingTexture(4, 2), roughness: 0.75 });
-        const woodFloorMat   = new THREE.MeshStandardMaterial({ map: createWoodTexture(5, 5), roughness: 0.55 });
-        const tileFloorMat   = new THREE.MeshStandardMaterial({ map: createTileTexture(6, 6), roughness: 0.35 });
-        const fenceWoodMat   = new THREE.MeshStandardMaterial({ map: createWoodTexture(6, 1), roughness: 0.85 });
-        const intWallMat     = new THREE.MeshStandardMaterial({ color: 0xf4f1ea, roughness: 0.9 });
-        const roofMat        = new THREE.MeshStandardMaterial({ color: 0x242830, roughness: 0.8 });
-        const metalTrimMat   = new THREE.MeshStandardMaterial({ color: 0x333840, metalness: 0.7, roughness: 0.35 });
-        const windowGlassMat = new THREE.MeshStandardMaterial({ color: 0x88ccff, metalness: 0.2, roughness: 0.1, transparent: true, opacity: 0.42 });
+            // Roads
+            const roadNS = new THREE.Mesh(new THREE.PlaneGeometry(16, 280), asphaltMat);
+            roadNS.rotation.x = -Math.PI / 2;
+            roadNS.position.set(0, 0.02, 40);
+            roadNS.receiveShadow = true;
+            townGroup.add(roadNS);
 
-        // Lighting
-        scene.add(new THREE.AmbientLight(0xffffff, 0.75));
-        const sunLight = new THREE.DirectionalLight(0xfff6e5, 1.4);
-        sunLight.position.set(60, 95, 50);
-        sunLight.castShadow = true;
-        sunLight.shadow.mapSize.width = 2048;
-        sunLight.shadow.mapSize.height = 2048;
-        const d = 95;
-        sunLight.shadow.camera.left = -d;
-        sunLight.shadow.camera.right = d;
-        sunLight.shadow.camera.top = d;
-        sunLight.shadow.camera.bottom = -d;
-        scene.add(sunLight);
+            const roadEW = new THREE.Mesh(new THREE.PlaneGeometry(280, 16), asphaltEWMat);
+            roadEW.rotation.x = -Math.PI / 2;
+            roadEW.position.set(0, 0.025, 0);
+            roadEW.receiveShadow = true;
+            townGroup.add(roadEW);
 
-        // Ground
-        const ground = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), grassGroundMat);
-        ground.rotation.x = -Math.PI / 2;
-        ground.receiveShadow = true;
-        scene.add(ground);
+            const plaza = new THREE.Mesh(new THREE.BoxGeometry(38, 0.14, 24), sidewalkMat);
+            plaza.position.set(0, 0.07, -20);
+            plaza.receiveShadow = true;
+            townGroup.add(plaza);
 
-        const townGroup = new THREE.Group();
-        scene.add(townGroup);
+            // Build Apeshit Corp
+            function buildApeshitCorp() {
+                const cx = 0, cz = -38;
+                const corp = new THREE.Group();
+                corp.position.set(cx, 0, cz);
+                townGroup.add(corp);
 
-        // =========================================================
-        // DOORS & STAIRWELL REGISTRY
-        // =========================================================
-        const interactiveDoors = [];
-        const doorMeshes = [];
-        const walkableRamps = [];
-        const elevatedFloors = [];
+                const addPart = (w, h, d, px, py, pz, mat) => {
+                    const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+                    m.position.set(px, py, pz);
+                    m.castShadow = true;
+                    m.receiveShadow = true;
+                    corp.add(m);
+                    return m;
+                };
 
-        function createHingedDoor({ name, hingeX, hingeY, hingeZ, width, height, depth, mat, closedAngle = 0, openAngle = Math.PI * 0.55, isRollUp = false }) {
-            const pivot = new THREE.Group();
-            pivot.position.set(hingeX, hingeY, hingeZ);
+                addPart(28, 0.2, 20, 0, 0.1, 0, tileFloorMat);
+                addPart(23, 0.25, 20, -2.5, 4.5, 0, woodFloorMat);
+                addPart(5, 0.25, 6, 11.5, 4.5, -7, woodFloorMat);
+                addPart(5, 0.25, 5, 11.5, 4.5, 7.5, woodFloorMat);
+                addPart(29, 0.6, 21, 0, 9.2, 0, roofMat);
 
-            const mesh = new THREE.Mesh(new THREE.BoxGeometry(width, height, depth), mat);
-            if (isRollUp) {
-                mesh.position.set(0, -height / 2, 0);
-            } else {
-                mesh.position.set(width / 2, height / 2, 0);
-            }
-            mesh.castShadow = true;
-            mesh.receiveShadow = true;
-            pivot.add(mesh);
+                addPart(0.5, 4.5, 20, -13.75, 2.25, 0, darkCorpMat);
+                addPart(0.5, 4.5, 20, 13.75, 2.25, 0, darkCorpMat);
+                addPart(28, 4.5, 0.5, 0, 2.25, -9.75, darkCorpMat);
+                addPart(12, 4.5, 0.5, -8, 2.25, 9.75, darkCorpMat);
+                addPart(12, 4.5, 0.5, 8, 2.25, 9.75, darkCorpMat);
+                addPart(4, 1.1, 0.5, 0, 3.95, 9.75, darkCorpMat);
+                addPart(8, 2.6, 0.15, -8, 2.3, 9.8, windowGlassMat);
+                addPart(8, 2.6, 0.15, 8, 2.3, 9.8, windowGlassMat);
 
-            if (!isRollUp) {
-                const knob = new THREE.Mesh(new THREE.SphereGeometry(0.09, 8, 8), new THREE.MeshStandardMaterial({ color: 0xd4af37, metalness: 0.9, roughness: 0.2 }));
-                knob.position.set(width - 0.25, height * 0.45, depth / 2 + 0.06);
-                const knobBack = knob.clone();
-                knobBack.position.z = -depth / 2 - 0.06;
-                pivot.add(knob, knobBack);
-            }
+                addPart(0.5, 4.5, 20, -13.75, 6.75, 0, darkCorpMat);
+                addPart(0.5, 4.5, 20, 13.75, 6.75, 0, darkCorpMat);
+                addPart(28, 4.5, 0.5, 0, 6.75, -9.75, darkCorpMat);
+                addPart(28, 1.2, 0.5, 0, 5.1, 9.75, darkCorpMat);
+                addPart(28, 1.0, 0.5, 0, 8.5, 9.75, darkCorpMat);
+                addPart(24, 2.3, 0.15, 0, 6.75, 9.8, windowGlassMat);
 
-            scene.add(pivot);
+                const corpSignMat = new THREE.MeshStandardMaterial({
+                    map: makeSignTexture("APESHIT CORP", "#10141d", "#00ffcc", "GLOBAL HEADQUARTERS"),
+                    roughness: 0.3
+                });
+                addPart(16, 2.8, 0.4, 0, 10.8, 10.0, corpSignMat);
 
-            const doorObj = {
-                name, pivot, mesh, isOpen: false, isRollUp, closedAngle, openAngle,
-                baseY: hingeY, openY: hingeY + height * 0.88,
-                worldCenter: new THREE.Vector3(hingeX + (isRollUp ? 0 : width / 2), hingeY + height / 2, hingeZ),
-                peanutOpened: false
-            };
+                addPart(6, 1.2, 1.4, 0, 0.7, -3, woodFloorMat);
+                addPart(4, 0.8, 1.5, -7, 0.5, 2, new THREE.MeshStandardMaterial({ color: 0x223344 }));
+                addPart(4, 0.8, 1.5, 6, 0.5, 2, new THREE.MeshStandardMaterial({ color: 0x223344 }));
+                addPart(8, 0.9, 3.2, -3, 5.05, 0, new THREE.MeshStandardMaterial({ color: 0x3a2312, roughness: 0.3 }));
 
-            mesh.userData.doorRef = doorObj;
-            interactiveDoors.push(doorObj);
-            doorMeshes.push(mesh);
-            return doorObj;
-        }
-
-        // Roads & Plaza
-        const roadNS = new THREE.Mesh(new THREE.PlaneGeometry(16, 280), asphaltMat);
-        roadNS.rotation.x = -Math.PI / 2;
-        roadNS.position.set(0, 0.02, 40);
-        roadNS.receiveShadow = true;
-        townGroup.add(roadNS);
-
-        const roadEW = new THREE.Mesh(new THREE.PlaneGeometry(280, 16), asphaltEWMat);
-        roadEW.rotation.x = -Math.PI / 2;
-        roadEW.position.set(0, 0.025, 0);
-        roadEW.receiveShadow = true;
-        townGroup.add(roadEW);
-
-        const plaza = new THREE.Mesh(new THREE.BoxGeometry(38, 0.14, 24), sidewalkMat);
-        plaza.position.set(0, 0.07, -20);
-        plaza.receiveShadow = true;
-        townGroup.add(plaza);
-
-        // =========================================================
-        // 1. "APESHIT CORP" 2-STORY ACCESSIBLE HQ + GORILLA STATUE
-        // =========================================================
-        function buildApeshitCorp() {
-            const cx = 0, cz = -38;
-            const corp = new THREE.Group();
-            corp.position.set(cx, 0, cz);
-            townGroup.add(corp);
-
-            const addPart = (w, h, d, px, py, pz, mat) => {
-                const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
-                m.position.set(px, py, pz);
-                m.castShadow = true;
-                m.receiveShadow = true;
-                corp.add(m);
-                return m;
-            };
-
-            addPart(28, 0.2, 20, 0, 0.1, 0, tileFloorMat);
-            addPart(23, 0.25, 20, -2.5, 4.5, 0, woodFloorMat);
-            addPart(5, 0.25, 6, 11.5, 4.5, -7, woodFloorMat);
-            addPart(5, 0.25, 5, 11.5, 4.5, 7.5, woodFloorMat);
-            addPart(29, 0.6, 21, 0, 9.2, 0, roofMat);
-
-            // 1st Floor Walls
-            addPart(0.5, 4.5, 20, -13.75, 2.25, 0, darkCorpMat);
-            addPart(0.5, 4.5, 20, 13.75, 2.25, 0, darkCorpMat);
-            addPart(28, 4.5, 0.5, 0, 2.25, -9.75, darkCorpMat);
-            addPart(12, 4.5, 0.5, -8, 2.25
+                const steps = 15;
+                for (let s = 0; s < steps; s++) {
+                    const stepY = (s + 1) * (4.5 / steps);
+                    const stepZ = 4.5 - s * (8.5 / steps);
+                    addPart(3.6, 0.25, 0.7, 11
