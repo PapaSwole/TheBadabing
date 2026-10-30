@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Badabing - Avatar God Mode</title>
+    <title>The Badabing - Detailed City & God Mode</title>
     <style>
         body {
             margin: 0;
@@ -123,7 +123,7 @@
             scene.fog = new THREE.FogExp2(0x1e222a, 0.012);
 
             const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1500);
-            camera.position.set(0, 8, 15); // Start behind player
+            camera.position.set(0, 8, 15); 
 
             const renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
@@ -134,14 +134,14 @@
             const controls = new OrbitControls(camera, renderer.domElement);
             controls.enableDamping = true;
             controls.dampingFactor = 0.05;
-            controls.maxPolarAngle = Math.PI / 2 - 0.05; // Prevent camera going under ground
+            controls.maxPolarAngle = Math.PI / 2 - 0.05; 
             controls.target.set(0, 1, 0);
 
             // Lighting
-            const ambientLight = new THREE.AmbientLight(0xddeeff, 0.75);
+            const ambientLight = new THREE.AmbientLight(0xddeeff, 0.55);
             scene.add(ambientLight);
 
-            const sunLight = new THREE.DirectionalLight(0xfff8ee, 1.4);
+            const sunLight = new THREE.DirectionalLight(0xfff8ee, 1.2);
             sunLight.position.set(45, 70, 35);
             sunLight.castShadow = true;
             sunLight.shadow.mapSize.width = 2048;
@@ -157,21 +157,25 @@
             scene.add(ground);
 
             // ==========================================
-            // CITY & HOUSE GENERATION (From previous code)
+            // DETAILED CITY & STREET INFRASTRUCTURE
             // ==========================================
             const townGroup = new THREE.Group();
             scene.add(townGroup);
 
-            const asphaltMat = new THREE.MeshStandardMaterial({ color: 0x242830 });
+            const asphaltMat = new THREE.MeshStandardMaterial({ color: 0x21252b });
             const concreteMat = new THREE.MeshStandardMaterial({ color: 0x545b6b });
-            const brickRedMat = new THREE.MeshStandardMaterial({ color: 0x6e3b30 });
-            const brickDarkMat = new THREE.MeshStandardMaterial({ color: 0x423d42 });
-            const windowGlassMat = new THREE.MeshStandardMaterial({ color: 0x1f3b4f, metalness: 0.9 });
+            const roadLineMat = new THREE.MeshBasicMaterial({ color: 0xddaa00 });
+            const crosswalkMat = new THREE.MeshBasicMaterial({ color: 0xdddddd });
+            
+            const brickRedMat = new THREE.MeshStandardMaterial({ color: 0x6e3b30, roughness: 0.9 });
+            const brickDarkMat = new THREE.MeshStandardMaterial({ color: 0x423d42, roughness: 0.9 });
+            const metalTrimMat = new THREE.MeshStandardMaterial({ color: 0x3e424b, metalness: 0.6, roughness: 0.5 });
+            const windowGlassMat = new THREE.MeshStandardMaterial({ color: 0x1f3b4f, metalness: 0.9, roughness: 0.1 });
             const awningRed = new THREE.MeshStandardMaterial({ color: 0xb82e2e });
             const awningBlue = new THREE.MeshStandardMaterial({ color: 0x256cb3 });
             const awningGreen = new THREE.MeshStandardMaterial({ color: 0x2e8540 });
 
-            // Roads
+            // Roads & Sidewalks
             const roadNS = new THREE.Mesh(new THREE.PlaneGeometry(16, 240), asphaltMat);
             roadNS.rotation.x = -Math.PI / 2;
             roadNS.position.set(0, 0.01, 0);
@@ -182,9 +186,421 @@
             roadEW.position.set(0, 0.01, 0);
             townGroup.add(roadEW);
 
-            function createBuilding(x, z, w, h, d, wallMat, awningMat) {
+            // Street Details (Lines & Crosswalks)
+            for (let i = -100; i < 100; i += 8) {
+                if (Math.abs(i) > 10) { 
+                    // N/S Centerlines
+                    const lineNS = new THREE.Mesh(new THREE.PlaneGeometry(0.4, 4), roadLineMat);
+                    lineNS.rotation.x = -Math.PI / 2;
+                    lineNS.position.set(0, 0.02, i);
+                    townGroup.add(lineNS);
+                    // E/W Centerlines
+                    const lineEW = new THREE.Mesh(new THREE.PlaneGeometry(4, 0.4), roadLineMat);
+                    lineEW.rotation.x = -Math.PI / 2;
+                    lineEW.position.set(i, 0.02, 0);
+                    townGroup.add(lineEW);
+                }
+            }
+
+            // Crosswalk stripes
+            for (let i = -6; i <= 6; i += 2) {
+                [-9, 9].forEach(pos => {
+                    const cwNS = new THREE.Mesh(new THREE.PlaneGeometry(1, 3), crosswalkMat);
+                    cwNS.rotation.x = -Math.PI / 2;
+                    cwNS.position.set(i, 0.02, pos);
+                    townGroup.add(cwNS);
+
+                    const cwEW = new THREE.Mesh(new THREE.PlaneGeometry(3, 1), crosswalkMat);
+                    cwEW.rotation.x = -Math.PI / 2;
+                    cwEW.position.set(pos, 0.02, i);
+                    townGroup.add(cwEW);
+                });
+            }
+
+            // Streetlamps
+            function createStreetlamp(x, z) {
+                const lampGroup = new THREE.Group();
+                const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.2, 7), metalTrimMat);
+                pole.position.y = 3.5;
+                pole.castShadow = true;
+                lampGroup.add(pole);
+                
+                const bulb = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.4), 
+                    new THREE.MeshStandardMaterial({color: 0xffffee, emissive: 0xffffee, emissiveIntensity: 1.5})
+                );
+                bulb.position.y = 7;
+                lampGroup.add(bulb);
+
+                const light = new THREE.PointLight(0xffffee, 1.2, 35);
+                light.position.y = 6.5;
+                light.castShadow = true;
+                lampGroup.add(light);
+
+                lampGroup.position.set(x, 0, z);
+                townGroup.add(lampGroup);
+            }
+            createStreetlamp(-9.5, -9.5);
+            createStreetlamp(9.5, -9.5);
+            createStreetlamp(-9.5, 9.5);
+            createStreetlamp(9.5, 9.5);
+
+            // Dumpsters
+            function createDumpster(x, z, rot) {
+                const dumpMat = new THREE.MeshStandardMaterial({ color: 0x2e4c33, metalness: 0.5, roughness: 0.7 });
+                const dumpster = new THREE.Mesh(new THREE.BoxGeometry(2.5, 1.8, 1.5), dumpMat);
+                dumpster.position.set(x, 0.9, z);
+                dumpster.rotation.y = rot;
+                dumpster.castShadow = true;
+                townGroup.add(dumpster);
+            }
+            createDumpster(12, -28, 0);
+            createDumpster(-14, 28, Math.PI/2);
+
+            // Highly Detailed Buildings
+            function createBuilding(x, z, w, h, d, wallMat, awningMat, name) {
                 const bld = new THREE.Group();
+                
+                // Main Structure
                 const body = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), wallMat);
                 body.position.set(0, h / 2, 0);
                 body.castShadow = true;
-                bld.add(body
+                bld.add(body);
+
+                // Roof Cornice Trim
+                const cornice = new THREE.Mesh(new THREE.BoxGeometry(w + 0.4, 0.5, d + 0.4), metalTrimMat);
+                cornice.position.set(0, h + 0.25, 0);
+                cornice.castShadow = true;
+                bld.add(cornice);
+
+                // Roof HVAC Unit
+                const hvac = new THREE.Mesh(new THREE.BoxGeometry(2, 1.5, 2.5), metalTrimMat);
+                hvac.position.set(-w/4, h + 0.75, 0);
+                hvac.castShadow = true;
+                bld.add(hvac);
+
+                // Side Industrial Pipe
+                const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, h), metalTrimMat);
+                pipe.position.set(w/2 + 0.15, h/2, -d/4);
+                pipe.castShadow = true;
+                bld.add(pipe);
+
+                // Front Storefront Glass Window
+                const winWidth = w * 0.5;
+                const winHeight = h * 0.35;
+                const glass = new THREE.Mesh(new THREE.BoxGeometry(winWidth, winHeight, 0.1), windowGlassMat);
+                glass.position.set(-w*0.1, winHeight / 2 + 0.2, d / 2 + 0.03);
+                bld.add(glass);
+
+                // Recessed Front Door
+                const doorWidth = w * 0.18;
+                const doorHeight = h * 0.4;
+                const door = new THREE.Mesh(new THREE.BoxGeometry(doorWidth, doorHeight, 0.1), windowGlassMat);
+                door.position.set(w*0.3, doorHeight / 2, d / 2 + 0.03);
+                bld.add(door);
+
+                // Glowing Neon Sign Box
+                const signMat = new THREE.MeshStandardMaterial({color: 0x111, emissive: awningMat.color, emissiveIntensity: 0.8});
+                const sign = new THREE.Mesh(new THREE.BoxGeometry(w * 0.6, 0.8, 0.4), signMat);
+                sign.position.set(0, h * 0.45 + 1.2, d / 2 + 0.1);
+                bld.add(sign);
+
+                // Awning
+                if (awningMat) {
+                    const awning = new THREE.Mesh(new THREE.BoxGeometry(w * 0.85, 0.35, 1.8), awningMat);
+                    awning.position.set(0, winHeight + 0.8, d / 2 + 0.8);
+                    awning.rotation.x = 0.25;
+                    bld.add(awning);
+                }
+
+                bld.position.set(x, 0, z);
+                townGroup.add(bld);
+            }
+
+            createBuilding(0, -35, 24, 9, 16, brickRedMat, awningRed, "HQ");
+            createBuilding(35, -18, 20, 8, 16, concreteMat, awningGreen, "Deli");
+            createBuilding(-35, 18, 20, 7.5, 16, brickRedMat, awningRed, "Hardware");
+            createBuilding(35, 18, 22, 9, 16, brickDarkMat, awningBlue, "Arms");
+
+            // Peanut's Accessible 2-Story House
+            function createPeanutHouse(x, z) {
+                const house = new THREE.Group();
+                const extWall = new THREE.MeshStandardMaterial({ color: 0x5a6370 }); 
+                const intWall = new THREE.MeshStandardMaterial({ color: 0xeaeaea }); 
+                const woodFloor = new THREE.MeshStandardMaterial({ color: 0x6e4e32 });
+                const roofMat = new THREE.MeshStandardMaterial({ color: 0x222222 });
+                const fenceMat = new THREE.MeshStandardMaterial({ color: 0x5c4033 });
+
+                function addWall(w, h, d, px, py, pz, mat) {
+                    const wall = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+                    wall.position.set(px, py, pz);
+                    wall.castShadow = true;
+                    house.add(wall);
+                }
+
+                addWall(16, 0.2, 12, 0, 0.1, 0, woodFloor); 
+                addWall(16, 0.2, 12, 0, 4.1, 0, woodFloor); 
+                addWall(17, 0.6, 13, 0, 8.3, 0, roofMat);   
+                addWall(0.5, 4, 12, -7.75, 2.1, 0, extWall); 
+                addWall(0.5, 4, 12, 7.75, 2.1, 0, extWall);  
+                addWall(16, 4, 0.5, 0, 2.1, -5.75, extWall); 
+                addWall(4, 4, 0.5, 5.75, 2.1, 5.75, extWall); 
+                addWall(2, 4, 0.5, 0.5, 2.1, 5.75, extWall);  
+                addWall(0.5, 4, 11.5, -0.5, 2.1, -0.25, intWall); 
+                addWall(0.5, 4, 12, -7.75, 6.2, 0, extWall);
+                addWall(0.5, 4, 12, 7.75, 6.2, 0, extWall);
+                addWall(16, 4, 0.5, 0, 6.2, -5.75, extWall);
+                addWall(16, 4, 0.5, 0, 6.2, 5.75, extWall);
+                addWall(0.5, 4, 11.5, -0.5, 6.2, -0.25, intWall);
+
+                const yard = new THREE.Mesh(new THREE.PlaneGeometry(16, 16), new THREE.MeshStandardMaterial({ color: 0x2d4c1e }));
+                yard.rotation.x = -Math.PI/2;
+                yard.position.set(0, 0.05, -14);
+                house.add(yard);
+                addWall(0.2, 2, 16, -7.9, 1, -14, fenceMat);
+                addWall(0.2, 2, 16, 7.9, 1, -14, fenceMat);
+                addWall(16, 2, 0.2, 0, 1, -21.9, fenceMat);
+
+                house.position.set(x, 0, z);
+                townGroup.add(house);
+            }
+            createPeanutHouse(-32, -20); 
+
+            // ==========================================
+            // AVATAR & PEANUT MODELS
+            // ==========================================
+            const avatarGroup = new THREE.Group();
+            scene.add(avatarGroup);
+            avatarGroup.position.set(0, 0, 8); 
+
+            const suitMat = new THREE.MeshStandardMaterial({ color: 0x111115, roughness: 0.8 });
+            const neonMat = new THREE.MeshStandardMaterial({ color: 0x00aaff, emissive: 0x0055ff, emissiveIntensity: 0.5 });
+            const visorMat = new THREE.MeshStandardMaterial({ color: 0x000000, metalness: 0.9, roughness: 0.1 });
+
+            const aTorso = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.9, 0.4), suitMat);
+            aTorso.position.y = 1.15;
+            aTorso.castShadow = true;
+            avatarGroup.add(aTorso);
+            const aCore = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.2), neonMat);
+            aCore.position.set(0, 1.2, -0.25);
+            avatarGroup.add(aCore);
+            const aHead = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.45, 0.45), suitMat);
+            aHead.position.y = 1.8;
+            aHead.castShadow = true;
+            avatarGroup.add(aHead);
+            const aVisor = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.15, 0.46), visorMat);
+            aVisor.position.y = 1.85;
+            avatarGroup.add(aVisor);
+            const aLeftLeg = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.7, 0.25), suitMat);
+            aLeftLeg.position.set(-0.2, 0.55, 0);
+            aLeftLeg.castShadow = true;
+            avatarGroup.add(aLeftLeg);
+            const aRightLeg = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.7, 0.25), suitMat);
+            aRightLeg.position.set(0.2, 0.55, 0);
+            aRightLeg.castShadow = true;
+            avatarGroup.add(aRightLeg);
+
+            // Peanut
+            const peanutGroup = new THREE.Group();
+            scene.add(peanutGroup);
+            const featherMat = new THREE.MeshStandardMaterial({ color: 0xff8c00 });
+            const beakMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b });
+            const birdBody = new THREE.Mesh(new THREE.SphereGeometry(0.5, 16, 16), featherMat);
+            birdBody.scale.set(1, 0.8, 1.3);
+            birdBody.position.y = 0.6;
+            peanutGroup.add(birdBody);
+            const birdHead = new THREE.Mesh(new THREE.SphereGeometry(0.3, 16, 16), featherMat);
+            birdHead.position.set(0, 0.95, 0.35);
+            peanutGroup.add(birdHead);
+            const birdBeak = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.3, 8), beakMat);
+            birdBeak.rotateX(Math.PI / 2);
+            birdBeak.position.set(0, 0.95, 0.65);
+            peanutGroup.add(birdBeak);
+
+            // God Mode Stations
+            const stationsGroup = new THREE.Group();
+            scene.add(stationsGroup);
+            function createBoxModel(colorHex, w, h, d, yOffset) {
+                const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshStandardMaterial({ color: colorHex }));
+                mesh.position.y = yOffset;
+                mesh.castShadow = true;
+                return mesh;
+            }
+            function updateStations(stations) {
+                while(stationsGroup.children.length > 0) stationsGroup.remove(stationsGroup.children[0]); 
+                stations.forEach(st => {
+                    let model;
+                    if (st.type === 'workbench') model = createBoxModel(0x7c471b, 1.5, 1, 0.8, 0.5);
+                    else if (st.type === 'crate') model = createBoxModel(0xbd7d4b, 0.8, 0.8, 0.8, 0.4);
+                    else if (st.type === 'bed') model = createBoxModel(0x1b4d3e, 1.2, 0.3, 2, 0.15);
+                    else model = createBoxModel(0xaaaaaa, 1, 1, 1, 0.5);
+                    model.position.set(st.gridX, 0, st.gridZ);
+                    model.userData = { uid: st.uid };
+                    stationsGroup.add(model);
+                });
+            }
+
+            // WebSocket Connection
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.host}`;
+            const ws = new WebSocket(wsUrl);
+            ws.onopen = () => { statusEl.innerText = "Connected"; statusEl.style.color = "#55ff55"; };
+            ws.onclose = () => { statusEl.innerText = "Disconnected"; statusEl.style.color = "#ff5555"; };
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                if (data.type === 'init_world' || data.type === 'world:stations_updated') {
+                    if (data.stations) updateStations(data.stations);
+                }
+                const birdData = data.bird || data.state?.bird;
+                if (birdData) {
+                    const moveX = birdData.x - peanutGroup.position.x;
+                    const moveZ = birdData.z - peanutGroup.position.z;
+                    peanutGroup.position.x = birdData.x;
+                    peanutGroup.position.z = birdData.z;
+                    coordsEl.innerText = `X: ${birdData.x.toFixed(2)}, Z: ${birdData.z.toFixed(2)}`;
+                    if (Math.abs(moveX) > 0.001 || Math.abs(moveZ) > 0.001) {
+                        peanutGroup.rotation.y = Math.atan2(moveX, moveZ);
+                    }
+                }
+            };
+
+            // Player Movement & Controls
+            let camMode = 'avatar';
+            const keys = { w: false, a: false, s: false, d: false };
+            window.addEventListener('keydown', (e) => {
+                const k = e.key.toLowerCase();
+                if (k === 'w' || e.key === 'ArrowUp') keys.w = true;
+                if (k === 's' || e.key === 'ArrowDown') keys.s = true;
+                if (k === 'a' || e.key === 'ArrowLeft') keys.a = true;
+                if (k === 'd' || e.key === 'ArrowRight') keys.d = true;
+
+                if (k === 'c') {
+                    camMode = camMode === 'follow_peanut' ? 'avatar' : 'follow_peanut';
+                    document.getElementById('cam-mode').innerText = camMode === 'follow_peanut' ? "Peanut Camera" : "Avatar Mode";
+                    document.getElementById('cam-mode').style.color = camMode === 'follow_peanut' ? "#ffaa00" : "#00aaff";
+                }
+                if (k === 'f') {
+                    camMode = camMode === 'orbit' ? 'avatar' : 'orbit';
+                    document.getElementById('cam-mode').innerText = camMode === 'orbit' ? "Free Fly Camera" : "Avatar Mode";
+                    document.getElementById('cam-mode').style.color = camMode === 'orbit' ? "#ff5555" : "#00aaff";
+                }
+            });
+            window.addEventListener('keyup', (e) => {
+                const k = e.key.toLowerCase();
+                if (k === 'w' || e.key === 'ArrowUp') keys.w = false;
+                if (k === 's' || e.key === 'ArrowDown') keys.s = false;
+                if (k === 'a' || e.key === 'ArrowLeft') keys.a = false;
+                if (k === 'd' || e.key === 'ArrowRight') keys.d = false;
+            });
+
+            // Building Logic (Raycaster)
+            let selectedTool = null;
+            document.querySelectorAll('.station-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.station-btn').forEach(b => b.classList.remove('active'));
+                    const type = e.target.getAttribute('data-type');
+                    if (type === 'none') {
+                        selectedTool = null;
+                    } else {
+                        selectedTool = type;
+                        e.target.classList.add('active');
+                    }
+                });
+            });
+
+            const raycaster = new THREE.Raycaster();
+            const mouse = new THREE.Vector2();
+
+            window.addEventListener('click', (event) => {
+                if (event.clientX > window.innerWidth - 260 && event.clientY < 240) return;
+                if (event.clientX < 320 && event.clientY < 180) return;
+
+                mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+                mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+                raycaster.setFromCamera(mouse, camera);
+
+                const intersectsStations = raycaster.intersectObjects(stationsGroup.children, true);
+                if (intersectsStations.length > 0 && !selectedTool) {
+                    let rootObj = intersectsStations[0].object;
+                    const hitUid = rootObj.userData.uid;
+                    if (hitUid) ws.send(JSON.stringify({ type: 'admin:delete_station', uid: hitUid }));
+                    return;
+                }
+
+                if (selectedTool) {
+                    const intersectsGround = raycaster.intersectObject(ground);
+                    if (intersectsGround.length > 0) {
+                        const point = intersectsGround[0].point;
+                        ws.send(JSON.stringify({ 
+                            type: 'admin:place_station', 
+                            station: {
+                                uid: `station_${Date.now()}`, type: selectedTool,
+                                gridX: Math.round(point.x), gridZ: Math.round(point.z),
+                                rotation: 0, footprintX: 1, footprintZ: 1
+                            }
+                        }));
+                    }
+                }
+            });
+
+            // Animation Loop
+            const clock = new THREE.Clock();
+            function animate() {
+                requestAnimationFrame(animate);
+                const elapsedTime = clock.getElapsedTime();
+
+                peanutGroup.position.y = Math.abs(Math.sin(elapsedTime * 10)) * 0.15;
+
+                let moveX = 0, moveZ = 0;
+                const playerSpeed = 0.25;
+                if (keys.w) moveZ -= 1;
+                if (keys.s) moveZ += 1;
+                if (keys.a) moveX -= 1;
+                if (keys.d) moveX += 1;
+
+                if (moveX !== 0 || moveZ !== 0) {
+                    const length = Math.sqrt(moveX * moveX + moveZ * moveZ);
+                    moveX /= length;
+                    moveZ /= length;
+                    const camAngle = Math.atan2(camera.position.x - avatarGroup.position.x, camera.position.z - avatarGroup.position.z);
+                    const walkDir = Math.atan2(moveX, moveZ) + camAngle + Math.PI;
+
+                    avatarGroup.rotation.y = walkDir;
+                    avatarGroup.position.x += Math.sin(walkDir) * playerSpeed;
+                    avatarGroup.position.z += Math.cos(walkDir) * playerSpeed;
+                    aLeftLeg.rotation.x = Math.sin(elapsedTime * 15) * 0.5;
+                    aRightLeg.rotation.x = -Math.sin(elapsedTime * 15) * 0.5;
+                } else {
+                    aLeftLeg.rotation.x = 0;
+                    aRightLeg.rotation.x = 0;
+                }
+
+                if (camMode === 'avatar') {
+                    const targetLook = avatarGroup.position.clone().add(new THREE.Vector3(0, 1, 0));
+                    const delta = targetLook.clone().sub(controls.target);
+                    controls.target.copy(targetLook);
+                    camera.position.add(delta); 
+                    controls.update();
+                } else if (camMode === 'follow_peanut') {
+                    controls.enabled = false;
+                    camera.position.x = THREE.MathUtils.lerp(camera.position.x, peanutGroup.position.x, 0.1);
+                    camera.position.z = THREE.MathUtils.lerp(camera.position.z, peanutGroup.position.z + 12, 0.1);
+                    camera.position.y = THREE.MathUtils.lerp(camera.position.y, 8, 0.1);
+                    camera.lookAt(peanutGroup.position);
+                } else {
+                    controls.enabled = true;
+                    controls.update();
+                }
+
+                renderer.render(scene, camera);
+            }
+            animate();
+
+        } catch (err) {
+            console.error("💥 Critical Script Error:", err);
+            statusEl.innerText = "Script Error";
+            statusEl.style.color = "#ff0000";
+        }
+    </script>
+</body>
+</html>
