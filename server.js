@@ -25,23 +25,26 @@ function createDefaultPeanut() {
         id: 'peanut',
         name: 'Peanut',
         species: 'panda',
-        x: 0,
-        z: 8,
+        x: 6,
+        z: 14,
         rotY: 0,
-        targetX: 12,
-        targetZ: 12,
+        targetX: 22,
+        targetZ: -18,
+        stuckTicks: 0,
+        wallet: 250,
+        inventory: ['🎋 Fresh Bamboo', '🍔 Kids Burger', '🥤 Fizzy Soda'],
         mood: 'Happy ✨',
         hunger: 88,
         energy: 92,
-        activity: 'Wandering Town',
+        activity: 'Roaming Town',
         assignedBedId: null,
-        wants: ["Eat a McDonald's Burger 🍔", 'Get a Cozy Bed 🛌', 'Visit the Mechanic Shop 🔧'],
+        wants: ["Eat a McDonald's Burger 🍔", 'Buy a treat from an Animal Merchant 🏪', 'Shoot hoops at the park 🏀'],
         diary: [
-            'Woke up feeling super cute in The Badabing!',
-            'Love the new Schedule I anime cel-shaded look in town!'
+            'Dear Diary: Woke up feeling super cute in The Badabing!',
+            'My new wallet has $250 and my backpack is packed!'
         ],
         activityLog: [
-            '[' + new Date().toLocaleTimeString() + '] Spawned in town center.'
+            '[' + new Date().toLocaleTimeString() + '] Started roaming around town.'
         ]
     };
 }
@@ -57,6 +60,17 @@ if (fs.existsSync(NPC_FILE)) {
 if (!Array.isArray(npcs) || npcs.length === 0) {
     npcs = [createDefaultPeanut()];
 }
+
+// Ensure all existing NPCs have wallet, inventory, and valid targets
+npcs.forEach(n => {
+    if (typeof n.wallet !== 'number') n.wallet = 200;
+    if (!Array.isArray(n.inventory)) n.inventory = ['🍎 Sweet Apple', '🥤Juice Box'];
+    if (typeof n.x !== 'number' || isNaN(n.x)) n.x = 6;
+    if (typeof n.z !== 'number' || isNaN(n.z)) n.z = 14;
+    if (typeof n.targetX !== 'number' || isNaN(n.targetX)) n.targetX = n.x + 18;
+    if (typeof n.targetZ !== 'number' || isNaN(n.targetZ)) n.targetZ = n.z - 18;
+    n.stuckTicks = 0;
+});
 
 function saveAllToDisk() {
     try {
@@ -86,12 +100,12 @@ function addDiary(npc, text) {
     }
 }
 
-// Server-Side Solid Wall & Building Obstacle Collision Check for Companions
+// Tuned 70%-Scale Companion Obstacle Collision Check
 function isNpcBlockedByWall(nx, nz) {
-    const pad = 1.05; // Companion body collision radius
+    const pad = 0.65; // Tuned for 70% companion scale so they never get false-trapped
     for (let i = 0; i < worldItems.length; i++) {
         const it = worldItems[i];
-        if ((it.y || 0) > 2.5) continue; // Ignore upper-floor walls
+        if ((it.y || 0) > 2.2) continue;
 
         const dx = nx - it.x;
         const dz = nz - it.z;
@@ -100,45 +114,65 @@ function isNpcBlockedByWall(nx, nz) {
         const lz = dx * Math.sin(rad) + dz * Math.cos(rad);
 
         if (it.type === 'wall' || it.type === 'window' || it.type === 'fence' || (it.type === 'doorway' && !it.isOpen)) {
-            if (Math.abs(lx) < 2.0 + pad && Math.abs(lz) < 0.35 + pad) return true;
+            if (Math.abs(lx) < 2.0 + pad && Math.abs(lz) < 0.25 + pad) return true;
         } else if (it.type === 'doorway' && it.isOpen) {
-            // Side pillars still solid when doorway is open
-            if (Math.abs(lz) < 0.35 + pad && (Math.abs(lx - 1.4) < 0.6 + pad || Math.abs(lx + 1.4) < 0.6 + pad)) return true;
+            if (Math.abs(lz) < 0.25 + pad && (Math.abs(lx - 1.4) < 0.5 + pad || Math.abs(lx + 1.4) < 0.5 + pad)) return true;
         } else if (it.type === 'mcdonalds') {
-            if (Math.abs(lx) < 8 + pad && Math.abs(lz + 6) < 0.4 + pad) return true; // Back wall
-            if (Math.abs( lz) < 6 + pad && (Math.abs(lx + 8) < 0.4 + pad || Math.abs(lx - 8) < 0.4 + pad)) return true; // Sides
-            if (Math.abs(lz - 6) < 0.4 + pad && Math.abs(lx) > 2.2) return true; // Front walls outside door gap
+            if (Math.abs(lx) < 8 + pad && Math.abs(lz + 6) < 0.4 + pad) return true;
+            if (Math.abs(lz) < 6 + pad && (Math.abs(lx + 8) < 0.4 + pad || Math.abs(lx - 8) < 0.4 + pad)) return true;
+            if (Math.abs(lz - 6) < 0.4 + pad && Math.abs(lx) > 2.4 && Math.abs(lx) < 8 + pad) return true;
         } else if (it.type === 'walmart') {
             if (Math.abs(lx) < 12 + pad && Math.abs(lz + 9) < 0.5 + pad) return true;
             if (Math.abs(lz) < 9 + pad && (Math.abs(lx + 12) < 0.5 + pad || Math.abs(lx - 12) < 0.5 + pad)) return true;
-            if (Math.abs(lz - 9) < 0.5 + pad && Math.abs(lx) > 3.0) return true;
+            if (Math.abs(lz - 9) < 0.5 + pad && Math.abs(lx) > 3.2 && Math.abs(lx) < 12 + pad) return true;
         } else if (it.type === 'mechanic_shop') {
             if (Math.abs(lx) < 10 + pad && Math.abs(lz + 8) < 0.5 + pad) return true;
             if (Math.abs(lz) < 8 + pad && (Math.abs(lx + 10) < 0.5 + pad || Math.abs(lx - 10) < 0.5 + pad)) return true;
-            if (Math.abs(lz - 8) < 0.5 + pad && Math.abs(lx) > 4.5) return true; // Wide garage bay opening (-4.5 to +4.5)
+            if (Math.abs(lz - 8) < 0.5 + pad && Math.abs(lx) > 4.6 && Math.abs(lx) < 10 + pad) return true;
         } else if (it.type === 'fountain' || it.type === 'gorilla_statue') {
-            if (Math.hypot(lx, lz) < 3.6 + pad) return true;
+            if (Math.hypot(lx, lz) < 3.3 + pad) return true;
         } else if (it.type === 'locker' || it.type === 'computer_desk' || it.type === 'merchant') {
-            if (Math.abs(lx) < 1.5 + pad && Math.abs(lz) < 1.2 + pad) return true;
+            if (Math.abs(lx) < 1.6 + pad && Math.abs(lz) < 1.1 + pad) return true;
         }
     }
     return false;
 }
 
+function pickRandomRoamWaypoint(npc) {
+    for (let attempt = 0; attempt < 10; attempt++) {
+        const angle = Math.random() * Math.PI * 2;
+        const radius = 15 + Math.random() * 55;
+        const tx = +(Math.cos(angle) * radius).toFixed(1);
+        const tz = +(Math.sin(angle) * radius).toFixed(1);
+        if (!isNpcBlockedByWall(tx, tz)) {
+            npc.targetX = tx;
+            npc.targetZ = tz;
+            return;
+        }
+    }
+    npc.targetX = +(npc.x + (Math.random() - 0.5) * 30).toFixed(1);
+    npc.targetZ = +(npc.z + (Math.random() - 0.5) * 30).toFixed(1);
+}
+
 // Active Gorilla Gods Registry (Max 4)
 const activeGods = {};
 const GOD_COLORS = ['#fa9549', '#38bdf8', '#4ade80', '#c084fc'];
-
-// Shared Basketball Court Score
 let hoopScore = 0;
 
-// Continuous Autonomous Simulation for Peanut & All Spawned Companions
+// Multi-Angle Steering & Roaming Loop for All Companions
 let tickCount = 0;
+const STEER_ANGLES = [0, 0.45, -0.45, 0.9, -0.9, 1.4, -1.4, 2.1, -2.1];
+
 setInterval(() => {
     tickCount++;
     npcs.forEach((npc) => {
-        npc.hunger = Math.max(10, +(npc.hunger - 0.012).toFixed(2));
-        npc.energy = Math.max(10, +(npc.energy - 0.01).toFixed(2));
+        npc.hunger = Math.max(10, +(npc.hunger - 0.01).toFixed(2));
+        npc.energy = Math.max(10, +(npc.energy - 0.008).toFixed(2));
+
+        // Passive pocket money allowance while roaming
+        if (tickCount % 300 === 0) {
+            npc.wallet = (npc.wallet || 0) + 5;
+        }
 
         const assignedBed = worldItems.find(it => it.id === npc.assignedBedId);
         const mcd = worldItems.find(it => it.type === 'mcdonalds');
@@ -146,31 +180,23 @@ setInterval(() => {
         let destX = npc.targetX;
         let destZ = npc.targetZ;
 
-        if (npc.energy < 25 && assignedBed) {
+        if (npc.energy < 22 && assignedBed) {
             destX = assignedBed.x;
-            destZ = assignedBed.z;
-            if (npc.activity !== 'Heading to Bed 🛌') {
-                npc.activity = 'Heading to Bed 🛌';
-                npc.mood = 'Sleepy 😴';
-                addLog(npc, 'Feeling tired, walking to assigned bed.');
-            }
-        } else if (npc.hunger < 30 && mcd) {
+            destZ = assignedBed.z + 2.2;
+            npc.activity = 'Heading to Bed 🛌';
+            npc.mood = 'Sleepy 😴';
+        } else if (npc.hunger < 25 && mcd) {
             destX = mcd.x;
-            destZ = mcd.z;
-            if (npc.activity !== "Heading to McDonald's 🍔") {
-                npc.activity = "Heading to McDonald's 🍔";
-                npc.mood = 'Hungry 😋';
-                addLog(npc, "Walking to McDonald's for food.");
-            }
+            destZ = mcd.z + 7.2;
+            npc.activity = "Heading to McDonald's 🍔";
+            npc.mood = 'Hungry 😋';
         } else {
-            if (typeof destX !== 'number' || typeof destZ !== 'number' || Math.hypot(destX - npc.x, destZ - npc.z) < 2.2) {
-                const angle = Math.random() * Math.PI * 2;
-                const radius = 10 + Math.random() * 45;
-                npc.targetX = +(Math.cos(angle) * radius).toFixed(1);
-                npc.targetZ = +(Math.sin(angle) * radius).toFixed(1);
+            const distToTarget = Math.hypot((destX || 0) - npc.x, (destZ || 0) - npc.z);
+            if (typeof destX !== 'number' || typeof destZ !== 'number' || isNaN(distToTarget) || distToTarget < 2.0) {
+                pickRandomRoamWaypoint(npc);
                 destX = npc.targetX;
                 destZ = npc.targetZ;
-                npc.activity = 'Strolling to (' + Math.round(destX) + ', ' + Math.round(destZ) + ')';
+                npc.activity = 'Roaming to (' + Math.round(destX) + ', ' + Math.round(destZ) + ')';
                 npc.mood = (npc.hunger > 55 && npc.energy > 55) ? 'Happy ✨' : 'Curious 🐾';
             }
         }
@@ -179,41 +205,59 @@ setInterval(() => {
         const dz = destZ - npc.z;
         const dist = Math.hypot(dx, dz);
 
-        if (dist > 0.6) {
-            const step = 0.22;
-            const nextX = npc.x + (dx / dist) * step;
-            const nextZ = npc.z + (dz / dist) * step;
+        if (dist > 0.8) {
+            const baseAngle = Math.atan2(dx, dz);
+            const speed = 0.28;
+            let moved = false;
 
-            // Check wall collision before stepping
-            if (!isNpcBlockedByWall(nextX, nextZ)) {
-                npc.x = +nextX.toFixed(2);
-                npc.z = +nextZ.toFixed(2);
-                npc.rotY = +(Math.atan2(dx, dz)).toFixed(2);
-            } else if (!isNpcBlockedByWall(nextX, npc.z)) {
-                // Slide along X axis
-                npc.x = +nextX.toFixed(2);
-                npc.rotY = +(Math.atan2(dx, 0)).toFixed(2);
-            } else if (!isNpcBlockedByWall(npc.x, nextZ)) {
-                // Slide along Z axis
-                npc.z = +nextZ.toFixed(2);
-                npc.rotY = +(Math.atan2(0, dz)).toFixed(2);
-            } else {
-                // Path completely blocked by solid wall — pick a new detour target
-                const detourAngle = Math.random() * Math.PI * 2;
-                npc.targetX = +(npc.x + Math.cos(detourAngle) * 18).toFixed(1);
-                npc.targetZ = +(npc.z + Math.sin(detourAngle) * 18).toFixed(1);
+            // If currently inside a wall (e.g. a building was just placed on top of them), allow escape move
+            const currentlyInsideWall = isNpcBlockedByWall(npc.x, npc.z);
+
+            for (let a = 0; a < STEER_ANGLES.length; a++) {
+                const tryAngle = baseAngle + STEER_ANGLES[a];
+                const stepX = npc.x + Math.sin(tryAngle) * speed;
+                const stepZ = npc.z + Math.cos(tryAngle) * speed;
+
+                if (currentlyInsideWall || !isNpcBlockedByWall(stepX, stepZ)) {
+                    npc.x = +stepX.toFixed(2);
+                    npc.z = +stepZ.toFixed(2);
+                    npc.rotY = +tryAngle.toFixed(2);
+                    moved = true;
+                    npc.stuckTicks = 0;
+                    break;
+                }
+            }
+
+            if (!moved) {
+                npc.stuckTicks = (npc.stuckTicks || 0) + 1;
+                if (npc.stuckTicks > 6) {
+                    // Unstick nudge and pick a fresh open direction
+                    const freeAngle = Math.random() * Math.PI * 2;
+                    npc.x = +(npc.x + Math.sin(freeAngle) * 1.4).toFixed(2);
+                    npc.z = +(npc.z + Math.cos(freeAngle) * 1.4).toFixed(2);
+                    pickRandomRoamWaypoint(npc);
+                    npc.stuckTicks = 0;
+                }
             }
         } else {
-            if (npc.energy < 25 && assignedBed) {
+            if (npc.energy < 22 && assignedBed) {
                 npc.activity = 'Sleeping in Bed 💤';
-                npc.energy = Math.min(100, +(npc.energy + 0.8).toFixed(1));
+                npc.energy = Math.min(100, +(npc.energy + 1.2).toFixed(1));
                 npc.mood = 'Well Rested 🌟';
-                if (npc.energy >= 95) addDiary(npc, 'Had the best nap in my cozy bed!');
-            } else if (npc.hunger < 30 && mcd) {
+                if (npc.energy >= 95) {
+                    addDiary(npc, 'Had the best nap in my cozy bed!');
+                    pickRandomRoamWaypoint(npc);
+                }
+            } else if (npc.hunger < 25 && mcd) {
                 npc.activity = 'Eating Happy Meal 🍟';
-                npc.hunger = Math.min(100, +(npc.hunger + 0.9).toFixed(1));
+                npc.hunger = Math.min(100, +(npc.hunger + 1.4).toFixed(1));
                 npc.mood = 'Full & Happy 🍔';
-                if (npc.hunger >= 95) addDiary(npc, "Ate delicious burgers at McDonald's!");
+                if (npc.hunger >= 95) {
+                    addDiary(npc, "Ate delicious burgers at McDonald's!");
+                    pickRandomRoamWaypoint(npc);
+                }
+            } else {
+                pickRandomRoamWaypoint(npc);
             }
         }
     });
@@ -269,18 +313,15 @@ app.post('/api/coop/sync', (req, res) => {
     });
 });
 
-// Increment Basketball Score
 app.post('/api/basketball/score', (req, res) => {
     hoopScore++;
     res.json({ success: true, hoopScore });
 });
 
-// Get Full World & NPCs
 app.get('/api/world', (req, res) => {
     res.json({ items: worldItems, npcs: npcs, hoopScore });
 });
 
-// Save World Items
 app.post('/api/world', (req, res) => {
     if (Array.isArray(req.body)) {
         worldItems = req.body;
@@ -290,7 +331,6 @@ app.post('/api/world', (req, res) => {
     res.status(400).json({ error: 'Expected array' });
 });
 
-// Auto-Restore Backup After Ephemeral Render Restart
 app.post('/api/world/rehydrate', (req, res) => {
     const { items, savedNpcs, forceNpcs } = req.body || {};
     let restored = false;
@@ -306,7 +346,6 @@ app.post('/api/world/rehydrate', (req, res) => {
     res.json({ success: true, restored, worldCount: worldItems.length, npcCount: npcs.length, npcs });
 });
 
-// Update Single World Piece (Door, Inventory, Bed, Merchant, Custom Sign, Computer URL)
 app.post('/api/world/update-item', (req, res) => {
     const { id, isOpen, inventory, assignedTo, merchantSkin, shopItems, merchantName, signText, signColor, signBg, lastUrl } = req.body || {};
     const target = worldItems.find(it => it.id === id);
@@ -340,22 +379,27 @@ app.post('/api/npcs/spawn', (req, res) => {
     const { name, species, x, z } = req.body || {};
     if (!name || !species) return res.status(400).json({ error: 'Name and species required' });
 
+    const startX = typeof x === 'number' ? x : 6;
+    const startZ = typeof z === 'number' ? z : 12;
     const newCompanion = {
         id: 'npc_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
         name: name.trim(),
         species,
-        x: typeof x === 'number' ? x : 0,
-        z: typeof z === 'number' ? z : 10,
+        x: startX,
+        z: startZ,
         rotY: 0,
-        targetX: (typeof x === 'number' ? x : 0) + 10,
-        targetZ: (typeof z === 'number' ? z : 10) + 10,
+        targetX: startX + 18,
+        targetZ: startZ - 18,
+        stuckTicks: 0,
+        wallet: 200,
+        inventory: ['🍎 Welcome Apple', '🧃 Berry Juice'],
         mood: 'Excited 🎉',
         hunger: 90,
         energy: 95,
-        activity: 'Exploring Town',
+        activity: 'Roaming Town',
         assignedBedId: null,
-        wants: ['Make friends with Peanut 🐼', 'Get a treat from a Merchant 🏪', 'Find a cozy bed 🛌'],
-        diary: ['Dear Diary: Today I arrived in The Badabing! Everyone has such cute anime eyes!'],
+        wants: ['Make friends with Peanut 🐼', 'Buy a treat from an Animal Merchant 🏪', 'Find a cozy bed 🛌'],
+        diary: ['Dear Diary: Today I arrived in The Badabing! I have $200 in my wallet!'],
         activityLog: ['[' + new Date().toLocaleTimeString() + '] Spawned as a cute ' + species + '!']
     };
     npcs.push(newCompanion);
@@ -363,7 +407,7 @@ app.post('/api/npcs/spawn', (req, res) => {
     res.json({ success: true, companion: newCompanion, npcs });
 });
 
-// Delete Companion Animal & Permanently Sync to Server
+// Delete Companion Animal
 app.post('/api/npcs/delete', (req, res) => {
     const { id } = req.body || {};
     if (!id || id === 'peanut') {
@@ -377,11 +421,14 @@ app.post('/api/npcs/delete', (req, res) => {
     res.json({ success: true, npcs });
 });
 
-// Feed, Energize, Cheer, or Buy Merchant Item for Companion
+// Companion Actions (Feed, Rest, Cheer, Buy from Merchant, Use Inventory Item, Add Money)
 app.post('/api/npcs/action', (req, res) => {
-    const { npcId, actionType, itemName, itemPrice } = req.body || {};
+    const { npcId, actionType, itemName, itemPrice, slotIndex, amount } = req.body || {};
     const npc = npcs.find(n => n.id === npcId) || npcs[0];
     if (!npc) return res.status(404).json({ error: 'NPC not found' });
+
+    if (typeof npc.wallet !== 'number') npc.wallet = 200;
+    if (!Array.isArray(npc.inventory)) npc.inventory = [];
 
     if (actionType === 'feed') {
         npc.hunger = 100;
@@ -398,14 +445,35 @@ app.post('/api/npcs/action', (req, res) => {
         npc.activity = 'Happy Anime Dance';
         addDiary(npc, 'Got head pats from a Gorilla God today!');
         addLog(npc, 'Cheered up by a Gorilla God.');
+    } else if (actionType === 'add_funds') {
+        const bonus = Number(amount) || 50;
+        npc.wallet += bonus;
+        addLog(npc, 'Received +$' + bonus + ' allowance from a Gorilla God!');
+        addDiary(npc, 'My wallet just got $' + bonus + ' richer!');
+    } else if (actionType === 'use_item') {
+        const idx = Number(slotIndex);
+        if (idx >= 0 && idx < npc.inventory.length) {
+            const used = npc.inventory.splice(idx, 1)[0];
+            npc.hunger = Math.min(100, npc.hunger + 30);
+            npc.energy = Math.min(100, npc.energy + 25);
+            npc.mood = 'Delighted 🌟';
+            npc.activity = 'Used ' + used;
+            addLog(npc, 'Used ' + used + ' from personal backpack.');
+            addDiary(npc, 'Enjoyed my ' + used + ' from my bag!');
+        }
     } else if (actionType === 'buy') {
-        npc.hunger = Math.min(100, npc.hunger + 35);
-        npc.energy = Math.min(100, npc.energy + 25);
+        const price = Number(itemPrice) || 0;
+        if (npc.wallet < price) {
+            return res.status(400).json({ error: npc.name + ' only has $' + npc.wallet + ' in their wallet!' });
+        }
+        npc.wallet -= price;
+        npc.inventory.push(itemName || '🎁 Mystery Item');
+        npc.hunger = Math.min(100, npc.hunger + 25);
+        npc.energy = Math.min(100, npc.energy + 20);
         npc.mood = 'Spoiled & Joyful 🛍️';
-        npc.activity = 'Using ' + (itemName || 'Gift');
-        addDiary(npc, 'Someone bought me ' + (itemName || 'a gift') + ' for $' + (itemPrice || 0) + ' at the Merchant!');
-        addLog(npc, 'Received ' + (itemName || 'item') + ' ($' + (itemPrice || 0) + ') from Merchant.');
-        npc.wants = ['Enjoy my new ' + (itemName || 'treat') + ' ✨', 'Take a happy nap 🛌', 'Explore new buildings 🏢'];
+        npc.activity = ' carrying ' + (itemName || 'Gift');
+        addDiary(npc, 'Bought ' + (itemName || 'a gift') + ' for $' + price + '! Still have $' + npc.wallet + ' left.');
+        addLog(npc, 'Purchased ' + (itemName || 'item') + ' ($' + price + ') -> Added to Bag.');
     }
 
     saveAllToDisk();
