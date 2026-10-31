@@ -1,140 +1,52 @@
-import express from 'express';
-import { WebSocketServer } from 'ws';
-import http from 'http';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const express = require('express');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
-const server = http.createServer(app);
-const wss = new WebSocketServer({ server });
+const PORT = process.env.PORT || 3000;
+const DATA_FILE = path.join(__dirname, 'world_data.json');
 
-app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.static(__dirname));
 
-// Explicit health check route so Render knows the server is alive immediately
-app.get('/health', (req, res) => {
-  res.status(200).send('OK');
-});
-
-const worldState = {
-  bird: {
-    name: "Peanut",
-    x: 0,
-    y: 0,
-    z: 0,
-    targetX: 0,
-    targetZ: -18,
-    state: "wandering",
-    mood: "exploring"
-  },
-  connectedClients: 0
-};
-
-let stationsList = [];
-
-const waypoints = [
-  { x: 0, z: -18 },
-  { x: 0, z: -34 },
-  { x: 0, z: 0 },
-  { x: -22, z: -10 },
-  { x: -30, z: -18 },
-  { x: -26, z: -26 },
-  { x: -42, z: -20 },
-  { x: -34, z: -38 },
-  { x: 25, z: -10 },
-  { x: -25, z: 15 },
-  { x: 25, z: 15 }
-];
-
-function setRandomPeanutTarget() {
-  const wp = waypoints[Math.floor(Math.random() * waypoints.length)];
-  worldState.bird.targetX = wp.x + (Math.random() * 3 - 1.5);
-  worldState.bird.targetZ = wp.z + (Math.random() * 3 - 1.5);
+// Initialize world_data.json if it doesn't exist
+if (!fs.existsSync(DATA_FILE)) {
+    fs.writeFileSync(DATA_FILE, JSON.stringify([], null, 2), 'utf8');
 }
 
-setRandomPeanutTarget();
-
-let lastWaypointTime = Date.now();
-
-setInterval(() => {
-  const bird = worldState.bird;
-  const dx = bird.targetX - bird.x;
-  const dz = bird.targetZ - bird.z;
-  const dist = Math.sqrt(dx * dx + dz * dz);
-
-  if (dist < 0.8) {
-    const now = Date.now();
-    if (now - lastWaypointTime > 2500) {
-      setRandomPeanutTarget();
-      lastWaypointTime = now;
-    }
-  } else {
-    bird.x += (dx / dist) * 0.11;
-    bird.z += (dz / dist) * 0.11;
-  }
-
-  broadcast({ type: 'bird:position', bird: worldState.bird });
-}, 50);
-
-wss.on('connection', (ws) => {
-  worldState.connectedClients++;
-
-  try {
-    ws.send(JSON.stringify({
-      type: 'init_world',
-      state: worldState,
-      stations: stationsList
-    }));
-  } catch (e) {
-    console.error("Send error:", e);
-  }
-
-  ws.on('message', (message) => {
+// Load all player-placed modular structures
+app.get('/api/world', (req, res) => {
     try {
-      const data = JSON.parse(message.toString());
-
-      if (data.type === 'admin:place_station' && data.station) {
-        const { uid, type, gridX, gridZ, rotation, footprintX, footprintZ } = data.station;
-        stationsList = stationsList.filter(s => s.uid !== uid);
-        stationsList.push({ uid, type, gridX, gridZ, rotation, footprintX, footprintZ });
-        broadcast({ type: 'world:stations_updated', stations: stationsList });
-      }
-
-      if (data.type === 'admin:delete_station' && data.uid) {
-        stationsList = stationsList.filter(s => s.uid !== data.uid);
-        broadcast({ type: 'world:stations_updated', stations: stationsList });
-      }
+        if (fs.existsSync(DATA_FILE)) {
+            const raw = fs.readFileSync(DATA_FILE, 'utf8');
+            const data = JSON.parse(raw || '[]');
+            return res.json(data);
+        }
+        res.json([]);
     } catch (err) {
-      console.error("Error processing WebSocket message:", err);
+        console.error('Error reading world_data.json:', err);
+        res.json([]);
     }
-  });
-
-  ws.on('close', () => {
-    worldState.connectedClients = Math.max(0, worldState.connectedClients - 1);
-  });
-
-  ws.on('error', (err) => {
-    console.error("WebSocket client error:", err.message);
-  });
 });
 
-function broadcast(data) {
-  const payload = JSON.stringify(data);
-  wss.clients.forEach((client) => {
-    if (client.readyState === 1) {
-      try {
-        client.send(payload);
-      } catch (e) {
-        // Ignore dropped socket errors
-      }
+// Save all player-placed modular structures permanently
+app.post('/api/world', (req, res) => {
+    try {
+        if (!Array.isArray(req.body)) {
+            return res.status(400).json({ error: 'Expected array of build items' });
+        }
+        fs.writeFileSync(DATA_FILE, JSON.stringify(req.body, null, 2), 'utf8');
+        res.json({ success: true, count: req.body.length });
+    } catch (err) {
+        console.error('Error writing world_data.json:', err);
+        res.status(500).json({ error: 'Failed to save world data' });
     }
-  });
-}
+});
 
-const PORT = process.env.PORT || 10000;
-server.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on port ${PORT}`);
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.listen(PORT, () => {
+    console.log('The Badabing Server running on port ' + PORT);
 });
