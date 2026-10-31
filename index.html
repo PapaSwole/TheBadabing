@@ -1,674 +1,182 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>The Badabing - Gorilla Gods & Companions City Builder</title>
-    <style>
-        * { box-sizing: border-box; }
-        body {
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            background-color: #14161d;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #fff;
-            user-select: none;
-            -webkit-user-select: none;
-            touch-action: none;
-        }
+const express = require('express');
+const fs = require('fs');
+const path = require('path');
 
-        /* 1. Compact Top Server & Co-op Status Banner */
-        #top-status-banner {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 36px;
-            background: rgba(15, 17, 23, 0.95);
-            border-bottom: 2px solid #fa9549;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 14px;
-            z-index: 20;
-            font-size: 12px;
-        }
-        .banner-left, .banner-center, .banner-right {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .brand-title {
-            color: #fa9549;
-            font-weight: 800;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-        }
-        .sync-badge { color: #4ade80; font-weight: bold; }
-        .coop-pills { display: flex; gap: 6px; }
-        .god-pill {
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 11px;
-            font-weight: bold;
-            background: #222733;
-            border: 1px solid #475569;
-        }
+const app = express();
+const PORT = process.env.PORT || 3000;
+const DATA_FILE = path.join(__dirname, 'world_data.json');
+const NPC_FILE = path.join(__dirname, 'npc_data.json');
 
-        /* 2. Companion Telemetry Bar Below Top Banner */
-        #companion-bar {
-            position: absolute;
-            top: 36px;
-            left: 0;
-            width: 100%;
-            min-height: 38px;
-            background: rgba(22, 25, 34, 0.92);
-            border-bottom: 1px solid #333842;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            padding: 4px 14px;
-            z-index: 19;
-            font-size: 12px;
-            gap: 8px;
-        }
-        .companion-stats {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-        #npc-selector {
-            background: #161922;
-            color: #fa9549;
-            border: 1px solid #fa9549;
-            border-radius: 4px;
-            padding: 2px 6px;
-            font-weight: bold;
-            font-size: 12px;
-        }
-        .stat-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .stat-bar-bg {
-            width: 55px;
-            height: 8px;
-            background: #111318;
-            border-radius: 4px;
-            overflow: hidden;
-            border: 1px solid #374151;
-        }
-        .stat-bar-fill {
-            height: 100%;
-            background: #4ade80;
-            transition: width 0.2s;
-        }
-        .companion-actions {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-        .mini-ui-btn {
-            background: #283040;
-            border: 1px solid #475569;
-            color: #f8fafc;
-            padding: 4px 9px;
-            border-radius: 4px;
-            font-size: 11px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-        .mini-ui-btn:hover, .mini-ui-btn.active {
-            background: #fa9549;
-            color: #111;
-            border-color: #fa9549;
-        }
+app.use(express.json({ limit: '15mb' }));
+app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, 'public')));
 
-        /* 3. Companion Mind Panel (Diary, Wants, Live Chat, Activity Log) */
-        #companion-mind-panel {
-            position: absolute;
-            top: 80px;
-            left: 14px;
-            width: 340px;
-            max-width: calc(100vw - 28px);
-            background: rgba(18, 21, 28, 0.96);
-            border: 2px solid #fa9549;
-            border-radius: 8px;
-            padding: 12px;
-            z-index: 24;
-            display: none;
-            box-shadow: 0 12px 35px rgba(0,0,0,0.85);
-        }
-        .mind-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #334155;
-            padding-bottom: 6px;
-            margin-bottom: 8px;
-        }
-        .mind-header h3 {
-            margin: 0;
-            font-size: 14px;
-            color: #fa9549;
-            text-transform: uppercase;
-        }
-        .mind-section {
-            margin-bottom: 10px;
-        }
-        .mind-section h4 {
-            margin: 0 0 4px 0;
-            font-size: 11px;
-            color: #38bdf8;
-            text-transform: uppercase;
-        }
-        .mind-box {
-            background: #14171f;
-            border: 1px solid #2d3548;
-            border-radius: 5px;
-            padding: 6px 8px;
-            max-height: 85px;
-            overflow-y: auto;
-            font-size: 11px;
-            color: #e2e8f0;
-            line-height: 1.4;
-        }
+let worldItems = [];
+if (fs.existsSync(DATA_FILE)) {
+    try { worldItems = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8') || '[]'); } catch (e) { worldItems = []; }
+} else {
+    fs.writeFileSync(DATA_FILE, JSON.stringify([], null, 2), 'utf8');
+}
 
-        /* 4. God / Build Menu Button & Modal */
-        #toggle-build-btn {
-            position: absolute;
-            top: 82px;
-            right: 14px;
-            background: rgba(24, 27, 34, 0.95);
-            border: 2px solid #fa9549;
-            color: #fa9549;
-            padding: 9px 15px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 800;
-            font-size: 12px;
-            text-transform: uppercase;
-            z-index: 20;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.6);
-        }
-        #toggle-build-btn:hover, #toggle-build-btn.active {
-            background: #fa9549;
-            color: #111318;
-        }
+let npcRegistry = [
+    { id: 'peanut', name: 'Peanut', type: 'panda', x: 0, z: 0, rotY: 0, mood: 'Happy', hunger: 85, energy: 90, activity: 'Wandering Town', assignedBedId: null }
+];
+if (fs.existsSync(NPC_FILE)) {
+    try { npcRegistry = JSON.parse(fs.readFileSync(NPC_FILE, 'utf8') || '[]'); } catch (e) {}
+} else {
+    fs.writeFileSync(NPC_FILE, JSON.stringify(npcRegistry, null, 2), 'utf8');
+}
 
-        #build-menu-modal {
-            position: absolute;
-            top: 128px;
-            right: 14px;
-            width: 460px;
-            max-width: calc(100vw - 28px);
-            max-height: calc(100vh - 145px);
-            overflow-y: auto;
-            background: rgba(18, 21, 28, 0.97);
-            border: 2px solid #fa9549;
-            border-radius: 8px;
-            padding: 14px;
-            z-index: 25;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.9);
-            display: none;
-        }
-        .god-physics-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #161922;
-            border: 1px solid #334155;
-            padding: 8px 12px;
-            border-radius: 6px;
-            margin-bottom: 10px;
-            font-size: 12px;
-        }
-        .tab-row {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 10px;
-        }
-        .tab-btn {
-            flex: 1;
-            padding: 7px 6px;
-            background: #1f2430;
-            border: 1px solid #3b4254;
-            color: #cbd5e1;
-            font-weight: 700;
-            font-size: 11px;
-            border-radius: 5px;
-            cursor: pointer;
-            text-transform: uppercase;
-        }
-        .tab-btn.active {
-            background: #fa9549;
-            color: #111;
-            border-color: #fa9549;
-        }
-        .build-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-        .build-card {
-            background: #232834;
-            border: 1px solid #3c4456;
-            border-radius: 5px;
-            padding: 8px 5px;
-            text-align: center;
-            cursor: pointer;
-            transition: 0.12s;
-            color: #e2e8f0;
-        }
-        .build-card:hover { border-color: #fa9549; background: #2d3444; }
-        .build-card.active {
-            background: rgba(250, 149, 73, 0.25);
-            border: 2px solid #fa9549;
-            color: #fff;
-        }
-        .build-card .icon { font-size: 19px; display: block; margin-bottom: 2px; }
-        .build-card .label { font-size: 11px; font-weight: 700; display: block; }
-        .build-card .sub { font-size: 9px; color: #94a3b8; }
+function saveDataToDisk() {
+    try {
+        fs.writeFileSync(DATA_FILE, JSON.stringify(worldItems, null, 2), 'utf8');
+        fs.writeFileSync(NPC_FILE, JSON.stringify(npcRegistry, null, 2), 'utf8');
+    } catch (e) {
+        console.error('Failed saving data:', e);
+    }
+}
 
-        /* Color Customizer Palette */
-        .color-section {
-            background: #161922;
-            padding: 8px 10px;
-            border-radius: 6px;
-            margin-bottom: 10px;
-            border: 1px solid #2e3444;
+// Active Co-op Gods Registry
+const activeGods = {};
+const GOD_COLORS = ['#fa9549', '#38bdf8', '#4ade80', '#c084fc'];
+
+let peanutState = npcRegistry[0] || {
+    x: 0, z: 0, rotY: 0, mood: 'Happy', hunger: 85, energy: 90, activity: 'Wandering Town', assignedBedId: null
+};
+
+// Robust Autonomous Simulation Tick for Peanut
+let simTick = 0;
+setInterval(() => {
+    simTick += 0.08;
+    
+    // Slow down drain so he doesn't panic-walk constantly
+    peanutState.hunger = Math.max(10, +(peanutState.hunger - 0.01).toFixed(1));
+    peanutState.energy = Math.max(10, +(peanutState.energy - 0.008).toFixed(1));
+
+    const assignedBed = worldItems.find(it => it.id === peanutState.assignedBedId);
+    const mcd = worldItems.find(it => it.type === 'mcdonalds');
+
+    if (peanutState.energy < 20 && assignedBed) {
+        peanutState.activity = 'Heading to Assigned Bed';
+        peanutState.mood = 'Sleepy 😴';
+        const dx = assignedBed.x - peanutState.x;
+        const dz = assignedBed.z - peanutState.z;
+        const dist = Math.hypot(dx, dz);
+        if (dist > 1.8) {
+            peanutState.x += (dx / dist) * 0.25;
+            peanutState.z += (dz / dist) * 0.25;
+            peanutState.rotY = Math.atan2(dx, dz);
+        } else {
+            peanutState.activity = 'Sleeping in Bed 💤';
+            peanutState.energy = Math.min(100, +(peanutState.energy + 0.5).toFixed(1));
+            peanutState.mood = 'Rested ✨';
         }
-        .color-section-title {
-            font-size: 11px;
-            color: #cbd5e1;
-            margin-bottom: 6px;
-            font-weight: bold;
-            display: flex;
-            justify-content: space-between;
+    } else if (peanutState.hunger < 20 && mcd) {
+        peanutState.activity = "Visiting McDonald's 🍔";
+        peanutState.mood = 'Hungry 😋';
+        const dx = mcd.x - peanutState.x;
+        const dz = mcd.z - peanutState.z;
+        const dist = Math.hypot(dx, dz);
+        if (dist > 2.8) {
+            peanutState.x += (dx / dist) * 0.25;
+            peanutState.z += (dz / dist) * 0.25;
+            peanutState.rotY = Math.atan2(dx, dz);
+        } else {
+            peanutState.activity = 'Eating Burgers 🍟';
+            peanutState.hunger = Math.min(100, +(peanutState.hunger + 0.6).toFixed(1));
+            peanutState.mood = 'Ecstatic 🎉';
         }
-        .swatch-row {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
+    } else {
+        // Default Smooth Circular Wandering Loop across the town
+        peanutState.activity = peanutState.assignedBedId ? 'Patrolling Near Home' : 'Wandering Town 🐼';
+        peanutState.mood = peanutState.hunger > 50 && peanutState.energy > 50 ? 'Happy ✨' : 'Chill';
+        
+        const nextX = Math.sin((simTick + 0.05) * 0.25) * 24;
+        const nextZ = Math.cos((simTick + 0.05) * 0.2) * 24;
+        const curX = Math.sin(simTick * 0.25) * 24;
+        const curZ = Math.cos(simTick * 0.2) * 24;
+
+        peanutState.x = curX;
+        peanutState.z = curZ;
+        peanutState.rotY = Math.atan2(nextX - curX, nextZ - curZ);
+    }
+}, 80);
+
+app.post('/api/coop/sync', (req, res) => {
+    const now = Date.now();
+    for (const id of Object.keys(activeGods)) {
+        if (now - activeGods[id].lastSeen > 6000) delete activeGods[id];
+    }
+
+    const { id, x, y, z, rotY } = req.body || {};
+    if (id) {
+        if (!activeGods[id]) {
+            const currentIds = Object.keys(activeGods);
+            if (currentIds.length < 4) {
+                const usedSlots = currentIds.map(k => activeGods[k].slot);
+                let slot = 1;
+                while (usedSlots.includes(slot) && slot <= 4) slot++;
+                activeGods[id] = {
+                    id, slot, name: 'God ' + slot,
+                    color: GOD_COLORS[(slot - 1) % 4],
+                    x: x || 0, y: y || 3, z: z || 20, rotY: rotY || 0, lastSeen: now
+                };
+            }
+        } else {
+            activeGods[id].x = typeof x === 'number' ? x : activeGods[id].x;
+            activeGods[id].y = typeof y === 'number' ? y : activeGods[id].y;
+            activeGods[id].z = typeof z === 'number' ? z : activeGods[id].z;
+            activeGods[id].rotY = typeof rotY === 'number' ? rotY : activeGods[id].rotY;
+            activeGods[id].lastSeen = now;
         }
-        .color-swatch {
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            border: 2px solid #334155;
-            cursor: pointer;
+    }
+
+    res.json({
+        gods: Object.values(activeGods),
+        peanut: peanutState,
+        worldCount: worldItems.length
+    });
+});
+
+app.post('/api/peanut/override', (req, res) => {
+    const { mood, hunger, energy, activity, assignedBedId } = req.body || {};
+    if (mood !== undefined) peanutState.mood = mood;
+    if (hunger !== undefined) peanutState.hunger = Number(hunger);
+    if (energy !== undefined) peanutState.energy = Number(energy);
+    if (activity !== undefined) peanutState.activity = activity;
+    if (assignedBedId !== undefined) peanutState.assignedBedId = assignedBedId;
+    res.json({ success: true, peanut: peanutState });
+});
+
+app.get('/api/world', (req, res) => res.json(worldItems));
+app.post('/api/world', (req, res) => {
+    if (Array.isArray(req.body)) {
+        worldItems = req.body;
+        saveDataToDisk();
+        return res.json({ success: true, count: worldItems.length });
+    }
+    res.status(400).json({ error: 'Invalid payload' });
+});
+
+app.post('/api/world/update-item', (req, res) => {
+    const { id, isOpen, inventory, assignedTo } = req.body || {};
+    const target = worldItems.find(it => it.id === id);
+    if (!target) return res.status(404).json({ error: 'Item not found' });
+
+    if (typeof isOpen === 'boolean') target.isOpen = isOpen;
+    if (Array.isArray(inventory)) target.inventory = inventory.slice(0, 10);
+    if (assignedTo !== undefined) {
+        target.assignedTo = assignedTo;
+        if (assignedTo === 'Peanut') {
+            peanutState.assignedBedId = target.id;
         }
-        .color-swatch.active {
-            border-color: #fff;
-            transform: scale(1.18);
-            box-shadow: 0 0 8px rgba(250,149,73,0.9);
-        }
+    }
+    saveDataToDisk();
+    res.json({ success: true, item: target, peanut: peanutState });
+});
 
-        .build-controls-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #161922;
-            padding: 8px 10px;
-            border-radius: 5px;
-            font-size: 11px;
-            color: #94a3b8;
-        }
+app.use((req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
 
-        /* Center Interaction Prompt */
-        #interaction-prompt {
-            position: absolute;
-            top: 56%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(15, 17, 23, 0.92);
-            border: 1px solid #fa9549;
-            color: #fff;
-            padding: 6px 14px;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: bold;
-            z-index: 15;
-            display: none;
-            pointer-events: none;
-        }
-        #interaction-prompt span { color: #fa9549; }
-
-        /* Object Inspector Modal (Inventory, Bed Assignment, Merchant Shop) */
-        #object-modal {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 430px;
-            max-width: 94vw;
-            max-height: 85vh;
-            overflow-y: auto;
-            background: rgba(18, 21, 28, 0.98);
-            border: 2px solid #fa9549;
-            border-radius: 8px;
-            padding: 16px;
-            z-index: 30;
-            display: none;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.9);
-        }
-        #object-modal h3 {
-            margin: 0 0 10px 0;
-            color: #fa9549;
-            font-size: 15px;
-            text-transform: uppercase;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .inv-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-        .inv-slot {
-            height: 56px;
-            background: #232834;
-            border: 1px solid #475569;
-            border-radius: 5px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 11px;
-            text-align: center;
-            padding: 4px;
-        }
-        .inv-slot:hover { border-color: #fa9549; }
-        .merchant-item-row {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            margin-bottom: 6px;
-            background: #161922;
-            padding: 6px;
-            border-radius: 5px;
-            border: 1px solid #2e3444;
-        }
-        .merchant-input {
-            background: #232834;
-            border: 1px solid #475569;
-            color: #fff;
-            padding: 4px 6px;
-            border-radius: 4px;
-            font-size: 11px;
-        }
-
-        /* Bottom Telemetry Pill */
-        #builder-hud {
-            position: absolute;
-            bottom: 14px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(18, 20, 26, 0.92);
-            border: 1px solid #fa9549;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 11px;
-            color: #f8fafc;
-            z-index: 15;
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            pointer-events: none;
-            white-space: nowrap;
-        }
-        #builder-hud span { color: #fa9549; font-weight: bold; }
-
-        #crosshair {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 10px;
-            height: 10px;
-            transform: translate(-50%, -50%);
-            border: 2px solid rgba(250, 149, 73, 0.95);
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 5;
-        }
-
-        #controls-hint {
-            position: absolute;
-            bottom: 14px;
-            left: 14px;
-            background: rgba(18, 20, 26, 0.9);
-            padding: 8px 12px;
-            border-radius: 6px;
-            border: 1px solid #333842;
-            font-size: 11px;
-            color: #cbd5e1;
-            z-index: 10;
-            line-height: 1.45;
-        }
-        #controls-hint span { color: #fa9549; font-weight: bold; }
-
-        /* Mobile Touch Controls */
-        #mobile-controls {
-            display: none;
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 22;
-        }
-        #mobile-move-btns {
-            position: absolute;
-            bottom: 58px;
-            left: 18px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            pointer-events: auto;
-        }
-        #mobile-action-btns {
-            position: absolute;
-            bottom: 58px;
-            right: 18px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            pointer-events: auto;
-        }
-        .mob-btn {
-            width: 54px;
-            height: 54px;
-            background: rgba(250, 149, 73, 0.82);
-            border: 2px solid #fff;
-            border-radius: 50%;
-            color: #111;
-            font-size: 16px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            pointer-events: auto;
-            touch-action: none;
-        }
-        @media (max-width: 900px) {
-            #controls-hint { display: none; }
-        }
-    </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
-</head>
-<body>
-
-    <div id="crosshair"></div>
-
-    <!-- 1. Compact Top Server & Co-op Status Banner -->
-    <div id="top-status-banner">
-        <div class="banner-left">
-            <span class="brand-title">🦍 The Badabing Co-op</span>
-            <span>Sync: <span id="status" class="sync-badge">Online</span></span>
-            <span>Structures: <strong id="piece-count" style="color:#fa9549;">0</strong></span>
-        </div>
-        <div class="banner-center">
-            <span>Gorilla Gods (Max 4):</span>
-            <div class="coop-pills" id="coop-gods-list">
-                <span class="god-pill">Connecting...</span>
-            </div>
-        </div>
-        <div class="banner-right">
-            <span id="gamepad-indicator" style="color:#94a3b8;">🎮 No Controller</span>
-        </div>
-    </div>
-
-    <!-- 2. Companion Telemetry Bar (With Coordinates & Mind Toggle) -->
-    <div id="companion-bar">
-        <div class="companion-stats">
-            <select id="npc-selector" title="Select Companion"></select>
-            <div class="stat-item">Mood: <strong id="p-mood" style="color:#fde047;">Happy ✨</strong></div>
-            <div class="stat-item">Pos: <strong id="p-coords" style="color:#38bdf8;">(0, 8)</strong></div>
-            <div class="stat-item">
-                Hunger:
-                <div class="stat-bar-bg"><div id="p-hunger-bar" class="stat-bar-fill" style="width:88%;"></div></div>
-                <span id="p-hunger-val">88%</span>
-            </div>
-            <div class="stat-item">
-                Energy:
-                <div class="stat-bar-bg"><div id="p-energy-bar" class="stat-bar-fill" style="width:92%;background:#38bdf8;"></div></div>
-                <span id="p-energy-val">92%</span>
-            </div>
-            <div class="stat-item">Activity: <strong id="p-activity" style="color:#4ade80;">Wandering Town</strong></div>
-            <div class="stat-item">Bed: <strong id="p-bed" style="color:#c084fc;">None</strong></div>
-        </div>
-        <div class="companion-actions">
-            <button class="mini-ui-btn" id="btn-toggle-mind">📓 Mind & Logs</button>
-            <button class="mini-ui-btn" id="btn-feed-npc">🍔 Feed</button>
-            <button class="mini-ui-btn" id="btn-rest-npc">⚡ Energize</button>
-            <button class="mini-ui-btn" id="btn-cheer-npc">✨ Cheer</button>
-        </div>
-    </div>
-
-    <!-- 3. Toggleable Companion Mind Panel (Diary, Wants, Live Chat Button, Activity Log) -->
-    <div id="companion-mind-panel">
-        <div class="mind-header">
-            <h3 id="mind-panel-title">🐼 Peanut's Mind & Logs</h3>
-            <button class="mini-ui-btn" id="btn-close-mind">✖</button>
-        </div>
-        <div class="mind-section">
-            <h4>💭 Current Wants</h4>
-            <div class="mind-box" id="mind-wants-box"></div>
-        </div>
-        <div class="mind-section">
-            <h4>📔 Personal Diary</h4>
-            <div class="mind-box" id="mind-diary-box"></div>
-        </div>
-        <div class="mind-section">
-            <h4>📋 Activity Log</h4>
-            <div class="mind-box" id="mind-log-box"></div>
-        </div>
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
-            <button class="mini-ui-btn" id="btn-live-chat" style="width:100%; padding:8px; background:#38bdf8; color:#111; font-weight:800;">
-                💬 Live Chat with Companion (AI Coming Soon)
-            </button>
-        </div>
-    </div>
-
-    <!-- 4. God / Build Menu Toggle Button & Modal -->
-    <button id="toggle-build-btn">🦍 God & Build Menu (B)</button>
-
-    <div id="build-menu-modal">
-        <!-- Gorilla God Physics Toggle (Walking Default vs Flying) -->
-        <div class="god-physics-bar">
-            <div>🦍 <strong>Gorilla God Movement:</strong> <span id="physics-mode-label" style="color:#4ade80;">Walking Physics (Gravity)</span></div>
-            <button class="mini-ui-btn" id="btn-toggle-fly">✈️ Enable Fly Mode</button>
-        </div>
-
-        <div class="tab-row">
-            <button class="tab-btn active" id="tab-modular">🧱 Modular Parts</button>
-            <button class="tab-btn" id="tab-buildings">🏢 Buildings & Shops</button>
-            <button class="tab-btn" id="tab-companions">🐾 Spawn Companions</button>
-        </div>
-
-        <!-- Tab 1: Modular Parts -->
-        <div class="build-grid" id="grid-modular">
-            <div class="build-card" data-type="foundation"><span class="icon">⬛</span><span class="label">Foundation</span><span class="sub">4x4m Slab</span></div>
-            <div class="build-card" data-type="wall"><span class="icon">🧱</span><span class="label">Solid Wall</span><span class="sub">Collidable</span></div>
-            <div class="build-card" data-type="doorway"><span class="icon">🚪</span><span class="label">Door Wall</span><span class="sub">Interactive Door</span></div>
-            <div class="build-card" data-type="window"><span class="icon">🪟</span><span class="label">Window Wall</span><span class="sub">Solid Frame</span></div>
-            <div class="build-card" data-type="stairs"><span class="icon">🪜</span><span class="label">Staircase</span><span class="sub">4m Ramp</span></div>
-            <div class="build-card" data-type="roof_flat"><span class="icon">⬜</span><span class="label">Flat Roof</span><span class="sub">Floor/Ceiling</span></div>
-            <div class="build-card" data-type="roof_pitched"><span class="icon">⛺</span><span class="label">Pitched Roof</span><span class="sub">Gable Crest</span></div>
-            <div class="build-card" data-type="fence"><span class="icon">⛓️</span><span class="label">Chain Fence</span><span class="sub">Solid Barrier</span></div>
-            <div class="build-card" data-type="streetlight"><span class="icon">🏮</span><span class="label">Streetlight</span><span class="sub">Lamp Post</span></div>
-        </div>
-
-        <!-- Tab 2: Buildings, XL Gorilla Statue & Customizable Merchant -->
-        <div class="build-grid" id="grid-buildings" style="display:none;">
-            <div class="build-card" data-type="mcdonalds"><span class="icon">🍔</span><span class="label">McDonald's</span><span class="sub">Full Restaurant</span></div>
-            <div class="build-card" data-type="walmart"><span class="icon">🛒</span><span class="label">Walmart</span><span class="sub">Supercenter</span></div>
-            <div class="build-card" data-type="gorilla_statue"><span class="icon">🗿</span><span class="label">XL Gorilla Statue</span><span class="sub">Giant Monument</span></div>
-            <div class="build-card" data-type="merchant"><span class="icon">🏪</span><span class="label">Merchant Booth</span><span class="sub">10 Skins & Shop</span></div>
-            <div class="build-card" data-type="fountain"><span class="icon">⛲</span><span class="label">Fountain</span><span class="sub">Park Centerpiece</span></div>
-            <div class="build-card" data-type="mailbox"><span class="icon">📫</span><span class="label">Mailbox</span><span class="sub">10 Inv. Slots</span></div>
-            <div class="build-card" data-type="locker"><span class="icon">🗄️</span><span class="label">Locker</span><span class="sub">10 Inv. Slots</span></div>
-            <div class="build-card" data-type="bed"><span class="icon">🛌</span><span class="label">Assignable Bed</span><span class="sub">Assign Owner</span></div>
-        </div>
-
-        <!-- Tab 3: Companion Spawner (20 Cute Anime Animals) -->
-        <div id="grid-companions" style="display:none; margin-bottom:12px;">
-            <div style="display:flex; gap:6px; margin-bottom:8px;">
-                <input type="text" id="new-companion-name" class="merchant-input" placeholder="Enter Companion Name (e.g. BamBam)" style="flex:1; padding:7px;" />
-                <button class="mini-ui-btn" id="btn-spawn-companion" style="background:#4ade80; color:#111; font-weight:800; padding:0 14px;">➕ Spawn Here</button>
-            </div>
-            <div class="build-grid" id="animal-species-grid" style="max-height:190px; overflow-y:auto;"></div>
-        </div>
-
-        <!-- Utility Row -->
-        <div class="build-grid" style="grid-template-columns: repeat(2, 1fr); margin-top: 4px;">
-            <div class="build-card" data-type="delete" style="border-color:#ef4444;"><span class="icon">💥</span><span class="label">Dismantle Mode (X)</span></div>
-            <div class="build-card active" data-type="none"><span class="icon">✋</span><span class="label">Hands Empty / Explore</span></div>
-        </div>
-
-        <!-- Paint Color Customizer -->
-        <div class="color-section">
-            <div class="color-section-title">
-                <span>🎨 Structure Paint Color</span>
-                <span id="selected-color-label">#8A483C</span>
-            </div>
-            <div class="swatch-row">
-                <div class="color-swatch active" data-color="#8a483c" style="background:#8a483c;"></div>
-                <div class="color-swatch" data-color="#757d86" style="background:#757d86;"></div>
-                <div class="color-swatch" data-color="#e2e8f0" style="background:#e2e8f0;"></div>
-                <div class="color-swatch" data-color="#2563eb" style="background:#2563eb;"></div>
-                <div class="color-swatch" data-color="#dc2626" style="background:#dc2626;"></div>
-                <div class="color-swatch" data-color="#eab308" style="background:#eab308;"></div>
-                <div class="color-swatch" data-color="#16a34a" style="background:#16a34a;"></div>
-                <div class="color-swatch" data-color="#9333ea" style="background:#9333ea;"></div>
-            </div>
-        </div>
-
-        <div class="build-controls-bar">
-            <div>Build Height: <strong id="hud-floor-modal" style="color:#fa9549;">0m</strong></div>
-            <div style="display:flex; gap:6px;">
-                <button class="mini-ui-btn" id="rotate-piece-btn">🔄 Rot (R)</button>
-                <button class="mini-ui-btn" id="level-down-btn">⬇️ Lv- (Q)</button>
-                <button class="mini-ui-btn" id="level-up-btn">⬆️ Lv+ (E)</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Center Screen Interaction Prompt -->
-    <div id="interaction-prompt">Press <span>[F]</span> or <span>[X]</span> to Interact</div>
-
-    <!-- Object Inspector Modal -->
-    <div id="object-modal">
-        <h3>
-            <span id="modal-title">Inspector
+app.listen(PORT, () => console.log('The Badabing Server running on port ' + PORT));
