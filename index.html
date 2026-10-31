@@ -1873,4 +1873,487 @@
             function openMerchantModal(itemData) {
                 if (typeof itemData.merchantSkin !== 'number') itemData.merchantSkin = 0;
                 if (!Array.isArray(itemData.shopItems) || itemData.shopItems.length === 0) {
-                    itemData.shopItems =
+                    itemData.shopItems = [
+                        { name: '🐼 Bamboo Ramen Bowl', price: 12 },
+                        { name: '🍔 Gorilla Smashburger', price: 15 },
+                        { name: '🧋 Anime Boba Tea', price: 8 },
+                        { name: '🧸 Golden Plushie Toy', price: 25 }
+                    ];
+                }
+
+                modalTitle.innerText = '🏪 Merchant Shop & Skin Editor';
+                const currentNpc = npcList.find(n => n.id === selectedNpcId) || npcList[0];
+
+                let html = `
+                    <div style="margin-bottom:10px;">
+                        <label style="font-size:11px;color:#94a3b8;display:block;margin-bottom:4px;">Choose Merchant Skin (10 Skins):</label>
+                        <select id="merchant-skin-select" class="merchant-input" style="width:100%;padding:6px;">
+                            ${MERCHANT_SKINS.map((sk, idx) => `<option value="${idx}" ${itemData.merchantSkin === idx ? 'selected' : ''}>Skin #${idx + 1}: ${sk.name}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div style="margin-bottom:10px;">
+                        <label style="font-size:11px;color:#94a3b8;display:block;margin-bottom:4px;">Buy For Companion:</label>
+                        <select id="merchant-buyer-select" class="merchant-input" style="width:100%;padding:6px;color:#fde047;font-weight:bold;">
+                            ${npcList.map(n => `<option value="${n.id}" ${n.id === (currentNpc && currentNpc.id) ? 'selected' : ''}>Buy for ${n.name} (${n.species})</option>`).join('')}
+                        </select>
+                    </div>
+                    <div style="font-size:11px;color:#38bdf8;font-weight:bold;margin-bottom:6px;">Editable Shop Inventory & Prices:</div>
+                    <div id="merchant-items-container">
+                        ${itemData.shopItems.map((it, i) => `
+                            <div class="merchant-item-row">
+                                <input type="text" class="merchant-input edit-item-name" data-idx="${i}" value="${it.name}" style="flex:1;" />
+                                <span style="font-size:11px;color:#94a3b8;">$</span>
+                                <input type="number" class="merchant-input edit-item-price" data-idx="${i}" value="${it.price}" style="width:58px;" />
+                                <button class="mini-ui-btn buy-item-btn" data-idx="${i}" style="background:#4ade80;color:#111;font-weight:bold;">🛍️ Buy</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div style="display:flex;justify-content:space-between;margin-top:10px;">
+                        <button class="mini-ui-btn" id="btn-add-shop-row">➕ Add Item</button>
+                        <button class="mini-ui-btn" id="btn-save-merchant" style="background:#fa9549;color:#111;font-weight:bold;">💾 Save Shop Changes</button>
+                    </div>
+                `;
+                modalContent.innerHTML = html;
+                objectModal.style.display = 'block';
+
+                document.getElementById('merchant-skin-select').addEventListener('change', async (e) => {
+                    itemData.merchantSkin = Number(e.target.value);
+                    itemData.merchantName = MERCHANT_SKINS[itemData.merchantSkin].name;
+                    rebuildSceneFromData(worldDataList);
+                    localStorage.setItem('badabing_world_v4', JSON.stringify(worldDataList));
+                    await fetch('/api/world/update-item', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            id: itemData.id,
+                            merchantSkin: itemData.merchantSkin,
+                            merchantName: itemData.merchantName
+                        })
+                    });
+                });
+
+                document.getElementById('btn-add-shop-row').addEventListener('click', () => {
+                    itemData.shopItems.push({ name: '✨ Mystery Treat', price: 10 });
+                    openMerchantModal(itemData);
+                });
+
+                document.getElementById('btn-save-merchant').addEventListener('click', async () => {
+                    const nameInputs = modalContent.querySelectorAll('.edit-item-name');
+                    const priceInputs = modalContent.querySelectorAll('.edit-item-price');
+                    itemData.shopItems = Array.from(nameInputs).map((inp, idx) => ({
+                        name: inp.value,
+                        price: Number(priceInputs[idx].value) || 0
+                    }));
+                    localStorage.setItem('badabing_world_v4', JSON.stringify(worldDataList));
+                    await fetch('/api/world/update-item', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id: itemData.id, shopItems: itemData.shopItems })
+                    });
+                    openMerchantModal(itemData);
+                });
+
+                modalContent.querySelectorAll('.buy-item-btn').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        const idx = Number(btn.getAttribute('data-idx'));
+                        const nameInputs = modalContent.querySelectorAll('.edit-item-name');
+                        const priceInputs = modalContent.querySelectorAll('.edit-item-price');
+                        const chosenItemName = nameInputs[idx].value;
+                        const chosenPrice = Number(priceInputs[idx].value) || 0;
+                        const buyerId = document.getElementById('merchant-buyer-select').value;
+
+                        const res = await fetch('/api/npcs/action', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                npcId: buyerId,
+                                actionType: 'buy',
+                                itemName: chosenItemName,
+                                itemPrice: chosenPrice
+                            })
+                        });
+                        if (res.ok) {
+                            const d = await res.json();
+                            if (d.npcs) syncNpcsClient(d.npcs);
+                            btn.innerText = '✅ Bought!';
+                            setTimeout(() => { btn.innerText = '🛍️ Buy'; }, 1000);
+                        }
+                    });
+                });
+            }
+
+            // =========================================================
+            // 10. PLACE / DISMANTLE & SOLID WALL COLLISIONS
+            // =========================================================
+            function getSnappedBuildPoint() {
+                raycaster.setFromCamera(centerScreen, camera);
+                const hits = raycaster.intersectObject(ground);
+                if (hits.length > 0) {
+                    const pt = hits[0].point;
+                    return {
+                        x: Math.round(pt.x / 2) * 2,
+                        y: buildElevation,
+                        z: Math.round(pt.z / 2) * 2
+                    };
+                }
+                return null;
+            }
+
+            function executeBuildAction() {
+                if (selectedTool === 'none') return;
+
+                if (selectedTool === 'delete') {
+                    raycaster.setFromCamera(centerScreen, camera);
+                    const hits = raycaster.intersectObjects(cityPropsGroup.children, true);
+                    if (hits.length > 0) {
+                        const rootObj = findRootPieceGroup(hits[0].object);
+                        if (rootObj && rootObj.userData.id) {
+                            worldDataList = worldDataList.filter(it => it.id !== rootObj.userData.id);
+                            rebuildSceneFromData(worldDataList);
+                            pushWorldToServer();
+                        }
+                    }
+                } else {
+                    const pt = getSnappedBuildPoint();
+                    if (pt) {
+                        const newItem = {
+                            id: 'piece_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+                            type: selectedTool,
+                            color: selectedColor,
+                            x: pt.x,
+                            y: pt.y,
+                            z: pt.z,
+                            rot: buildRotation,
+                            isOpen: false,
+                            inventory: new Array(10).fill(''),
+                            assignedTo: null,
+                            merchantSkin: 0,
+                            shopItems: [
+                                { name: '🐼 Bamboo Ramen Bowl', price: 12 },
+                                { name: '🍔 Gorilla Smashburger', price: 15 },
+                                { name: '🧋 Anime Boba Tea', price: 8 }
+                            ]
+                        };
+                        worldDataList.push(newItem);
+                        rebuildSceneFromData(worldDataList);
+                        pushWorldToServer();
+                    }
+                }
+            }
+
+            const collisionRay = new THREE.Raycaster();
+            function canMoveTo(oldPos, newPos) {
+                const moveVec = new THREE.Vector3().subVectors(newPos, oldPos);
+                moveVec.y = 0;
+                const dist = moveVec.length();
+                if (dist < 0.001) return true;
+
+                const origin = new THREE.Vector3(oldPos.x, oldPos.y - 0.8, oldPos.z);
+                collisionRay.set(origin, moveVec.normalize());
+                const hits = collisionRay.intersectObjects(cityPropsGroup.children, true);
+                for (let i = 0; i < hits.length; i++) {
+                    if (hits[i].distance < dist + 0.75 && hits[i].object.userData.isSolidWall) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            // =========================================================
+            // 11. DESKTOP, GAMEPAD & FIXED MOBILE ZERO-TWIST LOOK
+            // =========================================================
+            const controls = new THREE.PointerLockControls(camera, document.body);
+            const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
+            document.body.addEventListener('click', (e) => {
+                if (
+                    e.target.closest('#build-menu-modal') ||
+                    e.target.closest('#toggle-build-btn') ||
+                    e.target.closest('#top-status-banner') ||
+                    e.target.closest('#companion-bar') ||
+                    e.target.closest('#companion-mind-panel') ||
+                    e.target.closest('#object-modal') ||
+                    e.target.closest('#mobile-controls')
+                ) return;
+
+                if (!controls.isLocked && !isTouchDevice) {
+                    if (buildMenuOpen) toggleBuildMenu(false);
+                    controls.lock();
+                } else if (!isTouchDevice) {
+                    executeBuildAction();
+                }
+            });
+
+            const keys = { w: false, a: false, s: false, d: false, space: false, shift: false };
+            window.addEventListener('keydown', (e) => {
+                if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
+                const k = e.key.toLowerCase();
+                if (k === 'w' || e.key === 'ArrowUp') keys.w = true;
+                if (k === 's' || e.key === 'ArrowDown') keys.s = true;
+                if (k === 'a' || e.key === 'ArrowLeft') keys.a = true;
+                if (k === 'd' || e.key === 'ArrowRight') keys.d = true;
+                if (e.code === 'Space') {
+                    keys.space = true;
+                    if (!isFlyingMode && camera.position.y <= 2.25) verticalVelocity = 9.5;
+                }
+                if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') keys.shift = true;
+
+                if (k === 'b') toggleBuildMenu();
+                if (k === 'f') triggerInteraction();
+                if (k === 'x') selectBuildTool(selectedTool === 'delete' ? 'none' : 'delete');
+                if (k === 'r') { buildRotation = (buildRotation + 90) % 360; updateGhostPreview(); }
+                if (k === 'e') { buildElevation = Math.min(40, buildElevation + 4); updateGhostPreview(); }
+                if (k === 'q') { buildElevation = Math.max(0, buildElevation - 4); updateGhostPreview(); }
+            });
+
+            window.addEventListener('keyup', (e) => {
+                const k = e.key.toLowerCase();
+                if (k === 'w' || e.key === 'ArrowUp') keys.w = false;
+                if (k === 's' || e.key === 'ArrowDown') keys.s = false;
+                if (k === 'a' || e.key === 'ArrowLeft') keys.a = false;
+                if (k === 'd' || e.key === 'ArrowRight') keys.d = false;
+                if (e.code === 'Space') keys.space = false;
+                if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') keys.shift = false;
+            });
+
+            // Mobile Touch Buttons + Fixed Zero-Twist Touch Look
+            if (isTouchDevice) {
+                document.getElementById('mobile-controls').style.display = 'block';
+            }
+            document.getElementById('btn-forward').addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); keys.w = true; });
+            document.getElementById('btn-forward').addEventListener('touchend', (e) => { e.preventDefault(); e.stopPropagation(); keys.w = false; });
+            document.getElementById('btn-backward').addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); keys.s = true; });
+            document.getElementById('btn-backward').addEventListener('touchend', (e) => { e.preventDefault(); e.stopPropagation(); keys.s = false; });
+            document.getElementById('btn-up').addEventListener('touchstart', (e) => {
+                e.preventDefault(); e.stopPropagation();
+                keys.space = true;
+                if (!isFlyingMode && camera.position.y <= 2.25) verticalVelocity = 9.5;
+            });
+            document.getElementById('btn-up').addEventListener('touchend', (e) => { e.preventDefault(); e.stopPropagation(); keys.space = false; });
+            document.getElementById('btn-down').addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); keys.shift = true; });
+            document.getElementById('btn-down').addEventListener('touchend', (e) => { e.preventDefault(); e.stopPropagation(); keys.shift = false; });
+            document.getElementById('btn-place').addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); executeBuildAction(); });
+            document.getElementById('btn-interact').addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); triggerInteraction(); });
+
+            // Dedicated Multi-Touch Look Tracker (Strictly Up/Down Pitch & Left/Right Yaw, Zero Roll)
+            let lookTouchId = null;
+            let lastLookX = 0;
+            let lastLookY = 0;
+
+            window.addEventListener('touchstart', (e) => {
+                if (
+                    e.target.closest('#build-menu-modal') ||
+                    e.target.closest('#toggle-build-btn') ||
+                    e.target.closest('#top-status-banner') ||
+                    e.target.closest('#companion-bar') ||
+                    e.target.closest('#companion-mind-panel') ||
+                    e.target.closest('#object-modal') ||
+                    e.target.closest('.mob-btn')
+                ) return;
+
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    if (lookTouchId === null) {
+                        const t = e.changedTouches[i];
+                        lookTouchId = t.identifier;
+                        lastLookX = t.clientX;
+                        lastLookY = t.clientY;
+                        break;
+                    }
+                }
+            }, { passive: false });
+
+            window.addEventListener('touchmove', (e) => {
+                if (lookTouchId === null) return;
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    const t = e.changedTouches[i];
+                    if (t.identifier === lookTouchId) {
+                        const dx = t.clientX - lastLookX;
+                        const dy = t.clientY - lastLookY;
+                        lastLookX = t.clientX;
+                        lastLookY = t.clientY;
+
+                        camera.rotation.order = 'YXZ';
+                        camera.rotation.y -= dx * 0.0055;
+                        camera.rotation.x = Math.max(-Math.PI * 0.44, Math.min(Math.PI * 0.44, camera.rotation.x - dy * 0.0055));
+                        camera.rotation.z = 0; // Explicitly prevent view twisting
+                        break;
+                    }
+                }
+            }, { passive: false });
+
+            function endLookTouch(e) {
+                if (lookTouchId === null) return;
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    if (e.changedTouches[i].identifier === lookTouchId) {
+                        lookTouchId = null;
+                        break;
+                    }
+                }
+            }
+            window.addEventListener('touchend', endLookTouch);
+            window.addEventListener('touchcancel', endLookTouch);
+
+            // Gamepad Controller Support
+            const allBuildTypes = [
+                'none', 'foundation', 'wall', 'doorway', 'window', 'stairs',
+                'roof_flat', 'roof_pitched', 'fence', 'streetlight',
+                'mcdonalds', 'walmart', 'gorilla_statue', 'merchant', 'fountain', 'mailbox', 'locker', 'bed', 'delete'
+            ];
+            let prevGpButtons = {};
+
+            function pollGamepad(delta) {
+                const pads = navigator.getGamepads ? navigator.getGamepads() : [];
+                const gp = pads[0];
+                const ind = document.getElementById('gamepad-indicator');
+                if (!gp) {
+                    ind.innerText = '🎮 No Controller';
+                    ind.style.color = '#94a3b8';
+                    return;
+                }
+                ind.innerText = '🎮 Controller Active';
+                ind.style.color = '#4ade80';
+
+                const deadzone = 0.18;
+                const lx = Math.abs(gp.axes[0]) > deadzone ? gp.axes[0] : 0;
+                const ly = Math.abs(gp.axes[1]) > deadzone ? gp.axes[1] : 0;
+                const rx = Math.abs(gp.axes[2]) > deadzone ? gp.axes[2] : 0;
+                const ry = Math.abs(gp.axes[3]) > deadzone ? gp.axes[3] : 0;
+
+                camera.rotation.order = 'YXZ';
+                camera.rotation.y -= rx * 2.4 * delta;
+                camera.rotation.x = Math.max(-Math.PI * 0.44, Math.min(Math.PI * 0.44, camera.rotation.x - ry * 2.0 * delta));
+                camera.rotation.z = 0;
+
+                if (lx !== 0 || ly !== 0) {
+                    const dir = new THREE.Vector3();
+                    camera.getWorldDirection(dir);
+                    dir.y = 0; dir.normalize();
+                    const side = new THREE.Vector3(-dir.z, 0, dir.x);
+                    const nextPos = camera.position.clone();
+                    nextPos.addScaledVector(dir, -ly * 20 * delta);
+                    nextPos.addScaledVector(side, -lx * 20 * delta);
+                    if (canMoveTo(camera.position, nextPos)) camera.position.copy(nextPos);
+                }
+
+                if (gp.buttons[0]?.pressed || gp.buttons[5]?.pressed) {
+                    if (isFlyingMode) camera.position.y += 18 * delta;
+                    else if (camera.position.y <= 2.25) verticalVelocity = 9.5;
+                }
+                if (isFlyingMode && (gp.buttons[1]?.pressed || gp.buttons[4]?.pressed)) {
+                    camera.position.y = Math.max(2.2, camera.position.y - 18 * delta);
+                }
+
+                const tap = (idx) => gp.buttons[idx]?.pressed && !prevGpButtons[idx];
+                if (tap(3)) toggleBuildMenu();
+                if (tap(2)) triggerInteraction();
+                if (tap(7)) executeBuildAction();
+                if (tap(12)) { buildElevation = Math.min(40, buildElevation + 4); updateGhostPreview(); }
+                if (tap(13)) { buildElevation = Math.max(0, buildElevation - 4); updateGhostPreview(); }
+                if (tap(14)) { buildRotation = (buildRotation + 90) % 360; updateGhostPreview(); }
+                if (tap(15)) {
+                    const idx = (allBuildTypes.indexOf(selectedTool) + 1) % allBuildTypes.length;
+                    selectBuildTool(allBuildTypes[idx]);
+                }
+
+                gp.buttons.forEach((b, i) => { prevGpButtons[i] = b.pressed; });
+            }
+
+            // =========================================================
+            // 12. MAIN ANIMATION LOOP (WALKING GRAVITY + COMPANION GAIT)
+            // =========================================================
+            const targetXEl = document.getElementById('target-x');
+            const targetZEl = document.getElementById('target-z');
+            const clock = new THREE.Clock();
+
+            function animate() {
+                requestAnimationFrame(animate);
+                const delta = Math.min(0.1, clock.getDelta());
+                const elapsed = clock.getElapsedTime();
+
+                // Always keep horizon level (zero roll/twist)
+                camera.rotation.z = 0;
+
+                checkInteractiveTarget();
+                pollGamepad(delta);
+
+                const snapPt = getSnappedBuildPoint();
+                if (snapPt) {
+                    targetXEl.innerText = snapPt.x;
+                    targetZEl.innerText = snapPt.z;
+                    if (ghostMesh) {
+                        ghostMesh.position.set(snapPt.x, snapPt.y, snapPt.z);
+                        ghostMesh.rotation.y = THREE.MathUtils.degToRad(buildRotation);
+                    }
+                }
+
+                // Animate Peanut & All Spawned Cute Anime Companions
+                Object.keys(npcMeshes).forEach((id, idx) => {
+                    const mesh = npcMeshes[id];
+                    if (typeof mesh.userData.targetX === 'number') {
+                        mesh.position.x += (mesh.userData.targetX - mesh.position.x) * 0.14;
+                        mesh.position.z += (mesh.userData.targetZ - mesh.position.z) * 0.14;
+                        mesh.rotation.y = mesh.userData.targetRotY || 0;
+                    }
+                    const stride = elapsed * 5.2 + idx;
+                    mesh.position.y = Math.abs(Math.sin(stride)) * 0.06;
+                    if (mesh.userData.leftLeg) {
+                        mesh.userData.leftLeg.rotation.x = Math.sin(stride) * 0.55;
+                        mesh.userData.rightLeg.rotation.x = -Math.sin(stride) * 0.55;
+                        mesh.userData.leftArm.rotation.x = -Math.sin(stride) * 0.45;
+                        mesh.userData.rightArm.rotation.x = Math.sin(stride) * 0.45;
+                        mesh.userData.eyeGroup.scale.y = ((elapsed + idx) % 4.0 < 0.14) ? 0.08 : 1.0;
+                    }
+                });
+
+                // Player Horizontal Movement with Solid Wall Collisions
+                const moveSpeed = 20.0 * delta;
+                const oldPos = camera.position.clone();
+                if (controls.isLocked) {
+                    if (keys.w) controls.moveForward(moveSpeed);
+                    if (keys.s) controls.moveForward(-moveSpeed);
+                    if (keys.a) controls.moveRight(-moveSpeed);
+                    if (keys.d) controls.moveRight(moveSpeed);
+                } else {
+                    const dir = new THREE.Vector3();
+                    camera.getWorldDirection(dir);
+                    dir.y = 0; dir.normalize();
+                    const sideDir = new THREE.Vector3(-dir.z, 0, dir.x);
+                    if (keys.w) camera.position.addScaledVector(dir, moveSpeed);
+                    if (keys.s) camera.position.addScaledVector(dir, -moveSpeed);
+                    if (keys.a) camera.position.addScaledVector(sideDir, moveSpeed);
+                    if (keys.d) camera.position.addScaledVector(sideDir, -moveSpeed);
+                }
+                if (!canMoveTo(oldPos, camera.position)) {
+                    camera.position.x = oldPos.x;
+                    camera.position.z = oldPos.z;
+                }
+
+                // Vertical Physics: Walking Gravity (Default) vs Fly Mode Toggle
+                if (isFlyingMode) {
+                    if (keys.space) camera.position.y += moveSpeed;
+                    if (keys.shift) camera.position.y = Math.max(2.2, camera.position.y - moveSpeed);
+                } else {
+                    verticalVelocity -= 24.0 * delta; // Gravity
+                    camera.position.y += verticalVelocity * delta;
+                    const groundHeight = 2.2 + buildElevation;
+                    if (camera.position.y <= 2.2) {
+                        camera.position.y = 2.2;
+                        verticalVelocity = 0;
+                    }
+                }
+
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        } catch (err) {
+            console.error('Setup Error:', err);
+        }
+    </script>
+</body>
+</html>
