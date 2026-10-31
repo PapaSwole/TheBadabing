@@ -3,54 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>The Badabing - Satisfactory City Builder</title>
+    <title>The Badabing - 4-God Co-Op City Builder</title>
     <style>
+        * { box-sizing: border-box; }
         body {
             margin: 0;
             padding: 0;
             overflow: hidden;
-            background-color: #14161d;
+            background-color: #12141c;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: #fff;
             user-select: none;
             -webkit-user-select: none;
         }
-        #info-panel {
-            position: absolute;
-            top: 16px;
-            left: 16px;
-            background: rgba(18, 20, 26, 0.92);
-            padding: 14px 16px;
-            border-radius: 6px;
-            border-left: 4px solid #fa9549;
-            border-top: 1px solid #333842;
-            border-right: 1px solid #333842;
-            border-bottom: 1px solid #333842;
-            z-index: 10;
-            width: 280px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.75);
-        }
-        h1 { margin: 0 0 6px 0; font-size: 17px; color: #fa9549; letter-spacing: 0.5px; text-transform: uppercase; }
-        p { margin: 0 0 5px 0; font-size: 12px; color: #c5c8d4; }
-        #status { font-weight: bold; color: #4ade80; }
 
-        /* Satisfactory Style Build Button */
-        #toggle-build-btn {
+        /* 1. Sleek Top Status Banner */
+        #top-banner {
             position: absolute;
-            top: 16px;
-            right: 16px;
-            background: rgba(24, 27, 34, 0.95);
-            border: 2px solid #fa9549;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 36px;
+            background: rgba(14, 16, 22, 0.94);
+            border-bottom: 1px solid #333a48;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            z-index: 25;
+            font-size: 12px;
+        }
+        .banner-left, .banner-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .brand-title {
+            font-weight: 800;
             color: #fa9549;
-            padding: 10px 18px;
-            border-radius: 6px;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+        }
+        .badge {
+            background: #1e2430;
+            padding: 3px 9px;
+            border-radius: 12px;
+            border: 1px solid #384254;
+            font-size: 11px;
+        }
+        #status { color: #4ade80; font-weight: bold; }
+        #coop-status { color: #38bdf8; font-weight: bold; }
+        #gamepad-badge { color: #a855f7; font-weight: bold; }
+
+        /* 2. Peanut Emotion & Telemetry Bar (Below Top Banner) */
+        #peanut-bar {
+            position: absolute;
+            top: 36px;
+            left: 0;
+            width: 100%;
+            height: 34px;
+            background: rgba(20, 24, 33, 0.90);
+            border-bottom: 1px solid #fa9549;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            z-index: 24;
+            font-size: 12px;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        .peanut-stats {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+        .stat-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .meter-bg {
+            width: 65px;
+            height: 8px;
+            background: #0f131a;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid #374151;
+        }
+        .meter-fill {
+            height: 100%;
+            background: #4ade80;
+            transition: width 0.3s;
+        }
+        .peanut-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .mini-act-btn {
+            background: #272e3d;
+            border: 1px solid #475569;
+            color: #f8fafc;
+            padding: 3px 9px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .mini-act-btn:hover { background: #fa9549; color: #111; border-color: #fa9549; }
+
+        /* 3. Clean Toggleable Build Button */
+        #toggle-build-btn {
+            background: #232834;
+            border: 1px solid #fa9549;
+            color: #fa9549;
+            padding: 4px 12px;
+            border-radius: 4px;
             cursor: pointer;
             font-weight: 800;
-            font-size: 13px;
-            letter-spacing: 0.6px;
+            font-size: 11px;
             text-transform: uppercase;
-            z-index: 20;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.6);
             transition: 0.15s;
         }
         #toggle-build-btn:hover, #toggle-build-btn.active {
@@ -58,107 +131,119 @@
             color: #111318;
         }
 
-        /* Satisfactory Style Modular Catalog Modal */
+        /* 4. Satisfactory Build Menu Modal (Hidden unless toggled) */
+        #build-ui-wrapper {
+            display: none; /* Toggled cleanly via Build Mode button or B / Y */
+        }
         #build-menu-modal {
             position: absolute;
-            top: 68px;
+            top: 80px;
             right: 16px;
-            width: 420px;
+            width: 450px;
             max-width: calc(100vw - 32px);
-            background: rgba(20, 23, 30, 0.96);
+            max-height: calc(100vh - 180px);
+            overflow-y: auto;
+            background: rgba(18, 21, 28, 0.96);
             border: 2px solid #fa9549;
             border-radius: 8px;
-            padding: 16px;
-            z-index: 20;
+            padding: 14px;
+            z-index: 25;
             box-shadow: 0 15px 40px rgba(0,0,0,0.85);
-            display: none;
         }
-        .build-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #353b49;
-            padding-bottom: 8px;
-            margin-bottom: 12px;
-        }
-        .build-header h2 {
-            margin: 0;
-            font-size: 15px;
+        .cat-title {
+            font-size: 11px;
             color: #fa9549;
             text-transform: uppercase;
             letter-spacing: 0.8px;
+            margin: 8px 0 6px 0;
+            border-bottom: 1px solid #2e3545;
+            padding-bottom: 3px;
+            font-weight: 800;
         }
         .build-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-bottom: 12px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            margin-bottom: 8px;
         }
         .build-card {
             background: #232834;
             border: 1px solid #3c4456;
             border-radius: 5px;
-            padding: 10px 6px;
+            padding: 7px 4px;
             text-align: center;
             cursor: pointer;
-            transition: 0.15s;
+            transition: 0.12s;
             color: #e2e8f0;
         }
-        .build-card:hover {
-            border-color: #fa9549;
-            background: #2d3444;
-        }
+        .build-card:hover { border-color: #fa9549; background: #2d3444; }
         .build-card.active {
-            background: rgba(250, 149, 73, 0.22);
+            background: rgba(250, 149, 73, 0.24);
             border: 2px solid #fa9549;
             color: #fff;
         }
-        .build-card .icon { font-size: 20px; display: block; margin-bottom: 4px; }
-        .build-card .label { font-size: 11px; font-weight: 700; display: block; }
-        .build-card .key-hint { font-size: 10px; color: #fa9549; }
+        .build-card .icon { font-size: 17px; display: block; margin-bottom: 2px; }
+        .build-card .label { font-size: 10px; font-weight: 700; display: block; }
+
+        /* Color Swatches Bar */
+        .color-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #151821;
+            padding: 7px 10px;
+            border-radius: 5px;
+            margin-top: 6px;
+        }
+        .swatches {
+            display: flex;
+            gap: 6px;
+        }
+        .color-swatch {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 2px solid #475569;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .color-swatch.active {
+            border-color: #fff;
+            transform: scale(1.2);
+            box-shadow: 0 0 8px rgba(255,255,255,0.7);
+        }
 
         .build-controls-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #171a22;
-            padding: 8px 10px;
-            border-radius: 4px;
+            background: #151821;
+            padding: 7px 10px;
+            border-radius: 5px;
+            margin-top: 8px;
             font-size: 11px;
             color: #94a3b8;
         }
-        .action-mini-btn {
-            background: #334155;
-            border: 1px solid #475569;
-            color: #fff;
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 11px;
-            font-weight: bold;
-        }
-        .action-mini-btn:hover { background: #fa9549; color: #111; border-color: #fa9549; }
 
-        /* Satisfactory Bottom Hotbar */
+        /* Bottom Hotbar (Inside #build-ui-wrapper so it toggles cleanly) */
         #hotbar {
             position: absolute;
-            bottom: 16px;
+            bottom: 14px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            gap: 6px;
-            background: rgba(16, 18, 24, 0.92);
-            padding: 8px;
+            gap: 5px;
+            background: rgba(16, 18, 24, 0.94);
+            padding: 6px;
             border-radius: 8px;
-            border: 1px solid #384152;
-            z-index: 15;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.8);
-            max-width: 95vw;
+            border: 1px solid #fa9549;
+            z-index: 20;
+            max-width: 96vw;
             overflow-x: auto;
         }
         .hotbar-slot {
-            width: 54px;
-            height: 54px;
+            width: 50px;
+            height: 50px;
             background: #222733;
             border: 2px solid #3b4254;
             border-radius: 6px;
@@ -169,71 +254,157 @@
             cursor: pointer;
             position: relative;
             flex-shrink: 0;
-            transition: 0.12s;
         }
-        .hotbar-slot:hover { border-color: #fa9549; }
         .hotbar-slot.active {
             border-color: #fa9549;
             background: rgba(250, 149, 73, 0.25);
-            transform: translateY(-3px);
         }
         .hotbar-slot .slot-num {
             position: absolute;
             top: 2px;
-            left: 5px;
-            font-size: 10px;
+            left: 4px;
+            font-size: 9px;
             color: #fa9549;
             font-weight: bold;
         }
-        .hotbar-slot .slot-icon { font-size: 18px; margin-top: 4px; }
-        .hotbar-slot .slot-name { font-size: 9px; color: #cbd5e1; margin-top: 2px; text-align: center; }
+        .hotbar-slot .slot-icon { font-size: 16px; margin-top: 3px; }
+        .hotbar-slot .slot-name { font-size: 8px; color: #cbd5e1; margin-top: 1px; }
 
-        /* HUD Telemetry Bar for Builder */
         #builder-hud {
             position: absolute;
-            bottom: 86px;
+            bottom: 74px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(18, 20, 26, 0.9);
+            background: rgba(18, 20, 26, 0.92);
             border: 1px solid #fa9549;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 12px;
+            padding: 5px 14px;
+            border-radius: 18px;
+            font-size: 11px;
             color: #f8fafc;
-            z-index: 15;
+            z-index: 20;
             display: flex;
             gap: 14px;
-            align-items: center;
             pointer-events: none;
             white-space: nowrap;
         }
         #builder-hud span { color: #fa9549; font-weight: bold; }
 
+        /* Center Crosshair & Context Interaction Prompt */
         #crosshair {
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 12px;
-            height: 12px;
+            width: 10px;
+            height: 10px;
             transform: translate(-50%, -50%);
             border: 2px solid rgba(250, 149, 73, 0.9);
             border-radius: 50%;
             pointer-events: none;
-            z-index: 5;
+            z-index: 10;
+        }
+        #interact-prompt {
+            position: absolute;
+            top: calc(50% + 22px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15, 18, 24, 0.92);
+            border: 1px solid #fa9549;
+            color: #fff;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            pointer-events: none;
+            z-index: 15;
+            display: none;
+        }
+
+        /* 5. 10-Slot Inventory & Bed Assignment Modals */
+        .modal-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(18, 21, 29, 0.97);
+            border: 2px solid #fa9549;
+            border-radius: 8px;
+            padding: 18px;
+            z-index: 40;
+            width: 380px;
+            max-width: 92vw;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+            display: none;
+        }
+        .modal-overlay h3 {
+            margin: 0 0 12px 0;
+            color: #fa9549;
+            font-size: 15px;
+            text-transform: uppercase;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .inv-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .inv-slot {
+            height: 58px;
+            background: #232936;
+            border: 1px solid #475569;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 10px;
+            text-align: center;
+            padding: 4px;
+            color: #e2e8f0;
+        }
+        .inv-slot:hover { border-color: #fa9549; background: #2d3546; }
+        .item-picker-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            background: #141720;
+            padding: 8px;
+            border-radius: 6px;
+        }
+        .assign-btn {
+            display: block;
+            width: 100%;
+            padding: 9px;
+            margin-bottom: 6px;
+            background: #252b3b;
+            border: 1px solid #475569;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            text-align: left;
+        }
+        .assign-btn:hover, .assign-btn.active {
+            background: #fa9549;
+            color: #111;
+            border-color: #fff;
         }
 
         #controls-hint {
             position: absolute;
-            bottom: 16px;
-            left: 16px;
-            background: rgba(18, 20, 26, 0.9);
-            padding: 10px 14px;
+            bottom: 14px;
+            left: 14px;
+            background: rgba(16, 18, 24, 0.88);
+            padding: 8px 12px;
             border-radius: 6px;
             border: 1px solid #333842;
             font-size: 11px;
             color: #cbd5e1;
             z-index: 10;
-            line-height: 1.5;
+            line-height: 1.4;
         }
         #controls-hint span { color: #fa9549; font-weight: bold; }
 
@@ -246,142 +417,228 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: 25;
+            z-index: 22;
         }
         #mobile-move-btns {
             position: absolute;
-            bottom: 95px;
-            left: 20px;
+            bottom: 85px;
+            left: 16px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
             pointer-events: auto;
         }
         #mobile-action-btns {
             position: absolute;
-            bottom: 95px;
-            right: 20px;
+            bottom: 85px;
+            right: 16px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
             pointer-events: auto;
         }
         .mob-btn {
-            width: 58px;
-            height: 58px;
-            background: rgba(250, 149, 73, 0.75);
+            width: 54px;
+            height: 54px;
+            background: rgba(250, 149, 73, 0.78);
             border: 2px solid #fff;
             border-radius: 50%;
             color: #111;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: bold;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            pointer-events: auto;
             touch-action: manipulation;
-            cursor: pointer;
         }
-        .mob-btn:active { background: #fa9549; }
-
-        @media (max-width: 900px) {
-            #controls-hint { display: none; }
-        }
+        @media (max-width: 900px) { #controls-hint { display: none; } }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
 </head>
 <body>
 
-    <div id="crosshair"></div>
-
-    <div id="info-panel">
-        <h1>The Badabing 🐼</h1>
-        <p>Server Sync: <span id="status">Connected & Ready</span></p>
-        <p>Peanut (Panda): <span id="coords">X: 0, Z: 0</span></p>
-        <p>City Pieces Saved: <span id="piece-count" style="color:#fa9549;font-weight:bold;">0</span></p>
+    <!-- 1. Top Status & Co-Op Sync Banner -->
+    <div id="top-banner">
+        <div class="banner-left">
+            <span class="brand-title">🦫 The Badabing Co-Op</span>
+            <span class="badge">Sync: <span id="status">Online</span></span>
+            <span class="badge">Gods Active: <span id="coop-status">1 / 4</span></span>
+            <span class="badge">Objects: <span id="piece-count" style="color:#fa9549;font-weight:bold;">0</span></span>
+            <span class="badge" id="gamepad-badge">🎮 Controller: Ready</span>
+        </div>
+        <div class="banner-right">
+            <button id="toggle-build-btn">🔨 Build Mode (B / Y)</button>
+        </div>
     </div>
 
-    <!-- Satisfactory Build Menu Toggle -->
-    <button id="toggle-build-btn">🔨 Build Menu (B)</button>
+    <!-- 2. Peanut Emotion & Telemetry Bar -->
+    <div id="peanut-bar">
+        <div class="peanut-stats">
+            <strong>🐼 Peanut:</strong>
+            <div class="stat-pill">Mood: <span id="p-mood" style="color:#4ade80;font-weight:bold;">Happy 😊</span></div>
+            <div class="stat-pill">Hunger: <div class="meter-bg"><div class="meter-fill" id="p-hunger-bar" style="width:85%;"></div></div> <span id="p-hunger-val">85%</span></div>
+            <div class="stat-pill">Energy: <div class="meter-bg"><div class="meter-fill" id="p-energy-bar" style="width:90%;background:#38bdf8;"></div></div> <span id="p-energy-val">90%</span></div>
+            <div class="stat-pill">Activity: <span id="p-activity" style="color:#fa9549;font-weight:bold;">Strolling Town</span></div>
+            <div class="stat-pill">Pos: <span id="coords">0, 0</span></div>
+        </div>
+        <div class="peanut-actions">
+            <button class="mini-act-btn" id="btn-feed-peanut">🍔 Feed Burger</button>
+            <button class="mini-act-btn" id="btn-sleep-peanut">🛌 Send to Bed</button>
+            <button class="mini-act-btn" id="btn-wake-peanut">☀️ Wake / Stroll</button>
+        </div>
+    </div>
 
-    <!-- Satisfactory Style Modular Builder Modal -->
-    <div id="build-menu-modal">
-        <div class="build-header">
-            <h2>🏗️ FICSIT / Badabing City Constructor</h2>
-            <button class="action-mini-btn" id="rotate-piece-btn">🔄 Rotate (R)</button>
-        </div>
-        <div class="build-grid" id="catalog-grid">
-            <div class="build-card" data-type="foundation"><span class="icon">⬛</span><span class="label">Foundation</span><span class="key-hint">[1] 4x4m Slab</span></div>
-            <div class="build-card" data-type="wall"><span class="icon">🧱</span><span class="label">Brick Wall</span><span class="key-hint">[2] 4x4m Wall</span></div>
-            <div class="build-card" data-type="doorway"><span class="icon">🚪</span><span class="label">Door Wall</span><span class="key-hint">[3] Accessible</span></div>
-            <div class="build-card" data-type="window"><span class="icon">🪟</span><span class="label">Window Wall</span><span class="key-hint">[4] Glass Frame</span></div>
-            <div class="build-card" data-type="stairs"><span class="icon">🪜</span><span class="label">Staircase</span><span class="key-hint">[5] 2nd Floor</span></div>
-            <div class="build-card" data-type="roof_flat"><span class="icon">⬜</span><span class="label">Flat Roof</span><span class="key-hint">[6] Floor/Ceiling</span></div>
-            <div class="build-card" data-type="roof_pitched"><span class="icon">⛺</span><span class="label">Pitched Roof</span><span class="key-hint">[7] Gable Crest</span></div>
-            <div class="build-card" data-type="fence"><span class="icon">⛓️</span><span class="label">Chain Fence</span><span class="key-hint">[8] Yard Link</span></div>
-            <div class="build-card" data-type="streetlight"><span class="icon">🏮</span><span class="label">Streetlight</span><span class="key-hint">[9] Lamp Post</span></div>
-            <div class="build-card" data-type="delete" style="border-color:#ef4444;"><span class="icon">💥</span><span class="label">Dismantle</span><span class="key-hint">[X] Remove</span></div>
-            <div class="build-card active" data-type="none"><span class="icon">✋</span><span class="label">Holster Tool</span><span class="key-hint">[0] Explore</span></div>
-        </div>
-        <div class="build-controls-bar">
-            <div>Floor Level: <strong id="hud-floor-modal" style="color:#fa9549;">Ground (0m)</strong></div>
-            <div style="display:flex; gap:6px;">
-                <button class="action-mini-btn" id="level-down-btn">⬇️ Lv- (Q)</button>
-                <button class="action-mini-btn" id="level-up-btn">⬆️ Lv+ (E)</button>
+    <!-- Crosshair & Context Interaction Prompt -->
+    <div id="crosshair"></div>
+    <div id="interact-prompt">[E / Gamepad B] Interact</div>
+
+    <!-- 3. Toggleable Satisfactory Build UI Wrapper -->
+    <div id="build-ui-wrapper">
+        <div id="build-menu-modal">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                <strong style="color:#fa9549;font-size:14px;text-transform:uppercase;">🏗️ City Constructor Catalog</strong>
+                <button class="mini-act-btn" id="rotate-piece-btn">🔄 Rotate 90° (R / X)</button>
+            </div>
+
+            <div class="cat-title">Structural & Architecture</div>
+            <div class="build-grid">
+                <div class="build-card active" data-type="foundation"><span class="icon">⬛</span><span class="label">[1] Foundation</span></div>
+                <div class="build-card" data-type="wall"><span class="icon">🧱</span><span class="label">[2] Solid Wall</span></div>
+                <div class="build-card" data-type="doorway"><span class="icon">🚪</span><span class="label">[3] Door Wall</span></div>
+                <div class="build-card" data-type="window"><span class="icon">🪟</span><span class="label">[4] Window</span></div>
+                <div class="build-card" data-type="stairs"><span class="icon">🪜</span><span class="label">[5] Stairs</span></div>
+                <div class="build-card" data-type="roof_flat"><span class="icon">⬜</span><span class="label">[6] Flat Roof</span></div>
+                <div class="build-card" data-type="roof_pitched"><span class="icon">⛺</span><span class="label">[7] Gable Roof</span></div>
+                <div class="build-card" data-type="fence"><span class="icon">⛓️</span><span class="label">[8] Fence</span></div>
+            </div>
+
+            <div class="cat-title">Buildings, Storage (10-Slot) & Furniture</div>
+            <div class="build-grid">
+                <div class="build-card" data-type="mcdonalds"><span class="icon">🍔</span><span class="label">McDonald's</span></div>
+                <div class="build-card" data-type="walmart"><span class="icon">🛒</span><span class="label">Walmart</span></div>
+                <div class="build-card" data-type="fountain"><span class="icon">⛲</span><span class="label">Fountain</span></div>
+                <div class="build-card" data-type="mailbox"><span class="icon">📫</span><span class="label">Mailbox (10)</span></div>
+                <div class="build-card" data-type="locker"><span class="icon">🗄️</span><span class="label">Locker (10)</span></div>
+                <div class="build-card" data-type="bed"><span class="icon">🛌</span><span class="label">[9] Assign Bed</span></div>
+                <div class="build-card" data-type="streetlight"><span class="icon">🏮</span><span class="label">Streetlight</span></div>
+                <div class="build-card" data-type="delete" style="border-color:#ef4444;"><span class="icon">💥</span><span class="label">[X] Dismantle</span></div>
+            </div>
+
+            <!-- Custom Wall / Building Paint Swatches -->
+            <div class="color-row">
+                <span style="font-size:11px;color:#cbd5e1;font-weight:bold;">🎨 Paint Color:</span>
+                <div class="swatches" id="color-swatches">
+                    <div class="color-swatch active" data-color="#ffffff" style="background:#ffffff;" title="Default / Natural"></div>
+                    <div class="color-swatch" data-color="#ef4444" style="background:#ef4444;" title="Crimson Red"></div>
+                    <div class="color-swatch" data-color="#f59e0b" style="background:#f59e0b;" title="Industrial Gold"></div>
+                    <div class="color-swatch" data-color="#10b981" style="background:#10b981;" title="Emerald Green"></div>
+                    <div class="color-swatch" data-color="#3b82f6" style="background:#3b82f6;" title="Cobalt Blue"></div>
+                    <div class="color-swatch" data-color="#8b5cf6" style="background:#8b5cf6;" title="Royal Purple"></div>
+                    <div class="color-swatch" data-color="#f472b6" style="background:#f472b6;" title="Neon Pink"></div>
+                    <div class="color-swatch" data-color="#334155" style="background:#334155;" title="Dark Slate"></div>
+                </div>
+            </div>
+
+            <div class="build-controls-bar">
+                <div>Floor Height: <strong id="hud-floor-modal" style="color:#fa9549;">0m</strong></div>
+                <div style="display:flex; gap:6px;">
+                    <button class="mini-act-btn" id="level-down-btn">⬇️ Lv- (Q)</button>
+                    <button class="mini-act-btn" id="level-up-btn">⬆️ Lv+ (E)</button>
+                </div>
             </div>
         </div>
+
+        <div id="builder-hud">
+            <div>Piece: <span id="hud-tool">FOUNDATION</span></div>
+            <div>Grid: X:<span id="target-x">0</span> Z:<span id="target-z">0</span></div>
+            <div>Rot: <span id="hud-rot">0°</span></div>
+            <div>Elev: <span id="hud-elev">0m</span></div>
+        </div>
+
+        <div id="hotbar">
+            <div class="hotbar-slot active" data-type="foundation"><span class="slot-num">1</span><span class="slot-icon">⬛</span><span class="slot-name">Found.</span></div>
+            <div class="hotbar-slot" data-type="wall"><span class="slot-num">2</span><span class="slot-icon">🧱</span><span class="slot-name">Wall</span></div>
+            <div class="hotbar-slot" data-type="doorway"><span class="slot-num">3</span><span class="slot-icon">🚪</span><span class="slot-name">Door</span></div>
+            <div class="hotbar-slot" data-type="window"><span class="slot-num">4</span><span class="slot-icon">🪟</span><span class="slot-name">Window</span></div>
+            <div class="hotbar-slot" data-type="stairs"><span class="slot-num">5</span><span class="slot-icon">🪜</span><span class="slot-name">Stairs</span></div>
+            <div class="hotbar-slot" data-type="mcdonalds"><span class="slot-num">6</span><span class="slot-icon">🍔</span><span class="slot-name">McD's</span></div>
+            <div class="hotbar-slot" data-type="walmart"><span class="slot-num">7</span><span class="slot-icon">🛒</span><span class="slot-name">Walmart</span></div>
+            <div class="hotbar-slot" data-type="mailbox"><span class="slot-num">8</span><span class="slot-icon">📫</span><span class="slot-name">Mailbox</span></div>
+            <div class="hotbar-slot" data-type="locker"><span class="slot-num">9</span><span class="slot-icon">🗄️</span><span class="slot-name">Locker</span></div>
+            <div class="hotbar-slot" data-type="bed"><span class="slot-num">0</span><span class="slot-icon">🛌</span><span class="slot-name">Bed</span></div>
+            <div class="hotbar-slot" data-type="delete"><span class="slot-num">X</span><span class="slot-icon">💥</span><span class="slot-name">Delete</span></div>
+        </div>
     </div>
 
-    <!-- Builder Telemetry Pill -->
-    <div id="builder-hud">
-        <div>Tool: <span id="hud-tool">Explore</span></div>
-        <div>Target: X:<span id="target-x">0</span> Z:<span id="target-z">0</span></div>
-        <div>Rot: <span id="hud-rot">0°</span> (R)</div>
-        <div>Height: <span id="hud-elev">0m</span> (Q/E)</div>
+    <!-- 4. 10-Slot Inventory Modal (For Mailboxes & Lockers) -->
+    <div class="modal-overlay" id="inventory-modal">
+        <h3>
+            <span id="inv-title">🗄️ Storage Container (10 Slots)</span>
+            <button class="mini-act-btn" id="close-inv-btn">✖ Close</button>
+        </h3>
+        <p style="font-size:11px;color:#94a3b8;margin:0 0 8px 0;">Click an item below to store it, or click a slot to remove it:</p>
+        <div class="inv-grid" id="inv-slots-grid"></div>
+        <div class="item-picker-bar">
+            <button class="mini-act-btn inv-add-btn" data-item="🍔 Big Mac">🍔 Big Mac</button>
+            <button class="mini-act-btn inv-add-btn" data-item="🍟 Fries">🍟 Fries</button>
+            <button class="mini-act-btn inv-add-btn" data-item="🥤 Soda">🥤 Soda</button>
+            <button class="mini-act-btn inv-add-btn" data-item="✉️ Letter">✉️ Letter</button>
+            <button class="mini-act-btn inv-add-btn" data-item="📦 Package">📦 Package</button>
+            <button class="mini-act-btn inv-add-btn" data-item="🔧 Wrench">🔧 Wrench</button>
+            <button class="mini-act-btn inv-add-btn" data-item="💎 Gem">💎 Gem</button>
+        </div>
     </div>
 
-    <!-- Satisfactory 1-0 Bottom Hotbar -->
-    <div id="hotbar">
-        <div class="hotbar-slot" data-type="foundation"><span class="slot-num">1</span><span class="slot-icon">⬛</span><span class="slot-name">Found.</span></div>
-        <div class="hotbar-slot" data-type="wall"><span class="slot-num">2</span><span class="slot-icon">🧱</span><span class="slot-name">Wall</span></div>
-        <div class="hotbar-slot" data-type="doorway"><span class="slot-num">3</span><span class="slot-icon">🚪</span><span class="slot-name">Door</span></div>
-        <div class="hotbar-slot" data-type="window"><span class="slot-num">4</span><span class="slot-icon">🪟</span><span class="slot-name">Window</span></div>
-        <div class="hotbar-slot" data-type="stairs"><span class="slot-num">5</span><span class="slot-icon">🪜</span><span class="slot-name">Stairs</span></div>
-        <div class="hotbar-slot" data-type="roof_flat"><span class="slot-num">6</span><span class="slot-icon">⬜</span><span class="slot-name">Ceiling</span></div>
-        <div class="hotbar-slot" data-type="roof_pitched"><span class="slot-num">7</span><span class="slot-icon">⛺</span><span class="slot-name">Roof</span></div>
-        <div class="hotbar-slot" data-type="fence"><span class="slot-num">8</span><span class="slot-icon">⛓️</span><span class="slot-name">Fence</span></div>
-        <div class="hotbar-slot" data-type="streetlight"><span class="slot-num">9</span><span class="slot-icon">🏮</span><span class="slot-name">Light</span></div>
-        <div class="hotbar-slot" data-type="delete"><span class="slot-num">X</span><span class="slot-icon">💥</span><span class="slot-name">Delete</span></div>
-        <div class="hotbar-slot active" data-type="none"><span class="slot-num">0</span><span class="slot-icon">✋</span><span class="slot-name">Hands</span></div>
+    <!-- 5. Bed Assignment Modal -->
+    <div class="modal-overlay" id="bed-modal">
+        <h3>
+            <span>🛌 Assign Bed Owner</span>
+            <button class="mini-act-btn" id="close-bed-btn">✖ Close</button>
+        </h3>
+        <p style="font-size:11px;color:#94a3b8;margin:0 0 10px 0;">Assign this bed so Peanut or a Co-Op God knows this is their home:</p>
+        <button class="assign-btn" data-owner="Peanut (Panda)">🐼 Assign to Peanut (Panda Home Bed)</button>
+        <button class="assign-btn" data-owner="God 1">⚡ Assign to God 1</button>
+        <button class="assign-btn" data-owner="God 2">⚡ Assign to God 2</button>
+        <button class="assign-btn" data-owner="God 3">⚡ Assign to God 3</button>
+        <button class="assign-btn" data-owner="God 4">⚡ Assign to God 4</button>
     </div>
 
-    <!-- Virtual Touch Controls for Mobile / Tablets -->
+    <!-- Mobile Touch Buttons -->
     <div id="mobile-controls">
         <div id="mobile-move-btns">
             <div class="mob-btn" id="btn-forward">🔼</div>
             <div class="mob-btn" id="btn-backward">🔽</div>
-            <div class="mob-btn" id="btn-place" style="background:#4ade80;">🔨</div>
+            <div class="mob-btn" id="btn-interact" style="background:#38bdf8;">🖐️</div>
         </div>
         <div id="mobile-action-btns">
             <div class="mob-btn" id="btn-up">⬆️</div>
             <div class="mob-btn" id="btn-down">⬇️</div>
-            <div class="mob-btn" id="btn-rot">🔄</div>
+            <div class="mob-btn" id="btn-place" style="background:#4ade80;">🔨</div>
         </div>
     </div>
 
     <div id="controls-hint">
-        Walk: <span>WASD</span> | Fly: <span>Space/Shift</span> | Build Menu: <span>B</span><br>
-        Hotkeys: <span>1-9</span> | Rotate: <span>R</span> | Floor Height: <span>E / Q</span> | Dismantle: <span>X</span>
+        Walk: <span>WASD / L-Stick</span> | Look: <span>Mouse / R-Stick</span> | Interact Door/Bed/Stash: <span>E / Gamepad B</span><br>
+        Toggle Build GUI: <span>B / Gamepad Y</span> | Place: <span>Click / RT</span> | Rotate: <span>R / X</span>
     </div>
 
     <script>
         try {
             const statusEl = document.getElementById('status');
             const pieceCountEl = document.getElementById('piece-count');
+            const coopStatusEl = document.getElementById('coop-status');
+
+            // Unique Player ID for 4-God Co-Op Sync
+            let myGodId = sessionStorage.getItem('badabing_god_id');
+            if (!myGodId) {
+                myGodId = 'god_' + Math.random().toString(36).substring(2, 9);
+                sessionStorage.setItem('badabing_god_id', myGodId);
+            }
 
             // =========================================================
-            // 1. SCHEDULE I STYLE PROCEDURAL TEXTURE GENERATOR
+            // 1. SCHEDULE I STYLE PROCEDURAL TEXTURES
             // =========================================================
             function makeScheduleTexture(drawFn, repeatX, repeatY) {
                 const canvas = document.createElement('canvas');
@@ -396,124 +653,101 @@
                 return tex;
             }
 
-            // Grass Texture (Stylized Schedule 1 urban turf with dark blades)
             const grassTex = makeScheduleTexture((ctx, w, h) => {
                 ctx.fillStyle = '#335d2d';
                 ctx.fillRect(0, 0, w, h);
-                for (let i = 0; i < 1200; i++) {
+                for (let i = 0; i < 1100; i++) {
                     ctx.fillStyle = (i % 3 === 0) ? '#264721' : (i % 2 === 0 ? '#3f7037' : '#1d3819');
-                    const x = Math.random() * w;
-                    const y = Math.random() * h;
-                    ctx.fillRect(x, y, 3, 7);
+                    ctx.fillRect(Math.random() * w, Math.random() * h, 3, 7);
                 }
-                ctx.strokeStyle = 'rgba(15, 25, 12, 0.35)';
+                ctx.strokeStyle = 'rgba(15, 25, 12, 0.3)';
                 ctx.lineWidth = 2;
                 ctx.strokeRect(0, 0, w, h);
             }, 90, 90);
 
-            // Asphalt Road Texture with Bold Yellow Center Dashes
             const roadTex = makeScheduleTexture((ctx, w, h) => {
                 ctx.fillStyle = '#24272d';
                 ctx.fillRect(0, 0, w, h);
-                for (let i = 0; i < 900; i++) {
-                    ctx.fillStyle = (i % 2 === 0) ? '#1b1d22' : '#30343c';
-                    ctx.fillRect(Math.random() * w, Math.random() * h, 2, 2);
-                }
-                // Dark comic curb borders
                 ctx.fillStyle = '#141619';
                 ctx.fillRect(0, 0, 12, h);
                 ctx.fillRect(w - 12, 0, 12, h);
-                // Center dashed yellow line
                 ctx.fillStyle = '#eab308';
                 ctx.fillRect(w / 2 - 4, 20, 8, 80);
                 ctx.fillRect(w / 2 - 4, 148, 8, 80);
             }, 1, 35);
 
-            // Grungy Brick Texture with Bold Dark Outlines
             const brickTex = makeScheduleTexture((ctx, w, h) => {
-                ctx.fillStyle = '#7c3f34';
+                ctx.fillStyle = '#b86f62';
                 ctx.fillRect(0, 0, w, h);
-                const rows = 8;
-                const cols = 4;
-                const rowH = h / rows;
-                const colW = w / cols;
+                const rows = 8, cols = 4;
+                const rowH = h / rows, colW = w / cols;
                 ctx.strokeStyle = '#1e1b18';
                 ctx.lineWidth = 4;
                 for (let r = 0; r < rows; r++) {
-                    const offset = (r % 2) * (colW / 2);
+                    const off = (r % 2) * (colW / 2);
                     for (let c = -1; c <= cols; c++) {
-                        ctx.fillStyle = ((r + c) % 3 === 0) ? '#6b342a' : ((r + c) % 2 === 0 ? '#8a483c' : '#73392f');
-                        ctx.fillRect(c * colW + offset + 2, r * rowH + 2, colW - 4, rowH - 4);
-                        ctx.strokeRect(c * colW + offset, r * rowH, colW, rowH);
+                        ctx.fillStyle = ((r + c) % 2 === 0) ? '#c47b6e' : '#a66054';
+                        ctx.fillRect(c * colW + off + 2, r * rowH + 2, colW - 4, rowH - 4);
+                        ctx.strokeRect(c * colW + off, r * rowH, colW, rowH);
                     }
                 }
             }, 2, 2);
 
-            // Industrial Concrete Panel Texture (Schedule 1 Cel-Bordered)
             const concreteTex = makeScheduleTexture((ctx, w, h) => {
-                ctx.fillStyle = '#757d86';
+                ctx.fillStyle = '#9aa3ad';
                 ctx.fillRect(0, 0, w, h);
-                for (let i = 0; i < 600; i++) {
-                    ctx.fillStyle = (i % 2 === 0) ? '#666e76' : '#848d97';
-                    ctx.fillRect(Math.random() * w, Math.random() * h, 3, 3);
-                }
                 ctx.strokeStyle = '#1e2227';
                 ctx.lineWidth = 6;
                 ctx.strokeRect(3, 3, w - 6, h - 6);
-                ctx.fillStyle = '#2d3238';
-                [18, w - 18].forEach(bx => {
-                    [18, h - 18].forEach(by => {
-                        ctx.beginPath();
-                        ctx.arc(bx, by, 5, 0, Math.PI * 2);
-                        ctx.fill();
-                    });
-                });
             }, 2, 2);
 
-            // Wood Plank Texture
             const woodTex = makeScheduleTexture((ctx, w, h) => {
-                ctx.fillStyle = '#7c5230';
+                ctx.fillStyle = '#9c6b43';
                 ctx.fillRect(0, 0, w, h);
                 ctx.strokeStyle = '#2b1b0e';
                 ctx.lineWidth = 4;
                 for (let i = 0; i < 6; i++) {
-                    const y = i * (h / 6);
-                    ctx.fillStyle = (i % 2 === 0) ? '#734b2b' : '#875935';
-                    ctx.fillRect(0, y, w, h / 6);
-                    ctx.strokeRect(0, y, w, h / 6);
+                    ctx.strokeRect(0, i * (h / 6), w, h / 6);
                 }
             }, 2, 2);
 
-            // Chain-Link Fence Alpha Texture
             const fenceTex = makeScheduleTexture((ctx, w, h) => {
                 ctx.clearRect(0, 0, w, h);
                 ctx.strokeStyle = '#cbd5e1';
                 ctx.lineWidth = 3;
-                const step = 32;
-                for (let x = -h; x < w + h; x += step) {
-                    ctx.beginPath();
-                    ctx.moveTo(x, 0);
-                    ctx.lineTo(x + h, h);
-                    ctx.stroke();
-                    ctx.beginPath();
-                    ctx.moveTo(x + h, 0);
-                    ctx.lineTo(x, h);
-                    ctx.stroke();
+                for (let x = -h; x < w + h; x += 32) {
+                    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x + h, h); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(x + h, 0); ctx.lineTo(x, h); ctx.stroke();
                 }
                 ctx.strokeStyle = '#1e293b';
                 ctx.lineWidth = 8;
                 ctx.strokeRect(0, 0, w, h);
             }, 2, 1);
 
+            function makeSignBannerTexture(bg, fg, border, text) {
+                const c = document.createElement('canvas');
+                c.width = 512; c.height = 128;
+                const ctx = c.getContext('2d');
+                ctx.fillStyle = bg; ctx.fillRect(0, 0, 512, 128);
+                ctx.strokeStyle = border; ctx.lineWidth = 8; ctx.strokeRect(4, 4, 504, 120);
+                ctx.fillStyle = fg; ctx.font = 'bold 54px sans-serif';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText(text, 256, 64);
+                return new THREE.CanvasTexture(c);
+            }
+
+            const mcdSignTex = makeSignBannerTexture('#b91c1c', '#facc15', '#facc15', "M  McDONALD'S");
+            const walmartSignTex = makeSignBannerTexture('#0284c7', '#ffffff', '#facc15', "WALMART ★");
+
             // =========================================================
-            // 2. CORE SCENE, SKY, LIGHTS & EXISTING LANDMARKS
+            // 2. CORE SCENE, ROADS & CLEAN SLATE PARK (NO OLD BUILDINGS)
             // =========================================================
             const scene = new THREE.Scene();
             scene.background = new THREE.Color(0x7ba0c7);
             scene.fog = new THREE.FogExp2(0x7ba0c7, 0.0014);
 
             const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 3000);
-            camera.position.set(0, 3.2, 24);
+            camera.position.set(0, 3.2, 28);
 
             const renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
@@ -552,14 +786,12 @@
             });
             scene.add(new THREE.Mesh(skyGeo, skyMat));
 
-            // Lighting
-            scene.add(new THREE.AmbientLight(0xffffff, 0.78));
+            scene.add(new THREE.AmbientLight(0xffffff, 0.8));
             const sunLight = new THREE.DirectionalLight(0xfff5e0, 1.35);
             sunLight.position.set(120, 180, 100);
             sunLight.castShadow = true;
             scene.add(sunLight);
 
-            // Ground & Roads with Schedule I Textures
             const ground = new THREE.Mesh(
                 new THREE.PlaneGeometry(800, 800),
                 new THREE.MeshStandardMaterial({ map: grassTex, roughness: 0.9 })
@@ -600,11 +832,9 @@
                 const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 6), poleMat);
                 pole.position.set(hx, 3, 0);
                 courtGroup.add(pole);
-
                 const backboard = new THREE.Mesh(new THREE.BoxGeometry(0.3, 2, 3), backboardMat);
                 backboard.position.set(hx > 0 ? hx - 0.5 : hx + 0.5, 4.5, 0);
                 courtGroup.add(backboard);
-
                 const rim = new THREE.Mesh(new THREE.TorusGeometry(0.8, 0.08, 8, 24), rimMat);
                 rim.rotation.x = Math.PI / 2;
                 rim.position.set(hx > 0 ? hx - 1.5 : hx + 1.5, 4, 0);
@@ -612,825 +842,13 @@
             });
             scene.add(courtGroup);
 
-            // APESHIT INC Office Building at X:-16, Z:135
-            const officeBuilding = new THREE.Group();
-            officeBuilding.position.set(-16, 0, 135);
-
-            const concreteMat = new THREE.MeshStandardMaterial({ map: concreteTex, roughness: 0.7 });
-            const glassWallMat = new THREE.MeshStandardMaterial({ color: 0x264b62, metalness: 0.8, roughness: 0.15, transparent: true, opacity: 0.82 });
-            const floorMat = new THREE.MeshStandardMaterial({ map: concreteTex, color: 0x88929b, roughness: 0.6 });
-            const stairMat = new THREE.MeshStandardMaterial({ map: woodTex, roughness: 0.5 });
-            const trimMat = new THREE.MeshStandardMaterial({ color: 0x1b1e23, metalness: 0.5 });
-
-            // Rooftop Canvas Sign with crisp "APESHIT INC," text
-            const signCanvas = document.createElement('canvas');
-            signCanvas.width = 512;
-            signCanvas.height = 128;
-            const sCtx = signCanvas.getContext('2d');
-            sCtx.fillStyle = '#18181b';
-            sCtx.fillRect(0, 0, 512, 128);
-            sCtx.strokeStyle = '#fa9549';
-            sCtx.lineWidth = 8;
-            sCtx.strokeRect(4, 4, 504, 120);
-            sCtx.fillStyle = '#ff4444';
-            sCtx.font = 'bold 54px sans-serif';
-            sCtx.textAlign = 'center';
-            sCtx.textBaseline = 'middle';
-            sCtx.fillText('APESHIT INC,', 256, 64);
-            const signTex = new THREE.CanvasTexture(signCanvas);
-            const signMat = new THREE.MeshBasicMaterial({ map: signTex });
-
-            const oWidth = 22;
-            const oDepth = 18;
-            const oFloorHeight = 4.0;
-
-            for (let f = 0; f < 3; f++) {
-                const floorY = f * oFloorHeight;
-                const floorSlab = new THREE.Mesh(new THREE.BoxGeometry(oWidth, 0.3, oDepth), floorMat);
-                floorSlab.position.set(0, floorY + 0.15, 0);
-                officeBuilding.add(floorSlab);
-
-                // Leave front door entrance open on 1st floor
-                if (f === 0) {
-                    const fwLeft = new THREE.Mesh(new THREE.BoxGeometry(8, oFloorHeight - 0.3, 0.4), glassWallMat);
-                    fwLeft.position.set(-7, floorY + oFloorHeight / 2, oDepth / 2);
-                    officeBuilding.add(fwLeft);
-                    const fwRight = new THREE.Mesh(new THREE.BoxGeometry(8, oFloorHeight - 0.3, 0.4), glassWallMat);
-                    fwRight.position.set(7, floorY + oFloorHeight / 2, oDepth / 2);
-                    officeBuilding.add(fwRight);
-                } else {
-                    const frontWall = new THREE.Mesh(new THREE.BoxGeometry(oWidth, oFloorHeight - 0.3, 0.4), glassWallMat);
-                    frontWall.position.set(0, floorY + oFloorHeight / 2, oDepth / 2);
-                    officeBuilding.add(frontWall);
-                }
-
-                const backWall = new THREE.Mesh(new THREE.BoxGeometry(oWidth, oFloorHeight - 0.3, 0.4), concreteMat);
-                backWall.position.set(0, floorY + oFloorHeight / 2, -oDepth / 2);
-                officeBuilding.add(backWall);
-
-                const leftWall = new THREE.Mesh(new THREE.BoxGeometry(0.4, oFloorHeight - 0.3, oDepth), glassWallMat);
-                leftWall.position.set(-oWidth / 2, floorY + oFloorHeight / 2, 0);
-                officeBuilding.add(leftWall);
-
-                const rightWall = new THREE.Mesh(new THREE.BoxGeometry(0.4, oFloorHeight - 0.3, oDepth), concreteMat);
-                rightWall.position.set(oWidth / 2, floorY + oFloorHeight / 2, 0);
-                officeBuilding.add(rightWall);
-            }
-
-            const roofSlab = new THREE.Mesh(new THREE.BoxGeometry(oWidth + 0.8, 0.4, oDepth + 0.8), trimMat);
-            roofSlab.position.set(0, 3 * oFloorHeight + 0.2, 0);
-            officeBuilding.add(roofSlab);
-
-            const signBoard = new THREE.Mesh(new THREE.BoxGeometry(16, 2.8, 0.6), signMat);
-            signBoard.position.set(0, 3 * oFloorHeight + 1.8, oDepth / 2 - 1);
-            officeBuilding.add(signBoard);
-
-            for (let s = 0; s < 2; s++) {
-                const stairStartY = s * oFloorHeight;
-                const stairGroup = new THREE.Group();
-                stairGroup.position.set(oWidth / 4, stairStartY, 0);
-                const numSteps = 12;
-                for (let i = 0; i < numSteps; i++) {
-                    const step = new THREE.Mesh(new THREE.BoxGeometry(2.5, oFloorHeight / numSteps, 0.8), stairMat);
-                    step.position.set(0, (i + 0.5) * (oFloorHeight / numSteps), (i - numSteps / 2) * 0.8);
-                    stairGroup.add(step);
-                }
-                officeBuilding.add(stairGroup);
-            }
-            scene.add(officeBuilding);
-
-            // Two-Story House at X:-201, Z:-114
-            const houseGroup = new THREE.Group();
-            houseGroup.position.set(-201, 0, -114);
-
-            const sidingMat = new THREE.MeshStandardMaterial({ map: brickTex, roughness: 0.75 });
-            const houseRoofMat = new THREE.MeshStandardMaterial({ map: concreteTex, color: 0x333942, roughness: 0.8 });
-            const woodFloorMat = new THREE.MeshStandardMaterial({ map: woodTex, roughness: 0.55 });
-            const bedMat = new THREE.MeshStandardMaterial({ color: 0x256cb3, roughness: 0.5 });
-            const pillowMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9 });
-            const mailboxMat = new THREE.MeshStandardMaterial({ color: 0xd93838, metalness: 0.4 });
-
-            const hWidth = 16;
-            const hDepth = 12;
-            const hFloorHeight = 4.0;
-
-            const floor1 = new THREE.Mesh(new THREE.BoxGeometry(hWidth, 0.2, hDepth), woodFloorMat);
-            floor1.position.set(0, 0.1, 0);
-            houseGroup.add(floor1);
-
-            const floor2 = new THREE.Mesh(new THREE.BoxGeometry(hWidth, 0.2, hDepth), woodFloorMat);
-            floor2.position.set(0, hFloorHeight + 0.1, 0);
-            houseGroup.add(floor2);
-
-            const houseRoof = new THREE.Mesh(new THREE.ConeGeometry(11.5, 4, 4), houseRoofMat);
-            houseRoof.position.set(0, hFloorHeight * 2 + 2, 0);
-            houseRoof.rotation.y = Math.PI / 4;
-            houseGroup.add(houseRoof);
-
-            for (let f = 0; f < 2; f++) {
-                const fy = f * hFloorHeight;
-                const backWall = new THREE.Mesh(new THREE.BoxGeometry(hWidth, hFloorHeight, 0.4), sidingMat);
-                backWall.position.set(0, fy + hFloorHeight / 2, -hDepth / 2);
-                houseGroup.add(backWall);
-
-                const leftWall = new THREE.Mesh(new THREE.BoxGeometry(0.4, hFloorHeight, hDepth), sidingMat);
-                leftWall.position.set(-hWidth / 2, fy + hFloorHeight / 2, 0);
-                houseGroup.add(leftWall);
-
-                const rightWall = new THREE.Mesh(new THREE.BoxGeometry(0.4, hFloorHeight, hDepth), sidingMat);
-                rightWall.position.set(hWidth / 2, fy + hFloorHeight / 2, 0);
-                houseGroup.add(rightWall);
-            }
-
-            const frontWall1 = new THREE.Mesh(new THREE.BoxGeometry(6, hFloorHeight, 0.4), sidingMat);
-            frontWall1.position.set(-5, hFloorHeight / 2, hDepth / 2);
-            houseGroup.add(frontWall1);
-            const frontWall2 = new THREE.Mesh(new THREE.BoxGeometry(6, hFloorHeight, 0.4), sidingMat);
-            frontWall2.position.set(5, hFloorHeight / 2, hDepth / 2);
-            houseGroup.add(frontWall2);
-
-            const frontWall2nd = new THREE.Mesh(new THREE.BoxGeometry(hWidth, hFloorHeight, 0.4), sidingMat);
-            frontWall2nd.position.set(0, hFloorHeight + hFloorHeight / 2, hDepth / 2);
-            houseGroup.add(frontWall2nd);
-
-            const hNumSteps = 12;
-            for (let i = 0; i < hNumSteps; i++) {
-                const step = new THREE.Mesh(new THREE.BoxGeometry(2.5, hFloorHeight / hNumSteps, 0.8), woodFloorMat);
-                step.position.set(-4, (i + 0.5) * (hFloorHeight / hNumSteps), (i - hNumSteps / 2) * 0.8);
-                houseGroup.add(step);
-            }
-
-            const bedBase = new THREE.Mesh(new THREE.BoxGeometry(3, 0.8, 5), bedMat);
-            bedBase.position.set(4, hFloorHeight + 0.4, -3);
-            houseGroup.add(bedBase);
-
-            const pillow = new THREE.Mesh(new THREE.BoxGeometry(2, 0.3, 1), pillowMat);
-            pillow.position.set(4, hFloorHeight + 0.9, -5);
-            houseGroup.add(pillow);
-
-            const post = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 2.5), poleMat);
-            post.position.set(6, 1.25, hDepth / 2 + 4);
-            houseGroup.add(post);
-
-            const box = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 1.2), mailboxMat);
-            box.position.set(6, 2.4, hDepth / 2 + 4);
-            houseGroup.add(box);
-
-            scene.add(houseGroup);
-
-            // Stylized Schedule I Trees
+            // Stylized Trees
             const trunkMat = new THREE.MeshStandardMaterial({ map: woodTex, roughness: 0.9 });
             const leavesMat = new THREE.MeshStandardMaterial({ map: grassTex, color: 0x3b8546, roughness: 0.8 });
-
             function createTree(x, z) {
                 const tree = new THREE.Group();
                 const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.8, 4), trunkMat);
                 trunk.position.y = 2;
-                trunk.castShadow = true;
                 tree.add(trunk);
-
                 const leaves = new THREE.Mesh(new THREE.ConeGeometry(3.6, 6.5, 7), leavesMat);
                 leaves.position.y = 6.2;
-                leaves.castShadow = true;
-                tree.add(leaves);
-
-                tree.position.set(x, 0, z);
-                scene.add(tree);
-            }
-
-            [
-                [-50, -50], [-70, -30], [-30, -70],
-                [70, 30], [30, 70],
-                [-50, 50], [-70, 30], [50, -50], [70, -30],
-                [-120, -50], [-120, 50], [120, -50], [120, 50]
-            ].forEach(coord => createTree(coord[0], coord[1]));
-
-            // =========================================================
-            // 3. PEANUT THE GIANT WALKING ANIME PANDA (2X SCALE)
-            // =========================================================
-            const peanutGroup = new THREE.Group();
-            scene.add(peanutGroup);
-
-            const pandaWhite = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.6 });
-            const pandaBlack = new THREE.MeshStandardMaterial({ color: 0x141619, roughness: 0.7 });
-            const pandaPink = new THREE.MeshBasicMaterial({ color: 0xff8da1 });
-            const eyeWhite = new THREE.MeshBasicMaterial({ color: 0xffffff });
-            const eyeIris = new THREE.MeshBasicMaterial({ color: 0x1e1b4b });
-            const eyeBlack = new THREE.MeshBasicMaterial({ color: 0x050505 });
-
-            // Torso (White belly with black shoulder vest)
-            const pandaTorso = new THREE.Mesh(new THREE.SphereGeometry(1.15, 20, 20), pandaWhite);
-            pandaTorso.scale.set(1.0, 1.15, 0.92);
-            pandaTorso.position.y = 2.0;
-            pandaTorso.castShadow = true;
-            peanutGroup.add(pandaTorso);
-
-            const shoulderBand = new THREE.Mesh(new THREE.CylinderGeometry(1.08, 1.15, 0.75, 20), pandaBlack);
-            shoulderBand.position.y = 2.55;
-            peanutGroup.add(shoulderBand);
-
-            // Panda Head
-            const pandaHead = new THREE.Group();
-            pandaHead.position.set(0, 3.65, 0.1);
-            peanutGroup.add(pandaHead);
-
-            const headSphere = new THREE.Mesh(new THREE.SphereGeometry(0.95, 20, 20), pandaWhite);
-            headSphere.scale.set(1.08, 0.96, 0.95);
-            headSphere.castShadow = true;
-            pandaHead.add(headSphere);
-
-            // Round Black Ears
-            [-0.72, 0.72].forEach(ex => {
-                const ear = new THREE.Mesh(new THREE.SphereGeometry(0.36, 16, 16), pandaBlack);
-                ear.position.set(ex, 0.78, -0.1);
-                pandaHead.add(ear);
-            });
-
-            // Snout & Cute Button Nose
-            const snout = new THREE.Mesh(new THREE.SphereGeometry(0.35, 16, 16), pandaWhite);
-            snout.scale.set(1.2, 0.85, 1.0);
-            snout.position.set(0, -0.16, 0.82);
-            pandaHead.add(snout);
-
-            const nose = new THREE.Mesh(new THREE.SphereGeometry(0.14, 12, 12), pandaBlack);
-            nose.scale.set(1.3, 0.8, 0.9);
-            nose.position.set(0, -0.06, 1.12);
-            pandaHead.add(nose);
-
-            // Big Anime Cute Eyes + Rosy Cheeks
-            const eyeGroup = new THREE.Group();
-            pandaHead.add(eyeGroup);
-
-            [-0.36, 0.36].forEach(ex => {
-                const side = ex > 0 ? 1 : -1;
-
-                // Classic tilted black panda patch
-                const patch = new THREE.Mesh(new THREE.SphereGeometry(0.32, 16, 16), pandaBlack);
-                patch.scale.set(1.05, 1.25, 0.45);
-                patch.rotation.z = side * -0.22;
-                patch.position.set(ex, 0.1, 0.76);
-                eyeGroup.add(patch);
-
-                // Oversized glossy anime iris
-                const iris = new THREE.Mesh(new THREE.SphereGeometry(0.23, 16, 16), eyeIris);
-                iris.scale.set(1.0, 1.18, 0.5);
-                iris.position.set(ex, 0.11, 0.86);
-                eyeGroup.add(iris);
-
-                // Deep pupil
-                const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.17, 16, 16), eyeBlack);
-                pupil.scale.set(1.0, 1.15, 0.52);
-                pupil.position.set(ex, 0.11, 0.90);
-                eyeGroup.add(pupil);
-
-                // Big top-right anime starlight catchlight
-                const shineBig = new THREE.Mesh(new THREE.SphereGeometry(0.085, 12, 12), eyeWhite);
-                shineBig.position.set(ex + (side * 0.06), 0.21, 0.99);
-                eyeGroup.add(shineBig);
-
-                // Secondary bottom-left anime sparkle
-                const shineSmall = new THREE.Mesh(new THREE.SphereGeometry(0.042, 10, 10), eyeWhite);
-                shineSmall.position.set(ex - (side * 0.06), 0.02, 0.99);
-                eyeGroup.add(shineSmall);
-
-                // Cute pink anime blush cheek
-                const blush = new THREE.Mesh(new THREE.SphereGeometry(0.16, 12, 12), pandaPink);
-                blush.scale.set(1.4, 0.65, 0.4);
-                blush.position.set(ex * 1.45, -0.18, 0.78);
-                pandaHead.add(blush);
-            });
-
-            // Articulated Legs & Arms for Natural Walking Physics
-            function makePandaLimb(radius, len) {
-                const pivot = new THREE.Group();
-                const mesh = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius * 0.9, len, 14), pandaBlack);
-                mesh.position.y = -len / 2;
-                mesh.castShadow = true;
-                pivot.add(mesh);
-                const paw = new THREE.Mesh(new THREE.SphereGeometry(radius * 1.05, 12, 12), pandaBlack);
-                paw.position.y = -len;
-                pivot.add(paw);
-                return pivot;
-            }
-
-            const leftLeg = makePandaLimb(0.38, 1.1);
-            leftLeg.position.set(-0.52, 1.15, 0);
-            peanutGroup.add(leftLeg);
-
-            const rightLeg = makePandaLimb(0.38, 1.1);
-            rightLeg.position.set(0.52, 1.15, 0);
-            peanutGroup.add(rightLeg);
-
-            const leftArm = makePandaLimb(0.32, 1.15);
-            leftArm.position.set(-1.12, 2.75, 0);
-            peanutGroup.add(leftArm);
-
-            const rightArm = makePandaLimb(0.32, 1.15);
-            rightArm.position.set(1.12, 2.75, 0);
-            peanutGroup.add(rightArm);
-
-            // =========================================================
-            // 4. SATISFACTORY MODULAR BUILDING SYSTEM & SERVER SYNC
-            // =========================================================
-            const cityPropsGroup = new THREE.Group();
-            scene.add(cityPropsGroup);
-
-            const fenceMat = new THREE.MeshStandardMaterial({
-                map: fenceTex,
-                transparent: true,
-                alphaTest: 0.2,
-                side: THREE.DoubleSide
-            });
-
-            function buildModularMesh(type, isGhost) {
-                const group = new THREE.Group();
-                const ghostMat = isGhost ? new THREE.MeshBasicMaterial({
-                    color: type === 'delete' ? 0xef4444 : 0x38bdf8,
-                    transparent: true,
-                    opacity: 0.52,
-                    wireframe: false
-                }) : null;
-
-                if (type === 'foundation') {
-                    const m = new THREE.Mesh(new THREE.BoxGeometry(4, 0.4, 4), isGhost ? ghostMat : concreteMat);
-                    m.position.y = 0.2;
-                    m.castShadow = !isGhost;
-                    m.receiveShadow = !isGhost;
-                    group.add(m);
-                } else if (type === 'wall') {
-                    const m = new THREE.Mesh(new THREE.BoxGeometry(4, 4, 0.4), isGhost ? ghostMat : sidingMat);
-                    m.position.y = 2.0;
-                    m.castShadow = !isGhost;
-                    m.receiveShadow = !isGhost;
-                    group.add(m);
-                } else if (type === 'doorway') {
-                    const mat = isGhost ? ghostMat : sidingMat;
-                    const leftPillar = new THREE.Mesh(new THREE.BoxGeometry(1.2, 4, 0.4), mat);
-                    leftPillar.position.set(-1.4, 2.0, 0);
-                    const rightPillar = new THREE.Mesh(new THREE.BoxGeometry(1.2, 4, 0.4), mat);
-                    rightPillar.position.set(1.4, 2.0, 0);
-                    const header = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.2, 0.4), mat);
-                    header.position.set(0, 3.4, 0);
-                    group.add(leftPillar, rightPillar, header);
-                } else if (type === 'window') {
-                    const mat = isGhost ? ghostMat : sidingMat;
-                    const bottom = new THREE.Mesh(new THREE.BoxGeometry(4, 1.2, 0.4), mat);
-                    bottom.position.set(0, 0.6, 0);
-                    const top = new THREE.Mesh(new THREE.BoxGeometry(4, 1.0, 0.4), mat);
-                    top.position.set(0, 3.5, 0);
-                    const left = new THREE.Mesh(new THREE.BoxGeometry(1.0, 1.8, 0.4), mat);
-                    left.position.set(-1.5, 2.1, 0);
-                    const right = new THREE.Mesh(new THREE.BoxGeometry(1.0, 1.8, 0.4), mat);
-                    right.position.set(1.5, 2.1, 0);
-                    const pane = new THREE.Mesh(new THREE.BoxGeometry(2.0, 1.8, 0.12), isGhost ? ghostMat : glassWallMat);
-                    pane.position.set(0, 2.1, 0);
-                    group.add(bottom, top, left, right, pane);
-                } else if (type === 'stairs') {
-                    const mat = isGhost ? ghostMat : woodFloorMat;
-                    const steps = 10;
-                    for (let i = 0; i < steps; i++) {
-                        const step = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.4, 0.45), mat);
-                        step.position.set(0, (i + 0.5) * 0.4, -1.8 + i * 0.4);
-                        group.add(step);
-                    }
-                } else if (type === 'roof_flat') {
-                    const m = new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.35, 4.2), isGhost ? ghostMat : houseRoofMat);
-                    m.position.y = 4.0;
-                    group.add(m);
-                } else if (type === 'roof_pitched') {
-                    const m = new THREE.Mesh(new THREE.ConeGeometry(3.2, 2.6, 4), isGhost ? ghostMat : houseRoofMat);
-                    m.position.y = 5.3;
-                    m.rotation.y = Math.PI / 4;
-                    group.add(m);
-                } else if (type === 'fence') {
-                    const panel = new THREE.Mesh(new THREE.PlaneGeometry(4, 2.4), isGhost ? ghostMat : fenceMat);
-                    panel.position.y = 1.2;
-                    const postL = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 2.5), isGhost ? ghostMat : poleMat);
-                    postL.position.set(-1.95, 1.25, 0);
-                    const postR = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 2.5), isGhost ? ghostMat : poleMat);
-                    postR.position.set(1.95, 1.25, 0);
-                    group.add(panel, postL, postR);
-                } else if (type === 'streetlight') {
-                    const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.16, 5.5), isGhost ? ghostMat : poleMat);
-                    pole.position.y = 2.75;
-                    const arm = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.12, 0.12), isGhost ? ghostMat : poleMat);
-                    arm.position.set(0.5, 5.4, 0);
-                    const bulbMat = isGhost ? ghostMat : new THREE.MeshBasicMaterial({ color: 0xfef08a });
-                    const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.28, 12, 12), bulbMat);
-                    bulb.position.set(1.0, 5.2, 0);
-                    group.add(pole, arm, bulb);
-                }
-                return group;
-            }
-
-            // Ghost Hologram Preview Mesh
-            let selectedTool = 'none';
-            let buildRotation = 0; // Degrees (0, 90, 180, 270)
-            let buildElevation = 0; // Meters (0, 4, 8, 12...)
-            let ghostMesh = null;
-
-            function updateGhostPreview() {
-                if (ghostMesh) {
-                    scene.remove(ghostMesh);
-                    ghostMesh = null;
-                }
-                if (selectedTool !== 'none' && selectedTool !== 'delete') {
-                    ghostMesh = buildModularMesh(selectedTool, true);
-                    scene.add(ghostMesh);
-                }
-                document.getElementById('hud-tool').innerText = selectedTool.toUpperCase();
-                document.getElementById('hud-rot').innerText = buildRotation + '°';
-                document.getElementById('hud-elev').innerText = buildElevation + 'm';
-                document.getElementById('hud-floor-modal').innerText = (buildElevation === 0 ? 'Ground (0m)' : 'Floor +' + buildElevation + 'm');
-            }
-
-            function selectBuildTool(type) {
-                selectedTool = type || 'none';
-                document.querySelectorAll('.build-card').forEach(el => {
-                    el.classList.toggle('active', el.getAttribute('data-type') === selectedTool);
-                });
-                document.querySelectorAll('.hotbar-slot').forEach(el => {
-                    el.classList.toggle('active', el.getAttribute('data-type') === selectedTool);
-                });
-                updateGhostPreview();
-            }
-
-            // Server Persistence: Load & Save
-            async function saveWorldToServer() {
-                const items = cityPropsGroup.children.map(obj => ({
-                    type: obj.userData.type,
-                    x: obj.position.x,
-                    y: obj.position.y,
-                    z: obj.position.z,
-                    rot: obj.userData.rot || 0
-                }));
-                pieceCountEl.innerText = items.length;
-                localStorage.setItem('badabing_city_backup', JSON.stringify(items));
-
-                try {
-                    statusEl.innerText = 'Saving to Server...';
-                    const res = await fetch('/api/world', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(items)
-                    });
-                    if (res.ok) {
-                        statusEl.innerText = 'Saved to Server (' + items.length + ')';
-                        statusEl.style.color = '#4ade80';
-                    }
-                } catch (err) {
-                    statusEl.innerText = 'Saved Locally (' + items.length + ')';
-                    statusEl.style.color = '#fa9549';
-                }
-            }
-
-            function spawnPlacedPiece(item) {
-                const piece = buildModularMesh(item.type, false);
-                piece.position.set(item.x, item.y || 0, item.z);
-                piece.rotation.y = THREE.MathUtils.degToRad(item.rot || 0);
-                piece.userData = { type: item.type, rot: item.rot || 0 };
-                cityPropsGroup.add(piece);
-            }
-
-            async function loadWorldFromServer() {
-                let loaded = [];
-                try {
-                    const res = await fetch('/api/world');
-                    if (res.ok) {
-                        loaded = await res.json();
-                    }
-                } catch (err) {
-                    console.warn('Server endpoint offline, using local backup.');
-                }
-                if (!Array.isArray(loaded) || loaded.length === 0) {
-                    const localRaw = localStorage.getItem('badabing_city_backup');
-                    if (localRaw) {
-                        try { loaded = JSON.parse(localRaw); } catch (e) {}
-                    }
-                }
-                if (Array.isArray(loaded)) {
-                    cityPropsGroup.clear();
-                    loaded.forEach(item => spawnPlacedPiece(item));
-                    pieceCountEl.innerText = loaded.length;
-                }
-            }
-            loadWorldFromServer();
-
-            // =========================================================
-            // 5. UI EVENT HANDLERS & HOTKEYS
-            // =========================================================
-            const buildModal = document.getElementById('build-menu-modal');
-            const toggleBuildBtn = document.getElementById('toggle-build-btn');
-            let buildMenuOpen = false;
-
-            function toggleBuildMenu(forceState) {
-                buildMenuOpen = (typeof forceState === 'boolean') ? forceState : !buildMenuOpen;
-                buildModal.style.display = buildMenuOpen ? 'block' : 'none';
-                toggleBuildBtn.classList.toggle('active', buildMenuOpen);
-                if (buildMenuOpen && controls.isLocked) {
-                    controls.unlock();
-                }
-            }
-
-            toggleBuildBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                toggleBuildMenu();
-            });
-
-            document.querySelectorAll('.build-card, .hotbar-slot').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const type = e.currentTarget.getAttribute('data-type');
-                    selectBuildTool(type);
-                });
-            });
-
-            document.getElementById('rotate-piece-btn').addEventListener('click', (e) => {
-                e.stopPropagation();
-                buildRotation = (buildRotation + 90) % 360;
-                updateGhostPreview();
-            });
-
-            document.getElementById('level-up-btn').addEventListener('click', (e) => {
-                e.stopPropagation();
-                buildElevation = Math.min(40, buildElevation + 4);
-                updateGhostPreview();
-            });
-
-            document.getElementById('level-down-btn').addEventListener('click', (e) => {
-                e.stopPropagation();
-                buildElevation = Math.max(0, buildElevation - 4);
-                updateGhostPreview();
-            });
-
-            // Place or Dismantle Action
-            const raycaster = new THREE.Raycaster();
-            const centerScreen = new THREE.Vector2(0, 0);
-
-            function getSnappedBuildPoint() {
-                raycaster.setFromCamera(centerScreen, camera);
-                const hits = raycaster.intersectObject(ground);
-                if (hits.length > 0) {
-                    const pt = hits[0].point;
-                    // Snap to 2-meter modular construction grid
-                    const snapX = Math.round(pt.x / 2) * 2;
-                    const snapZ = Math.round(pt.z / 2) * 2;
-                    return { x: snapX, y: buildElevation, z: snapZ };
-                }
-                return null;
-            }
-
-            function executeBuildAction() {
-                if (selectedTool === 'none') return;
-
-                if (selectedTool === 'delete') {
-                    raycaster.setFromCamera(centerScreen, camera);
-                    const hits = raycaster.intersectObjects(cityPropsGroup.children, true);
-                    if (hits.length > 0) {
-                        let rootObj = hits[0].object;
-                        while (rootObj.parent && rootObj.parent !== cityPropsGroup) {
-                            rootObj = rootObj.parent;
-                        }
-                        cityPropsGroup.remove(rootObj);
-                        saveWorldToServer();
-                    }
-                } else {
-                    const pt = getSnappedBuildPoint();
-                    if (pt) {
-                        spawnPlacedPiece({
-                            type: selectedTool,
-                            x: pt.x,
-                            y: pt.y,
-                            z: pt.z,
-                            rot: buildRotation
-                        });
-                        saveWorldToServer();
-                    }
-                }
-            }
-
-            // Pointer Lock & Click Listener
-            const controls = new THREE.PointerLockControls(camera, document.body);
-            const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-
-            document.body.addEventListener('click', (e) => {
-                if (
-                    e.target.closest('#build-menu-modal') ||
-                    e.target.closest('#toggle-build-btn') ||
-                    e.target.closest('#hotbar') ||
-                    e.target.closest('#info-panel') ||
-                    e.target.closest('#mobile-controls')
-                ) {
-                    return;
-                }
-
-                if (!controls.isLocked && !isTouchDevice) {
-                    if (buildMenuOpen) toggleBuildMenu(false);
-                    controls.lock();
-                } else {
-                    executeBuildAction();
-                }
-            });
-
-            // Keyboard Shortcuts (WASD + Satisfactory Hotkeys)
-            const keys = { w: false, a: false, s: false, d: false, space: false, shift: false };
-            const hotbarMap = {
-                '1': 'foundation',
-                '2': 'wall',
-                '3': 'doorway',
-                '4': 'window',
-                '5': 'stairs',
-                '6': 'roof_flat',
-                '7': 'roof_pitched',
-                '8': 'fence',
-                '9': 'streetlight',
-                '0': 'none'
-            };
-
-            window.addEventListener('keydown', (e) => {
-                const k = e.key.toLowerCase();
-                if (k === 'w' || e.key === 'ArrowUp') keys.w = true;
-                if (k === 's' || e.key === 'ArrowDown') keys.s = true;
-                if (k === 'a' || e.key === 'ArrowLeft') keys.a = true;
-                if (k === 'd' || e.key === 'ArrowRight') keys.d = true;
-                if (e.code === 'Space') keys.space = true;
-                if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') keys.shift = true;
-
-                // Builder Hotkeys
-                if (hotbarMap[k]) selectBuildTool(hotbarMap[k]);
-                if (k === 'x') selectBuildTool(selectedTool === 'delete' ? 'none' : 'delete');
-                if (k === 'b') toggleBuildMenu();
-                if (k === 'r') {
-                    buildRotation = (buildRotation + 90) % 360;
-                    updateGhostPreview();
-                }
-                if (k === 'e') {
-                    buildElevation = Math.min(40, buildElevation + 4);
-                    updateGhostPreview();
-                }
-                if (k === 'q') {
-                    buildElevation = Math.max(0, buildElevation - 4);
-                    updateGhostPreview();
-                }
-            });
-
-            window.addEventListener('keyup', (e) => {
-                const k = e.key.toLowerCase();
-                if (k === 'w' || e.key === 'ArrowUp') keys.w = false;
-                if (k === 's' || e.key === 'ArrowDown') keys.s = false;
-                if (k === 'a' || e.key === 'ArrowLeft') keys.a = false;
-                if (k === 'd' || e.key === 'ArrowRight') keys.d = false;
-                if (e.code === 'Space') keys.space = false;
-                if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') keys.shift = false;
-            });
-
-            // Mobile Touch Controls
-            if (isTouchDevice) {
-                document.getElementById('mobile-controls').style.display = 'block';
-            }
-
-            const btnForward = document.getElementById('btn-forward');
-            const btnBackward = document.getElementById('btn-backward');
-            const btnPlace = document.getElementById('btn-place');
-            const btnRot = document.getElementById('btn-rot');
-            const btnUp = document.getElementById('btn-up');
-            const btnDown = document.getElementById('btn-down');
-
-            btnForward.addEventListener('touchstart', (e) => { e.preventDefault(); keys.w = true; });
-            btnForward.addEventListener('touchend', (e) => { e.preventDefault(); keys.w = false; });
-            btnBackward.addEventListener('touchstart', (e) => { e.preventDefault(); keys.s = true; });
-            btnBackward.addEventListener('touchend', (e) => { e.preventDefault(); keys.s = false; });
-            btnPlace.addEventListener('touchstart', (e) => { e.preventDefault(); executeBuildAction(); });
-            btnRot.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                buildRotation = (buildRotation + 90) % 360;
-                updateGhostPreview();
-            });
-            btnUp.addEventListener('touchstart', (e) => { e.preventDefault(); keys.space = true; });
-            btnUp.addEventListener('touchend', (e) => { e.preventDefault(); keys.space = false; });
-            btnDown.addEventListener('touchstart', (e) => { e.preventDefault(); keys.shift = true; });
-            btnDown.addEventListener('touchend', (e) => { e.preventDefault(); keys.shift = false; });
-
-            let isDragging = false;
-            let prevTouchX = 0, prevTouchY = 0;
-            window.addEventListener('touchstart', (e) => {
-                if (
-                    e.target.closest('#build-menu-modal') ||
-                    e.target.closest('#toggle-build-btn') ||
-                    e.target.closest('#hotbar') ||
-                    e.target.closest('#mobile-controls') ||
-                    e.target.closest('#info-panel')
-                ) return;
-                isDragging = true;
-                prevTouchX = e.touches[0].clientX;
-                prevTouchY = e.touches[0].clientY;
-            });
-            window.addEventListener('touchmove', (e) => {
-                if (!isDragging) return;
-                const touchX = e.touches[0].clientX;
-                const touchY = e.touches[0].clientY;
-                camera.rotation.y -= (touchX - prevTouchX) * 0.005;
-                camera.rotation.x -= (touchY - prevTouchY) * 0.005;
-                camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.x));
-                prevTouchX = touchX;
-                prevTouchY = touchY;
-            });
-            window.addEventListener('touchend', () => { isDragging = false; });
-
-            // =========================================================
-            // 6. MAIN ANIMATION LOOP (PANDA GAIT + HOLOGRAM + CAMERA)
-            // =========================================================
-            const targetXEl = document.getElementById('target-x');
-            const targetZEl = document.getElementById('target-z');
-            const coordsEl = document.getElementById('coords');
-            const clock = new THREE.Clock();
-
-            function animate() {
-                requestAnimationFrame(animate);
-                const delta = clock.getDelta();
-                const elapsed = clock.getElapsedTime();
-
-                // Update Target Coordinates & Hologram Ghost Position
-                const snapPt = getSnappedBuildPoint();
-                if (snapPt) {
-                    targetXEl.innerText = snapPt.x;
-                    targetZEl.innerText = snapPt.z;
-                    if (ghostMesh) {
-                        ghostMesh.position.set(snapPt.x, snapPt.y, snapPt.z);
-                        ghostMesh.rotation.y = THREE.MathUtils.degToRad(buildRotation);
-                    }
-                }
-
-                // Giant Anime Panda Peanut Natural Walking Physics
-                const walkRadius = 26;
-                const walkSpeed = 0.22;
-                const currentX = Math.sin(elapsed * walkSpeed) * walkRadius;
-                const currentZ = Math.cos(elapsed * walkSpeed * 0.85) * walkRadius;
-                const nextX = Math.sin((elapsed + 0.05) * walkSpeed) * walkRadius;
-                const nextZ = Math.cos((elapsed + 0.05) * walkSpeed * 0.85) * walkRadius;
-
-                peanutGroup.position.x = currentX;
-                peanutGroup.position.z = currentZ;
-
-                // Subtle natural step weight transfer instead of sphere bouncing
-                const strideCycle = elapsed * 5.2;
-                peanutGroup.position.y = Math.abs(Math.sin(strideCycle)) * 0.06;
-                peanutGroup.rotation.z = Math.cos(strideCycle) * 0.035;
-                peanutGroup.rotation.y = Math.atan2(nextX - currentX, nextZ - currentZ);
-
-                // Swing legs and arms in opposite natural phase
-                leftLeg.rotation.x = Math.sin(strideCycle) * 0.55;
-                rightLeg.rotation.x = -Math.sin(strideCycle) * 0.55;
-                leftArm.rotation.x = -Math.sin(strideCycle) * 0.45;
-                rightArm.rotation.x = Math.sin(strideCycle) * 0.45;
-
-                // Cute anime head tilt & blinking
-                pandaHead.rotation.z = Math.sin(elapsed * 2.0) * 0.06;
-                eyeGroup.scale.y = (elapsed % 4.0 < 0.14) ? 0.08 : 1.0;
-
-                coordsEl.innerText = 'X: ' + currentX.toFixed(1) + ', Z: ' + currentZ.toFixed(1);
-
-                // Player Camera Movement
-                const moveSpeed = 20.0 * delta;
-                if (controls.isLocked) {
-                    if (keys.w) controls.moveForward(moveSpeed);
-                    if (keys.s) controls.moveForward(-moveSpeed);
-                    if (keys.a) controls.moveRight(-moveSpeed);
-                    if (keys.d) controls.moveRight(moveSpeed);
-                } else {
-                    const dir = new THREE.Vector3();
-                    camera.getWorldDirection(dir);
-                    dir.y = 0;
-                    dir.normalize();
-                    const sideDir = new THREE.Vector3(-dir.z, 0, dir.x);
-
-                    if (keys.w) camera.position.addScaledVector(dir, moveSpeed);
-                    if (keys.s) camera.position.addScaledVector(dir, -moveSpeed);
-                    if (keys.a) camera.position.addScaledVector(sideDir, moveSpeed);
-                    if (keys.d) camera.position.addScaledVector(sideDir, -moveSpeed);
-                }
-
-                if (keys.space) camera.position.y += moveSpeed;
-                if (keys.shift) camera.position.y = Math.max(1.8, camera.position.y - moveSpeed);
-
-                renderer.render(scene, camera);
-            }
-            animate();
-
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            });
-
-        } catch (err) {
-            console.error('Critical Setup Error:', err);
-            const st = document.getElementById('status');
-            if (st) {
-                st.innerText = 'Error: ' + err.message;
-                st.style.color = '#ef4444';
-            }
-        }
-    </script>
-</body>
-</html>
