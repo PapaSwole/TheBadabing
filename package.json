@@ -1,7 +1,7 @@
 {
   "name": "the-badabing",
-  "version": "2.0.0",
-  "description": "The Badabing 3D World with Satisfactory Builder & Server Persistence",
+  "version": "3.0.0",
+  "description": "The Badabing 4-Player Co-Op City Builder & Panda Sim",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
