@@ -35,10 +35,10 @@ function createDefaultPeanut() {
         energy: 92,
         activity: 'Wandering Town',
         assignedBedId: null,
-        wants: ['Eat a McDonald\'s Burger 🍔', 'Get a Cozy Bed 🛌', 'Visit a Merchant Shop 🏪'],
+        wants: ["Eat a McDonald's Burger 🍔", 'Get a Cozy Bed 🛌', 'Visit the Mechanic Shop 🔧'],
         diary: [
             'Woke up feeling super cute in The Badabing!',
-            'Looking forward to seeing what the Gorilla Gods build today.'
+            'Love the new Schedule I anime cel-shaded look in town!'
         ],
         activityLog: [
             '[' + new Date().toLocaleTimeString() + '] Spawned in town center.'
@@ -86,9 +86,51 @@ function addDiary(npc, text) {
     }
 }
 
+// Server-Side Solid Wall & Building Obstacle Collision Check for Companions
+function isNpcBlockedByWall(nx, nz) {
+    const pad = 1.05; // Companion body collision radius
+    for (let i = 0; i < worldItems.length; i++) {
+        const it = worldItems[i];
+        if ((it.y || 0) > 2.5) continue; // Ignore upper-floor walls
+
+        const dx = nx - it.x;
+        const dz = nz - it.z;
+        const rad = -((it.rot || 0) * Math.PI) / 180;
+        const lx = dx * Math.cos(rad) - dz * Math.sin(rad);
+        const lz = dx * Math.sin(rad) + dz * Math.cos(rad);
+
+        if (it.type === 'wall' || it.type === 'window' || it.type === 'fence' || (it.type === 'doorway' && !it.isOpen)) {
+            if (Math.abs(lx) < 2.0 + pad && Math.abs(lz) < 0.35 + pad) return true;
+        } else if (it.type === 'doorway' && it.isOpen) {
+            // Side pillars still solid when doorway is open
+            if (Math.abs(lz) < 0.35 + pad && (Math.abs(lx - 1.4) < 0.6 + pad || Math.abs(lx + 1.4) < 0.6 + pad)) return true;
+        } else if (it.type === 'mcdonalds') {
+            if (Math.abs(lx) < 8 + pad && Math.abs(lz + 6) < 0.4 + pad) return true; // Back wall
+            if (Math.abs( lz) < 6 + pad && (Math.abs(lx + 8) < 0.4 + pad || Math.abs(lx - 8) < 0.4 + pad)) return true; // Sides
+            if (Math.abs(lz - 6) < 0.4 + pad && Math.abs(lx) > 2.2) return true; // Front walls outside door gap
+        } else if (it.type === 'walmart') {
+            if (Math.abs(lx) < 12 + pad && Math.abs(lz + 9) < 0.5 + pad) return true;
+            if (Math.abs(lz) < 9 + pad && (Math.abs(lx + 12) < 0.5 + pad || Math.abs(lx - 12) < 0.5 + pad)) return true;
+            if (Math.abs(lz - 9) < 0.5 + pad && Math.abs(lx) > 3.0) return true;
+        } else if (it.type === 'mechanic_shop') {
+            if (Math.abs(lx) < 10 + pad && Math.abs(lz + 8) < 0.5 + pad) return true;
+            if (Math.abs(lz) < 8 + pad && (Math.abs(lx + 10) < 0.5 + pad || Math.abs(lx - 10) < 0.5 + pad)) return true;
+            if (Math.abs(lz - 8) < 0.5 + pad && Math.abs(lx) > 4.5) return true; // Wide garage bay opening (-4.5 to +4.5)
+        } else if (it.type === 'fountain' || it.type === 'gorilla_statue') {
+            if (Math.hypot(lx, lz) < 3.6 + pad) return true;
+        } else if (it.type === 'locker' || it.type === 'computer_desk' || it.type === 'merchant') {
+            if (Math.abs(lx) < 1.5 + pad && Math.abs(lz) < 1.2 + pad) return true;
+        }
+    }
+    return false;
+}
+
 // Active Gorilla Gods Registry (Max 4)
 const activeGods = {};
 const GOD_COLORS = ['#fa9549', '#38bdf8', '#4ade80', '#c084fc'];
+
+// Shared Basketball Court Score
+let hoopScore = 0;
 
 // Continuous Autonomous Simulation for Peanut & All Spawned Companions
 let tickCount = 0;
@@ -121,7 +163,6 @@ setInterval(() => {
                 addLog(npc, "Walking to McDonald's for food.");
             }
         } else {
-            // Pick a new random town waypoint when close to target
             if (typeof destX !== 'number' || typeof destZ !== 'number' || Math.hypot(destX - npc.x, destZ - npc.z) < 2.2) {
                 const angle = Math.random() * Math.PI * 2;
                 const radius = 10 + Math.random() * 45;
@@ -140,9 +181,28 @@ setInterval(() => {
 
         if (dist > 0.6) {
             const step = 0.22;
-            npc.x = +(npc.x + (dx / dist) * step).toFixed(2);
-            npc.z = +(npc.z + (dz / dist) * step).toFixed(2);
-            npc.rotY = +(Math.atan2(dx, dz)).toFixed(2);
+            const nextX = npc.x + (dx / dist) * step;
+            const nextZ = npc.z + (dz / dist) * step;
+
+            // Check wall collision before stepping
+            if (!isNpcBlockedByWall(nextX, nextZ)) {
+                npc.x = +nextX.toFixed(2);
+                npc.z = +nextZ.toFixed(2);
+                npc.rotY = +(Math.atan2(dx, dz)).toFixed(2);
+            } else if (!isNpcBlockedByWall(nextX, npc.z)) {
+                // Slide along X axis
+                npc.x = +nextX.toFixed(2);
+                npc.rotY = +(Math.atan2(dx, 0)).toFixed(2);
+            } else if (!isNpcBlockedByWall(npc.x, nextZ)) {
+                // Slide along Z axis
+                npc.z = +nextZ.toFixed(2);
+                npc.rotY = +(Math.atan2(0, dz)).toFixed(2);
+            } else {
+                // Path completely blocked by solid wall — pick a new detour target
+                const detourAngle = Math.random() * Math.PI * 2;
+                npc.targetX = +(npc.x + Math.cos(detourAngle) * 18).toFixed(1);
+                npc.targetZ = +(npc.z + Math.sin(detourAngle) * 18).toFixed(1);
+            }
         } else {
             if (npc.energy < 25 && assignedBed) {
                 npc.activity = 'Sleeping in Bed 💤';
@@ -158,13 +218,12 @@ setInterval(() => {
         }
     });
 
-    // Save NPC positions to disk every ~5 seconds
     if (tickCount % 50 === 0) {
         saveAllToDisk();
     }
 }, 100);
 
-// Co-op Sync Endpoint (Gorilla Gods + NPCs + World Count)
+// Co-op Sync Endpoint
 app.post('/api/coop/sync', (req, res) => {
     const now = Date.now();
     for (const id of Object.keys(activeGods)) {
@@ -205,13 +264,20 @@ app.post('/api/coop/sync', (req, res) => {
     res.json({
         gods: Object.values(activeGods),
         npcs: npcs,
-        worldCount: worldItems.length
+        worldCount: worldItems.length,
+        hoopScore: hoopScore
     });
+});
+
+// Increment Basketball Score
+app.post('/api/basketball/score', (req, res) => {
+    hoopScore++;
+    res.json({ success: true, hoopScore });
 });
 
 // Get Full World & NPCs
 app.get('/api/world', (req, res) => {
-    res.json({ items: worldItems, npcs: npcs });
+    res.json({ items: worldItems, npcs: npcs, hoopScore });
 });
 
 // Save World Items
@@ -226,23 +292,23 @@ app.post('/api/world', (req, res) => {
 
 // Auto-Restore Backup After Ephemeral Render Restart
 app.post('/api/world/rehydrate', (req, res) => {
-    const { items, savedNpcs } = req.body || {};
+    const { items, savedNpcs, forceNpcs } = req.body || {};
     let restored = false;
     if (worldItems.length === 0 && Array.isArray(items) && items.length > 0) {
         worldItems = items;
         restored = true;
     }
-    if (Array.isArray(savedNpcs) && savedNpcs.length > 0 && npcs.length <= 1) {
+    if (Array.isArray(savedNpcs) && savedNpcs.length > 0 && (forceNpcs || npcs.length <= 1)) {
         npcs = savedNpcs;
         restored = true;
     }
     if (restored) saveAllToDisk();
-    res.json({ success: true, restored, worldCount: worldItems.length, npcCount: npcs.length });
+    res.json({ success: true, restored, worldCount: worldItems.length, npcCount: npcs.length, npcs });
 });
 
-// Update Single World Piece (Door, Inventory, Bed Owner, Merchant Shop)
+// Update Single World Piece (Door, Inventory, Bed, Merchant, Custom Sign, Computer URL)
 app.post('/api/world/update-item', (req, res) => {
-    const { id, isOpen, inventory, assignedTo, merchantSkin, shopItems, merchantName } = req.body || {};
+    const { id, isOpen, inventory, assignedTo, merchantSkin, shopItems, merchantName, signText, signColor, signBg, lastUrl } = req.body || {};
     const target = worldItems.find(it => it.id === id);
     if (!target) return res.status(404).json({ error: 'Item not found' });
 
@@ -260,12 +326,16 @@ app.post('/api/world/update-item', (req, res) => {
     if (typeof merchantSkin === 'number') target.merchantSkin = merchantSkin;
     if (Array.isArray(shopItems)) target.shopItems = shopItems;
     if (typeof merchantName === 'string') target.merchantName = merchantName;
+    if (typeof signText === 'string') target.signText = signText;
+    if (typeof signColor === 'string') target.signColor = signColor;
+    if (typeof signBg === 'string') target.signBg = signBg;
+    if (typeof lastUrl === 'string') target.lastUrl = lastUrl;
 
     saveAllToDisk();
     res.json({ success: true, item: target, npcs });
 });
 
-// Spawn New Companion Animal (20 Cute Anime Animals)
+// Spawn New Companion Animal
 app.post('/api/npcs/spawn', (req, res) => {
     const { name, species, x, z } = req.body || {};
     if (!name || !species) return res.status(400).json({ error: 'Name and species required' });
@@ -293,7 +363,21 @@ app.post('/api/npcs/spawn', (req, res) => {
     res.json({ success: true, companion: newCompanion, npcs });
 });
 
-// Feed, Energize, or Buy Merchant Item for Companion
+// Delete Companion Animal & Permanently Sync to Server
+app.post('/api/npcs/delete', (req, res) => {
+    const { id } = req.body || {};
+    if (!id || id === 'peanut') {
+        return res.status(400).json({ error: 'Peanut is the town founder and cannot be deleted!' });
+    }
+    npcs = npcs.filter(n => n.id !== id);
+    worldItems.forEach(it => {
+        if (it.assignedTo === id) it.assignedTo = null;
+    });
+    saveAllToDisk();
+    res.json({ success: true, npcs });
+});
+
+// Feed, Energize, Cheer, or Buy Merchant Item for Companion
 app.post('/api/npcs/action', (req, res) => {
     const { npcId, actionType, itemName, itemPrice } = req.body || {};
     const npc = npcs.find(n => n.id === npcId) || npcs[0];
