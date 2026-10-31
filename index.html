@@ -1,182 +1,1876 @@
-const express = require('express');
-const fs = require('fs');
-const path = require('path');
-
-const app = express();
-const PORT = process.env.PORT || 3000;
-const DATA_FILE = path.join(__dirname, 'world_data.json');
-const NPC_FILE = path.join(__dirname, 'npc_data.json');
-
-app.use(express.json({ limit: '15mb' }));
-app.use(express.static(__dirname));
-app.use(express.static(path.join(__dirname, 'public')));
-
-let worldItems = [];
-if (fs.existsSync(DATA_FILE)) {
-    try { worldItems = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8') || '[]'); } catch (e) { worldItems = []; }
-} else {
-    fs.writeFileSync(DATA_FILE, JSON.stringify([], null, 2), 'utf8');
-}
-
-let npcRegistry = [
-    { id: 'peanut', name: 'Peanut', type: 'panda', x: 0, z: 0, rotY: 0, mood: 'Happy', hunger: 85, energy: 90, activity: 'Wandering Town', assignedBedId: null }
-];
-if (fs.existsSync(NPC_FILE)) {
-    try { npcRegistry = JSON.parse(fs.readFileSync(NPC_FILE, 'utf8') || '[]'); } catch (e) {}
-} else {
-    fs.writeFileSync(NPC_FILE, JSON.stringify(npcRegistry, null, 2), 'utf8');
-}
-
-function saveDataToDisk() {
-    try {
-        fs.writeFileSync(DATA_FILE, JSON.stringify(worldItems, null, 2), 'utf8');
-        fs.writeFileSync(NPC_FILE, JSON.stringify(npcRegistry, null, 2), 'utf8');
-    } catch (e) {
-        console.error('Failed saving data:', e);
-    }
-}
-
-// Active Co-op Gods Registry
-const activeGods = {};
-const GOD_COLORS = ['#fa9549', '#38bdf8', '#4ade80', '#c084fc'];
-
-let peanutState = npcRegistry[0] || {
-    x: 0, z: 0, rotY: 0, mood: 'Happy', hunger: 85, energy: 90, activity: 'Wandering Town', assignedBedId: null
-};
-
-// Robust Autonomous Simulation Tick for Peanut
-let simTick = 0;
-setInterval(() => {
-    simTick += 0.08;
-    
-    // Slow down drain so he doesn't panic-walk constantly
-    peanutState.hunger = Math.max(10, +(peanutState.hunger - 0.01).toFixed(1));
-    peanutState.energy = Math.max(10, +(peanutState.energy - 0.008).toFixed(1));
-
-    const assignedBed = worldItems.find(it => it.id === peanutState.assignedBedId);
-    const mcd = worldItems.find(it => it.type === 'mcdonalds');
-
-    if (peanutState.energy < 20 && assignedBed) {
-        peanutState.activity = 'Heading to Assigned Bed';
-        peanutState.mood = 'Sleepy 😴';
-        const dx = assignedBed.x - peanutState.x;
-        const dz = assignedBed.z - peanutState.z;
-        const dist = Math.hypot(dx, dz);
-        if (dist > 1.8) {
-            peanutState.x += (dx / dist) * 0.25;
-            peanutState.z += (dz / dist) * 0.25;
-            peanutState.rotY = Math.atan2(dx, dz);
-        } else {
-            peanutState.activity = 'Sleeping in Bed 💤';
-            peanutState.energy = Math.min(100, +(peanutState.energy + 0.5).toFixed(1));
-            peanutState.mood = 'Rested ✨';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Badabing - Gorilla Gods & Companions City Builder</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #14161d;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #fff;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
         }
-    } else if (peanutState.hunger < 20 && mcd) {
-        peanutState.activity = "Visiting McDonald's 🍔";
-        peanutState.mood = 'Hungry 😋';
-        const dx = mcd.x - peanutState.x;
-        const dz = mcd.z - peanutState.z;
-        const dist = Math.hypot(dx, dz);
-        if (dist > 2.8) {
-            peanutState.x += (dx / dist) * 0.25;
-            peanutState.z += (dz / dist) * 0.25;
-            peanutState.rotY = Math.atan2(dx, dz);
-        } else {
-            peanutState.activity = 'Eating Burgers 🍟';
-            peanutState.hunger = Math.min(100, +(peanutState.hunger + 0.6).toFixed(1));
-            peanutState.mood = 'Ecstatic 🎉';
+
+        /* 1. Compact Top Server & Co-op Status Banner */
+        #top-status-banner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 36px;
+            background: rgba(15, 17, 23, 0.95);
+            border-bottom: 2px solid #fa9549;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 14px;
+            z-index: 20;
+            font-size: 12px;
         }
-    } else {
-        // Default Smooth Circular Wandering Loop across the town
-        peanutState.activity = peanutState.assignedBedId ? 'Patrolling Near Home' : 'Wandering Town 🐼';
-        peanutState.mood = peanutState.hunger > 50 && peanutState.energy > 50 ? 'Happy ✨' : 'Chill';
-        
-        const nextX = Math.sin((simTick + 0.05) * 0.25) * 24;
-        const nextZ = Math.cos((simTick + 0.05) * 0.2) * 24;
-        const curX = Math.sin(simTick * 0.25) * 24;
-        const curZ = Math.cos(simTick * 0.2) * 24;
+        .banner-left, .banner-center, .banner-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .brand-title {
+            color: #fa9549;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .sync-badge { color: #4ade80; font-weight: bold; }
+        .coop-pills { display: flex; gap: 6px; }
+        .god-pill {
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: bold;
+            background: #222733;
+            border: 1px solid #475569;
+        }
 
-        peanutState.x = curX;
-        peanutState.z = curZ;
-        peanutState.rotY = Math.atan2(nextX - curX, nextZ - curZ);
-    }
-}, 80);
+        /* 2. Companion Telemetry Bar Below Top Banner */
+        #companion-bar {
+            position: absolute;
+            top: 36px;
+            left: 0;
+            width: 100%;
+            min-height: 38px;
+            background: rgba(22, 25, 34, 0.92);
+            border-bottom: 1px solid #333842;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            padding: 4px 14px;
+            z-index: 19;
+            font-size: 12px;
+            gap: 8px;
+        }
+        .companion-stats {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        #npc-selector {
+            background: #161922;
+            color: #fa9549;
+            border: 1px solid #fa9549;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .stat-bar-bg {
+            width: 55px;
+            height: 8px;
+            background: #111318;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid #374151;
+        }
+        .stat-bar-fill {
+            height: 100%;
+            background: #4ade80;
+            transition: width 0.2s;
+        }
+        .companion-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .mini-ui-btn {
+            background: #283040;
+            border: 1px solid #475569;
+            color: #f8fafc;
+            padding: 4px 9px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .mini-ui-btn:hover, .mini-ui-btn.active {
+            background: #fa9549;
+            color: #111;
+            border-color: #fa9549;
+        }
 
-app.post('/api/coop/sync', (req, res) => {
-    const now = Date.now();
-    for (const id of Object.keys(activeGods)) {
-        if (now - activeGods[id].lastSeen > 6000) delete activeGods[id];
-    }
+        /* 3. Companion Mind Panel (Diary, Wants, Live Chat, Activity Log) */
+        #companion-mind-panel {
+            position: absolute;
+            top: 80px;
+            left: 14px;
+            width: 340px;
+            max-width: calc(100vw - 28px);
+            background: rgba(18, 21, 28, 0.96);
+            border: 2px solid #fa9549;
+            border-radius: 8px;
+            padding: 12px;
+            z-index: 24;
+            display: none;
+            box-shadow: 0 12px 35px rgba(0,0,0,0.85);
+        }
+        .mind-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 6px;
+            margin-bottom: 8px;
+        }
+        .mind-header h3 {
+            margin: 0;
+            font-size: 14px;
+            color: #fa9549;
+            text-transform: uppercase;
+        }
+        .mind-section {
+            margin-bottom: 10px;
+        }
+        .mind-section h4 {
+            margin: 0 0 4px 0;
+            font-size: 11px;
+            color: #38bdf8;
+            text-transform: uppercase;
+        }
+        .mind-box {
+            background: #14171f;
+            border: 1px solid #2d3548;
+            border-radius: 5px;
+            padding: 6px 8px;
+            max-height: 85px;
+            overflow-y: auto;
+            font-size: 11px;
+            color: #e2e8f0;
+            line-height: 1.4;
+        }
 
-    const { id, x, y, z, rotY } = req.body || {};
-    if (id) {
-        if (!activeGods[id]) {
-            const currentIds = Object.keys(activeGods);
-            if (currentIds.length < 4) {
-                const usedSlots = currentIds.map(k => activeGods[k].slot);
-                let slot = 1;
-                while (usedSlots.includes(slot) && slot <= 4) slot++;
-                activeGods[id] = {
-                    id, slot, name: 'God ' + slot,
-                    color: GOD_COLORS[(slot - 1) % 4],
-                    x: x || 0, y: y || 3, z: z || 20, rotY: rotY || 0, lastSeen: now
-                };
+        /* 4. God / Build Menu Button & Modal */
+        #toggle-build-btn {
+            position: absolute;
+            top: 82px;
+            right: 14px;
+            background: rgba(24, 27, 34, 0.95);
+            border: 2px solid #fa9549;
+            color: #fa9549;
+            padding: 9px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 800;
+            font-size: 12px;
+            text-transform: uppercase;
+            z-index: 20;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.6);
+        }
+        #toggle-build-btn:hover, #toggle-build-btn.active {
+            background: #fa9549;
+            color: #111318;
+        }
+
+        #build-menu-modal {
+            position: absolute;
+            top: 128px;
+            right: 14px;
+            width: 460px;
+            max-width: calc(100vw - 28px);
+            max-height: calc(100vh - 145px);
+            overflow-y: auto;
+            background: rgba(18, 21, 28, 0.97);
+            border: 2px solid #fa9549;
+            border-radius: 8px;
+            padding: 14px;
+            z-index: 25;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.9);
+            display: none;
+        }
+        .god-physics-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #161922;
+            border: 1px solid #334155;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            font-size: 12px;
+        }
+        .tab-row {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 7px 6px;
+            background: #1f2430;
+            border: 1px solid #3b4254;
+            color: #cbd5e1;
+            font-weight: 700;
+            font-size: 11px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        .tab-btn.active {
+            background: #fa9549;
+            color: #111;
+            border-color: #fa9549;
+        }
+        .build-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .build-card {
+            background: #232834;
+            border: 1px solid #3c4456;
+            border-radius: 5px;
+            padding: 8px 5px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.12s;
+            color: #e2e8f0;
+        }
+        .build-card:hover { border-color: #fa9549; background: #2d3444; }
+        .build-card.active {
+            background: rgba(250, 149, 73, 0.25);
+            border: 2px solid #fa9549;
+            color: #fff;
+        }
+        .build-card .icon { font-size: 19px; display: block; margin-bottom: 2px; }
+        .build-card .label { font-size: 11px; font-weight: 700; display: block; }
+        .build-card .sub { font-size: 9px; color: #94a3b8; }
+
+        /* Color Customizer Palette */
+        .color-section {
+            background: #161922;
+            padding: 8px 10px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            border: 1px solid #2e3444;
+        }
+        .color-section-title {
+            font-size: 11px;
+            color: #cbd5e1;
+            margin-bottom: 6px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+        }
+        .swatch-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .color-swatch {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            border: 2px solid #334155;
+            cursor: pointer;
+        }
+        .color-swatch.active {
+            border-color: #fff;
+            transform: scale(1.18);
+            box-shadow: 0 0 8px rgba(250,149,73,0.9);
+        }
+
+        .build-controls-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #161922;
+            padding: 8px 10px;
+            border-radius: 5px;
+            font-size: 11px;
+            color: #94a3b8;
+        }
+
+        /* Center Interaction Prompt */
+        #interaction-prompt {
+            position: absolute;
+            top: 56%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(15, 17, 23, 0.92);
+            border: 1px solid #fa9549;
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: bold;
+            z-index: 15;
+            display: none;
+            pointer-events: none;
+        }
+        #interaction-prompt span { color: #fa9549; }
+
+        /* Object Inspector Modal (Inventory, Bed Assignment, Merchant Shop) */
+        #object-modal {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 430px;
+            max-width: 94vw;
+            max-height: 85vh;
+            overflow-y: auto;
+            background: rgba(18, 21, 28, 0.98);
+            border: 2px solid #fa9549;
+            border-radius: 8px;
+            padding: 16px;
+            z-index: 30;
+            display: none;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+        }
+        #object-modal h3 {
+            margin: 0 0 10px 0;
+            color: #fa9549;
+            font-size: 15px;
+            text-transform: uppercase;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .inv-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .inv-slot {
+            height: 56px;
+            background: #232834;
+            border: 1px solid #475569;
+            border-radius: 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 11px;
+            text-align: center;
+            padding: 4px;
+        }
+        .inv-slot:hover { border-color: #fa9549; }
+        .merchant-item-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 6px;
+            background: #161922;
+            padding: 6px;
+            border-radius: 5px;
+            border: 1px solid #2e3444;
+        }
+        .merchant-input {
+            background: #232834;
+            border: 1px solid #475569;
+            color: #fff;
+            padding: 4px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+
+        /* Bottom Telemetry Pill */
+        #builder-hud {
+            position: absolute;
+            bottom: 14px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(18, 20, 26, 0.92);
+            border: 1px solid #fa9549;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            color: #f8fafc;
+            z-index: 15;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        #builder-hud span { color: #fa9549; font-weight: bold; }
+
+        #crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 10px;
+            height: 10px;
+            transform: translate(-50%, -50%);
+            border: 2px solid rgba(250, 149, 73, 0.95);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        #controls-hint {
+            position: absolute;
+            bottom: 14px;
+            left: 14px;
+            background: rgba(18, 20, 26, 0.9);
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #333842;
+            font-size: 11px;
+            color: #cbd5e1;
+            z-index: 10;
+            line-height: 1.45;
+        }
+        #controls-hint span { color: #fa9549; font-weight: bold; }
+
+        /* Mobile Touch Controls */
+        #mobile-controls {
+            display: none;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 22;
+        }
+        #mobile-move-btns {
+            position: absolute;
+            bottom: 58px;
+            left: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: auto;
+        }
+        #mobile-action-btns {
+            position: absolute;
+            bottom: 58px;
+            right: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: auto;
+        }
+        .mob-btn {
+            width: 54px;
+            height: 54px;
+            background: rgba(250, 149, 73, 0.82);
+            border: 2px solid #fff;
+            border-radius: 50%;
+            color: #111;
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: auto;
+            touch-action: none;
+        }
+        @media (max-width: 900px) {
+            #controls-hint { display: none; }
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
+</head>
+<body>
+
+    <div id="crosshair"></div>
+
+    <!-- 1. Compact Top Server & Co-op Status Banner -->
+    <div id="top-status-banner">
+        <div class="banner-left">
+            <span class="brand-title">🦍 The Badabing Co-op</span>
+            <span>Sync: <span id="status" class="sync-badge">Online</span></span>
+            <span>Structures: <strong id="piece-count" style="color:#fa9549;">0</strong></span>
+        </div>
+        <div class="banner-center">
+            <span>Gorilla Gods (Max 4):</span>
+            <div class="coop-pills" id="coop-gods-list">
+                <span class="god-pill">Connecting...</span>
+            </div>
+        </div>
+        <div class="banner-right">
+            <span id="gamepad-indicator" style="color:#94a3b8;">🎮 No Controller</span>
+        </div>
+    </div>
+
+    <!-- 2. Companion Telemetry Bar (With Coordinates & Mind Toggle) -->
+    <div id="companion-bar">
+        <div class="companion-stats">
+            <select id="npc-selector" title="Select Companion"></select>
+            <div class="stat-item">Mood: <strong id="p-mood" style="color:#fde047;">Happy ✨</strong></div>
+            <div class="stat-item">Pos: <strong id="p-coords" style="color:#38bdf8;">(0, 8)</strong></div>
+            <div class="stat-item">
+                Hunger:
+                <div class="stat-bar-bg"><div id="p-hunger-bar" class="stat-bar-fill" style="width:88%;"></div></div>
+                <span id="p-hunger-val">88%</span>
+            </div>
+            <div class="stat-item">
+                Energy:
+                <div class="stat-bar-bg"><div id="p-energy-bar" class="stat-bar-fill" style="width:92%;background:#38bdf8;"></div></div>
+                <span id="p-energy-val">92%</span>
+            </div>
+            <div class="stat-item">Activity: <strong id="p-activity" style="color:#4ade80;">Wandering Town</strong></div>
+            <div class="stat-item">Bed: <strong id="p-bed" style="color:#c084fc;">None</strong></div>
+        </div>
+        <div class="companion-actions">
+            <button class="mini-ui-btn" id="btn-toggle-mind">📓 Mind & Logs</button>
+            <button class="mini-ui-btn" id="btn-feed-npc">🍔 Feed</button>
+            <button class="mini-ui-btn" id="btn-rest-npc">⚡ Energize</button>
+            <button class="mini-ui-btn" id="btn-cheer-npc">✨ Cheer</button>
+        </div>
+    </div>
+
+    <!-- 3. Toggleable Companion Mind Panel (Diary, Wants, Live Chat Button, Activity Log) -->
+    <div id="companion-mind-panel">
+        <div class="mind-header">
+            <h3 id="mind-panel-title">🐼 Peanut's Mind & Logs</h3>
+            <button class="mini-ui-btn" id="btn-close-mind">✖</button>
+        </div>
+        <div class="mind-section">
+            <h4>💭 Current Wants</h4>
+            <div class="mind-box" id="mind-wants-box"></div>
+        </div>
+        <div class="mind-section">
+            <h4>📔 Personal Diary</h4>
+            <div class="mind-box" id="mind-diary-box"></div>
+        </div>
+        <div class="mind-section">
+            <h4>📋 Activity Log</h4>
+            <div class="mind-box" id="mind-log-box"></div>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+            <button class="mini-ui-btn" id="btn-live-chat" style="width:100%; padding:8px; background:#38bdf8; color:#111; font-weight:800;">
+                💬 Live Chat with Companion (AI Coming Soon)
+            </button>
+        </div>
+    </div>
+
+    <!-- 4. God / Build Menu Toggle Button & Modal -->
+    <button id="toggle-build-btn">🦍 God & Build Menu (B)</button>
+
+    <div id="build-menu-modal">
+        <!-- Gorilla God Physics Toggle (Walking Default vs Flying) -->
+        <div class="god-physics-bar">
+            <div>🦍 <strong>Gorilla God Movement:</strong> <span id="physics-mode-label" style="color:#4ade80;">Walking Physics (Gravity)</span></div>
+            <button class="mini-ui-btn" id="btn-toggle-fly">✈️ Enable Fly Mode</button>
+        </div>
+
+        <div class="tab-row">
+            <button class="tab-btn active" id="tab-modular">🧱 Modular Parts</button>
+            <button class="tab-btn" id="tab-buildings">🏢 Buildings & Shops</button>
+            <button class="tab-btn" id="tab-companions">🐾 Spawn Companions</button>
+        </div>
+
+        <!-- Tab 1: Modular Parts -->
+        <div class="build-grid" id="grid-modular">
+            <div class="build-card" data-type="foundation"><span class="icon">⬛</span><span class="label">Foundation</span><span class="sub">4x4m Slab</span></div>
+            <div class="build-card" data-type="wall"><span class="icon">🧱</span><span class="label">Solid Wall</span><span class="sub">Collidable</span></div>
+            <div class="build-card" data-type="doorway"><span class="icon">🚪</span><span class="label">Door Wall</span><span class="sub">Interactive Door</span></div>
+            <div class="build-card" data-type="window"><span class="icon">🪟</span><span class="label">Window Wall</span><span class="sub">Solid Frame</span></div>
+            <div class="build-card" data-type="stairs"><span class="icon">🪜</span><span class="label">Staircase</span><span class="sub">4m Ramp</span></div>
+            <div class="build-card" data-type="roof_flat"><span class="icon">⬜</span><span class="label">Flat Roof</span><span class="sub">Floor/Ceiling</span></div>
+            <div class="build-card" data-type="roof_pitched"><span class="icon">⛺</span><span class="label">Pitched Roof</span><span class="sub">Gable Crest</span></div>
+            <div class="build-card" data-type="fence"><span class="icon">⛓️</span><span class="label">Chain Fence</span><span class="sub">Solid Barrier</span></div>
+            <div class="build-card" data-type="streetlight"><span class="icon">🏮</span><span class="label">Streetlight</span><span class="sub">Lamp Post</span></div>
+        </div>
+
+        <!-- Tab 2: Buildings, XL Gorilla Statue & Customizable Merchant -->
+        <div class="build-grid" id="grid-buildings" style="display:none;">
+            <div class="build-card" data-type="mcdonalds"><span class="icon">🍔</span><span class="label">McDonald's</span><span class="sub">Full Restaurant</span></div>
+            <div class="build-card" data-type="walmart"><span class="icon">🛒</span><span class="label">Walmart</span><span class="sub">Supercenter</span></div>
+            <div class="build-card" data-type="gorilla_statue"><span class="icon">🗿</span><span class="label">XL Gorilla Statue</span><span class="sub">Giant Monument</span></div>
+            <div class="build-card" data-type="merchant"><span class="icon">🏪</span><span class="label">Merchant Booth</span><span class="sub">10 Skins & Shop</span></div>
+            <div class="build-card" data-type="fountain"><span class="icon">⛲</span><span class="label">Fountain</span><span class="sub">Park Centerpiece</span></div>
+            <div class="build-card" data-type="mailbox"><span class="icon">📫</span><span class="label">Mailbox</span><span class="sub">10 Inv. Slots</span></div>
+            <div class="build-card" data-type="locker"><span class="icon">🗄️</span><span class="label">Locker</span><span class="sub">10 Inv. Slots</span></div>
+            <div class="build-card" data-type="bed"><span class="icon">🛌</span><span class="label">Assignable Bed</span><span class="sub">Assign Owner</span></div>
+        </div>
+
+        <!-- Tab 3: Companion Spawner (20 Cute Anime Animals) -->
+        <div id="grid-companions" style="display:none; margin-bottom:12px;">
+            <div style="display:flex; gap:6px; margin-bottom:8px;">
+                <input type="text" id="new-companion-name" class="merchant-input" placeholder="Enter Companion Name (e.g. BamBam)" style="flex:1; padding:7px;" />
+                <button class="mini-ui-btn" id="btn-spawn-companion" style="background:#4ade80; color:#111; font-weight:800; padding:0 14px;">➕ Spawn Here</button>
+            </div>
+            <div class="build-grid" id="animal-species-grid" style="max-height:190px; overflow-y:auto;"></div>
+        </div>
+
+        <!-- Utility Row -->
+        <div class="build-grid" style="grid-template-columns: repeat(2, 1fr); margin-top: 4px;">
+            <div class="build-card" data-type="delete" style="border-color:#ef4444;"><span class="icon">💥</span><span class="label">Dismantle Mode (X)</span></div>
+            <div class="build-card active" data-type="none"><span class="icon">✋</span><span class="label">Hands Empty / Explore</span></div>
+        </div>
+
+        <!-- Paint Color Customizer -->
+        <div class="color-section">
+            <div class="color-section-title">
+                <span>🎨 Structure Paint Color</span>
+                <span id="selected-color-label">#8A483C</span>
+            </div>
+            <div class="swatch-row">
+                <div class="color-swatch active" data-color="#8a483c" style="background:#8a483c;"></div>
+                <div class="color-swatch" data-color="#757d86" style="background:#757d86;"></div>
+                <div class="color-swatch" data-color="#e2e8f0" style="background:#e2e8f0;"></div>
+                <div class="color-swatch" data-color="#2563eb" style="background:#2563eb;"></div>
+                <div class="color-swatch" data-color="#dc2626" style="background:#dc2626;"></div>
+                <div class="color-swatch" data-color="#eab308" style="background:#eab308;"></div>
+                <div class="color-swatch" data-color="#16a34a" style="background:#16a34a;"></div>
+                <div class="color-swatch" data-color="#9333ea" style="background:#9333ea;"></div>
+            </div>
+        </div>
+
+        <div class="build-controls-bar">
+            <div>Build Height: <strong id="hud-floor-modal" style="color:#fa9549;">0m</strong></div>
+            <div style="display:flex; gap:6px;">
+                <button class="mini-ui-btn" id="rotate-piece-btn">🔄 Rot (R)</button>
+                <button class="mini-ui-btn" id="level-down-btn">⬇️ Lv- (Q)</button>
+                <button class="mini-ui-btn" id="level-up-btn">⬆️ Lv+ (E)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Center Screen Interaction Prompt -->
+    <div id="interaction-prompt">Press <span>[F]</span> or <span>[X]</span> to Interact</div>
+
+    <!-- Object Inspector Modal -->
+    <div id="object-modal">
+        <h3>
+            <span id="modal-title">Inspector</span>
+            <button class="mini-ui-btn" id="close-modal-btn">✖ Close</button>
+        </h3>
+        <div id="modal-content"></div>
+    </div>
+
+    <!-- Bottom Telemetry Pill -->
+    <div id="builder-hud">
+        <div>Tool: <span id="hud-tool">EXPLORE</span></div>
+        <div>Target: X:<span id="target-x">0</span> Z:<span id="target-z">0</span></div>
+        <div>Rot: <span id="hud-rot">0°</span></div>
+        <div>Height: <span id="hud-elev">0m</span></div>
+    </div>
+
+    <!-- Mobile Touch Controls -->
+    <div id="mobile-controls">
+        <div id="mobile-move-btns">
+            <div class="mob-btn" id="btn-forward">🔼</div>
+            <div class="mob-btn" id="btn-backward">🔽</div>
+            <div class="mob-btn" id="btn-interact" style="background:#38bdf8;">🖐️</div>
+        </div>
+        <div id="mobile-action-btns">
+            <div class="mob-btn" id="btn-up">⬆️</div>
+            <div class="mob-btn" id="btn-down">⬇️</div>
+            <div class="mob-btn" id="btn-place" style="background:#4ade80;">🔨</div>
+        </div>
+    </div>
+
+    <div id="controls-hint">
+        Walk: <span>WASD / L-Stick</span> | Jump/Fly: <span>Space/Shift</span> | God Menu: <span>B / Y-Btn</span><br>
+        Interact (Door/Bed/Merchant): <span>F / X-Btn</span> | Rotate: <span>R</span> | Height: <span>E / Q</span>
+    </div>
+
+    <script>
+        try {
+            const statusEl = document.getElementById('status');
+            const pieceCountEl = document.getElementById('piece-count');
+            const myGodId = 'god_' + Math.random().toString(36).substring(2, 10);
+
+            // =========================================================
+            // 1. 20 CUTE ANIME ANIMAL SPECIES CATALOG & 10 MERCHANT SKINS
+            // =========================================================
+            const ANIMAL_CATALOG = [
+                { id: 'panda', label: 'Panda', icon: '🐼', primary: 0xf8fafc, secondary: 0x141619, earType: 'round' },
+                { id: 'gorilla', label: 'Gorilla', icon: '🦍', primary: 0x374151, secondary: 0x1f2937, earType: 'small' },
+                { id: 'cat', label: 'Kitty', icon: '🐱', primary: 0xfb923c, secondary: 0xffffff, earType: 'pointy' },
+                { id: 'dog', label: 'Puppy', icon: '🐶', primary: 0xd97706, secondary: 0x78350f, earType: 'floppy' },
+                { id: 'bunny', label: 'Bunny', icon: '🐰', primary: 0xfce7f3, secondary: 0xf472b6, earType: 'tall' },
+                { id: 'fox', label: 'Fox', icon: '🦊', primary: 0xea580c, secondary: 0xffffff, earType: 'pointy' },
+                { id: 'bear', label: 'Grizzly', icon: '🐻', primary: 0x78350f, secondary: 0x451a03, earType: 'round' },
+                { id: 'koala', label: 'Koala', icon: '🐨', primary: 0x94a3b8, secondary: 0x475569, earType: 'big_side' },
+                { id: 'penguin', label: 'Penguin', icon: '🐧', primary: 0x1e293b, secondary: 0xf8fafc, earType: 'none' },
+                { id: 'frog', label: 'Froggy', icon: '🐸', primary: 0x4ade80, secondary: 0x16a34a, earType: 'top_eyes' },
+                { id: 'tiger', label: 'Tiger', icon: '🐯', primary: 0xf97316, secondary: 0x111827, earType: 'round' },
+                { id: 'lion', label: 'Lion', icon: '🦁', primary: 0xfbbf24, secondary: 0x92400e, earType: 'mane' },
+                { id: 'pig', label: 'Piggy', icon: '🐷', primary: 0xf9a8d4, secondary: 0xf472b6, earType: 'pointy' },
+                { id: 'cow', label: 'Moo Cow', icon: '🐮', primary: 0xffffff, secondary: 0x111827, earType: 'horns' },
+                { id: 'monkey', label: 'Monkey', icon: '🐵', primary: 0x9a3412, secondary: 0xfde68a, earType: 'big_side' },
+                { id: 'hamster', label: 'Hamster', icon: '🐹', primary: 0xfdba74, secondary: 0xffffff, earType: 'round' },
+                { id: 'owl', label: 'Night Owl', icon: '🦉', primary: 0x6b4423, secondary: 0xfef08a, earType: 'pointy' },
+                { id: 'duck', label: 'Duckling', icon: '🦆', primary: 0xfacc15, secondary: 0xf97316, earType: 'none' },
+                { id: 'red_panda', label: 'Red Panda', icon: '🦊', primary: 0xb91c1c, secondary: 0x1f2937, earType: 'pointy' },
+                { id: 'raccoon', label: 'Raccoon', icon: '🦝', primary: 0x64748b, secondary: 0x0f172a, earType: 'pointy' }
+            ];
+
+            const MERCHANT_SKINS = [
+                { name: 'Street Hoodie Dealer', body: 0x1e293b, hat: 0xfa9549, apron: 0x334155 },
+                { name: 'Chef Gusto', body: 0xffffff, hat: 0xffffff, apron: 0xdc2626 },
+                { name: 'Cyberpunk Vendor', body: 0x0f172a, hat: 0x38bdf8, apron: 0x9333ea },
+                { name: 'Rasta Grocer', body: 0x16a34a, hat: 0xfacc15, apron: 0xdc2626 },
+                { name: 'Fancy Tuxedo Broker', body: 0x090d16, hat: 0x090d16, apron: 0xf8fafc },
+                { name: 'Tiki Beach Trader', body: 0xf97316, hat: 0xfde047, apron: 0x22c55e },
+                { name: 'Biker Quartermaster', body: 0x1c1917, hat: 0x7f1d1d, apron: 0x44403c },
+                { name: 'Wizard Alchemist', body: 0x581c87, hat: 0x3b0764, apron: 0xfacc15 },
+                { name: 'Space Suit Commissary', body: 0xe2e8f0, hat: 0x38bdf8, apron: 0x64748b },
+                { name: 'Golden Gorilla Mogul', body: 0xfacc15, hat: 0xb45309, apron: 0x1e293b }
+            ];
+
+            let selectedAnimalSpecies = 'panda';
+            const speciesGrid = document.getElementById('animal-species-grid');
+            ANIMAL_CATALOG.forEach(an => {
+                const div = document.createElement('div');
+                div.className = 'build-card' + (an.id === 'panda' ? ' active' : '');
+                div.innerHTML = `<span class="icon">${an.icon}</span><span class="label">${an.label}</span>`;
+                div.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    selectedAnimalSpecies = an.id;
+                    speciesGrid.querySelectorAll('.build-card').forEach(c => c.classList.remove('active'));
+                    div.classList.add('active');
+                });
+                speciesGrid.appendChild(div);
+            });
+
+            // =========================================================
+            // 2. SCHEDULE I PROCEDURAL TEXTURES
+            // =========================================================
+            function makeScheduleTexture(drawFn, repeatX, repeatY) {
+                const canvas = document.createElement('canvas');
+                canvas.width = 256; canvas.height = 256;
+                const ctx = canvas.getContext('2d');
+                drawFn(ctx, 256, 256);
+                const tex = new THREE.CanvasTexture(canvas);
+                tex.wrapS = THREE.RepeatWrapping;
+                tex.wrapT = THREE.RepeatWrapping;
+                tex.repeat.set(repeatX || 1, repeatY || 1);
+                return tex;
             }
-        } else {
-            activeGods[id].x = typeof x === 'number' ? x : activeGods[id].x;
-            activeGods[id].y = typeof y === 'number' ? y : activeGods[id].y;
-            activeGods[id].z = typeof z === 'number' ? z : activeGods[id].z;
-            activeGods[id].rotY = typeof rotY === 'number' ? rotY : activeGods[id].rotY;
-            activeGods[id].lastSeen = now;
-        }
-    }
 
-    res.json({
-        gods: Object.values(activeGods),
-        peanut: peanutState,
-        worldCount: worldItems.length
-    });
-});
+            const grassTex = makeScheduleTexture((ctx, w, h) => {
+                ctx.fillStyle = '#335d2d'; ctx.fillRect(0, 0, w, h);
+                for (let i = 0; i < 1100; i++) {
+                    ctx.fillStyle = (i % 3 === 0) ? '#264721' : '#3f7037';
+                    ctx.fillRect(Math.random() * w, Math.random() * h, 3, 6);
+                }
+            }, 90, 90);
 
-app.post('/api/peanut/override', (req, res) => {
-    const { mood, hunger, energy, activity, assignedBedId } = req.body || {};
-    if (mood !== undefined) peanutState.mood = mood;
-    if (hunger !== undefined) peanutState.hunger = Number(hunger);
-    if (energy !== undefined) peanutState.energy = Number(energy);
-    if (activity !== undefined) peanutState.activity = activity;
-    if (assignedBedId !== undefined) peanutState.assignedBedId = assignedBedId;
-    res.json({ success: true, peanut: peanutState });
-});
+            const roadTex = makeScheduleTexture((ctx, w, h) => {
+                ctx.fillStyle = '#24272d'; ctx.fillRect(0, 0, w, h);
+                ctx.fillStyle = '#141619'; ctx.fillRect(0, 0, 12, h); ctx.fillRect(w - 12, 0, 12, h);
+                ctx.fillStyle = '#eab308'; ctx.fillRect(w / 2 - 4, 20, 8, 80); ctx.fillRect(w / 2 - 4, 148, 8, 80);
+            }, 1, 35);
 
-app.get('/api/world', (req, res) => res.json(worldItems));
-app.post('/api/world', (req, res) => {
-    if (Array.isArray(req.body)) {
-        worldItems = req.body;
-        saveDataToDisk();
-        return res.json({ success: true, count: worldItems.length });
-    }
-    res.status(400).json({ error: 'Invalid payload' });
-});
+            const brickPatternTex = makeScheduleTexture((ctx, w, h) => {
+                ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, w, h);
+                const rows = 8, cols = 4, rowH = h / rows, colW = w / cols;
+                ctx.strokeStyle = '#1e1b18'; ctx.lineWidth = 4;
+                for (let r = 0; r < rows; r++) {
+                    const offset = (r % 2) * (colW / 2);
+                    for (let c = -1; c <= cols; c++) {
+                        ctx.fillStyle = ((r + c) % 2 === 0) ? '#e5e7eb' : '#d1d5db';
+                        ctx.fillRect(c * colW + offset + 2, r * rowH + 2, colW - 4, rowH - 4);
+                        ctx.strokeRect(c * colW + offset, r * rowH, colW, rowH);
+                    }
+                }
+            }, 2, 2);
 
-app.post('/api/world/update-item', (req, res) => {
-    const { id, isOpen, inventory, assignedTo } = req.body || {};
-    const target = worldItems.find(it => it.id === id);
-    if (!target) return res.status(404).json({ error: 'Item not found' });
+            const concreteTex = makeScheduleTexture((ctx, w, h) => {
+                ctx.fillStyle = '#9ca3af'; ctx.fillRect(0, 0, w, h);
+                ctx.strokeStyle = '#1e2227'; ctx.lineWidth = 6;
+                ctx.strokeRect(3, 3, w - 6, h - 6);
+            }, 2, 2);
 
-    if (typeof isOpen === 'boolean') target.isOpen = isOpen;
-    if (Array.isArray(inventory)) target.inventory = inventory.slice(0, 10);
-    if (assignedTo !== undefined) {
-        target.assignedTo = assignedTo;
-        if (assignedTo === 'Peanut') {
-            peanutState.assignedBedId = target.id;
-        }
-    }
-    saveDataToDisk();
-    res.json({ success: true, item: target, peanut: peanutState });
-});
+            const woodTex = makeScheduleTexture((ctx, w, h) => {
+                ctx.fillStyle = '#855834'; ctx.fillRect(0, 0, w, h);
+                ctx.strokeStyle = '#2b1b0e'; ctx.lineWidth = 4;
+                for (let i = 0; i < 6; i++) ctx.strokeRect(0, i * (h / 6), w, h / 6);
+            }, 2, 2);
 
-app.use((req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
+            const fenceTex = makeScheduleTexture((ctx, w, h) => {
+                ctx.clearRect(0, 0, w, h);
+                ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 3;
+                for (let x = -h; x < w + h; x += 32) {
+                    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x + h, h); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(x + h, 0); ctx.lineTo(x, h); ctx.stroke();
+                }
+                ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 8; ctx.strokeRect(0, 0, w, h);
+            }, 2, 1);
 
-app.listen(PORT, () => console.log('The Badabing Server running on port ' + PORT));
+            function makeSignTexture(text, bgColor, textColor) {
+                const c = document.createElement('canvas');
+                c.width = 512; c.height = 128;
+                const ctx = c.getContext('2d');
+                ctx.fillStyle = bgColor; ctx.fillRect(0, 0, 512, 128);
+                ctx.strokeStyle = '#111'; ctx.lineWidth = 8; ctx.strokeRect(4, 4, 504, 120);
+                ctx.fillStyle = textColor; ctx.font = 'bold 48px sans-serif';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText(text, 256, 64);
+                return new THREE.CanvasTexture(c);
+            }
+
+            const mcdSignTex = makeSignTexture("McDONALD'S 🍔", '#b91c1c', '#facc15');
+            const walmartSignTex = makeSignTexture('WALMART ✳️', '#1d4ed8', '#ffffff');
+
+            // =========================================================
+            // 3. SCENE, CAMERA (YXZ ZERO-TWIST ORDER) & ENVIRONMENT
+            // =========================================================
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x7ba0c7);
+            scene.fog = new THREE.FogExp2(0x7ba0c7, 0.0014);
+
+            const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 3000);
+            // Lock rotation order to YXZ so pitch & yaw never induce roll/twist
+            camera.rotation.order = 'YXZ';
+            camera.position.set(0, 2.2, 24);
+
+            const renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMap.enabled = true;
+            document.body.appendChild(renderer.domElement);
+
+            const skyGeo = new THREE.SphereGeometry(1500, 32, 15);
+            const skyMat = new THREE.ShaderMaterial({
+                uniforms: {
+                    topColor: { value: new THREE.Color(0x2b5fa8) },
+                    bottomColor: { value: new THREE.Color(0xd5e4f2) },
+                    offset: { value: 33 },
+                    exponent: { value: 0.6 }
+                },
+                vertexShader: `
+                    varying vec3 vWorldPosition;
+                    void main() {
+                        vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+                        vWorldPosition = worldPosition.xyz;
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                    }
+                `,
+                fragmentShader: `
+                    uniform vec3 topColor;
+                    uniform vec3 bottomColor;
+                    uniform float offset;
+                    uniform float exponent;
+                    varying vec3 vWorldPosition;
+                    void main() {
+                        float h = normalize(vWorldPosition + offset).y;
+                        gl_FragColor = vec4(mix(bottomColor, topColor, max(pow(max(h, 0.0), exponent), 0.0)), 1.0);
+                    }
+                `,
+                side: THREE.BackSide
+            });
+            scene.add(new THREE.Mesh(skyGeo, skyMat));
+
+            scene.add(new THREE.AmbientLight(0xffffff, 0.82));
+            const sunLight = new THREE.DirectionalLight(0xfff5e0, 1.35);
+            sunLight.position.set(120, 180, 100);
+            sunLight.castShadow = true;
+            scene.add(sunLight);
+
+            const ground = new THREE.Mesh(
+                new THREE.PlaneGeometry(800, 800),
+                new THREE.MeshStandardMaterial({ map: grassTex, roughness: 0.9 })
+            );
+            ground.rotation.x = -Math.PI / 2;
+            ground.receiveShadow = true;
+            scene.add(ground);
+
+            const roadMat = new THREE.MeshStandardMaterial({ map: roadTex, roughness: 0.85 });
+            [-180, -90, 0, 90, 180].forEach(pos => {
+                const roadNS = new THREE.Mesh(new THREE.PlaneGeometry(16, 700), roadMat);
+                roadNS.rotation.x = -Math.PI / 2;
+                roadNS.position.set(pos, 0.02, 0);
+                scene.add(roadNS);
+
+                const roadEW = new THREE.Mesh(new THREE.PlaneGeometry(16, 700), roadMat);
+                roadEW.rotation.x = -Math.PI / 2;
+                roadEW.rotation.z = Math.PI / 2;
+                roadEW.position.set(0, 0.03, pos);
+                scene.add(roadEW);
+            });
+
+            // Basketball Court at (60, 60)
+            const courtGroup = new THREE.Group();
+            courtGroup.position.set(60, 0.04, 60);
+            const courtSurface = new THREE.Mesh(
+                new THREE.PlaneGeometry(30, 20),
+                new THREE.MeshStandardMaterial({ color: 0xc86428, map: concreteTex, roughness: 0.7 })
+            );
+            courtSurface.rotation.x = -Math.PI / 2;
+            courtGroup.add(courtSurface);
+
+            const poleMat = new THREE.MeshStandardMaterial({ color: 0x18181b });
+            [-14, 14].forEach(hx => {
+                const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 6), poleMat);
+                pole.position.set(hx, 3, 0);
+                courtGroup.add(pole);
+                const backboard = new THREE.Mesh(new THREE.BoxGeometry(0.3, 2, 3), new THREE.MeshStandardMaterial({ color: 0xffffff }));
+                backboard.position.set(hx > 0 ? hx - 0.5 : hx + 0.5, 4.5, 0);
+                courtGroup.add(backboard);
+                const rim = new THREE.Mesh(new THREE.TorusGeometry(0.8, 0.08, 8, 24), new THREE.MeshStandardMaterial({ color: 0xff4500 }));
+                rim.rotation.x = Math.PI / 2;
+                rim.position.set(hx > 0 ? hx - 1.5 : hx + 1.5, 4, 0);
+                courtGroup.add(rim);
+            });
+            scene.add(courtGroup);
+
+            // Trees
+            const trunkMat = new THREE.MeshStandardMaterial({ map: woodTex, roughness: 0.9 });
+            const leavesMat = new THREE.MeshStandardMaterial({ map: grassTex, color: 0x3b8546, roughness: 0.8 });
+            [
+                [-50, -50], [-70, -30], [-30, -70], [70, 30], [30, 70],
+                [-50, 50], [-70, 30], [50, -50], [70, -30], [-120, -50], [-120, 50], [120, -50], [120, 50]
+            ].forEach(coord => {
+                const tree = new THREE.Group();
+                const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.8, 4), trunkMat);
+                trunk.position.y = 2;
+                tree.add(trunk);
+                const leaves = new THREE.Mesh(new THREE.ConeGeometry(3.6, 6.5, 7), leavesMat);
+                leaves.position.y = 6.2;
+                tree.add(leaves);
+                tree.position.set(coord[0], 0, coord[1]);
+                scene.add(tree);
+            });
+
+            // =========================================================
+            // 4. ANIME COMPANION FACTORY (20 ANIMALS) & GORILLA AVATARS
+            // =========================================================
+            const npcsGroup = new THREE.Group();
+            scene.add(npcsGroup);
+            const npcMeshes = {};
+            let npcList = [];
+            let selectedNpcId = 'peanut';
+
+            function createCuteAnimeAnimalMesh(speciesId, nameText, scaleMultiplier) {
+                const spec = ANIMAL_CATALOG.find(a => a.id === speciesId) || ANIMAL_CATALOG[0];
+                const sc = scaleMultiplier || 1.0;
+                const root = new THREE.Group();
+
+                const primMat = new THREE.MeshStandardMaterial({ color: spec.primary, roughness: 0.6 });
+                const secMat = new THREE.MeshStandardMaterial({ color: spec.secondary, roughness: 0.7 });
+                const pinkMat = new THREE.MeshBasicMaterial({ color: 0xff8da1 });
+                const eyeWhite = new THREE.MeshBasicMaterial({ color: 0xffffff });
+                const eyeIris = new THREE.MeshBasicMaterial({ color: 0x1e1b4b });
+                const eyeBlack = new THREE.MeshBasicMaterial({ color: 0x050505 });
+
+                // Torso
+                const torso = new THREE.Mesh(new THREE.SphereGeometry(1.1 * sc, 18, 18), primMat);
+                torso.scale.set(1.0, 1.12, 0.92);
+                torso.position.y = 1.9 * sc;
+                root.add(torso);
+
+                const vest = new THREE.Mesh(new THREE.CylinderGeometry(1.02 * sc, 1.08 * sc, 0.65 * sc, 18), secMat);
+                vest.position.y = 2.35 * sc;
+                root.add(vest);
+
+                // Head
+                const head = new THREE.Group();
+                head.position.set(0, 3.5 * sc, 0.1 * sc);
+                root.add(head);
+
+                const headSphere = new THREE.Mesh(new THREE.SphereGeometry(0.92 * sc, 18, 18), primMat);
+                headSphere.scale.set(1.08, 0.96, 0.95);
+                head.add(headSphere);
+
+                // Species-specific Ears
+                [-0.68 * sc, 0.68 * sc].forEach(ex => {
+                    if (spec.earType === 'tall') {
+                        const ear = new THREE.Mesh(new THREE.CylinderGeometry(0.18 * sc, 0.22 * sc, 1.1 * sc, 12), secMat);
+                        ear.position.set(ex * 0.8, 1.1 * sc, -0.05 * sc);
+                        head.add(ear);
+                    } else if (spec.earType === 'pointy') {
+                        const ear = new THREE.Mesh(new THREE.ConeGeometry(0.32 * sc, 0.65 * sc, 4), secMat);
+                        ear.position.set(ex, 0.85 * sc, -0.05 * sc);
+                        head.add(ear);
+                    } else if (spec.earType === 'horns') {
+                        const horn = new THREE.Mesh(new THREE.ConeGeometry(0.16 * sc, 0.55 * sc, 8), new THREE.MeshStandardMaterial({ color: 0xfef08a }));
+                        horn.position.set(ex, 0.88 * sc, -0.05 * sc);
+                        head.add(horn);
+                    } else if (spec.earType !== 'none') {
+                        const ear = new THREE.Mesh(new THREE.SphereGeometry(0.34 * sc, 14, 14), secMat);
+                        ear.position.set(ex, 0.74 * sc, -0.1 * sc);
+                        head.add(ear);
+                    }
+                });
+
+                // Snout
+                const snout = new THREE.Mesh(new THREE.SphereGeometry(0.32 * sc, 14, 14), secMat);
+                snout.scale.set(1.2, 0.85, 1.0);
+                snout.position.set(0, -0.15 * sc, 0.8 * sc);
+                head.add(snout);
+
+                // Big Glossy Anime Eyes
+                const eyeGroup = new THREE.Group();
+                head.add(eyeGroup);
+
+                [-0.35 * sc, 0.35 * sc].forEach(ex => {
+                    const side = ex > 0 ? 1 : -1;
+                    const patch = new THREE.Mesh(new THREE.SphereGeometry(0.28 * sc, 14, 14), secMat);
+                    patch.scale.set(1.05, 1.22, 0.45);
+                    patch.position.set(ex, 0.1 * sc, 0.74 * sc);
+                    eyeGroup.add(patch);
+
+                    const iris = new THREE.Mesh(new THREE.SphereGeometry(0.22 * sc, 14, 14), eyeIris);
+                    iris.scale.set(1.0, 1.18, 0.5);
+                    iris.position.set(ex, 0.11 * sc, 0.83 * sc);
+                    eyeGroup.add(iris);
+
+                    const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.16 * sc, 14, 14), eyeBlack);
+                    pupil.scale.set(1.0, 1.15, 0.52);
+                    pupil.position.set(ex, 0.11 * sc, 0.87 * sc);
+                    eyeGroup.add(pupil);
+
+                    const shineBig = new THREE.Mesh(new THREE.SphereGeometry(0.08 * sc, 10, 10), eyeWhite);
+                    shineBig.position.set(ex + (side * 0.06 * sc), 0.2 * sc, 0.96 * sc);
+                    eyeGroup.add(shineBig);
+
+                    const shineSmall = new THREE.Mesh(new THREE.SphereGeometry(0.04 * sc, 8, 8), eyeWhite);
+                    shineSmall.position.set(ex - (side * 0.05 * sc), 0.02 * sc, 0.96 * sc);
+                    eyeGroup.add(shineSmall);
+
+                    const blush = new THREE.Mesh(new THREE.SphereGeometry(0.15 * sc, 10, 10), pinkMat);
+                    blush.scale.set(1.4, 0.65, 0.4);
+                    blush.position.set(ex * 1.4, -0.17 * sc, 0.76 * sc);
+                    head.add(blush);
+                });
+
+                function makeLimb(radius, len) {
+                    const pivot = new THREE.Group();
+                    const m = new THREE.Mesh(new THREE.CylinderGeometry(radius * sc, radius * 0.9 * sc, len * sc, 12), secMat);
+                    m.position.y = -(len * sc) / 2;
+                    pivot.add(m);
+                    return pivot;
+                }
+
+                const leftLeg = makeLimb(0.35, 1.05); leftLeg.position.set(-0.48 * sc, 1.1 * sc, 0); root.add(leftLeg);
+                const rightLeg = makeLimb(0.35, 1.05); rightLeg.position.set(0.48 * sc, 1.1 * sc, 0); root.add(rightLeg);
+                const leftArm = makeLimb(0.3, 1.1); leftArm.position.set(-1.05 * sc, 2.6 * sc, 0); root.add(leftArm);
+                const rightArm = makeLimb(0.3, 1.1); rightArm.position.set(1.05 * sc, 2.6 * sc, 0); root.add(rightArm);
+
+                if (nameText) {
+                    const tagTex = makeSignTexture(spec.icon + ' ' + nameText, '#111318', '#fde047');
+                    const tag = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 0.55), new THREE.MeshBasicMaterial({ map: tagTex, side: THREE.DoubleSide }));
+                    tag.position.y = 4.9 * sc;
+                    root.add(tag);
+                }
+
+                root.userData = { leftLeg, rightLeg, leftArm, rightArm, eyeGroup, head };
+                return root;
+            }
+
+            // 3D Gorilla Model Builder (Used for Co-op Gorilla Gods & XL Gorilla Statue)
+            function createGorillaModel(bodyColorHex, scale, nameLabel) {
+                const g = new THREE.Group();
+                const furMat = new THREE.MeshStandardMaterial({ color: new THREE.Color(bodyColorHex || '#27272a'), roughness: 0.65, metalness: 0.15 });
+                const chestMat = new THREE.MeshStandardMaterial({ color: 0x52525b, roughness: 0.5 });
+
+                // Broad Muscular Gorilla Torso
+                const torso = new THREE.Mesh(new THREE.BoxGeometry(1.8 * scale, 2.1 * scale, 1.3 * scale), furMat);
+                torso.position.y = 2.0 * scale;
+                g.add(torso);
+
+                const chest = new THREE.Mesh(new THREE.BoxGeometry(1.5 * scale, 1.4 * scale, 0.2 * scale), chestMat);
+                chest.position.set(0, 2.15 * scale, 0.62 * scale);
+                g.add(chest);
+
+                // Gorilla Head & Brow Ridge
+                const head = new THREE.Mesh(new THREE.BoxGeometry(1.15 * scale, 1.15 * scale, 1.15 * scale), furMat);
+                head.position.set(0, 3.45 * scale, 0.15 * scale);
+                g.add(head);
+
+                const brow = new THREE.Mesh(new THREE.BoxGeometry(1.2 * scale, 0.28 * scale, 0.4 * scale), chestMat);
+                brow.position.set(0, 3.82 * scale, 0.65 * scale);
+                g.add(brow);
+
+                const jaw = new THREE.Mesh(new THREE.BoxGeometry(0.85 * scale, 0.55 * scale, 0.5 * scale), chestMat);
+                jaw.position.set(0, 3.15 * scale, 0.68 * scale);
+                g.add(jaw);
+
+                // Glowing Eyes
+                [-0.28 * scale, 0.28 * scale].forEach(ex => {
+                    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.11 * scale, 10, 10), new THREE.MeshBasicMaterial({ color: 0xfef08a }));
+                    eye.position.set(ex, 3.55 * scale, 0.72 * scale);
+                    g.add(eye);
+                });
+
+                // Thick Gorilla Arms & Legs
+                const leftArm = new THREE.Mesh(new THREE.BoxGeometry(0.6 * scale, 2.2 * scale, 0.6 * scale), furMat);
+                leftArm.position.set(-1.25 * scale, 1.8 * scale, 0.1 * scale);
+                const rightArm = new THREE.Mesh(new THREE.BoxGeometry(0.6 * scale, 2.2 * scale, 0.6 * scale), furMat);
+                rightArm.position.set(1.25 * scale, 1.8 * scale, 0.1 * scale);
+
+                const leftLeg = new THREE.Mesh(new THREE.BoxGeometry(0.65 * scale, 1.3 * scale, 0.65 * scale), furMat);
+                leftLeg.position.set(-0.5 * scale, 0.65 * scale, 0);
+                const rightLeg = new THREE.Mesh(new THREE.BoxGeometry(0.65 * scale, 1.3 * scale, 0.65 * scale), furMat);
+                rightLeg.position.set(0.5 * scale, 0.65 * scale, 0);
+
+                g.add(leftArm, rightArm, leftLeg, rightLeg);
+
+                if (nameLabel) {
+                    const nameTex = makeSignTexture('🦍 ' + nameLabel, '#111318', bodyColorHex);
+                    const namePlane = new THREE.Mesh(
+                        new THREE.PlaneGeometry(2.6, 0.6),
+                        new THREE.MeshBasicMaterial({ map: nameTex, side: THREE.DoubleSide })
+                    );
+                    namePlane.position.y = 4.6 * scale;
+                    g.add(namePlane);
+                }
+                return g;
+            }
+
+            const coopGodsGroup = new THREE.Group();
+            scene.add(coopGodsGroup);
+            const remoteGodMeshes = {};
+
+            // =========================================================
+            // 5. MODULAR & WHOLE-BUILDING FACTORY (+ STATUE & MERCHANT)
+            // =========================================================
+            const cityPropsGroup = new THREE.Group();
+            scene.add(cityPropsGroup);
+
+            let selectedTool = 'none';
+            let selectedColor = '#8a483c';
+            let buildRotation = 0;
+            let buildElevation = 0;
+            let ghostMesh = null;
+
+            const glassMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.65, roughness: 0.1 });
+
+            function buildModularMesh(type, colorHex, isGhost, itemData) {
+                const group = new THREE.Group();
+                const baseColor = new THREE.Color(colorHex || '#8a483c');
+
+                const ghostMat = isGhost ? new THREE.MeshBasicMaterial({
+                    color: type === 'delete' ? 0xef4444 : 0x38bdf8,
+                    transparent: true,
+                    opacity: 0.5
+                }) : null;
+
+                const paintedBrickMat = isGhost ? ghostMat : new THREE.MeshStandardMaterial({ map: brickPatternTex, color: baseColor, roughness: 0.75 });
+                const paintedConcreteMat = isGhost ? ghostMat : new THREE.MeshStandardMaterial({ map: concreteTex, color: baseColor, roughness: 0.7 });
+                const paintedWoodMat = isGhost ? ghostMat : new THREE.MeshStandardMaterial({ map: woodTex, roughness: 0.6 });
+                const fenceMat = isGhost ? ghostMat : new THREE.MeshStandardMaterial({ map: fenceTex, color: baseColor, transparent: true, alphaTest: 0.2, side: THREE.DoubleSide });
+
+                if (type === 'foundation') {
+                    const m = new THREE.Mesh(new THREE.BoxGeometry(4, 0.4, 4), paintedConcreteMat);
+                    m.position.y = 0.2;
+                    group.add(m);
+                } else if (type === 'wall') {
+                    const m = new THREE.Mesh(new THREE.BoxGeometry(4, 4, 0.4), paintedBrickMat);
+                    m.position.y = 2.0;
+                    m.userData.isSolidWall = !isGhost;
+                    group.add(m);
+                } else if (type === 'doorway') {
+                    const leftPillar = new THREE.Mesh(new THREE.BoxGeometry(1.2, 4, 0.4), paintedBrickMat);
+                    leftPillar.position.set(-1.4, 2.0, 0); leftPillar.userData.isSolidWall = !isGhost;
+                    const rightPillar = new THREE.Mesh(new THREE.BoxGeometry(1.2, 4, 0.4), paintedBrickMat);
+                    rightPillar.position.set(1.4, 2.0, 0); rightPillar.userData.isSolidWall = !isGhost;
+                    const header = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.2, 0.4), paintedBrickMat);
+                    header.position.set(0, 3.4, 0);
+
+                    const doorHinge = new THREE.Group();
+                    doorHinge.position.set(-0.8, 0, 0);
+                    const doorPanel = new THREE.Mesh(new THREE.BoxGeometry(1.6, 2.8, 0.16), paintedWoodMat);
+                    doorPanel.position.set(0.8, 1.4, 0);
+                    const knob = new THREE.Mesh(new THREE.SphereGeometry(0.08, 8, 8), new THREE.MeshStandardMaterial({ color: 0xfacc15 }));
+                    knob.position.set(1.4, 1.35, 0.12);
+                    doorPanel.add(knob);
+
+                    const isOpen = itemData && itemData.isOpen;
+                    doorHinge.rotation.y = isOpen ? -Math.PI * 0.55 : 0;
+                    doorPanel.userData.isSolidWall = (!isGhost && !isOpen);
+                    doorPanel.userData.interactType = 'door';
+                    doorHinge.add(doorPanel);
+                    group.add(leftPillar, rightPillar, header, doorHinge);
+                } else if (type === 'window') {
+                    const bottom = new THREE.Mesh(new THREE.BoxGeometry(4, 1.2, 0.4), paintedBrickMat);
+                    bottom.position.set(0, 0.6, 0); bottom.userData.isSolidWall = !isGhost;
+                    const top = new THREE.Mesh(new THREE.BoxGeometry(4, 1.0, 0.4), paintedBrickMat);
+                    top.position.set(0, 3.5, 0);
+                    const left = new THREE.Mesh(new THREE.BoxGeometry(1.0, 1.8, 0.4), paintedBrickMat);
+                    left.position.set(-1.5, 2.1, 0); left.userData.isSolidWall = !isGhost;
+                    const right = new THREE.Mesh(new THREE.BoxGeometry(1.0, 1.8, 0.4), paintedBrickMat);
+                    right.position.set(1.5, 2.1, 0); right.userData.isSolidWall = !isGhost;
+                    const pane = new THREE.Mesh(new THREE.BoxGeometry(2.0, 1.8, 0.12), isGhost ? ghostMat : glassMat);
+                    pane.position.set(0, 2.1, 0); pane.userData.isSolidWall = !isGhost;
+                    group.add(bottom, top, left, right, pane);
+                } else if (type === 'stairs') {
+                    for (let i = 0; i < 10; i++) {
+                        const step = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.4, 0.45), paintedWoodMat);
+                        step.position.set(0, (i + 0.5) * 0.4, -1.8 + i * 0.4);
+                        group.add(step);
+                    }
+                } else if (type === 'roof_flat') {
+                    const m = new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.35, 4.2), paintedConcreteMat);
+                    m.position.y = 4.0;
+                    group.add(m);
+                } else if (type === 'roof_pitched') {
+                    const m = new THREE.Mesh(new THREE.ConeGeometry(3.2, 2.6, 4), paintedBrickMat);
+                    m.position.y = 5.3; m.rotation.y = Math.PI / 4;
+                    group.add(m);
+                } else if (type === 'fence') {
+                    const panel = new THREE.Mesh(new THREE.BoxGeometry(4, 2.4, 0.15), fenceMat);
+                    panel.position.y = 1.2; panel.userData.isSolidWall = !isGhost;
+                    group.add(panel);
+                } else if (type === 'streetlight') {
+                    const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.16, 5.5), poleMat);
+                    pole.position.y = 2.75;
+                    const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.28, 12, 12), new THREE.MeshBasicMaterial({ color: 0xfef08a }));
+                    bulb.position.set(0.8, 5.2, 0);
+                    group.add(pole, bulb);
+                } else if (type === 'mcdonalds') {
+                    const redMat = isGhost ? ghostMat : new THREE.MeshStandardMaterial({ map: brickPatternTex, color: new THREE.Color(colorHex || '#b91c1c') });
+                    const yellowMat = isGhost ? ghostMat : new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.4 });
+                    const floor = new THREE.Mesh(new THREE.BoxGeometry(16, 0.3, 12), paintedConcreteMat); floor.position.y = 0.15;
+                    const backW = new THREE.Mesh(new THREE.BoxGeometry(16, 4.5, 0.4), redMat); backW.position.set(0, 2.25, -6); backW.userData.isSolidWall = !isGhost;
+                    const leftW = new THREE.Mesh(new THREE.BoxGeometry(0.4, 4.5, 12), redMat); leftW.position.set(-8, 2.25, 0); leftW.userData.isSolidWall = !isGhost;
+                    const rightW = new THREE.Mesh(new THREE.BoxGeometry(0.4, 4.5, 12), redMat); rightW.position.set(8, 2.25, 0); rightW.userData.isSolidWall = !isGhost;
+                    const frontL = new THREE.Mesh(new THREE.BoxGeometry(5.5, 4.5, 0.4), redMat); frontL.position.set(-5.25, 2.25, 6); frontL.userData.isSolidWall = !isGhost;
+                    const frontR = new THREE.Mesh(new THREE.BoxGeometry(5.5, 4.5, 0.4), redMat); frontR.position.set(5.25, 2.25, 6); frontR.userData.isSolidWall = !isGhost;
+                    const roof = new THREE.Mesh(new THREE.BoxGeometry(17, 0.6, 13), yellowMat); roof.position.y = 4.8;
+                    const counter = new THREE.Mesh(new THREE.BoxGeometry(8, 1.2, 1.2), yellowMat); counter.position.set(0, 0.6, -2.5);
+                    const sign = new THREE.Mesh(new THREE.BoxGeometry(10, 2.2, 0.4), isGhost ? ghostMat : new THREE.MeshBasicMaterial({ map: mcdSignTex })); sign.position.set(0, 6.2, 6);
+                    group.add(floor, backW, leftW, rightW, frontL, frontR, roof, counter, sign);
+                } else if (type === 'walmart') {
+                    const blueMat = isGhost ? ghostMat : new THREE.MeshStandardMaterial({ map: concreteTex, color: new THREE.Color(colorHex || '#1d4ed8') });
+                    const floor = new THREE.Mesh(new THREE.BoxGeometry(24, 0.3, 18), paintedConcreteMat); floor.position.y = 0.15;
+                    const backW = new THREE.Mesh(new THREE.BoxGeometry(24, 6, 0.5), blueMat); backW.position.set(0, 3, -9); backW.userData.isSolidWall = !isGhost;
+                    const leftW = new THREE.Mesh(new THREE.BoxGeometry(0.5, 6, 18), blueMat); leftW.position.set(-12, 3, 0); leftW.userData.isSolidWall = !isGhost;
+                    const rightW = new THREE.Mesh(new THREE.BoxGeometry(0.5, 6, 18), blueMat); rightW.position.set(12, 3, 0); rightW.userData.isSolidWall = !isGhost;
+                    const frontL = new THREE.Mesh(new THREE.BoxGeometry(9, 6, 0.5), blueMat); frontL.position.set(-7.5, 3, 9); frontL.userData.isSolidWall = !isGhost;
+                    const frontR = new THREE.Mesh(new THREE.BoxGeometry(9, 6, 0.5), blueMat); frontR.position.set(7.5, 3, 9); frontR.userData.isSolidWall = !isGhost;
+                    const roof = new THREE.Mesh(new THREE.BoxGeometry(25, 0.6, 19), paintedConcreteMat); roof.position.y = 6.3;
+                    const sign = new THREE.Mesh(new THREE.BoxGeometry(14, 2.6, 0.5), isGhost ? ghostMat : new THREE.MeshBasicMaterial({ map: walmartSignTex })); sign.position.set(0, 8.0, 9);
+                    group.add(floor, backW, leftW, rightW, frontL, frontR, roof, sign);
+                } else if (type === 'gorilla_statue') {
+                    // XL Gorilla Monument Statue
+                    const pedestal = new THREE.Mesh(new THREE.CylinderGeometry(3.6, 4.2, 2.0, 16), paintedConcreteMat);
+                    pedestal.position.y = 1.0;
+                    pedestal.userData.isSolidWall = !isGhost;
+                    group.add(pedestal);
+
+                    const statueColor = colorHex || '#d97706';
+                    const giantGorilla = createGorillaModel(statueColor, 3.6, null);
+                    giantGorilla.position.y = 2.0;
+                    group.add(giantGorilla);
+
+                    const plaqueTex = makeSignTexture('🦍 XL GORILLA MONUMENT', '#1c1917', '#facc15');
+                    const plaque = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 0.9), new THREE.MeshBasicMaterial({ map: plaqueTex }));
+                    plaque.position.set(0, 1.2, 4.05);
+                    group.add(plaque);
+                } else if (type === 'merchant') {
+                    // Customizable Merchant Booth + 10-Skin NPC
+                    const skinIdx = (itemData && typeof itemData.merchantSkin === 'number') ? itemData.merchantSkin : 0;
+                    const skin = MERCHANT_SKINS[skinIdx % MERCHANT_SKINS.length];
+
+                    const counter = new THREE.Mesh(new THREE.BoxGeometry(3.6, 1.1, 1.4), paintedWoodMat);
+                    counter.position.set(0, 0.55, 0.8);
+                    counter.userData.isSolidWall = !isGhost;
+                    counter.userData.interactType = 'merchant';
+                    group.add(counter);
+
+                    const postL = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 3.2), poleMat); postL.position.set(-1.6, 1.6, 0.8);
+                    const postR = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 3.2), poleMat); postR.position.set(1.6, 1.6, 0.8);
+                    const canopy = new THREE.Mesh(new THREE.ConeGeometry(2.8, 1.2, 4), isGhost ? ghostMat : new THREE.MeshStandardMaterial({ color: skin.hat }));
+                    canopy.position.set(0, 3.5, 0.4); canopy.rotation.y = Math.PI / 4;
+                    group.add(postL, postR, canopy);
+
+                    // Merchant Character Standing Behind Booth
+                    const merchNpc = new THREE.Group();
+                    merchNpc.position.set(0, 0, -0.3);
+                    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.5, 1.6, 14), new THREE.MeshStandardMaterial({ color: skin.body }));
+                    body.position.y = 0.8;
+                    const apron = new THREE.Mesh(new THREE.BoxGeometry(0.7, 1.1, 0.15), new THREE.MeshStandardMaterial({ color: skin.apron }));
+                    apron.position.set(0, 0.8, 0.42);
+                    const head = new THREE.Mesh(new THREE.SphereGeometry(0.42, 14, 14), new THREE.MeshStandardMaterial({ color: 0xfde68a }));
+                    head.position.y = 1.95;
+                    const hat = new THREE.Mesh(new THREE.CylinderGeometry(0.48, 0.55, 0.35, 12), new THREE.MeshStandardMaterial({ color: skin.hat }));
+                    hat.position.y = 2.35;
+                    merchNpc.add(body, apron, head, hat);
+                    body.userData.interactType = 'merchant';
+                    head.userData.interactType = 'merchant';
+                    group.add(merchNpc);
+
+                    const shopTitle = (itemData && itemData.merchantName) ? itemData.merchantName : skin.name;
+                    const signTex = makeSignTexture('🏪 ' + shopTitle, '#111318', '#4ade80');
+                    const sign = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 0.65), new THREE.MeshBasicMaterial({ map: signTex, side: THREE.DoubleSide }));
+                    sign.position.set(0, 2.85, 1.5);
+                    group.add(sign);
+                } else if (type === 'fountain') {
+                    const basin = new THREE.Mesh(new THREE.CylinderGeometry(3.2, 3.5, 0.8, 20), paintedConcreteMat);
+                    basin.position.y = 0.4; basin.userData.isSolidWall = !isGhost;
+                    const waterMat = isGhost ? ghostMat : new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.1, transparent: true, opacity: 0.85 });
+                    const water = new THREE.Mesh(new THREE.CylinderGeometry(2.9, 2.9, 0.65, 20), waterMat); water.position.y = 0.45;
+                    const pillar = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.7, 2.4, 16), paintedConcreteMat); pillar.position.y = 1.2;
+                    const topBowl = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 0.6, 0.5, 16), waterMat); topBowl.position.y = 2.4;
+                    group.add(basin, water, pillar, topBowl);
+                } else if (type === 'mailbox') {
+                    const post = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 1.4), poleMat); post.position.y = 0.7;
+                    const box = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.65, 1.1), isGhost ? ghostMat : new THREE.MeshStandardMaterial({ color: baseColor, metalness: 0.3 }));
+                    box.position.y = 1.5; box.userData.interactType = 'inventory';
+                    group.add(post, box);
+                } else if (type === 'locker') {
+                    const lockerBox = new THREE.Mesh(new THREE.BoxGeometry(1.2, 2.4, 1.0), isGhost ? ghostMat : new THREE.MeshStandardMaterial({ color: baseColor, metalness: 0.5, roughness: 0.4 }));
+                    lockerBox.position.y = 1.2; lockerBox.userData.isSolidWall = !isGhost; lockerBox.userData.interactType = 'inventory';
+                    group.add(lockerBox);
+                } else if (type === 'bed') {
+                    const frame = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.6, 3.6), paintedWoodMat); frame.position.y = 0.3;
+                    const mattress = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.35, 3.3), isGhost ? ghostMat : new THREE.MeshStandardMaterial({ color: baseColor }));
+                    mattress.position.y = 0.7; mattress.userData.interactType = 'bed';
+                    const pillow = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.25, 0.7), new THREE.MeshStandardMaterial({ color: 0xffffff }));
+                    pillow.position.set(0, 0.95, -1.1);
+                    group.add(frame, mattress, pillow);
+
+                    if (!isGhost && itemData && itemData.assignedTo) {
+                        const tagTex = makeSignTexture('🛏️ ' + itemData.assignedTo, '#1e1b4b', '#fde047');
+                        const tag = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 0.45), new THREE.MeshBasicMaterial({ map: tagTex, side: THREE.DoubleSide }));
+                        tag.position.set(0, 1.65, 0);
+                        group.add(tag);
+                    }
+                }
+                return group;
+            }
+
+            // =========================================================
+            // 6. RESTART-PROOF HYBRID PERSISTENCE & CO-OP SYNC
+            // =========================================================
+            let worldDataList = [];
+
+            function rebuildSceneFromData(list) {
+                cityPropsGroup.clear();
+                worldDataList = list;
+                pieceCountEl.innerText = list.length;
+
+                list.forEach(item => {
+                    const mesh = buildModularMesh(item.type, item.color || '#8a483c', false, item);
+                    mesh.position.set(item.x, item.y || 0, item.z);
+                    mesh.rotation.y = THREE.MathUtils.degToRad(item.rot || 0);
+                    mesh.userData = Object.assign(mesh.userData || {}, item);
+                    cityPropsGroup.add(mesh);
+                });
+            }
+
+            async function pushWorldToServer() {
+                pieceCountEl.innerText = worldDataList.length;
+                localStorage.setItem('badabing_world_v4', JSON.stringify(worldDataList));
+                try {
+                    await fetch('/api/world', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(worldDataList)
+                    });
+                } catch (e) {}
+            }
+
+            async function initWorldAndRehydrate() {
+                const localItemsRaw = localStorage.getItem('badabing_world_v4') || localStorage.getItem('badabing_coop_backup');
+                const localNpcsRaw = localStorage.getItem('badabing_npcs_v4');
+                let localItems = [];
+                let localNpcs = [];
+                try { if (localItemsRaw) localItems = JSON.parse(localItemsRaw); } catch (e) {}
+                try { if (localNpcsRaw) localNpcs = JSON.parse(localNpcsRaw); } catch (e) {}
+
+                try {
+                    const res = await fetch('/api/world');
+                    if (res.ok) {
+                        const data = await res.json();
+                        const serverItems = Array.isArray(data.items) ? data.items : (Array.isArray(data) ? data : []);
+                        const serverNpcs = Array.isArray(data.npcs) ? data.npcs : [];
+
+                        // If server restarted on Render free tier and lost its disk state, auto-restore from client cache!
+                        if (serverItems.length === 0 && localItems.length > 0) {
+                            await fetch('/api/world/rehydrate', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ items: localItems, savedNpcs: localNpcs })
+                            });
+                            rebuildSceneFromData(localItems);
+                        } else {
+                            rebuildSceneFromData(serverItems);
+                            if (serverItems.length > 0) {
+                                localStorage.setItem('badabing_world_v4', JSON.stringify(serverItems));
+                            }
+                        }
+                        if (serverNpcs.length > 0) {
+                            syncNpcsClient(serverNpcs);
+                        }
+                        return;
+                    }
+                } catch (e) {}
+
+                if (localItems.length > 0) rebuildSceneFromData(localItems);
+            }
+            initWorldAndRehydrate();
+
+            function syncNpcsClient(serverNpcs) {
+                npcList = serverNpcs;
+                localStorage.setItem('badabing_npcs_v4', JSON.stringify(serverNpcs));
+
+                // Populate companion dropdown selector
+                const sel = document.getElementById('npc-selector');
+                const currentVal = sel.value || selectedNpcId;
+                if (sel.options.length !== serverNpcs.length) {
+                    sel.innerHTML = '';
+                    serverNpcs.forEach(n => {
+                        const spec = ANIMAL_CATALOG.find(a => a.id === n.species) || ANIMAL_CATALOG[0];
+                        const opt = document.createElement('option');
+                        opt.value = n.id;
+                        opt.textContent = spec.icon + ' ' + n.name;
+                        sel.appendChild(opt);
+                    });
+                    if (serverNpcs.some(n => n.id === currentVal)) sel.value = currentVal;
+                }
+                selectedNpcId = sel.value || (serverNpcs[0] && serverNpcs[0].id);
+
+                // Create or update 3D Cute Anime Animal Meshes
+                const activeNpcIds = new Set();
+                serverNpcs.forEach(n => {
+                    activeNpcIds.add(n.id);
+                    if (!npcMeshes[n.id]) {
+                        const scale = n.id === 'peanut' ? 1.0 : 0.88;
+                        const mesh = createCuteAnimeAnimalMesh(n.species, n.name, scale);
+                        mesh.position.set(n.x, 0, n.z);
+                        npcsGroup.add(mesh);
+                        npcMeshes[n.id] = mesh;
+                    }
+                    npcMeshes[n.id].userData.targetX = n.x;
+                    npcMeshes[n.id].userData.targetZ = n.z;
+                    npcMeshes[n.id].userData.targetRotY = n.rotY;
+                });
+
+                Object.keys(npcMeshes).forEach(id => {
+                    if (!activeNpcIds.has(id)) {
+                        npcsGroup.remove(npcMeshes[id]);
+                        delete npcMeshes[id];
+                    }
+                });
+
+                // Update Top Bar & Mind Panel for Selected Companion
+                const activeNpc = serverNpcs.find(n => n.id === selectedNpcId) || serverNpcs[0];
+                if (activeNpc) {
+                    document.getElementById('p-mood').innerText = activeNpc.mood;
+                    document.getElementById('p-coords').innerText = `(${Math.round(activeNpc.x)}, ${Math.round(activeNpc.z)})`;
+                    document.getElementById('p-hunger-val').innerText = Math.round(activeNpc.hunger) + '%';
+                    document.getElementById('p-hunger-bar').style.width = activeNpc.hunger + '%';
+                    document.getElementById('p-energy-val').innerText = Math.round(activeNpc.energy) + '%';
+                    document.getElementById('p-energy-bar').style.width = activeNpc.energy + '%';
+                    document.getElementById('p-activity').innerText = activeNpc.activity;
+                    document.getElementById('p-bed').innerText = activeNpc.assignedBedId ? 'Assigned 🏠' : 'None';
+
+                    document.getElementById('mind-panel-title').innerText = `${activeNpc.name}'s Mind & Logs`;
+                    document.getElementById('mind-wants-box').innerHTML = (activeNpc.wants || []).map(w => `• ${w}`).join('<br>');
+                    document.getElementById('mind-diary-box').innerHTML = (activeNpc.diary || []).map(d => `<div style="margin-bottom:4px;">${d}</div>`).join('');
+                    document.getElementById('mind-log-box').innerHTML = (activeNpc.activityLog || []).map(l => `<div>${l}</div>`).join('');
+                }
+            }
+
+            document.getElementById('npc-selector').addEventListener('change', (e) => {
+                selectedNpcId = e.target.value;
+                syncNpcsClient(npcList);
+            });
+
+            // Co-op Polling Interval
+            let isFlyingMode = false;
+            setInterval(async () => {
+                try {
+                    const res = await fetch('/api/coop/sync', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            id: myGodId,
+                            x: +(camera.position.x).toFixed(2),
+                            y: +(camera.position.y - 2.2).toFixed(2),
+                            z: +(camera.position.z).toFixed(2),
+                            rotY: +(camera.rotation.y).toFixed(2),
+                            isFlying: isFlyingMode
+                        })
+                    });
+                    if (!res.ok) return;
+                    const data = await res.json();
+
+                    if (Array.isArray(data.gods)) {
+                        const pillsHtml = data.gods.map(g => {
+                            const isMe = g.id === myGodId;
+                            return `<span class="god-pill" style="border-color:${g.color};color:${g.color};">🦍 ${g.name}${isMe ? ' (You)' : ''}</span>`;
+                        }).join('');
+                        document.getElementById('coop-gods-list').innerHTML = pillsHtml || '<span class="god-pill">1 Gorilla God</span>';
+
+                        const activeIds = new Set();
+                        data.gods.forEach(g => {
+                            if (g.id === myGodId) return;
+                            activeIds.add(g.id);
+                            if (!remoteGodMeshes[g.id]) {
+                                const gorillaAv = createGorillaModel(g.color, 0.9, g.name);
+                                coopGodsGroup.add(gorillaAv);
+                                remoteGodMeshes[g.id] = gorillaAv;
+                            }
+                            remoteGodMeshes[g.id].position.set(g.x, Math.max(0, g.y), g.z);
+                            remoteGodMeshes[g.id].rotation.y = g.rotY;
+                        });
+                        Object.keys(remoteGodMeshes).forEach(id => {
+                            if (!activeIds.has(id)) {
+                                coopGodsGroup.remove(remoteGodMeshes[id]);
+                                delete remoteGodMeshes[id];
+                            }
+                        });
+                    }
+
+                    if (Array.isArray(data.npcs)) {
+                        syncNpcsClient(data.npcs);
+                    }
+
+                    if (typeof data.worldCount === 'number' && data.worldCount !== worldDataList.length) {
+                        initWorldAndRehydrate();
+                    }
+                } catch (e) {}
+            }, 350);
+
+            // =========================================================
+            // 7. MIND PANEL, COMPANION SPAWNER & FLY PHYSICS TOGGLE
+            // =========================================================
+            const mindPanel = document.getElementById('companion-mind-panel');
+            document.getElementById('btn-toggle-mind').addEventListener('click', (e) => {
+                e.stopPropagation();
+                const open = mindPanel.style.display === 'block';
+                mindPanel.style.display = open ? 'none' : 'block';
+            });
+            document.getElementById('btn-close-mind').addEventListener('click', (e) => {
+                e.stopPropagation();
+                mindPanel.style.display = 'none';
+            });
+            document.getElementById('btn-live-chat').addEventListener('click', (e) => {
+                e.stopPropagation();
+                const activeNpc = npcList.find(n => n.id === selectedNpcId) || npcList[0];
+                alert(`💬 Live AI Chat with ${activeNpc ? activeNpc.name : 'Peanut'} is ready to be hooked up next!`);
+            });
+
+            // Feed / Energize / Cheer Selected Companion
+            ['feed', 'rest', 'cheer'].forEach(act => {
+                document.getElementById('btn-' + act + '-npc').addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const res = await fetch('/api/npcs/action', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ npcId: selectedNpcId, actionType: act })
+                    });
+                    if (res.ok) {
+                        const d = await res.json();
+                        if (d.npcs) syncNpcsClient(d.npcs);
+                    }
+                });
+            });
+
+            // Spawn New Companion Animal
+            document.getElementById('btn-spawn-companion').addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const nameInput = document.getElementById('new-companion-name');
+                const specObj = ANIMAL_CATALOG.find(a => a.id === selectedAnimalSpecies) || ANIMAL_CATALOG[0];
+                const chosenName = (nameInput.value || '').trim() || ('Cute ' + specObj.label);
+
+                const pt = getSnappedBuildPoint() || { x: camera.position.x, z: camera.position.z - 5 };
+                const res = await fetch('/api/npcs/spawn', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: chosenName,
+                        species: selectedAnimalSpecies,
+                        x: pt.x,
+                        z: pt.z
+                    })
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    nameInput.value = '';
+                    if (data.npcs) {
+                        selectedNpcId = data.companion.id;
+                        syncNpcsClient(data.npcs);
+                    }
+                }
+            });
+
+            // Toggle Walking Physics vs Fly Mode
+            const flyBtn = document.getElementById('btn-toggle-fly');
+            const physLabel = document.getElementById('physics-mode-label');
+            let verticalVelocity = 0;
+
+            flyBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                isFlyingMode = !isFlyingMode;
+                verticalVelocity = 0;
+                physLabel.innerText = isFlyingMode ? 'Flying Mode (No Gravity)' : 'Walking Physics (Gravity)';
+                physLabel.style.color = isFlyingMode ? '#38bdf8' : '#4ade80';
+                flyBtn.innerText = isFlyingMode ? '🦍 Switch to Walking' : '✈️ Enable Fly Mode';
+                flyBtn.classList.toggle('active', isFlyingMode);
+            });
+
+            // =========================================================
+            // 8. BUILD MENU TABS, COLOR SWATCHES & HOLOGRAM
+            // =========================================================
+            function updateGhostPreview() {
+                if (ghostMesh) {
+                    scene.remove(ghostMesh);
+                    ghostMesh = null;
+                }
+                if (selectedTool !== 'none' && selectedTool !== 'delete') {
+                    ghostMesh = buildModularMesh(selectedTool, selectedColor, true, null);
+                    scene.add(ghostMesh);
+                }
+                document.getElementById('hud-tool').innerText = selectedTool.toUpperCase();
+                document.getElementById('hud-rot').innerText = buildRotation + '°';
+                document.getElementById('hud-elev').innerText = buildElevation + 'm';
+                document.getElementById('hud-floor-modal').innerText = buildElevation + 'm';
+            }
+
+            function selectBuildTool(type) {
+                selectedTool = type || 'none';
+                document.querySelectorAll('#grid-modular .build-card, #grid-buildings .build-card').forEach(el => {
+                    el.classList.toggle('active', el.getAttribute('data-type') === selectedTool);
+                });
+                updateGhostPreview();
+            }
+
+            const tabModular = document.getElementById('tab-modular');
+            const tabBuildings = document.getElementById('tab-buildings');
+            const tabCompanions = document.getElementById('tab-companions');
+            const gridModular = document.getElementById('grid-modular');
+            const gridBuildings = document.getElementById('grid-buildings');
+            const gridCompanions = document.getElementById('grid-companions');
+
+            function switchTab(activeTab, activeGrid) {
+                [tabModular, tabBuildings, tabCompanions].forEach(t => t.classList.remove('active'));
+                [gridModular, gridBuildings, gridCompanions].forEach(g => g.style.display = 'none');
+                activeTab.classList.add('active');
+                activeGrid.style.display = activeGrid === gridCompanions ? 'block' : 'grid';
+            }
+
+            tabModular.addEventListener('click', (e) => { e.stopPropagation(); switchTab(tabModular, gridModular); });
+            tabBuildings.addEventListener('click', (e) => { e.stopPropagation(); switchTab(tabBuildings, gridBuildings); });
+            tabCompanions.addEventListener('click', (e) => { e.stopPropagation(); switchTab(tabCompanions, gridCompanions); });
+
+            document.querySelectorAll('.color-swatch').forEach(sw => {
+                sw.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+                    sw.classList.add('active');
+                    selectedColor = sw.getAttribute('data-color');
+                    document.getElementById('selected-color-label').innerText = selectedColor.toUpperCase();
+                    updateGhostPreview();
+                });
+            });
+
+            const buildModal = document.getElementById('build-menu-modal');
+            const toggleBuildBtn = document.getElementById('toggle-build-btn');
+            let buildMenuOpen = false;
+
+            function toggleBuildMenu(force) {
+                buildMenuOpen = (typeof force === 'boolean') ? force : !buildMenuOpen;
+                buildModal.style.display = buildMenuOpen ? 'block' : 'none';
+                toggleBuildBtn.classList.toggle('active', buildMenuOpen);
+                if (buildMenuOpen && controls.isLocked) controls.unlock();
+            }
+
+            toggleBuildBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleBuildMenu(); });
+
+            document.querySelectorAll('#grid-modular .build-card, #grid-buildings .build-card, [data-type="delete"], [data-type="none"]').forEach(card => {
+                card.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    selectBuildTool(card.getAttribute('data-type'));
+                });
+            });
+
+            document.getElementById('rotate-piece-btn').addEventListener('click', (e) => {
+                e.stopPropagation(); buildRotation = (buildRotation + 90) % 360; updateGhostPreview();
+            });
+            document.getElementById('level-up-btn').addEventListener('click', (e) => {
+                e.stopPropagation(); buildElevation = Math.min(40, buildElevation + 4); updateGhostPreview();
+            });
+            document.getElementById('level-down-btn').addEventListener('click', (e) => {
+                e.stopPropagation(); buildElevation = Math.max(0, buildElevation - 4); updateGhostPreview();
+            });
+
+            // =========================================================
+            // 9. INTERACTIONS: DOORS, INVENTORIES, BEDS & MERCHANT SHOPS
+            // =========================================================
+            const raycaster = new THREE.Raycaster();
+            const centerScreen = new THREE.Vector2(0, 0);
+            const promptEl = document.getElementById('interaction-prompt');
+            const objectModal = document.getElementById('object-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalContent = document.getElementById('modal-content');
+            let currentHoveredInteract = null;
+
+            document.getElementById('close-modal-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                objectModal.style.display = 'none';
+            });
+
+            function findRootPieceGroup(obj) {
+                let cur = obj;
+                while (cur && cur.parent && cur.parent !== cityPropsGroup) cur = cur.parent;
+                return cur;
+            }
+
+            function checkInteractiveTarget() {
+                raycaster.setFromCamera(centerScreen, camera);
+                const hits = raycaster.intersectObjects(cityPropsGroup.children, true);
+                if (hits.length > 0 && hits[0].distance < 11) {
+                    let obj = hits[0].object;
+                    while (obj && !obj.userData.interactType && obj.parent !== cityPropsGroup) obj = obj.parent;
+                    const interactType = hits[0].object.userData.interactType || (obj && obj.userData.interactType);
+                    if (interactType) {
+                        const rootGroup = findRootPieceGroup(hits[0].object);
+                        currentHoveredInteract = { interactType, rootGroup };
+                        promptEl.style.display = 'block';
+                        if (interactType === 'door') promptEl.innerHTML = 'Press <span>[F]</span> or <span>🖐️</span> to Open / Close Door';
+                        else if (interactType === 'inventory') promptEl.innerHTML = 'Press <span>[F]</span> or <span>🖐️</span> to Open 10-Slot Storage';
+                        else if (interactType === 'bed') promptEl.innerHTML = 'Press <span>[F]</span> or <span>🖐️</span> to Assign Bed Owner';
+                        else if (interactType === 'merchant') promptEl.innerHTML = 'Press <span>[F]</span> or <span>🖐️</span> to Trade & Customize Merchant';
+                        return;
+                    }
+                }
+                currentHoveredInteract = null;
+                promptEl.style.display = 'none';
+            }
+
+            async function triggerInteraction() {
+                if (!currentHoveredInteract) return;
+                const { interactType, rootGroup } = currentHoveredInteract;
+                const itemData = worldDataList.find(it => it.id === rootGroup.userData.id);
+                if (!itemData) return;
+
+                if (interactType === 'door') {
+                    itemData.isOpen = !itemData.isOpen;
+                    rebuildSceneFromData(worldDataList);
+                    localStorage.setItem('badabing_world_v4', JSON.stringify(worldDataList));
+                    await fetch('/api/world/update-item', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id: itemData.id, isOpen: itemData.isOpen })
+                    });
+                } else if (interactType === 'inventory') {
+                    if (controls.isLocked) controls.unlock();
+                    openInventoryModal(itemData);
+                } else if (interactType === 'bed') {
+                    if (controls.isLocked) controls.unlock();
+                    openBedModal(itemData);
+                } else if (interactType === 'merchant') {
+                    if (controls.isLocked) controls.unlock();
+                    openMerchantModal(itemData);
+                }
+            }
+
+            function openInventoryModal(itemData) {
+                if (!Array.isArray(itemData.inventory)) itemData.inventory = new Array(10).fill('');
+                modalTitle.innerText = (itemData.type === 'mailbox' ? '📫 Mailbox' : '🗄️ Storage Locker') + ' (10 Slots)';
+                const sampleItems = ['🍔 Burger', '🥤 Soda', '🧱 Bricks', '🛠️ Wrench', '💎 Gem', '✉️ Letter'];
+                let html = '<div class="inv-grid">';
+                for (let i = 0; i < 10; i++) {
+                    const val = itemData.inventory[i] || '';
+                    html += `<div class="inv-slot" data-slot="${i}">
+                        <span style="color:#94a3b8;font-size:9px;">Slot ${i + 1}</span>
+                        <strong style="color:#f8fafc;margin-top:3px;">${val || 'Empty'}</strong>
+                    </div>`;
+                }
+                html += '</div><div style="display:flex;gap:6px;flex-wrap:wrap;">';
+                sampleItems.forEach(st => {
+                    html += `<button class="mini-ui-btn add-inv-btn" data-item="${st}">+ ${st}</button>`;
+                });
+                html += '</div>';
+                modalContent.innerHTML = html;
+                objectModal.style.display = 'block';
+
+                modalContent.querySelectorAll('.inv-slot').forEach(slotEl => {
+                    slotEl.addEventListener('click', async () => {
+                        const idx = Number(slotEl.getAttribute('data-slot'));
+                        itemData.inventory[idx] = '';
+                        openInventoryModal(itemData);
+                        localStorage.setItem('badabing_world_v4', JSON.stringify(worldDataList));
+                        await fetch('/api/world/update-item', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ id: itemData.id, inventory: itemData.inventory })
+                        });
+                    });
+                });
+
+                modalContent.querySelectorAll('.add-inv-btn').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        const emptyIdx = itemData.inventory.findIndex(v => !v);
+                        if (emptyIdx !== -1) {
+                            itemData.inventory[emptyIdx] = btn.getAttribute('data-item');
+                            openInventoryModal(itemData);
+                            localStorage.setItem('badabing_world_v4', JSON.stringify(worldDataList));
+                            await fetch('/api/world/update-item', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ id: itemData.id, inventory: itemData.inventory })
+                            });
+                        }
+                    });
+                });
+            }
+
+            function openBedModal(itemData) {
+                modalTitle.innerText = '🛌 Assign Bed to Companion or God';
+                const companionNames = npcList.map(n => n.name);
+                const owners = [...companionNames, 'Gorilla God 1', 'Gorilla God 2', 'Gorilla God 3', 'Gorilla God 4', 'Unassigned'];
+                let html = `<p style="font-size:12px;color:#cbd5e1;margin-bottom:10px;">Current Owner: <strong style="color:#fde047;">${itemData.assignedTo || 'Unassigned'}</strong></p><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;">`;
+                owners.forEach(ow => {
+                    html += `<button class="mini-ui-btn assign-bed-btn" data-owner="${ow}" style="padding:9px;">Assign to ${ow}</button>`;
+                });
+                html += '</div>';
+                modalContent.innerHTML = html;
+                objectModal.style.display = 'block';
+
+                modalContent.querySelectorAll('.assign-bed-btn').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        const chosen = btn.getAttribute('data-owner');
+                        itemData.assignedTo = chosen === 'Unassigned' ? null : chosen;
+                        rebuildSceneFromData(worldDataList);
+                        localStorage.setItem('badabing_world_v4', JSON.stringify(worldDataList));
+                        objectModal.style.display = 'none';
+                        await fetch('/api/world/update-item', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ id: itemData.id, assignedTo: itemData.assignedTo })
+                        });
+                    });
+                });
+            }
+
+            // Merchant Customization (10 Skins, Editable Items/Prices, Purchase for Peanut & Companions)
+            function openMerchantModal(itemData) {
+                if (typeof itemData.merchantSkin !== 'number') itemData.merchantSkin = 0;
+                if (!Array.isArray(itemData.shopItems) || itemData.shopItems.length === 0) {
+                    itemData.shopItems =
