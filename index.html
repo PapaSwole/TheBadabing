@@ -11,69 +11,79 @@
             padding: 0;
             overflow: hidden;
             background-color: #14161d;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             color: #fff;
             user-select: none;
             -webkit-user-select: none;
             touch-action: none;
         }
 
-        /* 1. Compact Top Server & Co-op Status Banner */
+        /* Sleek Modern Schedule I Anime Glassmorphic UI */
         #top-status-banner {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            height: 36px;
-            background: rgba(15, 17, 23, 0.96);
+            height: 38px;
+            background: linear-gradient(90deg, rgba(13, 16, 23, 0.96), rgba(22, 27, 38, 0.96));
             border-bottom: 2px solid #fa9549;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 14px;
+            padding: 0 16px;
             z-index: 20;
             font-size: 12px;
+            backdrop-filter: blur(8px);
         }
         .banner-left, .banner-center, .banner-right {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
         }
         .brand-title {
             color: #fa9549;
             font-weight: 900;
-            letter-spacing: 0.6px;
+            letter-spacing: 0.7px;
             text-transform: uppercase;
             text-shadow: 1px 1px 0 #000;
         }
-        .sync-badge { color: #4ade80; font-weight: bold; }
+        .sync-badge {
+            background: rgba(74, 222, 128, 0.15);
+            color: #4ade80;
+            border: 1px solid #4ade80;
+            padding: 1px 8px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 11px;
+        }
         .coop-pills { display: flex; gap: 6px; }
         .god-pill {
-            padding: 2px 8px;
-            border-radius: 10px;
+            padding: 2px 9px;
+            border-radius: 12px;
             font-size: 11px;
             font-weight: bold;
-            background: #222733;
+            background: rgba(30, 36, 48, 0.9);
             border: 1px solid #475569;
         }
 
         /* 2. Companion Telemetry Bar */
         #companion-bar {
             position: absolute;
-            top: 36px;
+            top: 38px;
             left: 0;
             width: 100%;
-            min-height: 38px;
-            background: rgba(22, 25, 34, 0.94);
+            min-height: 42px;
+            background: rgba(18, 22, 31, 0.92);
             border-bottom: 2px solid #0f1117;
             display: flex;
             flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
-            padding: 4px 14px;
+            padding: 5px 16px;
             z-index: 19;
             font-size: 12px;
-            gap: 8px;
+            gap: 10px;
+            backdrop-filter: blur(6px);
         }
         .companion-stats {
             display: flex;
@@ -82,31 +92,44 @@
             flex-wrap: wrap;
         }
         #npc-selector {
-            background: #161922;
+            background: #11151e;
             color: #fa9549;
             border: 2px solid #fa9549;
-            border-radius: 5px;
-            padding: 2px 6px;
-            font-weight: bold;
+            border-radius: 6px;
+            padding: 3px 8px;
+            font-weight: 800;
             font-size: 12px;
+            cursor: pointer;
         }
         .stat-item {
             display: flex;
             align-items: center;
             gap: 5px;
+            background: rgba(15, 18, 26, 0.65);
+            padding: 3px 8px;
+            border-radius: 6px;
+            border: 1px solid #262c3a;
+        }
+        .wallet-badge {
+            background: rgba(250, 204, 21, 0.15);
+            border: 1px solid #facc15;
+            color: #fde047;
+            font-weight: 900;
+            padding: 3px 9px;
+            border-radius: 6px;
         }
         .stat-bar-bg {
-            width: 55px;
+            width: 52px;
             height: 9px;
-            background: #111318;
-            border-radius: 4px;
+            background: #090b10;
+            border-radius: 5px;
             overflow: hidden;
             border: 1px solid #000;
         }
         .stat-bar-fill {
             height: 100%;
-            background: #4ade80;
-            transition: width 0.2s;
+            background: linear-gradient(90deg, #22c55e, #4ade80);
+            transition: width 0.25s;
         }
         .companion-actions {
             display: flex;
@@ -115,51 +138,91 @@
             flex-wrap: wrap;
         }
         .mini-ui-btn {
-            background: #283040;
-            border: 2px solid #0f1117;
+            background: #252b3b;
+            border: 2px solid #0d1017;
             box-shadow: 0 2px 0 #000;
             color: #f8fafc;
-            padding: 4px 9px;
-            border-radius: 5px;
+            padding: 5px 10px;
+            border-radius: 6px;
             font-size: 11px;
             cursor: pointer;
-            font-weight: 700;
+            font-weight: 800;
+            transition: all 0.12s;
         }
         .mini-ui-btn:hover, .mini-ui-btn.active {
             background: #fa9549;
             color: #111;
-            border-color: #000;
+            transform: translateY(-1px);
         }
 
-        /* 3. Companion Mind Panel */
+        /* 3. Upgraded Companion Mind, Wallet & Inventory Bag Panel */
         #companion-mind-panel {
             position: absolute;
-            top: 82px;
-            left: 14px;
-            width: 340px;
-            max-width: calc(100vw - 28px);
-            background: rgba(18, 21, 28, 0.97);
-            border: 3px solid #0f1117;
+            top: 88px;
+            left: 16px;
+            width: 390px;
+            max-width: calc(100vw - 32px);
+            max-height: calc(100vh - 110px);
+            overflow-y: auto;
+            background: rgba(16, 19, 27, 0.97);
+            border: 3px solid #000;
             outline: 2px solid #fa9549;
-            border-radius: 8px;
-            padding: 12px;
+            border-radius: 12px;
+            padding: 14px;
             z-index: 24;
             display: none;
-            box-shadow: 0 12px 35px rgba(0,0,0,0.85);
+            box-shadow: 0 18px 45px rgba(0,0,0,0.9);
+            backdrop-filter: blur(10px);
         }
         .mind-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #334155;
-            padding-bottom: 6px;
-            margin-bottom: 8px;
+            border-bottom: 2px solid #262c3a;
+            padding-bottom: 8px;
+            margin-bottom: 10px;
         }
         .mind-header h3 {
             margin: 0;
             font-size: 14px;
             color: #fa9549;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .wallet-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border: 2px solid #facc15;
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin-bottom: 10px;
+        }
+        .wallet-amount {
+            font-size: 18px;
+            font-weight: 900;
+            color: #fde047;
+        }
+        .companion-bag-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+        .bag-item-chip {
+            background: #1e2433;
+            border: 1px solid #3b4459;
+            border-radius: 6px;
+            padding: 6px;
+            font-size: 11px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.12s;
+        }
+        .bag-item-chip:hover {
+            border-color: #4ade80;
+            background: #253042;
         }
         .mind-section { margin-bottom: 10px; }
         .mind-section h4 {
@@ -167,46 +230,47 @@
             font-size: 11px;
             color: #38bdf8;
             text-transform: uppercase;
+            letter-spacing: 0.4px;
         }
         .mind-box {
-            background: #14171f;
-            border: 1px solid #2d3548;
-            border-radius: 5px;
-            padding: 6px 8px;
-            max-height: 85px;
+            background: #10131a;
+            border: 1px solid #283042;
+            border-radius: 6px;
+            padding: 7px 9px;
+            max-height: 80px;
             overflow-y: auto;
             font-size: 11px;
             color: #e2e8f0;
-            line-height: 1.4;
+            line-height: 1.45;
         }
 
         /* 4. All-in-One Companion Manager Modal */
         #companion-manager-modal {
             position: absolute;
-            top: 82px;
+            top: 88px;
             left: 50%;
             transform: translateX(-50%);
-            width: 560px;
+            width: 580px;
             max-width: 94vw;
             max-height: 78vh;
             overflow-y: auto;
-            background: rgba(18, 21, 28, 0.98);
+            background: rgba(16, 19, 27, 0.98);
             border: 3px solid #000;
             outline: 2px solid #4ade80;
-            border-radius: 10px;
+            border-radius: 12px;
             padding: 16px;
             z-index: 28;
             display: none;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.92);
+            box-shadow: 0 22px 55px rgba(0,0,0,0.92);
         }
         .comp-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: #161922;
+            background: #161a24;
             border: 2px solid #283040;
-            border-radius: 7px;
-            padding: 8px 12px;
+            border-radius: 8px;
+            padding: 9px 12px;
             margin-bottom: 8px;
             gap: 10px;
             flex-wrap: wrap;
@@ -224,7 +288,7 @@
             background: #0f172a;
             border: 4px solid #000;
             outline: 2px solid #38bdf8;
-            border-radius: 10px;
+            border-radius: 12px;
             z-index: 35;
             display: none;
             flex-direction: column;
@@ -271,20 +335,20 @@
         /* 6. God / Build Menu Button & Modal */
         #toggle-build-btn {
             position: absolute;
-            top: 82px;
-            right: 14px;
-            background: rgba(24, 27, 34, 0.96);
+            top: 88px;
+            right: 16px;
+            background: rgba(20, 24, 34, 0.96);
             border: 2px solid #000;
             outline: 2px solid #fa9549;
             color: #fa9549;
-            padding: 9px 15px;
-            border-radius: 6px;
+            padding: 10px 16px;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: 900;
             font-size: 12px;
             text-transform: uppercase;
             z-index: 20;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.6);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.65);
         }
         #toggle-build-btn:hover, #toggle-build-btn.active {
             background: #fa9549;
@@ -293,29 +357,29 @@
 
         #build-menu-modal {
             position: absolute;
-            top: 128px;
-            right: 14px;
-            width: 470px;
-            max-width: calc(100vw - 28px);
-            max-height: calc(100vh - 145px);
+            top: 136px;
+            right: 16px;
+            width: 475px;
+            max-width: calc(100vw - 32px);
+            max-height: calc(100vh - 155px);
             overflow-y: auto;
-            background: rgba(18, 21, 28, 0.98);
+            background: rgba(16, 19, 27, 0.98);
             border: 3px solid #000;
             outline: 2px solid #fa9549;
-            border-radius: 8px;
+            border-radius: 12px;
             padding: 14px;
             z-index: 25;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.9);
+            box-shadow: 0 18px 45px rgba(0,0,0,0.92);
             display: none;
         }
         .god-physics-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #161922;
-            border: 1px solid #334155;
+            background: #141720;
+            border: 1px solid #2e3646;
             padding: 8px 12px;
-            border-radius: 6px;
+            border-radius: 8px;
             margin-bottom: 10px;
             font-size: 12px;
         }
@@ -326,13 +390,13 @@
         }
         .tab-btn {
             flex: 1;
-            padding: 7px 6px;
-            background: #1f2430;
+            padding: 8px 6px;
+            background: #1d2230;
             border: 1px solid #3b4254;
             color: #cbd5e1;
-            font-weight: 700;
+            font-weight: 800;
             font-size: 11px;
-            border-radius: 5px;
+            border-radius: 6px;
             cursor: pointer;
             text-transform: uppercase;
         }
@@ -348,30 +412,30 @@
             margin-bottom: 12px;
         }
         .build-card {
-            background: #232834;
+            background: #212634;
             border: 2px solid #0f1117;
-            border-radius: 6px;
+            border-radius: 7px;
             padding: 8px 5px;
             text-align: center;
             cursor: pointer;
             transition: 0.12s;
             color: #e2e8f0;
         }
-        .build-card:hover { border-color: #fa9549; background: #2d3444; }
+        .build-card:hover { border-color: #fa9549; background: #2b3244; }
         .build-card.active {
             background: rgba(250, 149, 73, 0.25);
             border: 2px solid #fa9549;
             color: #fff;
         }
-        .build-card .icon { font-size: 19px; display: block; margin-bottom: 2px; }
-        .build-card .label { font-size: 11px; font-weight: 700; display: block; }
+        .build-card .icon { font-size: 20px; display: block; margin-bottom: 2px; }
+        .build-card .label { font-size: 11px; font-weight: 800; display: block; }
         .build-card .sub { font-size: 9px; color: #94a3b8; }
 
         /* Color Customizer Palette */
         .color-section {
-            background: #161922;
+            background: #141720;
             padding: 8px 10px;
-            border-radius: 6px;
+            border-radius: 8px;
             margin-bottom: 10px;
             border: 1px solid #2e3444;
         }
@@ -405,9 +469,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #161922;
+            background: #141720;
             padding: 8px 10px;
-            border-radius: 5px;
+            border-radius: 6px;
             font-size: 11px;
             color: #94a3b8;
         }
@@ -418,11 +482,11 @@
             top: 56%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(15, 17, 23, 0.94);
+            background: rgba(15, 17, 23, 0.95);
             border: 2px solid #fa9549;
             color: #fff;
-            padding: 6px 14px;
-            border-radius: 6px;
+            padding: 7px 16px;
+            border-radius: 8px;
             font-size: 13px;
             font-weight: bold;
             z-index: 15;
@@ -436,10 +500,10 @@
             bottom: 54px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(234, 88, 12, 0.95);
+            background: linear-gradient(90deg, #ea580c, #f97316);
             border: 2px solid #000;
             color: #fff;
-            padding: 6px 16px;
+            padding: 6px 18px;
             border-radius: 20px;
             font-size: 13px;
             font-weight: 900;
@@ -450,24 +514,24 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.6);
         }
 
-        /* Object Inspector Modal (Inventory, Bed, Merchant, Custom Sign) */
+        /* Object Inspector Modal */
         #object-modal {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 430px;
+            width: 440px;
             max-width: 94vw;
             max-height: 85vh;
             overflow-y: auto;
-            background: rgba(18, 21, 28, 0.98);
+            background: rgba(16, 19, 27, 0.98);
             border: 3px solid #000;
             outline: 2px solid #fa9549;
-            border-radius: 8px;
+            border-radius: 12px;
             padding: 16px;
             z-index: 30;
             display: none;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+            box-shadow: 0 22px 55px rgba(0,0,0,0.92);
         }
         #object-modal h3 {
             margin: 0 0 10px 0;
@@ -488,7 +552,7 @@
             height: 56px;
             background: #232834;
             border: 1px solid #475569;
-            border-radius: 5px;
+            border-radius: 6px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -504,9 +568,9 @@
             align-items: center;
             gap: 6px;
             margin-bottom: 6px;
-            background: #161922;
+            background: #141720;
             padding: 6px;
-            border-radius: 5px;
+            border-radius: 6px;
             border: 1px solid #2e3444;
         }
         .merchant-input {
@@ -514,7 +578,7 @@
             border: 1px solid #475569;
             color: #fff;
             padding: 5px 8px;
-            border-radius: 4px;
+            border-radius: 5px;
             font-size: 12px;
         }
 
@@ -524,10 +588,10 @@
             bottom: 14px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(18, 20, 26, 0.94);
+            background: rgba(16, 19, 27, 0.94);
             border: 2px solid #000;
             outline: 1px solid #fa9549;
-            padding: 6px 14px;
+            padding: 6px 16px;
             border-radius: 20px;
             font-size: 11px;
             color: #f8fafc;
@@ -557,9 +621,9 @@
             position: absolute;
             bottom: 14px;
             left: 14px;
-            background: rgba(18, 20, 26, 0.92);
+            background: rgba(16, 19, 27, 0.92);
             padding: 8px 12px;
-            border-radius: 6px;
+            border-radius: 8px;
             border: 2px solid #000;
             font-size: 11px;
             color: #cbd5e1;
@@ -600,7 +664,7 @@
         .mob-btn {
             width: 54px;
             height: 54px;
-            background: rgba(250, 149, 73, 0.85);
+            background: rgba(250, 149, 73, 0.88);
             border: 2px solid #000;
             border-radius: 50%;
             color: #111;
@@ -623,11 +687,11 @@
 
     <div id="crosshair"></div>
 
-    <!-- 1. Compact Top Server & Co-op Status Banner -->
+    <!-- 1. Sleek Top Server & Co-op Status Banner -->
     <div id="top-status-banner">
         <div class="banner-left">
             <span class="brand-title">🦍 The Badabing Anime Co-op</span>
-            <span>Sync: <span id="status" class="sync-badge">Online</span></span>
+            <span id="status" class="sync-badge">● Synced</span>
             <span>Structures: <strong id="piece-count" style="color:#fa9549;">0</strong></span>
             <span>🏀 Hoops: <strong id="hoop-score-banner" style="color:#fde047;">0</strong></span>
         </div>
@@ -642,12 +706,13 @@
         </div>
     </div>
 
-    <!-- 2. Companion Telemetry Bar -->
+    <!-- 2. Companion Telemetry Bar (With Live Wallet, Coords & Mind/Bag Toggle) -->
     <div id="companion-bar">
         <div class="companion-stats">
             <select id="npc-selector" title="Select Companion"></select>
+            <div class="wallet-badge">💰 $<span id="p-wallet">250</span></div>
             <div class="stat-item">Mood: <strong id="p-mood" style="color:#fde047;">Happy ✨</strong></div>
-            <div class="stat-item">Pos: <strong id="p-coords" style="color:#38bdf8;">(0, 8)</strong></div>
+            <div class="stat-item">Pos: <strong id="p-coords" style="color:#38bdf8;">(6, 14)</strong></div>
             <div class="stat-item">
                 Hunger:
                 <div class="stat-bar-bg"><div id="p-hunger-bar" class="stat-bar-fill" style="width:88%;"></div></div>
@@ -658,24 +723,40 @@
                 <div class="stat-bar-bg"><div id="p-energy-bar" class="stat-bar-fill" style="width:92%;background:#38bdf8;"></div></div>
                 <span id="p-energy-val">92%</span>
             </div>
-            <div class="stat-item">Activity: <strong id="p-activity" style="color:#4ade80;">Wandering Town</strong></div>
+            <div class="stat-item">Activity: <strong id="p-activity" style="color:#4ade80;">Roaming Town</strong></div>
             <div class="stat-item">Bed: <strong id="p-bed" style="color:#c084fc;">None</strong></div>
         </div>
         <div class="companion-actions">
+            <button class="mini-ui-btn" id="btn-toggle-mind" style="background:#facc15;color:#111;">🎒 Mind, Wallet & Bag</button>
             <button class="mini-ui-btn" id="btn-toggle-manager" style="background:#4ade80;color:#111;">🐾 Manage Companions</button>
-            <button class="mini-ui-btn" id="btn-toggle-mind">📓 Mind & Logs</button>
             <button class="mini-ui-btn" id="btn-feed-npc">🍔 Feed</button>
             <button class="mini-ui-btn" id="btn-rest-npc">⚡ Energize</button>
             <button class="mini-ui-btn" id="btn-cheer-npc">✨ Cheer</button>
         </div>
     </div>
 
-    <!-- 3. Toggleable Companion Mind Panel -->
+    <!-- 3. Toggleable Companion Mind, Wallet & Inventory Panel -->
     <div id="companion-mind-panel">
         <div class="mind-header">
-            <h3 id="mind-panel-title">🐼 Peanut's Mind & Logs</h3>
+            <h3 id="mind-panel-title">🐼 Peanut's Mind, Wallet & Bag</h3>
             <button class="mini-ui-btn" id="btn-close-mind">✖</button>
         </div>
+
+        <!-- Companion Wallet Section -->
+        <div class="wallet-card">
+            <div>
+                <div style="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:bold;">Personal Companion Wallet</div>
+                <div class="wallet-amount">💰 $<span id="mind-wallet-val">250</span></div>
+            </div>
+            <button class="mini-ui-btn" id="btn-give-allowance" style="background:#4ade80;color:#111;">💵 +$50 Allowance</button>
+        </div>
+
+        <!-- Companion Personal Inventory Bag -->
+        <div class="mind-section">
+            <h4>🎒 Personal Inventory Bag (Click item to consume/use)</h4>
+            <div class="companion-bag-grid" id="mind-bag-grid"></div>
+        </div>
+
         <div class="mind-section">
             <h4>💭 Current Wants</h4>
             <div class="mind-box" id="mind-wants-box"></div>
@@ -689,19 +770,19 @@
             <div class="mind-box" id="mind-log-box"></div>
         </div>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
-            <button class="mini-ui-btn" id="btn-live-chat" style="width:100%; padding:8px; background:#38bdf8; color:#111; font-weight:800;">
+            <button class="mini-ui-btn" id="btn-live-chat" style="width:100%; padding:8px; background:#38bdf8; color:#111; font-weight:900;">
                 💬 Live Chat with Companion (AI Coming Soon)
             </button>
         </div>
     </div>
 
-    <!-- 4. All-in-One Companion Manager Modal (View All Moods, Locations & Delete) -->
+    <!-- 4. All-in-One Companion Manager Modal -->
     <div id="companion-manager-modal">
         <div class="mind-header">
             <h3 style="margin:0;color:#4ade80;font-size:15px;">🐾 Town Companion Roster & Manager</h3>
             <button class="mini-ui-btn" id="btn-close-manager">✖ Close</button>
         </div>
-        <p style="font-size:11px;color:#94a3b8;margin:0 0 10px 0;">All added and deleted companions and their live coordinates are permanently synced to the server.</p>
+        <p style="font-size:11px;color:#94a3b8;margin:0 0 10px 0;">All companions roam freely around obstacles and sync their coordinates, wallets, and bags to the server.</p>
         <div id="companion-roster-list"></div>
     </div>
 
@@ -711,7 +792,7 @@
             <strong style="color:#38bdf8;font-size:13px;">💻 BADABING OS WEB BROWSER</strong>
             <input type="text" id="browser-url-bar" class="browser-url-input" value="https://en.m.wikipedia.org/wiki/Giant_panda" placeholder="https://..." />
             <button class="mini-ui-btn" id="btn-browser-go" style="background:#4ade80;color:#111;">🌐 Go</button>
-            <button class="mini-ui-btn" id="btn-browser-ext" style="background:#fa9549;color:#111;" title="For sites like Google/YouTube that block iframe embedding">🚀 Pop Out Tab</button>
+            <button class="mini-ui-btn" id="btn-browser-ext" style="background:#fa9549;color:#111;">🚀 Pop Out Tab</button>
             <button class="mini-ui-btn" id="btn-browser-close" style="background:#ef4444;color:#fff;">✖ Exit PC</button>
         </div>
         <div class="browser-bookmarks">
@@ -720,7 +801,6 @@
             <button class="mini-ui-btn bm-btn" data-url="https://www.openstreetmap.org/export/embed.html?bbox=-82.85,27.70,-82.55,28.05&layer=mapnik">🗺️ Live Map</button>
             <button class="mini-ui-btn bm-btn" data-url="https://lite.duckduckgo.com/lite/">🦆 DuckDuckGo</button>
             <button class="mini-ui-btn bm-btn" data-url="https://archive.org">🏛️ Internet Archive</button>
-            <span style="color:#94a3b8;margin-left:auto;font-size:10px;">Tip: Use "🚀 Pop Out Tab" if a site blocks embedded frames.</span>
         </div>
         <iframe id="browser-iframe" src="about:blank" sandbox="allow-same-origin allow-scripts allow-forms allow-popups"></iframe>
     </div>
@@ -740,7 +820,7 @@
             <button class="tab-btn" id="tab-companions">🐾 Spawn Companions</button>
         </div>
 
-        <!-- Tab 1: Modular Parts (Plus Custom Text Sign) -->
+        <!-- Tab 1: Modular Parts -->
         <div class="build-grid" id="grid-modular">
             <div class="build-card" data-type="foundation"><span class="icon">⬛</span><span class="label">Foundation</span><span class="sub">4x4m Slab</span></div>
             <div class="build-card" data-type="wall"><span class="icon">🧱</span><span class="label">Anime Wall</span><span class="sub">Cel-Trimmed</span></div>
@@ -754,14 +834,14 @@
             <div class="build-card" data-type="streetlight"><span class="icon">🏮</span><span class="label">Streetlight</span><span class="sub">Lamp Post</span></div>
         </div>
 
-        <!-- Tab 2: Buildings, Mechanic Shop, Internet PC, Statue & Merchant -->
+        <!-- Tab 2: Buildings, Mechanic Shop, Internet PC, Statue & Animal Merchant -->
         <div class="build-grid" id="grid-buildings" style="display:none;">
             <div class="build-card" data-type="mechanic_shop"><span class="icon">🔧</span><span class="label">Mechanic Shop</span><span class="sub">Accessible Garage</span></div>
             <div class="build-card" data-type="computer_desk"><span class="icon">💻</span><span class="label">Internet PC</span><span class="sub">Live Web Browser</span></div>
+            <div class="build-card" data-type="merchant"><span class="icon">🏪</span><span class="label">Animal Merchant</span><span class="sub">10 Animal Shopkeepers</span></div>
             <div class="build-card" data-type="mcdonalds"><span class="icon">🍔</span><span class="label">McDonald's</span><span class="sub">Full Restaurant</span></div>
             <div class="build-card" data-type="walmart"><span class="icon">🛒</span><span class="label">Walmart</span><span class="sub">Supercenter</span></div>
             <div class="build-card" data-type="gorilla_statue"><span class="icon">🗿</span><span class="label">XL Gorilla Statue</span><span class="sub">Giant Monument</span></div>
-            <div class="build-card" data-type="merchant"><span class="icon">🏪</span><span class="label">Merchant Booth</span><span class="sub">10 Skins & Shop</span></div>
             <div class="build-card" data-type="fountain"><span class="icon">⛲</span><span class="label">Fountain</span><span class="sub">Park Centerpiece</span></div>
             <div class="build-card" data-type="mailbox"><span class="icon">📫</span><span class="label">Mailbox</span><span class="sub">10 Inv. Slots</span></div>
             <div class="build-card" data-type="locker"><span class="icon">🗄️</span><span class="label">Locker</span><span class="sub">10 Inv. Slots</span></div>
@@ -816,8 +896,8 @@
 
     <!-- Basketball Dribbling & Shoot Bar -->
     <div id="bball-hud">
-        <span>🏀 Dribbling Basketball!</span>
-        <button class="mini-ui-btn" id="btn-shoot-bball" style="background:#fde047;color:#111;font-weight:900;">🏀 Shoot at Hoop [G]</button>
+        <span>🏀 Dribbling Basketball! Aim with Crosshair:</span>
+        <button class="mini-ui-btn" id="btn-shoot-bball" style="background:#fde047;color:#111;font-weight:900;">🏀 Shoot Forward [G]</button>
     </div>
 
     <!-- Object Inspector Modal -->
@@ -888,7 +968,7 @@
                 }, opts));
             }
 
-            // Automatically wraps any 3D mesh or group in bold Schedule I comic ink outlines
+            // Applies comic ink outlines ONLY to architectural blocks (skips organic animal bodies)
             function applyAnimeInkOutlines(rootObj) {
                 const meshes = [];
                 rootObj.traverse(child => {
@@ -896,7 +976,7 @@
                 });
                 meshes.forEach(m => {
                     try {
-                        const edges = new THREE.EdgesGeometry(m.geometry, 28);
+                        const edges = new THREE.EdgesGeometry(m.geometry, 32);
                         const line = new THREE.LineSegments(edges, animeOutlineMat);
                         line.userData.noOutline = true;
                         m.add(line);
@@ -905,42 +985,43 @@
             }
 
             // =========================================================
-            // 2. 20 ANIME ANIMAL SPECIES & 10 MERCHANT SKINS
+            // 2. 20 ORGANIC ANIMAL SPECIES & 10 ANIMAL MERCHANT SKINS
             // =========================================================
             const ANIMAL_CATALOG = [
-                { id: 'panda', label: 'Panda', icon: '🐼', primary: 0xf8fafc, secondary: 0x141619, earType: 'round' },
-                { id: 'gorilla', label: 'Gorilla', icon: '🦍', primary: 0x374151, secondary: 0x1f2937, earType: 'small' },
-                { id: 'cat', label: 'Kitty', icon: '🐱', primary: 0xfb923c, secondary: 0xffffff, earType: 'pointy' },
-                { id: 'dog', label: 'Puppy', icon: '🐶', primary: 0xd97706, secondary: 0x78350f, earType: 'floppy' },
-                { id: 'bunny', label: 'Bunny', icon: '🐰', primary: 0xfce7f3, secondary: 0xf472b6, earType: 'tall' },
-                { id: 'fox', label: 'Fox', icon: '🦊', primary: 0xea580c, secondary: 0xffffff, earType: 'pointy' },
-                { id: 'bear', label: 'Grizzly', icon: '🐻', primary: 0x78350f, secondary: 0x451a03, earType: 'round' },
-                { id: 'koala', label: 'Koala', icon: '🐨', primary: 0x94a3b8, secondary: 0x475569, earType: 'big_side' },
-                { id: 'penguin', label: 'Penguin', icon: '🐧', primary: 0x1e293b, secondary: 0xf8fafc, earType: 'none' },
-                { id: 'frog', label: 'Froggy', icon: '🐸', primary: 0x4ade80, secondary: 0x16a34a, earType: 'top_eyes' },
-                { id: 'tiger', label: 'Tiger', icon: '🐯', primary: 0xf97316, secondary: 0x111827, earType: 'round' },
-                { id: 'lion', label: 'Lion', icon: '🦁', primary: 0xfbbf24, secondary: 0x92400e, earType: 'mane' },
-                { id: 'pig', label: 'Piggy', icon: '🐷', primary: 0xf9a8d4, secondary: 0xf472b6, earType: 'pointy' },
-                { id: 'cow', label: 'Moo Cow', icon: '🐮', primary: 0xffffff, secondary: 0x111827, earType: 'horns' },
-                { id: 'monkey', label: 'Monkey', icon: '🐵', primary: 0x9a3412, secondary: 0xfde68a, earType: 'big_side' },
-                { id: 'hamster', label: 'Hamster', icon: '🐹', primary: 0xfdba74, secondary: 0xffffff, earType: 'round' },
-                { id: 'owl', label: 'Night Owl', icon: '🦉', primary: 0x6b4423, secondary: 0xfef08a, earType: 'pointy' },
-                { id: 'duck', label: 'Duckling', icon: '🦆', primary: 0xfacc15, secondary: 0xf97316, earType: 'none' },
-                { id: 'red_panda', label: 'Red Panda', icon: '🦊', primary: 0xb91c1c, secondary: 0x1f2937, earType: 'pointy' },
-                { id: 'raccoon', label: 'Raccoon', icon: '🦝', primary: 0x64748b, secondary: 0x0f172a, earType: 'pointy' }
+                { id: 'panda', label: 'Panda', icon: '🐼', primary: 0xf8fafc, secondary: 0x141619, earType: 'round', tailType: 'puff', whiskers: false },
+                { id: 'gorilla', label: 'Gorilla', icon: '🦍', primary: 0x374151, secondary: 0x1f2937, earType: 'small', tailType: 'none', whiskers: false },
+                { id: 'cat', label: 'Kitty', icon: '🐱', primary: 0xfb923c, secondary: 0xffffff, earType: 'pointy', tailType: 'long', whiskers: true },
+                { id: 'dog', label: 'Puppy', icon: '🐶', primary: 0xd97706, secondary: 0x78350f, earType: 'floppy', tailType: 'wag', whiskers: false },
+                { id: 'bunny', label: 'Bunny', icon: '🐰', primary: 0xfce7f3, secondary: 0xf472b6, earType: 'tall', tailType: 'puff', whiskers: true },
+                { id: 'fox', label: 'Fox', icon: '🦊', primary: 0xea580c, secondary: 0xffffff, earType: 'pointy', tailType: 'bushy', whiskers: true },
+                { id: 'bear', label: 'Grizzly', icon: '🐻', primary: 0x78350f, secondary: 0x451a03, earType: 'round', tailType: 'puff', whiskers: false },
+                { id: 'koala', label: 'Koala', icon: '🐨', primary: 0x94a3b8, secondary: 0x475569, earType: 'big_side', tailType: 'puff', whiskers: false },
+                { id: 'penguin', label: 'Penguin', icon: '🐧', primary: 0x1e293b, secondary: 0xf8fafc, earType: 'none', tailType: 'puff', whiskers: false, beak: true },
+                { id: 'frog', label: 'Froggy', icon: '🐸', primary: 0x4ade80, secondary: 0x16a34a, earType: 'top_eyes', tailType: 'none', whiskers: false },
+                { id: 'tiger', label: 'Tiger', icon: '🐯', primary: 0xf97316, secondary: 0x111827, earType: 'round', tailType: 'long', whiskers: true },
+                { id: 'lion', label: 'Lion', icon: '🦁', primary: 0xfbbf24, secondary: 0x92400e, earType: 'mane', tailType: 'long', whiskers: true },
+                { id: 'pig', label: 'Piggy', icon: '🐷', primary: 0xf9a8d4, secondary: 0xf472b6, earType: 'pointy', tailType: 'puff', whiskers: false, pigNose: true },
+                { id: 'cow', label: 'Moo Cow', icon: '🐮', primary: 0xffffff, secondary: 0x111827, earType: 'horns', tailType: 'long', whiskers: false },
+                { id: 'monkey', label: 'Monkey', icon: '🐵', primary: 0x9a3412, secondary: 0xfde68a, earType: 'big_side', tailType: 'long', whiskers: false },
+                { id: 'hamster', label: 'Hamster', icon: '🐹', primary: 0xfdba74, secondary: 0xffffff, earType: 'round', tailType: 'puff', whiskers: true },
+                { id: 'owl', label: 'Night Owl', icon: '🦉', primary: 0x6b4423, secondary: 0xfef08a, earType: 'pointy', tailType: 'puff', whiskers: false, beak: true },
+                { id: 'duck', label: 'Duckling', icon: '🦆', primary: 0xfacc15, secondary: 0xf97316, earType: 'none', tailType: 'puff', whiskers: false, beak: true },
+                { id: 'red_panda', label: 'Red Panda', icon: '🦊', primary: 0xb91c1c, secondary: 0x1f2937, earType: 'pointy', tailType: 'bushy', whiskers: true },
+                { id: 'raccoon', label: 'Raccoon', icon: '🦝', primary: 0x64748b, secondary: 0x0f172a, earType: 'pointy', tailType: 'bushy', whiskers: true }
             ];
 
+            // All 10 Merchants are now Cute Animal Shopkeepers!
             const MERCHANT_SKINS = [
-                { name: 'Street Hoodie Dealer', body: 0x1e293b, hat: 0xfa9549, apron: 0x334155 },
-                { name: 'Chef Gusto', body: 0xffffff, hat: 0xffffff, apron: 0xdc2626 },
-                { name: 'Cyberpunk Vendor', body: 0x0f172a, hat: 0x38bdf8, apron: 0x9333ea },
-                { name: 'Rasta Grocer', body: 0x16a34a, hat: 0xfacc15, apron: 0xdc2626 },
-                { name: 'Fancy Tuxedo Broker', body: 0x090d16, hat: 0x090d16, apron: 0xf8fafc },
-                { name: 'Tiki Beach Trader', body: 0xf97316, hat: 0xfde047, apron: 0x22c55e },
-                { name: 'Biker Quartermaster', body: 0x1c1917, hat: 0x7f1d1d, apron: 0x44403c },
-                { name: 'Wizard Alchemist', body: 0x581c87, hat: 0x3b0764, apron: 0xfacc15 },
-                { name: 'Space Suit Commissary', body: 0xe2e8f0, hat: 0x38bdf8, apron: 0x64748b },
-                { name: 'Golden Gorilla Mogul', body: 0xfacc15, hat: 0xb45309, apron: 0x1e293b }
+                { name: 'Street Hoodie Raccoon', species: 'raccoon', hat: 0xfa9549, apron: 0x334155 },
+                { name: 'Chef Gusto Panda', species: 'panda', hat: 0xffffff, apron: 0xdc2626 },
+                { name: 'Cyberpunk Fox Vendor', species: 'fox', hat: 0x38bdf8, apron: 0x9333ea },
+                { name: 'Rasta Lion Grocer', species: 'lion', hat: 0xfacc15, apron: 0x16a34a },
+                { name: 'Tuxedo Penguin Broker', species: 'penguin', hat: 0x090d16, apron: 0xf8fafc },
+                { name: 'Tiki Beach Koala', species: 'koala', hat: 0xfde047, apron: 0x22c55e },
+                { name: 'Biker Grizzly Quartermaster', species: 'bear', hat: 0x7f1d1d, apron: 0x1c1917 },
+                { name: 'Wizard Owl Alchemist', species: 'owl', hat: 0x581c87, apron: 0xfacc15 },
+                { name: 'Space Bunny Commissary', species: 'bunny', hat: 0x38bdf8, apron: 0xe2e8f0 },
+                { name: 'Golden Gorilla Mogul', species: 'gorilla', hat: 0xfacc15, apron: 0xb45309 }
             ];
 
             let selectedAnimalSpecies = 'panda';
@@ -994,18 +1075,13 @@
             const stuccoWallTex = makeScheduleTexture((ctx, w, h) => {
                 ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, w, h);
                 ctx.fillStyle = '#e2e8f0';
-                for (let y = 0; y < h; y += 32) {
-                    ctx.fillRect(0, y, w, 3);
-                }
-                ctx.strokeStyle = '#0f172a';
-                ctx.lineWidth = 6;
-                ctx.strokeRect(0, 0, w, h);
+                for (let y = 0; y < h; y += 32) ctx.fillRect(0, y, w, 3);
+                ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 6; ctx.strokeRect(0, 0, w, h);
             }, 2, 2);
 
             const concreteTex = makeScheduleTexture((ctx, w, h) => {
                 ctx.fillStyle = '#cbd5e1'; ctx.fillRect(0, 0, w, h);
-                ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 6;
-                ctx.strokeRect(3, 3, w - 6, h - 6);
+                ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 6; ctx.strokeRect(3, 3, w - 6, h - 6);
             }, 2, 2);
 
             const woodTex = makeScheduleTexture((ctx, w, h) => {
@@ -1037,7 +1113,7 @@
                 ctx.lineWidth = 3;
                 ctx.strokeRect(14, 14, 484, 132);
                 ctx.fillStyle = textColor || '#fde047';
-                ctx.font = '900 44px sans-serif';
+                ctx.font = '900 42px sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 const lines = String(text || 'SIGN').split('\n');
@@ -1055,7 +1131,7 @@
             const mechSignTex = makeSignTexture('BADABING CUSTOMS 🔧', '#0f172a', '#fa9549');
 
             // =========================================================
-            // 4. SCENE, CAMERA, COURT & INTERACTIVE PHYSICS BASKETBALL
+            // 4. SCENE, CAMERA & DIRECTIONAL BASKETBALL SHOOTING
             // =========================================================
             const scene = new THREE.Scene();
             scene.background = new THREE.Color(0x6897bb);
@@ -1132,7 +1208,7 @@
                 scene.add(roadEW);
             });
 
-            // Basketball Court at (60, 60) + Interactive Basketball + Scoreboard
+            // Basketball Court at (60, 60)
             const courtGroup = new THREE.Group();
             courtGroup.position.set(60, 0.04, 60);
             const courtSurface = new THREE.Mesh(
@@ -1144,8 +1220,8 @@
 
             const poleMat = makeAnimeMat({ color: 0x18181b });
             const hoopRims = [
-                { x: 60 - 12.5, y: 4.0, z: 60 },
-                { x: 60 + 12.5, y: 4.0, z: 60 }
+                { x: 60 - 12.5, y: 4.0, z: 60, boardX: 60 - 13.5 },
+                { x: 60 + 12.5, y: 4.0, z: 60, boardX: 60 + 13.5 }
             ];
 
             [-14, 14].forEach(hx => {
@@ -1163,7 +1239,6 @@
                 courtGroup.add(rim);
             });
 
-            // 3D Court Scoreboard
             let currentHoopScore = 0;
             const scoreSignBoard = new THREE.Mesh(
                 new THREE.BoxGeometry(7.5, 2.2, 0.35),
@@ -1181,7 +1256,6 @@
                 scoreSignBoard.material.needsUpdate = true;
             }
 
-            // Interactive Physics Basketball
             const bballTex = makeScheduleTexture((ctx, w, h) => {
                 ctx.fillStyle = '#ea580c'; ctx.fillRect(0, 0, w, h);
                 ctx.strokeStyle = '#090d16'; ctx.lineWidth = 10;
@@ -1191,48 +1265,44 @@
             }, 1, 1);
 
             const basketballMesh = new THREE.Mesh(
-                new THREE.SphereGeometry(0.48, 20, 20),
+                new THREE.SphereGeometry(0.45, 20, 20),
                 makeAnimeMat({ map: bballTex })
             );
-            basketballMesh.position.set(60, 0.48, 60);
+            basketballMesh.position.set(60, 0.45, 60);
             basketballMesh.castShadow = true;
             scene.add(basketballMesh);
 
             const bballState = {
                 held: false,
-                pos: new THREE.Vector3(60, 0.48, 60),
+                pos: new THREE.Vector3(60, 0.45, 60),
                 vel: new THREE.Vector3(0, 0, 0),
-                scoredThisShot: false
+                scoredThisShot: false,
+                shotCooldown: 0
             };
 
+            // Shoots strictly in the direction the character/camera is facing!
             function shootBasketball() {
                 if (!bballState.held) return;
                 bballState.held = false;
                 bballState.scoredThisShot = false;
+                bballState.shotCooldown = 0.45;
                 document.getElementById('bball-hud').style.display = 'none';
 
-                // Aim automatically toward nearest hoop if within 32m of the court, else shoot forward
-                let bestHoop = null;
-                let bestDist = 999;
-                hoopRims.forEach(hr => {
-                    const d = Math.hypot(hr.x - camera.position.x, hr.z - camera.position.z);
-                    if (d < bestDist) { bestDist = d; bestHoop = hr; }
-                });
+                const lookDir = new THREE.Vector3();
+                camera.getWorldDirection(lookDir);
+                lookDir.normalize();
 
-                bballState.pos.copy(camera.position).add(new THREE.Vector3(0, -0.2, 0));
+                // Spawn ball slightly in front of player face
+                bballState.pos.copy(camera.position).addScaledVector(lookDir, 1.3);
 
-                if (bestHoop && bestDist < 34) {
-                    const flightTime = Math.max(0.75, Math.min(1.45, bestDist * 0.068));
-                    const gravity = 22.0;
-                    const vx = (bestHoop.x - bballState.pos.x) / flightTime;
-                    const vz = (bestHoop.z - bballState.pos.z) / flightTime;
-                    const vy = ((bestHoop.y + 0.65 - bballState.pos.y) + 0.5 * gravity * flightTime * flightTime) / flightTime;
-                    bballState.vel.set(vx, vy, vz);
-                } else {
-                    const dir = new THREE.Vector3();
-                    camera.getWorldDirection(dir);
-                    bballState.vel.set(dir.x * 16, 10.5, dir.z * 16);
-                }
+                // Launch forward along facing direction with natural upward basketball arc
+                const forwardPower = 16.5;
+                const upwardArc = Math.max(7.5, lookDir.y * 16.0 + 9.2);
+                bballState.vel.set(
+                    lookDir.x * forwardPower,
+                    upwardArc,
+                    lookDir.z * forwardPower
+                );
             }
 
             document.getElementById('btn-shoot-bball').addEventListener('click', (e) => {
@@ -1244,7 +1314,7 @@
                 if (bballState.held) shootBasketball();
             });
 
-            // Stylized Anime Cel-Shaded Trees (Layered Spherical Canopies)
+            // Stylized Anime Cel-Shaded Trees
             const trunkMat = makeAnimeMat({ map: woodTex });
             const leavesMat = makeAnimeMat({ color: 0x3b9c4c });
             [
@@ -1269,7 +1339,7 @@
             });
 
             // =========================================================
-            // 5. ANIME COMPANION FACTORY & GORILLA AVATARS
+            // 5. ORGANIC 70%-SCALE ANIME ANIMAL BUILDER (COMPANIONS & MERCHANTS)
             // =========================================================
             const npcsGroup = new THREE.Group();
             scene.add(npcsGroup);
@@ -1277,143 +1347,276 @@
             let npcList = [];
             let selectedNpcId = 'peanut';
 
-            function createCuteAnimeAnimalMesh(speciesId, nameText, scaleMultiplier) {
+            function createCuteAnimeAnimalMesh(speciesId, nameText, scaleMultiplier, outfitOpts) {
                 const spec = ANIMAL_CATALOG.find(a => a.id === speciesId) || ANIMAL_CATALOG[0];
-                const sc = scaleMultiplier || 1.0;
+                // 70% smaller scale as requested
+                const sc = scaleMultiplier || 0.68;
                 const root = new THREE.Group();
 
                 const primMat = makeAnimeMat({ color: spec.primary });
                 const secMat = makeAnimeMat({ color: spec.secondary });
+                const bellyMat = makeAnimeMat({ color: 0xffffff });
                 const pinkMat = new THREE.MeshBasicMaterial({ color: 0xff8da1 });
                 const eyeWhite = new THREE.MeshBasicMaterial({ color: 0xffffff });
-                const eyeIris = new THREE.MeshBasicMaterial({ color: 0x1e1b4b });
+                const eyeIris = new THREE.MeshBasicMaterial({ color: 0x2563eb });
                 const eyeBlack = new THREE.MeshBasicMaterial({ color: 0x050505 });
 
-                const torso = new THREE.Mesh(new THREE.SphereGeometry(1.1 * sc, 18, 18), primMat);
-                torso.scale.set(1.0, 1.12, 0.92);
-                torso.position.y = 1.9 * sc;
-                torso.userData.noOutline = true;
+                // Plump Organic Animal Body + Soft Tummy Patch
+                const torso = new THREE.Mesh(new THREE.SphereGeometry(1.05 * sc, 24, 24), primMat);
+                torso.scale.set(1.0, 1.15, 0.95);
+                torso.position.y = 1.75 * sc;
                 root.add(torso);
 
-                const vest = new THREE.Mesh(new THREE.CylinderGeometry(1.02 * sc, 1.08 * sc, 0.65 * sc, 18), secMat);
-                vest.position.y = 2.35 * sc;
-                vest.userData.noOutline = true;
-                root.add(vest);
+                const tummy = new THREE.Mesh(new THREE.SphereGeometry(0.82 * sc, 20, 20), spec.id === 'panda' ? secMat : bellyMat);
+                tummy.scale.set(0.9, 1.05, 0.55);
+                tummy.position.set(0, 1.72 * sc, 0.62 * sc);
+                root.add(tummy);
 
+                // Optional Merchant Apron
+                if (outfitOpts && outfitOpts.apronColor !== undefined) {
+                    const apronMat = makeAnimeMat({ color: outfitOpts.apronColor });
+                    const apron = new THREE.Mesh(new THREE.CylinderGeometry(0.92 * sc, 1.05 * sc, 1.25 * sc, 20, 1, false, -Math.PI * 0.45, Math.PI * 0.9), apronMat);
+                    apron.position.set(0, 1.55 * sc, 0.08 * sc);
+                    root.add(apron);
+                }
+
+                // Sculpted Animal Head with Chubby Cheeks
                 const head = new THREE.Group();
-                head.position.set(0, 3.5 * sc, 0.1 * sc);
+                head.position.set(0, 3.25 * sc, 0.12 * sc);
                 root.add(head);
 
-                const headSphere = new THREE.Mesh(new THREE.SphereGeometry(0.92 * sc, 18, 18), primMat);
-                headSphere.scale.set(1.08, 0.96, 0.95);
-                headSphere.userData.noOutline = true;
+                const headSphere = new THREE.Mesh(new THREE.SphereGeometry(0.96 * sc, 24, 24), primMat);
+                headSphere.scale.set(1.12, 0.98, 0.98);
                 head.add(headSphere);
 
+                // Chubby Side Cheek Tufts
+                [-0.72 * sc, 0.72 * sc].forEach(cx => {
+                    const cheek = new THREE.Mesh(new THREE.SphereGeometry(0.42 * sc, 16, 16), primMat);
+                    cheek.scale.set(1.1, 0.75, 0.85);
+                    cheek.position.set(cx, -0.22 * sc, 0.25 * sc);
+                    head.add(cheek);
+                });
+
+                // Optional Merchant Hat
+                if (outfitOpts && outfitOpts.hatColor !== undefined) {
+                    const hatMat = makeAnimeMat({ color: outfitOpts.hatColor });
+                    const hatBrim = new THREE.Mesh(new THREE.CylinderGeometry(0.85 * sc, 0.85 * sc, 0.12 * sc, 20), hatMat);
+                    hatBrim.position.set(0, 0.88 * sc, 0);
+                    const hatTop = new THREE.Mesh(new THREE.CylinderGeometry(0.58 * sc, 0.65 * sc, 0.55 * sc, 20), hatMat);
+                    hatTop.position.set(0, 1.18 * sc, 0);
+                    head.add(hatBrim, hatTop);
+                }
+
+                // Lion Mane Ring
+                if (spec.earType === 'mane') {
+                    for (let m = 0; m < 12; m++) {
+                        const ang = (m / 12) * Math.PI * 2;
+                        const tuft = new THREE.Mesh(new THREE.SphereGeometry(0.42 * sc, 12, 12), secMat);
+                        tuft.position.set(Math.cos(ang) * 0.95 * sc, Math.sin(ang) * 0.92 * sc, -0.15 * sc);
+                        head.add(tuft);
+                    }
+                }
+
+                // Species-Specific Organic Ears
                 [-0.68 * sc, 0.68 * sc].forEach(ex => {
+                    const side = ex > 0 ? 1 : -1;
                     if (spec.earType === 'tall') {
-                        const ear = new THREE.Mesh(new THREE.CylinderGeometry(0.18 * sc, 0.22 * sc, 1.1 * sc, 12), secMat);
-                        ear.position.set(ex * 0.8, 1.1 * sc, -0.05 * sc);
-                        head.add(ear);
+                        // Long Bunny Ears with Pink Inner
+                        const ear = new THREE.Mesh(new THREE.SphereGeometry(0.24 * sc, 16, 16), primMat);
+                        ear.scale.set(0.8, 2.8, 0.45);
+                        ear.position.set(ex * 0.75, 1.25 * sc, -0.05 * sc);
+                        ear.rotation.z = side * -0.12;
+                        const inner = new THREE.Mesh(new THREE.SphereGeometry(0.15 * sc, 12, 12), pinkMat);
+                        inner.scale.set(0.7, 2.4, 0.3);
+                        inner.position.set(ex * 0.75, 1.22 * sc, 0.04 * sc);
+                        inner.rotation.z = side * -0.12;
+                        head.add(ear, inner);
                     } else if (spec.earType === 'pointy') {
-                        const ear = new THREE.Mesh(new THREE.ConeGeometry(0.32 * sc, 0.65 * sc, 4), secMat);
-                        ear.position.set(ex, 0.85 * sc, -0.05 * sc);
+                        // Cat / Fox / Wolf Ears with Pink Inner
+                        const ear = new THREE.Mesh(new THREE.ConeGeometry(0.36 * sc, 0.72 * sc, 12), secMat);
+                        ear.position.set(ex, 0.86 * sc, -0.05 * sc);
+                        ear.rotation.z = side * -0.25;
+                        const inner = new THREE.Mesh(new THREE.ConeGeometry(0.2 * sc, 0.48 * sc, 10), pinkMat);
+                        inner.position.set(ex, 0.82 * sc, 0.08 * sc);
+                        inner.rotation.z = side * -0.25;
+                        head.add(ear, inner);
+                    } else if (spec.earType === 'floppy') {
+                        // Puppy Floppy Drooping Ears
+                        const ear = new THREE.Mesh(new THREE.SphereGeometry(0.32 * sc, 16, 16), secMat);
+                        ear.scale.set(0.55, 1.65, 0.85);
+                        ear.position.set(ex * 1.35, 0.15 * sc, 0.05 * sc);
+                        ear.rotation.z = side * 0.25;
+                        head.add(ear);
+                    } else if (spec.earType === 'big_side') {
+                        // Koala / Monkey Fuzzy Side Ears
+                        const ear = new THREE.Mesh(new THREE.SphereGeometry(0.46 * sc, 16, 16), secMat);
+                        ear.scale.set(0.9, 0.9, 0.45);
+                        ear.position.set(ex * 1.45, 0.28 * sc, -0.05 * sc);
                         head.add(ear);
                     } else if (spec.earType === 'horns') {
-                        const horn = new THREE.Mesh(new THREE.ConeGeometry(0.16 * sc, 0.55 * sc, 8), makeAnimeMat({ color: 0xfef08a }));
-                        horn.position.set(ex, 0.88 * sc, -0.05 * sc);
+                        const horn = new THREE.Mesh(new THREE.ConeGeometry(0.16 * sc, 0.55 * sc, 12), makeAnimeMat({ color: 0xfef08a }));
+                        horn.position.set(ex * 0.85, 0.92 * sc, -0.05 * sc);
+                        horn.rotation.z = side * -0.3;
                         head.add(horn);
-                    } else if (spec.earType !== 'none') {
-                        const ear = new THREE.Mesh(new THREE.SphereGeometry(0.34 * sc, 14, 14), secMat);
-                        ear.position.set(ex, 0.74 * sc, -0.1 * sc);
+                    } else if (spec.earType === 'round' || spec.earType === 'small') {
+                        const r = spec.earType === 'small' ? 0.24 : 0.36;
+                        const ear = new THREE.Mesh(new THREE.SphereGeometry(r * sc, 16, 16), secMat);
+                        ear.position.set(ex, 0.78 * sc, -0.08 * sc);
                         head.add(ear);
                     }
                 });
 
-                const snout = new THREE.Mesh(new THREE.SphereGeometry(0.32 * sc, 14, 14), secMat);
-                snout.scale.set(1.2, 0.85, 1.0);
-                snout.position.set(0, -0.15 * sc, 0.8 * sc);
-                head.add(snout);
+                // Species Muzzle / Snout / Beak / Pig Nose
+                if (spec.beak) {
+                    const beakMat = makeAnimeMat({ color: 0xf97316 });
+                    const beak = new THREE.Mesh(new THREE.ConeGeometry(0.28 * sc, 0.55 * sc, 14), beakMat);
+                    beak.rotation.x = Math.PI / 2;
+                    beak.position.set(0, -0.12 * sc, 1.05 * sc);
+                    head.add(beak);
+                } else if (spec.pigNose) {
+                    const snout = new THREE.Mesh(new THREE.CylinderGeometry(0.32 * sc, 0.34 * sc, 0.28 * sc, 16), pinkMat);
+                    snout.rotation.x = Math.PI / 2;
+                    snout.position.set(0, -0.12 * sc, 0.92 * sc);
+                    head.add(snout);
+                } else {
+                    const snout = new THREE.Mesh(new THREE.SphereGeometry(0.34 * sc, 16, 16), bellyMat);
+                    snout.scale.set(1.25, 0.85, 0.95);
+                    snout.position.set(0, -0.16 * sc, 0.82 * sc);
+                    head.add(snout);
 
+                    const nose = new THREE.Mesh(new THREE.SphereGeometry(0.14 * sc, 12, 12), secMat);
+                    nose.scale.set(1.3, 0.85, 0.9);
+                    nose.position.set(0, -0.06 * sc, 1.1 * sc);
+                    head.add(nose);
+                }
+
+                // Cute Whiskers for Cats, Bunnies, Foxes, Tigers, Raccoons
+                if (spec.whiskers) {
+                    [-1, 1].forEach(side => {
+                        [-0.06, 0.04].forEach(wy => {
+                            const wBar = new THREE.Mesh(new THREE.BoxGeometry(0.45 * sc, 0.025 * sc, 0.025 * sc), eyeBlack);
+                            wBar.position.set(side * 0.72 * sc, (-0.15 + wy) * sc, 0.82 * sc);
+                            wBar.rotation.z = side * wy * 1.5;
+                            head.add(wBar);
+                        });
+                    });
+                }
+
+                // Expressive Glossy Anime Eyes
                 const eyeGroup = new THREE.Group();
                 head.add(eyeGroup);
 
-                [-0.35 * sc, 0.35 * sc].forEach(ex => {
+                [-0.36 * sc, 0.36 * sc].forEach(ex => {
                     const side = ex > 0 ? 1 : -1;
-                    const patch = new THREE.Mesh(new THREE.SphereGeometry(0.28 * sc, 14, 14), secMat);
-                    patch.scale.set(1.05, 1.22, 0.45);
-                    patch.position.set(ex, 0.1 * sc, 0.74 * sc);
-                    eyeGroup.add(patch);
+                    if (spec.id === 'panda' || spec.id === 'raccoon') {
+                        const patch = new THREE.Mesh(new THREE.SphereGeometry(0.3 * sc, 14, 14), secMat);
+                        patch.scale.set(1.1, 1.25, 0.45);
+                        patch.position.set(ex, 0.1 * sc, 0.74 * sc);
+                        eyeGroup.add(patch);
+                    }
 
-                    const iris = new THREE.Mesh(new THREE.SphereGeometry(0.22 * sc, 14, 14), eyeIris);
-                    iris.scale.set(1.0, 1.18, 0.5);
-                    iris.position.set(ex, 0.11 * sc, 0.83 * sc);
+                    const iris = new THREE.Mesh(new THREE.SphereGeometry(0.23 * sc, 16, 16), eyeIris);
+                    iris.scale.set(1.0, 1.2, 0.5);
+                    iris.position.set(ex, 0.11 * sc, 0.84 * sc);
                     eyeGroup.add(iris);
 
-                    const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.16 * sc, 14, 14), eyeBlack);
-                    pupil.scale.set(1.0, 1.15, 0.52);
-                    pupil.position.set(ex, 0.11 * sc, 0.87 * sc);
+                    const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.17 * sc, 16, 16), eyeBlack);
+                    pupil.scale.set(1.0, 1.16, 0.52);
+                    pupil.position.set(ex, 0.11 * sc, 0.88 * sc);
                     eyeGroup.add(pupil);
 
-                    const shineBig = new THREE.Mesh(new THREE.SphereGeometry(0.08 * sc, 10, 10), eyeWhite);
-                    shineBig.position.set(ex + (side * 0.06 * sc), 0.2 * sc, 0.96 * sc);
+                    const shineBig = new THREE.Mesh(new THREE.SphereGeometry(0.085 * sc, 10, 10), eyeWhite);
+                    shineBig.position.set(ex + (side * 0.06 * sc), 0.21 * sc, 0.97 * sc);
                     eyeGroup.add(shineBig);
 
-                    const shineSmall = new THREE.Mesh(new THREE.SphereGeometry(0.04 * sc, 8, 8), eyeWhite);
-                    shineSmall.position.set(ex - (side * 0.05 * sc), 0.02 * sc, 0.96 * sc);
+                    const shineSmall = new THREE.Mesh(new THREE.SphereGeometry(0.042 * sc, 8, 8), eyeWhite);
+                    shineSmall.position.set(ex - (side * 0.05 * sc), 0.02 * sc, 0.97 * sc);
                     eyeGroup.add(shineSmall);
 
-                    const blush = new THREE.Mesh(new THREE.SphereGeometry(0.15 * sc, 10, 10), pinkMat);
+                    const blush = new THREE.Mesh(new THREE.SphereGeometry(0.16 * sc, 12, 12), pinkMat);
                     blush.scale.set(1.4, 0.65, 0.4);
-                    blush.position.set(ex * 1.4, -0.17 * sc, 0.76 * sc);
+                    blush.position.set(ex * 1.42, -0.18 * sc, 0.78 * sc);
                     head.add(blush);
                 });
 
+                // Species Tail (Bushy, Long, Wagging, or Puff)
+                let tailPivot = null;
+                if (spec.tailType && spec.tailType !== 'none') {
+                    tailPivot = new THREE.Group();
+                    tailPivot.position.set(0, 1.25 * sc, -0.88 * sc);
+                    if (spec.tailType === 'bushy') {
+                        const tMesh = new THREE.Mesh(new THREE.SphereGeometry(0.45 * sc, 16, 16), secMat);
+                        tMesh.scale.set(0.75, 0.75, 1.85);
+                        tMesh.position.set(0, 0.25 * sc, -0.55 * sc);
+                        tMesh.rotation.x = 0.45;
+                        tailPivot.add(tMesh);
+                    } else if (spec.tailType === 'long' || spec.tailType === 'wag') {
+                        const tMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.12 * sc, 0.16 * sc, 1.15 * sc, 12), secMat);
+                        tMesh.position.set(0, 0.35 * sc, -0.45 * sc);
+                        tMesh.rotation.x = -0.85;
+                        tailPivot.add(tMesh);
+                    } else {
+                        const tMesh = new THREE.Mesh(new THREE.SphereGeometry(0.28 * sc, 14, 14), bellyMat);
+                        tMesh.position.set(0, 0.05 * sc, -0.18 * sc);
+                        tailPivot.add(tMesh);
+                    }
+                    root.add(tailPivot);
+                }
+
+                // Organic Rounded Limbs with Paws
                 function makeLimb(radius, len) {
                     const pivot = new THREE.Group();
-                    const m = new THREE.Mesh(new THREE.CylinderGeometry(radius * sc, radius * 0.9 * sc, len * sc, 12), secMat);
+                    const m = new THREE.Mesh(new THREE.CylinderGeometry(radius * sc, radius * 0.88 * sc, len * sc, 16), secMat);
                     m.position.y = -(len * sc) / 2;
                     pivot.add(m);
+                    const paw = new THREE.Mesh(new THREE.SphereGeometry(radius * 1.08 * sc, 14, 14), secMat);
+                    paw.scale.set(1.0, 0.7, 1.25);
+                    paw.position.set(0, -len * sc, 0.08 * sc);
+                    pivot.add(paw);
                     return pivot;
                 }
 
-                const leftLeg = makeLimb(0.35, 1.05); leftLeg.position.set(-0.48 * sc, 1.1 * sc, 0); root.add(leftLeg);
-                const rightLeg = makeLimb(0.35, 1.05); rightLeg.position.set(0.48 * sc, 1.1 * sc, 0); root.add(rightLeg);
-                const leftArm = makeLimb(0.3, 1.1); leftArm.position.set(-1.05 * sc, 2.6 * sc, 0); root.add(leftArm);
-                const rightArm = makeLimb(0.3, 1.1); rightArm.position.set(1.05 * sc, 2.6 * sc, 0); root.add(rightArm);
+                const leftLeg = makeLimb(0.34, 0.95); leftLeg.position.set(-0.46 * sc, 1.0 * sc, 0); root.add(leftLeg);
+                const rightLeg = makeLimb(0.34, 0.95); rightLeg.position.set(0.46 * sc, 1.0 * sc, 0); root.add(rightLeg);
+                const leftArm = makeLimb(0.28, 0.95); leftArm.position.set(-1.02 * sc, 2.4 * sc, 0); root.add(leftArm);
+                const rightArm = makeLimb(0.28, 0.95); rightArm.position.set(1.02 * sc, 2.4 * sc, 0); root.add(rightArm);
 
                 if (nameText) {
                     const tagTex = makeSignTexture(spec.icon + ' ' + nameText, '#111318', '#fde047');
-                    const tag = new THREE.Mesh(new THREE.PlaneGeometry(2.5, 0.6), new THREE.MeshBasicMaterial({ map: tagTex, side: THREE.DoubleSide }));
-                    tag.position.y = 4.9 * sc;
-                    tag.userData.noOutline = true;
+                    const tag = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 0.52), new THREE.MeshBasicMaterial({ map: tagTex, side: THREE.DoubleSide }));
+                    tag.position.y = 4.65 * sc;
                     root.add(tag);
                 }
 
-                root.userData = { leftLeg, rightLeg, leftArm, rightArm, eyeGroup, head };
+                // Mark organic animal meshes so block-edge wireframes are never drawn on them
+                root.traverse(c => { if (c.isMesh) c.userData.noOutline = true; });
+                root.userData = { leftLeg, rightLeg, leftArm, rightArm, eyeGroup, head, tailPivot };
                 return root;
             }
 
-            // Sculpted Cel-Shaded Gorilla Model
+            // Sculpted Organic Gorilla Model (No Blocky Wireframe Edges)
             function createGorillaModel(bodyColorHex, scale, nameLabel) {
                 const g = new THREE.Group();
                 const furMat = makeAnimeMat({ color: new THREE.Color(bodyColorHex || '#27272a') });
                 const chestMat = makeAnimeMat({ color: 0x52525b });
 
-                const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.95 * scale, 0.75 * scale, 2.1 * scale, 12), furMat);
+                const torso = new THREE.Mesh(new THREE.SphereGeometry(1.05 * scale, 20, 20), furMat);
+                torso.scale.set(1.15, 1.25, 0.95);
                 torso.position.y = 2.0 * scale;
                 g.add(torso);
 
-                const chest = new THREE.Mesh(new THREE.SphereGeometry(0.75 * scale, 12, 12), chestMat);
-                chest.scale.set(1.1, 0.9, 0.5);
+                const chest = new THREE.Mesh(new THREE.SphereGeometry(0.82 * scale, 18, 18), chestMat);
+                chest.scale.set(1.1, 0.95, 0.55);
                 chest.position.set(0, 2.2 * scale, 0.55 * scale);
                 g.add(chest);
 
-                const head = new THREE.Mesh(new THREE.SphereGeometry(0.68 * scale, 14, 14), furMat);
+                const head = new THREE.Mesh(new THREE.SphereGeometry(0.68 * scale, 18, 18), furMat);
                 head.position.set(0, 3.45 * scale, 0.15 * scale);
                 g.add(head);
 
-                const brow = new THREE.Mesh(new THREE.BoxGeometry(1.1 * scale, 0.25 * scale, 0.45 * scale), chestMat);
-                brow.position.set(0, 3.78 * scale, 0.58 * scale);
+                const brow = new THREE.Mesh(new THREE.SphereGeometry(0.45 * scale, 14, 14), chestMat);
+                brow.scale.set(1.5, 0.45, 0.8);
+                brow.position.set(0, 3.75 * scale, 0.48 * scale);
                 g.add(brow);
 
                 [-0.25 * scale, 0.25 * scale].forEach(ex => {
@@ -1422,18 +1625,18 @@
                     g.add(eye);
                 });
 
-                const leftArm = new THREE.Mesh(new THREE.CylinderGeometry(0.32 * scale, 0.28 * scale, 2.2 * scale, 10), furMat);
-                leftArm.position.set(-1.18 * scale, 1.8 * scale, 0.1 * scale);
-                const rightArm = new THREE.Mesh(new THREE.CylinderGeometry(0.32 * scale, 0.28 * scale, 2.2 * scale, 10), furMat);
-                rightArm.position.set(1.18 * scale, 1.8 * scale, 0.1 * scale);
+                const leftArm = new THREE.Mesh(new THREE.CylinderGeometry(0.34 * scale, 0.28 * scale, 2.1 * scale, 14), furMat);
+                leftArm.position.set(-1.2 * scale, 1.8 * scale, 0.1 * scale);
+                const rightArm = new THREE.Mesh(new THREE.CylinderGeometry(0.34 * scale, 0.28 * scale, 2.1 * scale, 14), furMat);
+                rightArm.position.set(1.2 * scale, 1.8 * scale, 0.1 * scale);
 
-                const leftLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.34 * scale, 0.3 * scale, 1.3 * scale, 10), furMat);
+                const leftLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.36 * scale, 0.3 * scale, 1.3 * scale, 14), furMat);
                 leftLeg.position.set(-0.48 * scale, 0.65 * scale, 0);
-                const rightLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.34 * scale, 0.3 * scale, 1.3 * scale, 10), furMat);
+                const rightLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.36 * scale, 0.3 * scale, 1.3 * scale, 14), furMat);
                 rightLeg.position.set(0.48 * scale, 0.65 * scale, 0);
 
                 g.add(leftArm, rightArm, leftLeg, rightLeg);
-                applyAnimeInkOutlines(g);
+                g.traverse(c => { if (c.isMesh) c.userData.noOutline = true; });
 
                 if (nameLabel) {
                     const nameTex = makeSignTexture('🦍 ' + nameLabel, '#111318', bodyColorHex);
@@ -1442,6 +1645,7 @@
                         new THREE.MeshBasicMaterial({ map: nameTex, side: THREE.DoubleSide })
                     );
                     namePlane.position.y = 4.6 * scale;
+                    namePlane.userData.noOutline = true;
                     g.add(namePlane);
                 }
                 return g;
@@ -1452,7 +1656,7 @@
             const remoteGodMeshes = {};
 
             // =========================================================
-            // 6. SCHEDULE I ARCHITECTURAL BUILDER (MECHANIC, PC, SIGNS)
+            // 6. SCHEDULE I ARCHITECTURAL BUILDER (+ ANIMAL MERCHANTS)
             // =========================================================
             const cityPropsGroup = new THREE.Group();
             scene.add(cityPropsGroup);
@@ -1489,10 +1693,8 @@
                     curb.position.y = 0.38;
                     group.add(slab, curb);
                 } else if (type === 'wall') {
-                    // Architectural Wall with Baseboard & Crown Molding Trim (Not a plain Minecraft block)
                     const mainW = new THREE.Mesh(new THREE.BoxGeometry(4, 3.6, 0.34), wallMat);
-                    mainW.position.y = 2.0;
-                    mainW.userData.isSolidWall = !isGhost;
+                    mainW.position.y = 2.0; mainW.userData.isSolidWall = !isGhost;
                     const baseboard = new THREE.Mesh(new THREE.BoxGeometry(4.04, 0.25, 0.42), trimMat);
                     baseboard.position.y = 0.125;
                     const crown = new THREE.Mesh(new THREE.BoxGeometry(4.06, 0.22, 0.44), trimMat);
@@ -1561,15 +1763,12 @@
                     bulb.position.set(0.8, 5.2, 0);
                     group.add(pole, bulb);
                 } else if (type === 'sign_post') {
-                    // Placeable Custom Text Sign
                     const sText = (itemData && itemData.signText) ? itemData.signText : 'WELCOME TO\nTHE BADABING';
                     const sColor = (itemData && itemData.signColor) ? itemData.signColor : '#fde047';
                     const sBg = (itemData && itemData.signBg) ? itemData.signBg : '#111318';
 
-                    const postL = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 2.8), poleMat);
-                    postL.position.set(-1.3, 1.4, 0);
-                    const postR = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 2.8), poleMat);
-                    postR.position.set(1.3, 1.4, 0);
+                    const postL = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 2.8), poleMat); postL.position.set(-1.3, 1.4, 0);
+                    const postR = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 2.8), poleMat); postR.position.set(1.3, 1.4, 0);
 
                     const sTex = makeSignTexture(sText, sBg, sColor);
                     const boardMat = isGhost ? ghostMat : new THREE.MeshBasicMaterial({ map: sTex });
@@ -1579,88 +1778,57 @@
                     board.userData.isSolidWall = !isGhost;
                     group.add(postL, postR, board);
                 } else if (type === 'computer_desk') {
-                    // Placeable Computer Terminal with Real Internet Access
                     const deskTop = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.14, 1.2), woodMat);
-                    deskTop.position.y = 1.1;
-                    deskTop.userData.isSolidWall = !isGhost;
-                    deskTop.userData.interactType = 'computer';
+                    deskTop.position.y = 1.1; deskTop.userData.isSolidWall = !isGhost; deskTop.userData.interactType = 'computer';
                     const legL = new THREE.Mesh(new THREE.BoxGeometry(0.14, 1.1, 1.1), trimMat); legL.position.set(-0.95, 0.55, 0);
                     const legR = new THREE.Mesh(new THREE.BoxGeometry(0.14, 1.1, 1.1), trimMat); legR.position.set(0.95, 0.55, 0);
 
                     const monitorBezel = new THREE.Mesh(new THREE.BoxGeometry(1.25, 0.85, 0.1), trimMat);
-                    monitorBezel.position.set(0, 1.68, -0.25);
-                    monitorBezel.userData.interactType = 'computer';
+                    monitorBezel.position.set(0, 1.68, -0.25); monitorBezel.userData.interactType = 'computer';
 
                     const screenTex = makeSignTexture('🌐 CLICK [F]\nINTERNET PC', '#0284c7', '#ffffff');
                     const screen = new THREE.Mesh(new THREE.PlaneGeometry(1.15, 0.72), isGhost ? ghostMat : new THREE.MeshBasicMaterial({ map: screenTex }));
-                    screen.position.set(0, 1.68, -0.19);
-                    screen.userData.interactType = 'computer';
+                    screen.position.set(0, 1.68, -0.19); screen.userData.interactType = 'computer';
 
                     const tower = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.75, 0.75), trimMat);
-                    tower.position.set(0.78, 1.5, -0.1);
-                    tower.userData.interactType = 'computer';
+                    tower.position.set(0.78, 1.5, -0.1); tower.userData.interactType = 'computer';
 
                     group.add(deskTop, legL, legR, monitorBezel, screen, tower);
                 } else if (type === 'mechanic_shop') {
-                    // Large Accessible Mechanic Shop & Garage
                     const shopWallMat = isGhost ? ghostMat : makeAnimeMat({ map: stuccoWallTex, color: new THREE.Color(colorHex || '#334155') });
                     const redMetalMat = isGhost ? ghostMat : makeAnimeMat({ color: 0xdc2626 });
                     const yellowLiftMat = isGhost ? ghostMat : makeAnimeMat({ color: 0xfacc15 });
 
-                    // Concrete Garage Floor (20m wide x 16m deep)
-                    const floor = new THREE.Mesh(new THREE.BoxGeometry(20, 0.3, 16), concreteMat);
-                    floor.position.y = 0.15;
+                    const floor = new THREE.Mesh(new THREE.BoxGeometry(20, 0.3, 16), concreteMat); floor.position.y = 0.15;
                     group.add(floor);
 
-                    // Back & Side Walls (6m tall)
-                    const backW = new THREE.Mesh(new THREE.BoxGeometry(20, 6, 0.45), shopWallMat);
-                    backW.position.set(0, 3, -8); backW.userData.isSolidWall = !isGhost;
-                    const leftW = new THREE.Mesh(new THREE.BoxGeometry(0.45, 6, 16), shopWallMat);
-                    leftW.position.set(-10, 3, 0); leftW.userData.isSolidWall = !isGhost;
-                    const rightW = new THREE.Mesh(new THREE.BoxGeometry(0.45, 6, 16), shopWallMat);
-                    rightW.position.set(10, 3, 0); rightW.userData.isSolidWall = !isGhost;
+                    const backW = new THREE.Mesh(new THREE.BoxGeometry(20, 6, 0.45), shopWallMat); backW.position.set(0, 3, -8); backW.userData.isSolidWall = !isGhost;
+                    const leftW = new THREE.Mesh(new THREE.BoxGeometry(0.45, 6, 16), shopWallMat); leftW.position.set(-10, 3, 0); leftW.userData.isSolidWall = !isGhost;
+                    const rightW = new THREE.Mesh(new THREE.BoxGeometry(0.45, 6, 16), shopWallMat); rightW.position.set(10, 3, 0); rightW.userData.isSolidWall = !isGhost;
 
-                    // Front Walls with Wide 9-Meter Open Garage Bay in Center
-                    const frontL = new THREE.Mesh(new THREE.BoxGeometry(5.5, 6, 0.45), shopWallMat);
-                    frontL.position.set(-7.25, 3, 8); frontL.userData.isSolidWall = !isGhost;
-                    const frontR = new THREE.Mesh(new THREE.BoxGeometry(5.5, 6, 0.45), shopWallMat);
-                    frontR.position.set(7.25, 3, 8); frontR.userData.isSolidWall = !isGhost;
-                    const bayHeader = new THREE.Mesh(new THREE.BoxGeometry(9.0, 1.5, 0.5), redMetalMat);
-                    bayHeader.position.set(0, 5.25, 8);
+                    const frontL = new THREE.Mesh(new THREE.BoxGeometry(5.5, 6, 0.45), shopWallMat); frontL.position.set(-7.25, 3, 8); frontL.userData.isSolidWall = !isGhost;
+                    const frontR = new THREE.Mesh(new THREE.BoxGeometry(5.5, 6, 0.45), shopWallMat); frontR.position.set(7.25, 3, 8); frontR.userData.isSolidWall = !isGhost;
+                    const bayHeader = new THREE.Mesh(new THREE.BoxGeometry(9.0, 1.5, 0.5), redMetalMat); bayHeader.position.set(0, 5.25, 8);
 
-                    // Rolled-Up Corrugated Garage Door Overhead
                     const rolledDoor = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 8.8, 12), trimMat);
-                    rolledDoor.rotation.z = Math.PI / 2;
-                    rolledDoor.position.set(0, 4.4, 7.7);
+                    rolledDoor.rotation.z = Math.PI / 2; rolledDoor.position.set(0, 4.4, 7.7);
 
-                    // 2-Post Hydraulic Car Lift Inside Garage
-                    const liftPostL = new THREE.Mesh(new THREE.BoxGeometry(0.45, 4.2, 0.45), yellowLiftMat);
-                    liftPostL.position.set(-2.6, 2.1, -1.5); liftPostL.userData.isSolidWall = !isGhost;
-                    const liftPostR = new THREE.Mesh(new THREE.BoxGeometry(0.45, 4.2, 0.45), yellowLiftMat);
-                    liftPostR.position.set(2.6, 2.1, -1.5); liftPostR.userData.isSolidWall = !isGhost;
-                    const rampL = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.18, 5.2), redMetalMat);
-                    rampL.position.set(-1.5, 1.2, -1.5);
-                    const rampR = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.18, 5.2), redMetalMat);
-                    rampR.position.set(1.5, 1.2, -1.5);
+                    const liftPostL = new THREE.Mesh(new THREE.BoxGeometry(0.45, 4.2, 0.45), yellowLiftMat); liftPostL.position.set(-2.6, 2.1, -1.5); liftPostL.userData.isSolidWall = !isGhost;
+                    const liftPostR = new THREE.Mesh(new THREE.BoxGeometry(0.45, 4.2, 0.45), yellowLiftMat); liftPostR.position.set(2.6, 2.1, -1.5); liftPostR.userData.isSolidWall = !isGhost;
+                    const rampL = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.18, 5.2), redMetalMat); rampL.position.set(-1.5, 1.2, -1.5);
+                    const rampR = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.18, 5.2), redMetalMat); rampR.position.set(1.5, 1.2, -1.5);
 
-                    // Red Mechanic Tool Chest & Stacked Tires
                     const toolChest = new THREE.Mesh(new THREE.BoxGeometry(3.2, 1.6, 1.1), redMetalMat);
                     toolChest.position.set(-7.5, 0.95, -5.8); toolChest.userData.isSolidWall = !isGhost;
 
                     for (let t = 0; t < 4; t++) {
                         const tire = new THREE.Mesh(new THREE.TorusGeometry(0.55, 0.24, 10, 18), poleMat);
-                        tire.rotation.x = Math.PI / 2;
-                        tire.position.set(8.2, 0.5 + t * 0.48, -5.5);
+                        tire.rotation.x = Math.PI / 2; tire.position.set(8.2, 0.5 + t * 0.48, -5.5);
                         group.add(tire);
                     }
 
-                    const roof = new THREE.Mesh(new THREE.BoxGeometry(20.8, 0.5, 16.8), redMetalMat);
-                    roof.position.y = 6.25;
-
-                    const sign = new THREE.Mesh(
-                        new THREE.BoxGeometry(13, 2.4, 0.5),
-                        isGhost ? ghostMat : new THREE.MeshBasicMaterial({ map: mechSignTex })
-                    );
+                    const roof = new THREE.Mesh(new THREE.BoxGeometry(20.8, 0.5, 16.8), redMetalMat); roof.position.y = 6.25;
+                    const sign = new THREE.Mesh(new THREE.BoxGeometry(13, 2.4, 0.5), isGhost ? ghostMat : new THREE.MeshBasicMaterial({ map: mechSignTex }));
                     sign.position.set(0, 7.7, 8);
 
                     group.add(backW, leftW, rightW, frontL, frontR, bayHeader, rolledDoor, liftPostL, liftPostR, rampL, rampR, toolChest, roof, sign);
@@ -1696,11 +1864,12 @@
                     giantGorilla.position.y = 2.0;
                     group.add(giantGorilla);
                 } else if (type === 'merchant') {
+                    // Animal Merchant Booth with 10 Animal Shopkeeper Skins!
                     const skinIdx = (itemData && typeof itemData.merchantSkin === 'number') ? itemData.merchantSkin : 0;
                     const skin = MERCHANT_SKINS[skinIdx % MERCHANT_SKINS.length];
 
-                    const counter = new THREE.Mesh(new THREE.BoxGeometry(3.6, 1.1, 1.4), woodMat);
-                    counter.position.set(0, 0.55, 0.8);
+                    const counter = new THREE.Mesh(new THREE.BoxGeometry(3.6, 1.05, 1.3), woodMat);
+                    counter.position.set(0, 0.52, 0.85);
                     counter.userData.isSolidWall = !isGhost;
                     counter.userData.interactType = 'merchant';
                     group.add(counter);
@@ -1711,25 +1880,22 @@
                     canopy.position.set(0, 3.5, 0.4); canopy.rotation.y = Math.PI / 4;
                     group.add(postL, postR, canopy);
 
-                    const merchNpc = new THREE.Group();
-                    merchNpc.position.set(0, 0, -0.3);
-                    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.5, 1.6, 14), makeAnimeMat({ color: skin.body }));
-                    body.position.y = 0.8;
-                    const apron = new THREE.Mesh(new THREE.BoxGeometry(0.7, 1.1, 0.15), makeAnimeMat({ color: skin.apron }));
-                    apron.position.set(0, 0.8, 0.42);
-                    const head = new THREE.Mesh(new THREE.SphereGeometry(0.42, 14, 14), makeAnimeMat({ color: 0xfde68a }));
-                    head.position.y = 1.95;
-                    const hat = new THREE.Mesh(new THREE.CylinderGeometry(0.48, 0.55, 0.35, 12), makeAnimeMat({ color: skin.hat }));
-                    hat.position.y = 2.35;
-                    merchNpc.add(body, apron, head, hat);
-                    body.userData.interactType = 'merchant';
-                    head.userData.interactType = 'merchant';
-                    group.add(merchNpc);
+                    // Organic Animal Shopkeeper Standing Behind Counter
+                    const animalVendor = createCuteAnimeAnimalMesh(skin.species, null, 0.65, {
+                        hatColor: skin.hat,
+                        apronColor: skin.apron
+                    });
+                    animalVendor.position.set(0, 0, -0.35);
+                    animalVendor.traverse(c => {
+                        if (c.isMesh) c.userData.interactType = 'merchant';
+                    });
+                    group.add(animalVendor);
 
                     const shopTitle = (itemData && itemData.merchantName) ? itemData.merchantName : skin.name;
                     const signTex = makeSignTexture('🏪 ' + shopTitle, '#111318', '#4ade80');
                     const sign = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 0.65), new THREE.MeshBasicMaterial({ map: signTex, side: THREE.DoubleSide }));
                     sign.position.set(0, 2.85, 1.5);
+                    sign.userData.noOutline = true;
                     group.add(sign);
                 } else if (type === 'fountain') {
                     const basin = new THREE.Mesh(new THREE.CylinderGeometry(3.2, 3.5, 0.8, 20), concreteMat);
@@ -1760,6 +1926,7 @@
                         const tagTex = makeSignTexture('🛏️ ' + itemData.assignedTo, '#1e1b4b', '#fde047');
                         const tag = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 0.45), new THREE.MeshBasicMaterial({ map: tagTex, side: THREE.DoubleSide }));
                         tag.position.set(0, 1.65, 0);
+                        tag.userData.noOutline = true;
                         group.add(tag);
                     }
                 }
@@ -1789,7 +1956,7 @@
 
             async function pushWorldToServer() {
                 pieceCountEl.innerText = worldDataList.length;
-                localStorage.setItem('badabing_world_v5', JSON.stringify(worldDataList));
+                localStorage.setItem('badabing_world_v6', JSON.stringify(worldDataList));
                 try {
                     await fetch('/api/world', {
                         method: 'POST',
@@ -1800,8 +1967,8 @@
             }
 
             async function initWorldAndRehydrate() {
-                const localItemsRaw = localStorage.getItem('badabing_world_v5') || localStorage.getItem('badabing_world_v4');
-                const localNpcsRaw = localStorage.getItem('badabing_npcs_v5') || localStorage.getItem('badabing_npcs_v4');
+                const localItemsRaw = localStorage.getItem('badabing_world_v6') || localStorage.getItem('badabing_world_v5');
+                const localNpcsRaw = localStorage.getItem('badabing_npcs_v6') || localStorage.getItem('badabing_npcs_v5');
                 let localItems = [];
                 let localNpcs = [];
                 try { if (localItemsRaw) localItems = JSON.parse(localItemsRaw); } catch (e) {}
@@ -1825,7 +1992,7 @@
                         } else {
                             rebuildSceneFromData(serverItems);
                             if (serverItems.length > 0) {
-                                localStorage.setItem('badabing_world_v5', JSON.stringify(serverItems));
+                                localStorage.setItem('badabing_world_v6', JSON.stringify(serverItems));
                             }
                         }
                         if (serverNpcs.length > 0) {
@@ -1850,12 +2017,12 @@
                         <div class="comp-row">
                             <div>
                                 <strong style="color:#fde047;font-size:13px;">${spec.icon} ${n.name}</strong>
-                                <span style="color:#94a3b8;font-size:11px;">(${spec.label}) • Pos: (${Math.round(n.x)}, ${Math.round(n.z)})</span><br>
-                                <span style="font-size:11px;color:#cbd5e1;">Mood: <strong style="color:#4ade80;">${n.mood}</strong> | Hunger: ${Math.round(n.hunger)}% | Energy: ${Math.round(n.energy)}% | ${n.activity}</span>
+                                <span style="color:#94a3b8;font-size:11px;">(${spec.label}) • Pos: (${Math.round(n.x)}, ${Math.round(n.z)}) • 💰 $${n.wallet ?? 200}</span><br>
+                                <span style="font-size:11px;color:#cbd5e1;">Mood: <strong style="color:#4ade80;">${n.mood}</strong> | Bag: ${(n.inventory || []).length} items | ${n.activity}</span>
                             </div>
                             <div style="display:flex;gap:6px;">
                                 <button class="mini-ui-btn mgr-feed-btn" data-id="${n.id}">🍔 Feed</button>
-                                <button class="mini-ui-btn mgr-focus-btn" data-id="${n.id}">🔍 Select</button>
+                                <button class="mini-ui-btn mgr-focus-btn" data-id="${n.id}">🎒 Bag</button>
                                 ${!isPeanut ? `<button class="mini-ui-btn mgr-del-btn" data-id="${n.id}" style="background:#ef4444;color:#fff;">🗑️ Delete</button>` : `<span style="font-size:10px;color:#94a3b8;padding:4px;">👑 Founder</span>`}
                             </div>
                         </div>
@@ -1880,6 +2047,8 @@
                     btn.addEventListener('click', () => {
                         selectedNpcId = btn.getAttribute('data-id');
                         document.getElementById('npc-selector').value = selectedNpcId;
+                        document.getElementById('companion-manager-modal').style.display = 'none';
+                        document.getElementById('companion-mind-panel').style.display = 'block';
                         syncNpcsClient(npcList);
                     });
                 });
@@ -1905,7 +2074,7 @@
 
             function syncNpcsClient(serverNpcs) {
                 npcList = serverNpcs;
-                localStorage.setItem('badabing_npcs_v5', JSON.stringify(serverNpcs));
+                localStorage.setItem('badabing_npcs_v6', JSON.stringify(serverNpcs));
 
                 const sel = document.getElementById('npc-selector');
                 const currentVal = sel.value || selectedNpcId;
@@ -1924,7 +2093,8 @@
                 serverNpcs.forEach(n => {
                     activeNpcIds.add(n.id);
                     if (!npcMeshes[n.id]) {
-                        const scale = n.id === 'peanut' ? 1.0 : 0.88;
+                        // 70% scale as requested (0.70 for Peanut, 0.62 for peer animals)
+                        const scale = n.id === 'peanut' ? 0.70 : 0.62;
                         const mesh = createCuteAnimeAnimalMesh(n.species, n.name, scale);
                         mesh.position.set(n.x, 0, n.z);
                         npcsGroup.add(mesh);
@@ -1944,6 +2114,9 @@
 
                 const activeNpc = serverNpcs.find(n => n.id === selectedNpcId) || serverNpcs[0];
                 if (activeNpc) {
+                    const walletVal = typeof activeNpc.wallet === 'number' ? activeNpc.wallet : 200;
+                    document.getElementById('p-wallet').innerText = walletVal;
+                    document.getElementById('mind-wallet-val').innerText = walletVal;
                     document.getElementById('p-mood').innerText = activeNpc.mood;
                     document.getElementById('p-coords').innerText = `(${Math.round(activeNpc.x)}, ${Math.round(activeNpc.z)})`;
                     document.getElementById('p-hunger-val').innerText = Math.round(activeNpc.hunger) + '%';
@@ -1953,10 +2126,40 @@
                     document.getElementById('p-activity').innerText = activeNpc.activity;
                     document.getElementById('p-bed').innerText = activeNpc.assignedBedId ? 'Assigned 🏠' : 'None';
 
-                    document.getElementById('mind-panel-title').innerText = `${activeNpc.name}'s Mind & Logs`;
+                    document.getElementById('mind-panel-title').innerText = `${activeNpc.name}'s Mind, Wallet & Bag`;
                     document.getElementById('mind-wants-box').innerHTML = (activeNpc.wants || []).map(w => `• ${w}`).join('<br>');
                     document.getElementById('mind-diary-box').innerHTML = (activeNpc.diary || []).map(d => `<div style="margin-bottom:4px;">${d}</div>`).join('');
                     document.getElementById('mind-log-box').innerHTML = (activeNpc.activityLog || []).map(l => `<div>${l}</div>`).join('');
+
+                    // Render Companion Personal Inventory Bag
+                    const bagGrid = document.getElementById('mind-bag-grid');
+                    const bagItems = Array.isArray(activeNpc.inventory) ? activeNpc.inventory : [];
+                    if (bagItems.length === 0) {
+                        bagGrid.innerHTML = `<div style="grid-column:span 3;color:#94a3b8;font-size:11px;padding:6px;">Bag is empty — buy treats at an Animal Merchant!</div>`;
+                    } else {
+                        bagGrid.innerHTML = bagItems.map((it, idx) => `
+                            <div class="bag-item-chip" data-idx="${idx}" title="Click to consume/use">
+                                <strong>${it}</strong><br><span style="font-size:9px;color:#4ade80;">[Click to Use]</span>
+                            </div>
+                        `).join('');
+                        bagGrid.querySelectorAll('.bag-item-chip').forEach(chip => {
+                            chip.addEventListener('click', async () => {
+                                const res = await fetch('/api/npcs/action', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        npcId: activeNpc.id,
+                                        actionType: 'use_item',
+                                        slotIndex: Number(chip.getAttribute('data-idx'))
+                                    })
+                                });
+                                if (res.ok) {
+                                    const d = await res.json();
+                                    if (d.npcs) syncNpcsClient(d.npcs);
+                                }
+                            });
+                        });
+                    }
                 }
 
                 renderCompanionManagerRoster();
@@ -1965,6 +2168,20 @@
             document.getElementById('npc-selector').addEventListener('change', (e) => {
                 selectedNpcId = e.target.value;
                 syncNpcsClient(npcList);
+            });
+
+            // +$50 Allowance Button in Companion Wallet
+            document.getElementById('btn-give-allowance').addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const res = await fetch('/api/npcs/action', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ npcId: selectedNpcId, actionType: 'add_funds', amount: 50 })
+                });
+                if (res.ok) {
+                    const d = await res.json();
+                    if (d.npcs) syncNpcsClient(d.npcs);
+                }
             });
 
             // Companion Manager Modal Toggle
@@ -2203,7 +2420,7 @@
             });
 
             // =========================================================
-            // 10. INTERACTIONS: DOORS, PC BROWSER, SIGNS, SHOPS & BEDS
+            // 10. INTERACTIONS: DOORS, PC BROWSER, SIGNS, ANIMAL SHOPS
             // =========================================================
             const raycaster = new THREE.Raycaster();
             const centerScreen = new THREE.Vector2(0, 0);
@@ -2222,7 +2439,6 @@
                 objectModal.style.display = 'none';
             });
 
-            // Real Internet Browser Controls
             function navigateInGameBrowser(rawUrl) {
                 let url = (rawUrl || '').trim();
                 if (!url) return;
@@ -2287,7 +2503,7 @@
                         if (interactType === 'door') promptEl.innerHTML = 'Press <span>[F]</span> or <span>🖐️</span> to Open / Close Door';
                         else if (interactType === 'inventory') promptEl.innerHTML = 'Press <span>[F]</span> or <span>🖐️</span> to Open 10-Slot Storage';
                         else if (interactType === 'bed') promptEl.innerHTML = 'Press <span>[F]</span> or <span>🖐️</span> to Assign Bed Owner';
-                        else if (interactType === 'merchant') promptEl.innerHTML = 'Press <span>[F]</span> or <span>🖐️</span> to Trade & Customize Merchant';
+                        else if (interactType === 'merchant') promptEl.innerHTML = 'Press <span>[F]</span> or <span>🖐️</span> to Trade with Animal Merchant';
                         else if (interactType === 'sign') promptEl.innerHTML = 'Press <span>[F]</span> or <span>🖐️</span> to Edit Sign Text';
                         else if (interactType === 'computer') promptEl.innerHTML = 'Press <span>[F]</span> or <span>🖐️</span> to Use Internet Computer';
                         return;
@@ -2306,7 +2522,7 @@
                 if (interactType === 'door') {
                     itemData.isOpen = !itemData.isOpen;
                     rebuildSceneFromData(worldDataList);
-                    localStorage.setItem('badabing_world_v5', JSON.stringify(worldDataList));
+                    localStorage.setItem('badabing_world_v6', JSON.stringify(worldDataList));
                     await fetch('/api/world/update-item', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -2332,7 +2548,6 @@
                 }
             }
 
-            // Custom Text Sign Editor Modal
             function openSignEditorModal(itemData) {
                 modalTitle.innerText = '🪧 Customize Structure Sign Text';
                 const curText = itemData.signText || 'WELCOME TO\nTHE BADABING';
@@ -2363,7 +2578,7 @@
                     itemData.signColor = document.getElementById('sign-color-input').value || '#fde047';
                     itemData.signBg = document.getElementById('sign-bg-input').value || '#111318';
                     rebuildSceneFromData(worldDataList);
-                    localStorage.setItem('badabing_world_v5', JSON.stringify(worldDataList));
+                    localStorage.setItem('badabing_world_v6', JSON.stringify(worldDataList));
                     objectModal.style.display = 'none';
                     await fetch('/api/world/update-item', {
                         method: 'POST',
@@ -2403,7 +2618,7 @@
                         const idx = Number(slotEl.getAttribute('data-slot'));
                         itemData.inventory[idx] = '';
                         openInventoryModal(itemData);
-                        localStorage.setItem('badabing_world_v5', JSON.stringify(worldDataList));
+                        localStorage.setItem('badabing_world_v6', JSON.stringify(worldDataList));
                         await fetch('/api/world/update-item', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -2418,7 +2633,7 @@
                         if (emptyIdx !== -1) {
                             itemData.inventory[emptyIdx] = btn.getAttribute('data-item');
                             openInventoryModal(itemData);
-                            localStorage.setItem('badabing_world_v5', JSON.stringify(worldDataList));
+                            localStorage.setItem('badabing_world_v6', JSON.stringify(worldDataList));
                             await fetch('/api/world/update-item', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
@@ -2446,7 +2661,7 @@
                         const chosen = btn.getAttribute('data-owner');
                         itemData.assignedTo = chosen === 'Unassigned' ? null : chosen;
                         rebuildSceneFromData(worldDataList);
-                        localStorage.setItem('badabing_world_v5', JSON.stringify(worldDataList));
+                        localStorage.setItem('badabing_world_v6', JSON.stringify(worldDataList));
                         objectModal.style.display = 'none';
                         await fetch('/api/world/update-item', {
                             method: 'POST',
@@ -2457,6 +2672,7 @@
                 });
             }
 
+            // Animal Merchant Modal (Purchases deduct from Companion Wallet & add to Companion Bag)
             function openMerchantModal(itemData) {
                 if (typeof itemData.merchantSkin !== 'number') itemData.merchantSkin = 0;
                 if (!Array.isArray(itemData.shopItems) || itemData.shopItems.length === 0) {
@@ -2468,20 +2684,20 @@
                     ];
                 }
 
-                modalTitle.innerText = '🏪 Merchant Shop & Skin Editor';
+                modalTitle.innerText = '🏪 Animal Merchant Shop & Skin Editor';
                 const currentNpc = npcList.find(n => n.id === selectedNpcId) || npcList[0];
 
                 let html = `
                     <div style="margin-bottom:10px;">
-                        <label style="font-size:11px;color:#94a3b8;display:block;margin-bottom:4px;">Choose Merchant Skin (10 Skins):</label>
+                        <label style="font-size:11px;color:#94a3b8;display:block;margin-bottom:4px;">Choose Animal Shopkeeper Skin (10 Animals):</label>
                         <select id="merchant-skin-select" class="merchant-input" style="width:100%;padding:6px;">
-                            ${MERCHANT_SKINS.map((sk, idx) => `<option value="${idx}" ${itemData.merchantSkin === idx ? 'selected' : ''}>Skin #${idx + 1}: ${sk.name}</option>`).join('')}
+                            ${MERCHANT_SKINS.map((sk, idx) => `<option value="${idx}" ${itemData.merchantSkin === idx ? 'selected' : ''}>Skin #${idx + 1}: ${sk.name} (${sk.species.toUpperCase()})</option>`).join('')}
                         </select>
                     </div>
                     <div style="margin-bottom:10px;">
-                        <label style="font-size:11px;color:#94a3b8;display:block;margin-bottom:4px;">Buy For Companion:</label>
+                        <label style="font-size:11px;color:#94a3b8;display:block;margin-bottom:4px;">Select Companion Buyer (Uses their Wallet & Bag):</label>
                         <select id="merchant-buyer-select" class="merchant-input" style="width:100%;padding:6px;color:#fde047;font-weight:bold;">
-                            ${npcList.map(n => `<option value="${n.id}" ${n.id === (currentNpc && currentNpc.id) ? 'selected' : ''}>Buy for ${n.name} (${n.species})</option>`).join('')}
+                            ${npcList.map(n => `<option value="${n.id}" ${n.id === (currentNpc && currentNpc.id) ? 'selected' : ''}>${n.name} (${n.species}) — Wallet: $${n.wallet ?? 200}</option>`).join('')}
                         </select>
                     </div>
                     <div style="font-size:11px;color:#38bdf8;font-weight:bold;margin-bottom:6px;">Editable Shop Inventory & Prices:</div>
@@ -2507,7 +2723,7 @@
                     itemData.merchantSkin = Number(e.target.value);
                     itemData.merchantName = MERCHANT_SKINS[itemData.merchantSkin].name;
                     rebuildSceneFromData(worldDataList);
-                    localStorage.setItem('badabing_world_v5', JSON.stringify(worldDataList));
+                    localStorage.setItem('badabing_world_v6', JSON.stringify(worldDataList));
                     await fetch('/api/world/update-item', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -2531,7 +2747,7 @@
                         name: inp.value,
                         price: Number(priceInputs[idx].value) || 0
                     }));
-                    localStorage.setItem('badabing_world_v5', JSON.stringify(worldDataList));
+                    localStorage.setItem('badabing_world_v6', JSON.stringify(worldDataList));
                     await fetch('/api/world/update-item', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -2562,8 +2778,10 @@
                         if (res.ok) {
                             const d = await res.json();
                             if (d.npcs) syncNpcsClient(d.npcs);
-                            btn.innerText = '✅ Bought!';
-                            setTimeout(() => { btn.innerText = '🛍️ Buy'; }, 1000);
+                            openMerchantModal(itemData);
+                        } else {
+                            const err = await res.json();
+                            alert(err.error || 'Not enough funds in companion wallet!');
                         }
                     });
                 });
@@ -2794,8 +3012,8 @@
             const allBuildTypes = [
                 'none', 'foundation', 'wall', 'doorway', 'window', 'stairs',
                 'roof_flat', 'roof_pitched', 'fence', 'sign_post', 'streetlight',
-                'mechanic_shop', 'computer_desk', 'mcdonalds', 'walmart', 'gorilla_statue',
-                'merchant', 'fountain', 'mailbox', 'locker', 'bed', 'delete'
+                'mechanic_shop', 'computer_desk', 'merchant', 'mcdonalds', 'walmart', 'gorilla_statue',
+                'fountain', 'mailbox', 'locker', 'bed', 'delete'
             ];
             let prevGpButtons = {};
 
@@ -2860,7 +3078,7 @@
             }
 
             // =========================================================
-            // 13. MAIN ANIMATION LOOP (BASKETBALL + GRAVITY + COMPANIONS)
+            // 13. MAIN ANIMATION LOOP (DIRECTIONAL BASKETBALL + ROAMING)
             // =========================================================
             const targetXEl = document.getElementById('target-x');
             const targetZEl = document.getElementById('target-z');
@@ -2886,48 +3104,51 @@
                     }
                 }
 
-                // Basketball Physics & Dribbling
+                // Directional Basketball Physics & Dribbling
+                if (bballState.shotCooldown > 0) bballState.shotCooldown -= delta;
+
                 if (bballState.held) {
                     const forward = new THREE.Vector3();
                     camera.getWorldDirection(forward);
                     forward.y = 0; forward.normalize();
-                    const dribbleBounce = Math.abs(Math.sin(elapsed * 9.5)) * 0.85;
+                    const dribbleBounce = Math.abs(Math.sin(elapsed * 9.5)) * 0.82;
                     bballState.pos.set(
-                        camera.position.x + forward.x * 1.65,
-                        0.48 + dribbleBounce,
-                        camera.position.z + forward.z * 1.65
+                        camera.position.x + forward.x * 1.55,
+                        0.45 + dribbleBounce,
+                        camera.position.z + forward.z * 1.55
                     );
                     basketballMesh.position.copy(bballState.pos);
                     basketballMesh.rotation.x += 8 * delta;
                 } else {
-                    // Check if Gorilla God walks close to basketball to pick it up
                     const distToBall = Math.hypot(camera.position.x - bballState.pos.x, camera.position.z - bballState.pos.z);
-                    if (distToBall < 1.85 && bballState.vel.length() < 3.5 && camera.position.y < 4.5) {
+                    if (bballState.shotCooldown <= 0 && distToBall < 1.85 && bballState.vel.length() < 4.5 && camera.position.y < 4.5) {
                         bballState.held = true;
                         document.getElementById('bball-hud').style.display = 'flex';
                     } else {
-                        // Flight & Bounce Physics
                         bballState.vel.y -= 22.0 * delta;
                         bballState.pos.addScaledVector(bballState.vel, delta);
 
-                        if (bballState.pos.y <= 0.48) {
-                            bballState.pos.y = 0.48;
+                        if (bballState.pos.y <= 0.45) {
+                            bballState.pos.y = 0.45;
                             bballState.vel.y = Math.abs(bballState.vel.y) * 0.62;
-                            bballState.vel.x *= 0.86;
-                            bballState.vel.z *= 0.86;
+                            bballState.vel.x *= 0.88;
+                            bballState.vel.z *= 0.88;
                             if (bballState.vel.y < 1.2) bballState.vel.y = 0;
                         }
 
-                        // Check Rim Collision & Hoop Swish Scoring
+                        // Backboard & Rim Collision + Swish Detection
                         hoopRims.forEach(hr => {
+                            // Backboard bounce
+                            if (Math.abs(bballState.pos.x - hr.boardX) < 0.45 && Math.abs(bballState.pos.z - hr.z) < 1.6 && bballState.pos.y > 3.4 && bballState.pos.y < 5.6) {
+                                bballState.vel.x *= -0.65;
+                            }
                             const hDist = Math.hypot(bballState.pos.x - hr.x, bballState.pos.z - hr.z);
                             const yDiff = Math.abs(bballState.pos.y - hr.y);
-                            if (hDist < 0.72 && yDiff < 0.45 && bballState.vel.y < 0 && !bballState.scoredThisShot) {
+                            if (hDist < 0.78 && yDiff < 0.5 && bballState.vel.y < 0 && !bballState.scoredThisShot) {
                                 bballState.scoredThisShot = true;
                                 updateScoreboardDisplay(currentHoopScore + 1);
                                 fetch('/api/basketball/score', { method: 'POST' });
-                            } else if (hDist >= 0.72 && hDist < 1.05 && yDiff < 0.35) {
-                                // Rim bounce
+                            } else if (hDist >= 0.78 && hDist < 1.08 && yDiff < 0.35) {
                                 bballState.vel.y = Math.abs(bballState.vel.y) * 0.55;
                                 bballState.vel.x = (bballState.pos.x - hr.x) * 4.5;
                                 bballState.vel.z = (bballState.pos.z - hr.z) * 4.5;
@@ -2940,22 +3161,30 @@
                     }
                 }
 
-                // Animate Peanut & All Spawned Cute Anime Companions
+                // Animate Organic 70%-Scale Companions (Legs, Arms, Wagging Tails & Blinking)
                 Object.keys(npcMeshes).forEach((id, idx) => {
                     const mesh = npcMeshes[id];
+                    let isMoving = false;
                     if (typeof mesh.userData.targetX === 'number') {
-                        mesh.position.x += (mesh.userData.targetX - mesh.position.x) * 0.14;
-                        mesh.position.z += (mesh.userData.targetZ - mesh.position.z) * 0.14;
+                        const dx = mesh.userData.targetX - mesh.position.x;
+                        const dz = mesh.userData.targetZ - mesh.position.z;
+                        if (Math.hypot(dx, dz) > 0.03) isMoving = true;
+                        mesh.position.x += dx * 0.16;
+                        mesh.position.z += dz * 0.16;
                         mesh.rotation.y = mesh.userData.targetRotY || 0;
                     }
-                    const stride = elapsed * 5.2 + idx;
-                    mesh.position.y = Math.abs(Math.sin(stride)) * 0.06;
+                    const stride = elapsed * 6.5 + idx;
+                    mesh.position.y = isMoving ? Math.abs(Math.sin(stride)) * 0.05 : 0;
                     if (mesh.userData.leftLeg) {
-                        mesh.userData.leftLeg.rotation.x = Math.sin(stride) * 0.55;
-                        mesh.userData.rightLeg.rotation.x = -Math.sin(stride) * 0.55;
-                        mesh.userData.leftArm.rotation.x = -Math.sin(stride) * 0.45;
-                        mesh.userData.rightArm.rotation.x = Math.sin(stride) * 0.45;
+                        const swing = isMoving ? 0.58 : 0.08;
+                        mesh.userData.leftLeg.rotation.x = Math.sin(stride) * swing;
+                        mesh.userData.rightLeg.rotation.x = -Math.sin(stride) * swing;
+                        mesh.userData.leftArm.rotation.x = -Math.sin(stride) * (swing * 0.8);
+                        mesh.userData.rightArm.rotation.x = Math.sin(stride) * (swing * 0.8);
                         mesh.userData.eyeGroup.scale.y = ((elapsed + idx) % 4.0 < 0.14) ? 0.08 : 1.0;
+                    }
+                    if (mesh.userData.tailPivot) {
+                        mesh.userData.tailPivot.rotation.y = Math.sin(elapsed * 8.0 + idx) * 0.35;
                     }
                 });
 
