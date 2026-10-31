@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>The Badabing - Gorilla Gods & Companions City Builder</title>
+    <title>The Badabing - Schedule I Anime Co-op City Builder</title>
     <style>
         * { box-sizing: border-box; }
         body {
@@ -25,7 +25,7 @@
             left: 0;
             width: 100%;
             height: 36px;
-            background: rgba(15, 17, 23, 0.95);
+            background: rgba(15, 17, 23, 0.96);
             border-bottom: 2px solid #fa9549;
             display: flex;
             align-items: center;
@@ -41,9 +41,10 @@
         }
         .brand-title {
             color: #fa9549;
-            font-weight: 800;
-            letter-spacing: 0.5px;
+            font-weight: 900;
+            letter-spacing: 0.6px;
             text-transform: uppercase;
+            text-shadow: 1px 1px 0 #000;
         }
         .sync-badge { color: #4ade80; font-weight: bold; }
         .coop-pills { display: flex; gap: 6px; }
@@ -56,15 +57,15 @@
             border: 1px solid #475569;
         }
 
-        /* 2. Companion Telemetry Bar Below Top Banner */
+        /* 2. Companion Telemetry Bar */
         #companion-bar {
             position: absolute;
             top: 36px;
             left: 0;
             width: 100%;
             min-height: 38px;
-            background: rgba(22, 25, 34, 0.92);
-            border-bottom: 1px solid #333842;
+            background: rgba(22, 25, 34, 0.94);
+            border-bottom: 2px solid #0f1117;
             display: flex;
             flex-wrap: wrap;
             align-items: center;
@@ -83,8 +84,8 @@
         #npc-selector {
             background: #161922;
             color: #fa9549;
-            border: 1px solid #fa9549;
-            border-radius: 4px;
+            border: 2px solid #fa9549;
+            border-radius: 5px;
             padding: 2px 6px;
             font-weight: bold;
             font-size: 12px;
@@ -96,11 +97,11 @@
         }
         .stat-bar-bg {
             width: 55px;
-            height: 8px;
+            height: 9px;
             background: #111318;
             border-radius: 4px;
             overflow: hidden;
-            border: 1px solid #374151;
+            border: 1px solid #000;
         }
         .stat-bar-fill {
             height: 100%;
@@ -115,29 +116,31 @@
         }
         .mini-ui-btn {
             background: #283040;
-            border: 1px solid #475569;
+            border: 2px solid #0f1117;
+            box-shadow: 0 2px 0 #000;
             color: #f8fafc;
             padding: 4px 9px;
-            border-radius: 4px;
+            border-radius: 5px;
             font-size: 11px;
             cursor: pointer;
-            font-weight: 600;
+            font-weight: 700;
         }
         .mini-ui-btn:hover, .mini-ui-btn.active {
             background: #fa9549;
             color: #111;
-            border-color: #fa9549;
+            border-color: #000;
         }
 
-        /* 3. Companion Mind Panel (Diary, Wants, Live Chat, Activity Log) */
+        /* 3. Companion Mind Panel */
         #companion-mind-panel {
             position: absolute;
-            top: 80px;
+            top: 82px;
             left: 14px;
             width: 340px;
             max-width: calc(100vw - 28px);
-            background: rgba(18, 21, 28, 0.96);
-            border: 2px solid #fa9549;
+            background: rgba(18, 21, 28, 0.97);
+            border: 3px solid #0f1117;
+            outline: 2px solid #fa9549;
             border-radius: 8px;
             padding: 12px;
             z-index: 24;
@@ -158,9 +161,7 @@
             color: #fa9549;
             text-transform: uppercase;
         }
-        .mind-section {
-            margin-bottom: 10px;
-        }
+        .mind-section { margin-bottom: 10px; }
         .mind-section h4 {
             margin: 0 0 4px 0;
             font-size: 11px;
@@ -179,18 +180,107 @@
             line-height: 1.4;
         }
 
-        /* 4. God / Build Menu Button & Modal */
+        /* 4. All-in-One Companion Manager Modal */
+        #companion-manager-modal {
+            position: absolute;
+            top: 82px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 560px;
+            max-width: 94vw;
+            max-height: 78vh;
+            overflow-y: auto;
+            background: rgba(18, 21, 28, 0.98);
+            border: 3px solid #000;
+            outline: 2px solid #4ade80;
+            border-radius: 10px;
+            padding: 16px;
+            z-index: 28;
+            display: none;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.92);
+        }
+        .comp-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #161922;
+            border: 2px solid #283040;
+            border-radius: 7px;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* 5. Real Internet Computer Browser Modal */
+        #computer-browser-modal {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 860px;
+            max-width: 95vw;
+            height: 78vh;
+            background: #0f172a;
+            border: 4px solid #000;
+            outline: 2px solid #38bdf8;
+            border-radius: 10px;
+            z-index: 35;
+            display: none;
+            flex-direction: column;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.95);
+            overflow: hidden;
+        }
+        .browser-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #1e293b;
+            padding: 8px 12px;
+            border-bottom: 2px solid #000;
+            flex-wrap: wrap;
+        }
+        .browser-url-input {
+            flex: 1;
+            min-width: 180px;
+            background: #090d16;
+            color: #38bdf8;
+            border: 2px solid #334155;
+            border-radius: 5px;
+            padding: 6px 10px;
+            font-size: 12px;
+            font-family: monospace;
+        }
+        .browser-bookmarks {
+            display: flex;
+            gap: 6px;
+            background: #141c2b;
+            padding: 5px 12px;
+            border-bottom: 1px solid #334155;
+            font-size: 11px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        #browser-iframe {
+            flex: 1;
+            width: 100%;
+            border: none;
+            background: #fff;
+        }
+
+        /* 6. God / Build Menu Button & Modal */
         #toggle-build-btn {
             position: absolute;
             top: 82px;
             right: 14px;
-            background: rgba(24, 27, 34, 0.95);
-            border: 2px solid #fa9549;
+            background: rgba(24, 27, 34, 0.96);
+            border: 2px solid #000;
+            outline: 2px solid #fa9549;
             color: #fa9549;
             padding: 9px 15px;
             border-radius: 6px;
             cursor: pointer;
-            font-weight: 800;
+            font-weight: 900;
             font-size: 12px;
             text-transform: uppercase;
             z-index: 20;
@@ -205,12 +295,13 @@
             position: absolute;
             top: 128px;
             right: 14px;
-            width: 460px;
+            width: 470px;
             max-width: calc(100vw - 28px);
             max-height: calc(100vh - 145px);
             overflow-y: auto;
-            background: rgba(18, 21, 28, 0.97);
-            border: 2px solid #fa9549;
+            background: rgba(18, 21, 28, 0.98);
+            border: 3px solid #000;
+            outline: 2px solid #fa9549;
             border-radius: 8px;
             padding: 14px;
             z-index: 25;
@@ -258,8 +349,8 @@
         }
         .build-card {
             background: #232834;
-            border: 1px solid #3c4456;
-            border-radius: 5px;
+            border: 2px solid #0f1117;
+            border-radius: 6px;
             padding: 8px 5px;
             text-align: center;
             cursor: pointer;
@@ -301,7 +392,7 @@
             width: 25px;
             height: 25px;
             border-radius: 50%;
-            border: 2px solid #334155;
+            border: 2px solid #000;
             cursor: pointer;
         }
         .color-swatch.active {
@@ -321,14 +412,14 @@
             color: #94a3b8;
         }
 
-        /* Center Interaction Prompt */
+        /* Center Interaction & Basketball HUD */
         #interaction-prompt {
             position: absolute;
             top: 56%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(15, 17, 23, 0.92);
-            border: 1px solid #fa9549;
+            background: rgba(15, 17, 23, 0.94);
+            border: 2px solid #fa9549;
             color: #fff;
             padding: 6px 14px;
             border-radius: 6px;
@@ -340,7 +431,26 @@
         }
         #interaction-prompt span { color: #fa9549; }
 
-        /* Object Inspector Modal (Inventory, Bed Assignment, Merchant Shop) */
+        #bball-hud {
+            position: absolute;
+            bottom: 54px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(234, 88, 12, 0.95);
+            border: 2px solid #000;
+            color: #fff;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 900;
+            z-index: 18;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+        }
+
+        /* Object Inspector Modal (Inventory, Bed, Merchant, Custom Sign) */
         #object-modal {
             position: absolute;
             top: 50%;
@@ -351,7 +461,8 @@
             max-height: 85vh;
             overflow-y: auto;
             background: rgba(18, 21, 28, 0.98);
-            border: 2px solid #fa9549;
+            border: 3px solid #000;
+            outline: 2px solid #fa9549;
             border-radius: 8px;
             padding: 16px;
             z-index: 30;
@@ -402,9 +513,9 @@
             background: #232834;
             border: 1px solid #475569;
             color: #fff;
-            padding: 4px 6px;
+            padding: 5px 8px;
             border-radius: 4px;
-            font-size: 11px;
+            font-size: 12px;
         }
 
         /* Bottom Telemetry Pill */
@@ -413,8 +524,9 @@
             bottom: 14px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(18, 20, 26, 0.92);
-            border: 1px solid #fa9549;
+            background: rgba(18, 20, 26, 0.94);
+            border: 2px solid #000;
+            outline: 1px solid #fa9549;
             padding: 6px 14px;
             border-radius: 20px;
             font-size: 11px;
@@ -445,10 +557,10 @@
             position: absolute;
             bottom: 14px;
             left: 14px;
-            background: rgba(18, 20, 26, 0.9);
+            background: rgba(18, 20, 26, 0.92);
             padding: 8px 12px;
             border-radius: 6px;
-            border: 1px solid #333842;
+            border: 2px solid #000;
             font-size: 11px;
             color: #cbd5e1;
             z-index: 10;
@@ -488,8 +600,8 @@
         .mob-btn {
             width: 54px;
             height: 54px;
-            background: rgba(250, 149, 73, 0.82);
-            border: 2px solid #fff;
+            background: rgba(250, 149, 73, 0.85);
+            border: 2px solid #000;
             border-radius: 50%;
             color: #111;
             font-size: 16px;
@@ -514,12 +626,13 @@
     <!-- 1. Compact Top Server & Co-op Status Banner -->
     <div id="top-status-banner">
         <div class="banner-left">
-            <span class="brand-title">🦍 The Badabing Co-op</span>
+            <span class="brand-title">🦍 The Badabing Anime Co-op</span>
             <span>Sync: <span id="status" class="sync-badge">Online</span></span>
             <span>Structures: <strong id="piece-count" style="color:#fa9549;">0</strong></span>
+            <span>🏀 Hoops: <strong id="hoop-score-banner" style="color:#fde047;">0</strong></span>
         </div>
         <div class="banner-center">
-            <span>Gorilla Gods (Max 4):</span>
+            <span>Gorilla Gods:</span>
             <div class="coop-pills" id="coop-gods-list">
                 <span class="god-pill">Connecting...</span>
             </div>
@@ -529,7 +642,7 @@
         </div>
     </div>
 
-    <!-- 2. Companion Telemetry Bar (With Coordinates & Mind Toggle) -->
+    <!-- 2. Companion Telemetry Bar -->
     <div id="companion-bar">
         <div class="companion-stats">
             <select id="npc-selector" title="Select Companion"></select>
@@ -549,6 +662,7 @@
             <div class="stat-item">Bed: <strong id="p-bed" style="color:#c084fc;">None</strong></div>
         </div>
         <div class="companion-actions">
+            <button class="mini-ui-btn" id="btn-toggle-manager" style="background:#4ade80;color:#111;">🐾 Manage Companions</button>
             <button class="mini-ui-btn" id="btn-toggle-mind">📓 Mind & Logs</button>
             <button class="mini-ui-btn" id="btn-feed-npc">🍔 Feed</button>
             <button class="mini-ui-btn" id="btn-rest-npc">⚡ Energize</button>
@@ -556,7 +670,7 @@
         </div>
     </div>
 
-    <!-- 3. Toggleable Companion Mind Panel (Diary, Wants, Live Chat Button, Activity Log) -->
+    <!-- 3. Toggleable Companion Mind Panel -->
     <div id="companion-mind-panel">
         <div class="mind-header">
             <h3 id="mind-panel-title">🐼 Peanut's Mind & Logs</h3>
@@ -581,11 +695,40 @@
         </div>
     </div>
 
-    <!-- 4. God / Build Menu Toggle Button & Modal -->
+    <!-- 4. All-in-One Companion Manager Modal (View All Moods, Locations & Delete) -->
+    <div id="companion-manager-modal">
+        <div class="mind-header">
+            <h3 style="margin:0;color:#4ade80;font-size:15px;">🐾 Town Companion Roster & Manager</h3>
+            <button class="mini-ui-btn" id="btn-close-manager">✖ Close</button>
+        </div>
+        <p style="font-size:11px;color:#94a3b8;margin:0 0 10px 0;">All added and deleted companions and their live coordinates are permanently synced to the server.</p>
+        <div id="companion-roster-list"></div>
+    </div>
+
+    <!-- 5. In-Game Real Internet Computer Terminal Modal -->
+    <div id="computer-browser-modal">
+        <div class="browser-toolbar">
+            <strong style="color:#38bdf8;font-size:13px;">💻 BADABING OS WEB BROWSER</strong>
+            <input type="text" id="browser-url-bar" class="browser-url-input" value="https://en.m.wikipedia.org/wiki/Giant_panda" placeholder="https://..." />
+            <button class="mini-ui-btn" id="btn-browser-go" style="background:#4ade80;color:#111;">🌐 Go</button>
+            <button class="mini-ui-btn" id="btn-browser-ext" style="background:#fa9549;color:#111;" title="For sites like Google/YouTube that block iframe embedding">🚀 Pop Out Tab</button>
+            <button class="mini-ui-btn" id="btn-browser-close" style="background:#ef4444;color:#fff;">✖ Exit PC</button>
+        </div>
+        <div class="browser-bookmarks">
+            <span style="color:#94a3b8;font-weight:bold;">Bookmarks:</span>
+            <button class="mini-ui-btn bm-btn" data-url="https://en.m.wikipedia.org/wiki/Main_Page">📖 Wikipedia</button>
+            <button class="mini-ui-btn bm-btn" data-url="https://www.openstreetmap.org/export/embed.html?bbox=-82.85,27.70,-82.55,28.05&layer=mapnik">🗺️ Live Map</button>
+            <button class="mini-ui-btn bm-btn" data-url="https://lite.duckduckgo.com/lite/">🦆 DuckDuckGo</button>
+            <button class="mini-ui-btn bm-btn" data-url="https://archive.org">🏛️ Internet Archive</button>
+            <span style="color:#94a3b8;margin-left:auto;font-size:10px;">Tip: Use "🚀 Pop Out Tab" if a site blocks embedded frames.</span>
+        </div>
+        <iframe id="browser-iframe" src="about:blank" sandbox="allow-same-origin allow-scripts allow-forms allow-popups"></iframe>
+    </div>
+
+    <!-- 6. God / Build Menu Toggle Button & Modal -->
     <button id="toggle-build-btn">🦍 God & Build Menu (B)</button>
 
     <div id="build-menu-modal">
-        <!-- Gorilla God Physics Toggle (Walking Default vs Flying) -->
         <div class="god-physics-bar">
             <div>🦍 <strong>Gorilla God Movement:</strong> <span id="physics-mode-label" style="color:#4ade80;">Walking Physics (Gravity)</span></div>
             <button class="mini-ui-btn" id="btn-toggle-fly">✈️ Enable Fly Mode</button>
@@ -593,25 +736,28 @@
 
         <div class="tab-row">
             <button class="tab-btn active" id="tab-modular">🧱 Modular Parts</button>
-            <button class="tab-btn" id="tab-buildings">🏢 Buildings & Shops</button>
+            <button class="tab-btn" id="tab-buildings">🏢 Buildings & Tech</button>
             <button class="tab-btn" id="tab-companions">🐾 Spawn Companions</button>
         </div>
 
-        <!-- Tab 1: Modular Parts -->
+        <!-- Tab 1: Modular Parts (Plus Custom Text Sign) -->
         <div class="build-grid" id="grid-modular">
             <div class="build-card" data-type="foundation"><span class="icon">⬛</span><span class="label">Foundation</span><span class="sub">4x4m Slab</span></div>
-            <div class="build-card" data-type="wall"><span class="icon">🧱</span><span class="label">Solid Wall</span><span class="sub">Collidable</span></div>
+            <div class="build-card" data-type="wall"><span class="icon">🧱</span><span class="label">Anime Wall</span><span class="sub">Cel-Trimmed</span></div>
             <div class="build-card" data-type="doorway"><span class="icon">🚪</span><span class="label">Door Wall</span><span class="sub">Interactive Door</span></div>
-            <div class="build-card" data-type="window"><span class="icon">🪟</span><span class="label">Window Wall</span><span class="sub">Solid Frame</span></div>
+            <div class="build-card" data-type="window"><span class="icon">🪟</span><span class="label">Window Wall</span><span class="sub">Mullion Glass</span></div>
             <div class="build-card" data-type="stairs"><span class="icon">🪜</span><span class="label">Staircase</span><span class="sub">4m Ramp</span></div>
-            <div class="build-card" data-type="roof_flat"><span class="icon">⬜</span><span class="label">Flat Roof</span><span class="sub">Floor/Ceiling</span></div>
+            <div class="build-card" data-type="roof_flat"><span class="icon">⬜</span><span class="label">Flat Roof</span><span class="sub">Overhang Slab</span></div>
             <div class="build-card" data-type="roof_pitched"><span class="icon">⛺</span><span class="label">Pitched Roof</span><span class="sub">Gable Crest</span></div>
             <div class="build-card" data-type="fence"><span class="icon">⛓️</span><span class="label">Chain Fence</span><span class="sub">Solid Barrier</span></div>
+            <div class="build-card" data-type="sign_post"><span class="icon">🪧</span><span class="label">Text Sign</span><span class="sub">Custom God Text</span></div>
             <div class="build-card" data-type="streetlight"><span class="icon">🏮</span><span class="label">Streetlight</span><span class="sub">Lamp Post</span></div>
         </div>
 
-        <!-- Tab 2: Buildings, XL Gorilla Statue & Customizable Merchant -->
+        <!-- Tab 2: Buildings, Mechanic Shop, Internet PC, Statue & Merchant -->
         <div class="build-grid" id="grid-buildings" style="display:none;">
+            <div class="build-card" data-type="mechanic_shop"><span class="icon">🔧</span><span class="label">Mechanic Shop</span><span class="sub">Accessible Garage</span></div>
+            <div class="build-card" data-type="computer_desk"><span class="icon">💻</span><span class="label">Internet PC</span><span class="sub">Live Web Browser</span></div>
             <div class="build-card" data-type="mcdonalds"><span class="icon">🍔</span><span class="label">McDonald's</span><span class="sub">Full Restaurant</span></div>
             <div class="build-card" data-type="walmart"><span class="icon">🛒</span><span class="label">Walmart</span><span class="sub">Supercenter</span></div>
             <div class="build-card" data-type="gorilla_statue"><span class="icon">🗿</span><span class="label">XL Gorilla Statue</span><span class="sub">Giant Monument</span></div>
@@ -622,7 +768,7 @@
             <div class="build-card" data-type="bed"><span class="icon">🛌</span><span class="label">Assignable Bed</span><span class="sub">Assign Owner</span></div>
         </div>
 
-        <!-- Tab 3: Companion Spawner (20 Cute Anime Animals) -->
+        <!-- Tab 3: Companion Spawner -->
         <div id="grid-companions" style="display:none; margin-bottom:12px;">
             <div style="display:flex; gap:6px; margin-bottom:8px;">
                 <input type="text" id="new-companion-name" class="merchant-input" placeholder="Enter Companion Name (e.g. BamBam)" style="flex:1; padding:7px;" />
@@ -640,7 +786,7 @@
         <!-- Paint Color Customizer -->
         <div class="color-section">
             <div class="color-section-title">
-                <span>🎨 Structure Paint Color</span>
+                <span>🎨 Anime Cel Paint Color</span>
                 <span id="selected-color-label">#8A483C</span>
             </div>
             <div class="swatch-row">
@@ -666,7 +812,13 @@
     </div>
 
     <!-- Center Screen Interaction Prompt -->
-    <div id="interaction-prompt">Press <span>[F]</span> or <span>[X]</span> to Interact</div>
+    <div id="interaction-prompt">Press <span>[F]</span> or <span>🖐️</span> to Interact</div>
+
+    <!-- Basketball Dribbling & Shoot Bar -->
+    <div id="bball-hud">
+        <span>🏀 Dribbling Basketball!</span>
+        <button class="mini-ui-btn" id="btn-shoot-bball" style="background:#fde047;color:#111;font-weight:900;">🏀 Shoot at Hoop [G]</button>
+    </div>
 
     <!-- Object Inspector Modal -->
     <div id="object-modal">
@@ -696,12 +848,13 @@
             <div class="mob-btn" id="btn-up">⬆️</div>
             <div class="mob-btn" id="btn-down">⬇️</div>
             <div class="mob-btn" id="btn-place" style="background:#4ade80;">🔨</div>
+            <div class="mob-btn" id="btn-mob-shoot" style="background:#f97316;">🏀</div>
         </div>
     </div>
 
     <div id="controls-hint">
-        Walk: <span>WASD / L-Stick</span> | Jump/Fly: <span>Space/Shift</span> | God Menu: <span>B / Y-Btn</span><br>
-        Interact (Door/Bed/Merchant): <span>F / X-Btn</span> | Rotate: <span>R</span> | Height: <span>E / Q</span>
+        Walk: <span>WASD / L-Stick</span> | Jump/Fly: <span>Space/Shift</span> | God Menu: <span>B</span><br>
+        Interact (Door/PC/Sign/Shop): <span>F</span> | Shoot Basketball: <span>G</span> | Rotate: <span>R</span>
     </div>
 
     <script>
@@ -711,7 +864,48 @@
             const myGodId = 'god_' + Math.random().toString(36).substring(2, 10);
 
             // =========================================================
-            // 1. 20 CUTE ANIME ANIMAL SPECIES CATALOG & 10 MERCHANT SKINS
+            // 1. SCHEDULE I ANIME CEL-SHADING & INK OUTLINE ENGINE
+            // =========================================================
+            const toonGradientTex = (() => {
+                const c = document.createElement('canvas');
+                c.width = 4; c.height = 1;
+                const ctx = c.getContext('2d');
+                ctx.fillStyle = '#454d5e'; ctx.fillRect(0, 0, 1, 1);
+                ctx.fillStyle = '#828c9e'; ctx.fillRect(1, 0, 1, 1);
+                ctx.fillStyle = '#c8d0de'; ctx.fillRect(2, 0, 1, 1);
+                ctx.fillStyle = '#ffffff'; ctx.fillRect(3, 0, 1, 1);
+                const t = new THREE.CanvasTexture(c);
+                t.minFilter = THREE.NearestFilter;
+                t.magFilter = THREE.NearestFilter;
+                return t;
+            })();
+
+            const animeOutlineMat = new THREE.LineBasicMaterial({ color: 0x0b0d13, linewidth: 1.5 });
+
+            function makeAnimeMat(opts) {
+                return new THREE.MeshToonMaterial(Object.assign({
+                    gradientMap: toonGradientTex
+                }, opts));
+            }
+
+            // Automatically wraps any 3D mesh or group in bold Schedule I comic ink outlines
+            function applyAnimeInkOutlines(rootObj) {
+                const meshes = [];
+                rootObj.traverse(child => {
+                    if (child.isMesh && !child.userData.noOutline) meshes.push(child);
+                });
+                meshes.forEach(m => {
+                    try {
+                        const edges = new THREE.EdgesGeometry(m.geometry, 28);
+                        const line = new THREE.LineSegments(edges, animeOutlineMat);
+                        line.userData.noOutline = true;
+                        m.add(line);
+                    } catch (e) {}
+                });
+            }
+
+            // =========================================================
+            // 2. 20 ANIME ANIMAL SPECIES & 10 MERCHANT SKINS
             // =========================================================
             const ANIMAL_CATALOG = [
                 { id: 'panda', label: 'Panda', icon: '🐼', primary: 0xf8fafc, secondary: 0x141619, earType: 'round' },
@@ -765,7 +959,7 @@
             });
 
             // =========================================================
-            // 2. SCHEDULE I PROCEDURAL TEXTURES
+            // 3. SCHEDULE I ANIME PROCEDURAL TEXTURES
             // =========================================================
             function makeScheduleTexture(drawFn, repeatX, repeatY) {
                 const canvas = document.createElement('canvas');
@@ -780,79 +974,94 @@
             }
 
             const grassTex = makeScheduleTexture((ctx, w, h) => {
-                ctx.fillStyle = '#335d2d'; ctx.fillRect(0, 0, w, h);
-                for (let i = 0; i < 1100; i++) {
-                    ctx.fillStyle = (i % 3 === 0) ? '#264721' : '#3f7037';
-                    ctx.fillRect(Math.random() * w, Math.random() * h, 3, 6);
+                ctx.fillStyle = '#3b7a3e'; ctx.fillRect(0, 0, w, h);
+                for (let i = 0; i < 650; i++) {
+                    ctx.fillStyle = (i % 3 === 0) ? '#2d6130' : '#4d9450';
+                    ctx.fillRect(Math.random() * w, Math.random() * h, 4, 8);
                 }
-            }, 90, 90);
+            }, 85, 85);
 
             const roadTex = makeScheduleTexture((ctx, w, h) => {
-                ctx.fillStyle = '#24272d'; ctx.fillRect(0, 0, w, h);
-                ctx.fillStyle = '#141619'; ctx.fillRect(0, 0, 12, h); ctx.fillRect(w - 12, 0, 12, h);
-                ctx.fillStyle = '#eab308'; ctx.fillRect(w / 2 - 4, 20, 8, 80); ctx.fillRect(w / 2 - 4, 148, 8, 80);
+                ctx.fillStyle = '#252830'; ctx.fillRect(0, 0, w, h);
+                ctx.fillStyle = '#0f1115';
+                ctx.fillRect(0, 0, 14, h);
+                ctx.fillRect(w - 14, 0, 14, h);
+                ctx.fillStyle = '#facc15';
+                ctx.fillRect(w / 2 - 5, 20, 10, 80);
+                ctx.fillRect(w / 2 - 5, 148, 10, 80);
             }, 1, 35);
 
-            const brickPatternTex = makeScheduleTexture((ctx, w, h) => {
+            const stuccoWallTex = makeScheduleTexture((ctx, w, h) => {
                 ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, w, h);
-                const rows = 8, cols = 4, rowH = h / rows, colW = w / cols;
-                ctx.strokeStyle = '#1e1b18'; ctx.lineWidth = 4;
-                for (let r = 0; r < rows; r++) {
-                    const offset = (r % 2) * (colW / 2);
-                    for (let c = -1; c <= cols; c++) {
-                        ctx.fillStyle = ((r + c) % 2 === 0) ? '#e5e7eb' : '#d1d5db';
-                        ctx.fillRect(c * colW + offset + 2, r * rowH + 2, colW - 4, rowH - 4);
-                        ctx.strokeRect(c * colW + offset, r * rowH, colW, rowH);
-                    }
+                ctx.fillStyle = '#e2e8f0';
+                for (let y = 0; y < h; y += 32) {
+                    ctx.fillRect(0, y, w, 3);
                 }
+                ctx.strokeStyle = '#0f172a';
+                ctx.lineWidth = 6;
+                ctx.strokeRect(0, 0, w, h);
             }, 2, 2);
 
             const concreteTex = makeScheduleTexture((ctx, w, h) => {
-                ctx.fillStyle = '#9ca3af'; ctx.fillRect(0, 0, w, h);
-                ctx.strokeStyle = '#1e2227'; ctx.lineWidth = 6;
+                ctx.fillStyle = '#cbd5e1'; ctx.fillRect(0, 0, w, h);
+                ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 6;
                 ctx.strokeRect(3, 3, w - 6, h - 6);
             }, 2, 2);
 
             const woodTex = makeScheduleTexture((ctx, w, h) => {
-                ctx.fillStyle = '#855834'; ctx.fillRect(0, 0, w, h);
-                ctx.strokeStyle = '#2b1b0e'; ctx.lineWidth = 4;
-                for (let i = 0; i < 6; i++) ctx.strokeRect(0, i * (h / 6), w, h / 6);
+                ctx.fillStyle = '#9a6338'; ctx.fillRect(0, 0, w, h);
+                ctx.strokeStyle = '#1e130a'; ctx.lineWidth = 5;
+                for (let i = 0; i < 5; i++) ctx.strokeRect(0, i * (h / 5), w, h / 5);
             }, 2, 2);
 
             const fenceTex = makeScheduleTexture((ctx, w, h) => {
                 ctx.clearRect(0, 0, w, h);
-                ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 3;
+                ctx.strokeStyle = '#f1f5f9'; ctx.lineWidth = 4;
                 for (let x = -h; x < w + h; x += 32) {
                     ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x + h, h); ctx.stroke();
                     ctx.beginPath(); ctx.moveTo(x + h, 0); ctx.lineTo(x, h); ctx.stroke();
                 }
-                ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 8; ctx.strokeRect(0, 0, w, h);
+                ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 10; ctx.strokeRect(0, 0, w, h);
             }, 2, 1);
 
             function makeSignTexture(text, bgColor, textColor) {
                 const c = document.createElement('canvas');
-                c.width = 512; c.height = 128;
+                c.width = 512; c.height = 160;
                 const ctx = c.getContext('2d');
-                ctx.fillStyle = bgColor; ctx.fillRect(0, 0, 512, 128);
-                ctx.strokeStyle = '#111'; ctx.lineWidth = 8; ctx.strokeRect(4, 4, 504, 120);
-                ctx.fillStyle = textColor; ctx.font = 'bold 48px sans-serif';
-                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-                ctx.fillText(text, 256, 64);
+                ctx.fillStyle = bgColor || '#111318';
+                ctx.fillRect(0, 0, 512, 160);
+                ctx.strokeStyle = '#000000';
+                ctx.lineWidth = 12;
+                ctx.strokeRect(6, 6, 500, 148);
+                ctx.strokeStyle = textColor || '#fde047';
+                ctx.lineWidth = 3;
+                ctx.strokeRect(14, 14, 484, 132);
+                ctx.fillStyle = textColor || '#fde047';
+                ctx.font = '900 44px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                const lines = String(text || 'SIGN').split('\n');
+                if (lines.length === 1) {
+                    ctx.fillText(lines[0], 256, 80);
+                } else {
+                    ctx.fillText(lines[0], 256, 54);
+                    ctx.fillText(lines[1], 256, 108);
+                }
                 return new THREE.CanvasTexture(c);
             }
 
             const mcdSignTex = makeSignTexture("McDONALD'S 🍔", '#b91c1c', '#facc15');
             const walmartSignTex = makeSignTexture('WALMART ✳️', '#1d4ed8', '#ffffff');
+            const mechSignTex = makeSignTexture('BADABING CUSTOMS 🔧', '#0f172a', '#fa9549');
 
             // =========================================================
-            // 3. SCENE, CAMERA (YXZ ZERO-TWIST ORDER) & ENVIRONMENT
+            // 4. SCENE, CAMERA, COURT & INTERACTIVE PHYSICS BASKETBALL
             // =========================================================
             const scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x7ba0c7);
-            scene.fog = new THREE.FogExp2(0x7ba0c7, 0.0014);
+            scene.background = new THREE.Color(0x6897bb);
+            scene.fog = new THREE.FogExp2(0x6897bb, 0.0012);
 
             const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 3000);
-            // Lock rotation order to YXZ so pitch & yaw never induce roll/twist
             camera.rotation.order = 'YXZ';
             camera.position.set(0, 2.2, 24);
 
@@ -864,10 +1073,10 @@
             const skyGeo = new THREE.SphereGeometry(1500, 32, 15);
             const skyMat = new THREE.ShaderMaterial({
                 uniforms: {
-                    topColor: { value: new THREE.Color(0x2b5fa8) },
-                    bottomColor: { value: new THREE.Color(0xd5e4f2) },
+                    topColor: { value: new THREE.Color(0x1e4b8f) },
+                    bottomColor: { value: new THREE.Color(0xdbeafe) },
                     offset: { value: 33 },
-                    exponent: { value: 0.6 }
+                    exponent: { value: 0.55 }
                 },
                 vertexShader: `
                     varying vec3 vWorldPosition;
@@ -892,7 +1101,7 @@
             });
             scene.add(new THREE.Mesh(skyGeo, skyMat));
 
-            scene.add(new THREE.AmbientLight(0xffffff, 0.82));
+            scene.add(new THREE.AmbientLight(0xffffff, 0.85));
             const sunLight = new THREE.DirectionalLight(0xfff5e0, 1.35);
             sunLight.position.set(120, 180, 100);
             sunLight.castShadow = true;
@@ -900,71 +1109,167 @@
 
             const ground = new THREE.Mesh(
                 new THREE.PlaneGeometry(800, 800),
-                new THREE.MeshStandardMaterial({ map: grassTex, roughness: 0.9 })
+                makeAnimeMat({ map: grassTex })
             );
             ground.rotation.x = -Math.PI / 2;
             ground.receiveShadow = true;
+            ground.userData.noOutline = true;
             scene.add(ground);
 
-            const roadMat = new THREE.MeshStandardMaterial({ map: roadTex, roughness: 0.85 });
+            const roadMat = makeAnimeMat({ map: roadTex });
             [-180, -90, 0, 90, 180].forEach(pos => {
                 const roadNS = new THREE.Mesh(new THREE.PlaneGeometry(16, 700), roadMat);
                 roadNS.rotation.x = -Math.PI / 2;
                 roadNS.position.set(pos, 0.02, 0);
+                roadNS.userData.noOutline = true;
                 scene.add(roadNS);
 
                 const roadEW = new THREE.Mesh(new THREE.PlaneGeometry(16, 700), roadMat);
                 roadEW.rotation.x = -Math.PI / 2;
                 roadEW.rotation.z = Math.PI / 2;
                 roadEW.position.set(0, 0.03, pos);
+                roadEW.userData.noOutline = true;
                 scene.add(roadEW);
             });
 
-            // Basketball Court at (60, 60)
+            // Basketball Court at (60, 60) + Interactive Basketball + Scoreboard
             const courtGroup = new THREE.Group();
             courtGroup.position.set(60, 0.04, 60);
             const courtSurface = new THREE.Mesh(
-                new THREE.PlaneGeometry(30, 20),
-                new THREE.MeshStandardMaterial({ color: 0xc86428, map: concreteTex, roughness: 0.7 })
+                new THREE.PlaneGeometry(32, 22),
+                makeAnimeMat({ color: 0xd96b27, map: concreteTex })
             );
             courtSurface.rotation.x = -Math.PI / 2;
             courtGroup.add(courtSurface);
 
-            const poleMat = new THREE.MeshStandardMaterial({ color: 0x18181b });
+            const poleMat = makeAnimeMat({ color: 0x18181b });
+            const hoopRims = [
+                { x: 60 - 12.5, y: 4.0, z: 60 },
+                { x: 60 + 12.5, y: 4.0, z: 60 }
+            ];
+
             [-14, 14].forEach(hx => {
-                const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 6), poleMat);
+                const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 6), poleMat);
                 pole.position.set(hx, 3, 0);
                 courtGroup.add(pole);
-                const backboard = new THREE.Mesh(new THREE.BoxGeometry(0.3, 2, 3), new THREE.MeshStandardMaterial({ color: 0xffffff }));
+
+                const backboard = new THREE.Mesh(new THREE.BoxGeometry(0.3, 2.2, 3.2), makeAnimeMat({ color: 0xffffff }));
                 backboard.position.set(hx > 0 ? hx - 0.5 : hx + 0.5, 4.5, 0);
                 courtGroup.add(backboard);
-                const rim = new THREE.Mesh(new THREE.TorusGeometry(0.8, 0.08, 8, 24), new THREE.MeshStandardMaterial({ color: 0xff4500 }));
+
+                const rim = new THREE.Mesh(new THREE.TorusGeometry(0.85, 0.09, 10, 24), makeAnimeMat({ color: 0xff4500 }));
                 rim.rotation.x = Math.PI / 2;
-                rim.position.set(hx > 0 ? hx - 1.5 : hx + 1.5, 4, 0);
+                rim.position.set(hx > 0 ? hx - 1.5 : hx + 1.5, 4.0, 0);
                 courtGroup.add(rim);
             });
+
+            // 3D Court Scoreboard
+            let currentHoopScore = 0;
+            const scoreSignBoard = new THREE.Mesh(
+                new THREE.BoxGeometry(7.5, 2.2, 0.35),
+                new THREE.MeshBasicMaterial({ map: makeSignTexture('🏀 PARK SCORE: 0', '#090d16', '#4ade80') })
+            );
+            scoreSignBoard.position.set(0, 3.5, -11.5);
+            courtGroup.add(scoreSignBoard);
+            applyAnimeInkOutlines(courtGroup);
             scene.add(courtGroup);
 
-            // Trees
-            const trunkMat = new THREE.MeshStandardMaterial({ map: woodTex, roughness: 0.9 });
-            const leavesMat = new THREE.MeshStandardMaterial({ map: grassTex, color: 0x3b8546, roughness: 0.8 });
+            function updateScoreboardDisplay(newScore) {
+                currentHoopScore = newScore;
+                document.getElementById('hoop-score-banner').innerText = newScore;
+                scoreSignBoard.material.map = makeSignTexture('🏀 PARK SCORE: ' + newScore, '#090d16', '#4ade80');
+                scoreSignBoard.material.needsUpdate = true;
+            }
+
+            // Interactive Physics Basketball
+            const bballTex = makeScheduleTexture((ctx, w, h) => {
+                ctx.fillStyle = '#ea580c'; ctx.fillRect(0, 0, w, h);
+                ctx.strokeStyle = '#090d16'; ctx.lineWidth = 10;
+                ctx.beginPath(); ctx.moveTo(0, h / 2); ctx.lineTo(w, h / 2); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(w / 2, 0); ctx.lineTo(w / 2, h); ctx.stroke();
+                ctx.beginPath(); ctx.arc(w / 2, h / 2, w * 0.38, 0, Math.PI * 2); ctx.stroke();
+            }, 1, 1);
+
+            const basketballMesh = new THREE.Mesh(
+                new THREE.SphereGeometry(0.48, 20, 20),
+                makeAnimeMat({ map: bballTex })
+            );
+            basketballMesh.position.set(60, 0.48, 60);
+            basketballMesh.castShadow = true;
+            scene.add(basketballMesh);
+
+            const bballState = {
+                held: false,
+                pos: new THREE.Vector3(60, 0.48, 60),
+                vel: new THREE.Vector3(0, 0, 0),
+                scoredThisShot: false
+            };
+
+            function shootBasketball() {
+                if (!bballState.held) return;
+                bballState.held = false;
+                bballState.scoredThisShot = false;
+                document.getElementById('bball-hud').style.display = 'none';
+
+                // Aim automatically toward nearest hoop if within 32m of the court, else shoot forward
+                let bestHoop = null;
+                let bestDist = 999;
+                hoopRims.forEach(hr => {
+                    const d = Math.hypot(hr.x - camera.position.x, hr.z - camera.position.z);
+                    if (d < bestDist) { bestDist = d; bestHoop = hr; }
+                });
+
+                bballState.pos.copy(camera.position).add(new THREE.Vector3(0, -0.2, 0));
+
+                if (bestHoop && bestDist < 34) {
+                    const flightTime = Math.max(0.75, Math.min(1.45, bestDist * 0.068));
+                    const gravity = 22.0;
+                    const vx = (bestHoop.x - bballState.pos.x) / flightTime;
+                    const vz = (bestHoop.z - bballState.pos.z) / flightTime;
+                    const vy = ((bestHoop.y + 0.65 - bballState.pos.y) + 0.5 * gravity * flightTime * flightTime) / flightTime;
+                    bballState.vel.set(vx, vy, vz);
+                } else {
+                    const dir = new THREE.Vector3();
+                    camera.getWorldDirection(dir);
+                    bballState.vel.set(dir.x * 16, 10.5, dir.z * 16);
+                }
+            }
+
+            document.getElementById('btn-shoot-bball').addEventListener('click', (e) => {
+                e.stopPropagation();
+                shootBasketball();
+            });
+            document.getElementById('btn-mob-shoot').addEventListener('touchstart', (e) => {
+                e.preventDefault(); e.stopPropagation();
+                if (bballState.held) shootBasketball();
+            });
+
+            // Stylized Anime Cel-Shaded Trees (Layered Spherical Canopies)
+            const trunkMat = makeAnimeMat({ map: woodTex });
+            const leavesMat = makeAnimeMat({ color: 0x3b9c4c });
             [
                 [-50, -50], [-70, -30], [-30, -70], [70, 30], [30, 70],
                 [-50, 50], [-70, 30], [50, -50], [70, -30], [-120, -50], [-120, 50], [120, -50], [120, 50]
             ].forEach(coord => {
                 const tree = new THREE.Group();
-                const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.8, 4), trunkMat);
-                trunk.position.y = 2;
+                const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.85, 4.2, 10), trunkMat);
+                trunk.position.y = 2.1;
                 tree.add(trunk);
-                const leaves = new THREE.Mesh(new THREE.ConeGeometry(3.6, 6.5, 7), leavesMat);
-                leaves.position.y = 6.2;
-                tree.add(leaves);
+
+                const puff1 = new THREE.Mesh(new THREE.DodecahedronGeometry(2.8, 1), leavesMat);
+                puff1.position.set(0, 5.5, 0);
+                const puff2 = new THREE.Mesh(new THREE.DodecahedronGeometry(2.1, 1), leavesMat);
+                puff2.position.set(1.4, 4.8, 0.8);
+                const puff3 = new THREE.Mesh(new THREE.DodecahedronGeometry(2.0, 1), leavesMat);
+                puff3.position.set(-1.3, 5.0, -0.7);
+                tree.add(puff1, puff2, puff3);
+                applyAnimeInkOutlines(tree);
                 tree.position.set(coord[0], 0, coord[1]);
                 scene.add(tree);
             });
 
             // =========================================================
-            // 4. ANIME COMPANION FACTORY (20 ANIMALS) & GORILLA AVATARS
+            // 5. ANIME COMPANION FACTORY & GORILLA AVATARS
             // =========================================================
             const npcsGroup = new THREE.Group();
             scene.add(npcsGroup);
@@ -977,33 +1282,33 @@
                 const sc = scaleMultiplier || 1.0;
                 const root = new THREE.Group();
 
-                const primMat = new THREE.MeshStandardMaterial({ color: spec.primary, roughness: 0.6 });
-                const secMat = new THREE.MeshStandardMaterial({ color: spec.secondary, roughness: 0.7 });
+                const primMat = makeAnimeMat({ color: spec.primary });
+                const secMat = makeAnimeMat({ color: spec.secondary });
                 const pinkMat = new THREE.MeshBasicMaterial({ color: 0xff8da1 });
                 const eyeWhite = new THREE.MeshBasicMaterial({ color: 0xffffff });
                 const eyeIris = new THREE.MeshBasicMaterial({ color: 0x1e1b4b });
                 const eyeBlack = new THREE.MeshBasicMaterial({ color: 0x050505 });
 
-                // Torso
                 const torso = new THREE.Mesh(new THREE.SphereGeometry(1.1 * sc, 18, 18), primMat);
                 torso.scale.set(1.0, 1.12, 0.92);
                 torso.position.y = 1.9 * sc;
+                torso.userData.noOutline = true;
                 root.add(torso);
 
                 const vest = new THREE.Mesh(new THREE.CylinderGeometry(1.02 * sc, 1.08 * sc, 0.65 * sc, 18), secMat);
                 vest.position.y = 2.35 * sc;
+                vest.userData.noOutline = true;
                 root.add(vest);
 
-                // Head
                 const head = new THREE.Group();
                 head.position.set(0, 3.5 * sc, 0.1 * sc);
                 root.add(head);
 
                 const headSphere = new THREE.Mesh(new THREE.SphereGeometry(0.92 * sc, 18, 18), primMat);
                 headSphere.scale.set(1.08, 0.96, 0.95);
+                headSphere.userData.noOutline = true;
                 head.add(headSphere);
 
-                // Species-specific Ears
                 [-0.68 * sc, 0.68 * sc].forEach(ex => {
                     if (spec.earType === 'tall') {
                         const ear = new THREE.Mesh(new THREE.CylinderGeometry(0.18 * sc, 0.22 * sc, 1.1 * sc, 12), secMat);
@@ -1014,7 +1319,7 @@
                         ear.position.set(ex, 0.85 * sc, -0.05 * sc);
                         head.add(ear);
                     } else if (spec.earType === 'horns') {
-                        const horn = new THREE.Mesh(new THREE.ConeGeometry(0.16 * sc, 0.55 * sc, 8), new THREE.MeshStandardMaterial({ color: 0xfef08a }));
+                        const horn = new THREE.Mesh(new THREE.ConeGeometry(0.16 * sc, 0.55 * sc, 8), makeAnimeMat({ color: 0xfef08a }));
                         horn.position.set(ex, 0.88 * sc, -0.05 * sc);
                         head.add(horn);
                     } else if (spec.earType !== 'none') {
@@ -1024,13 +1329,11 @@
                     }
                 });
 
-                // Snout
                 const snout = new THREE.Mesh(new THREE.SphereGeometry(0.32 * sc, 14, 14), secMat);
                 snout.scale.set(1.2, 0.85, 1.0);
                 snout.position.set(0, -0.15 * sc, 0.8 * sc);
                 head.add(snout);
 
-                // Big Glossy Anime Eyes
                 const eyeGroup = new THREE.Group();
                 head.add(eyeGroup);
 
@@ -1080,8 +1383,9 @@
 
                 if (nameText) {
                     const tagTex = makeSignTexture(spec.icon + ' ' + nameText, '#111318', '#fde047');
-                    const tag = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 0.55), new THREE.MeshBasicMaterial({ map: tagTex, side: THREE.DoubleSide }));
+                    const tag = new THREE.Mesh(new THREE.PlaneGeometry(2.5, 0.6), new THREE.MeshBasicMaterial({ map: tagTex, side: THREE.DoubleSide }));
                     tag.position.y = 4.9 * sc;
+                    tag.userData.noOutline = true;
                     root.add(tag);
                 }
 
@@ -1089,53 +1393,47 @@
                 return root;
             }
 
-            // 3D Gorilla Model Builder (Used for Co-op Gorilla Gods & XL Gorilla Statue)
+            // Sculpted Cel-Shaded Gorilla Model
             function createGorillaModel(bodyColorHex, scale, nameLabel) {
                 const g = new THREE.Group();
-                const furMat = new THREE.MeshStandardMaterial({ color: new THREE.Color(bodyColorHex || '#27272a'), roughness: 0.65, metalness: 0.15 });
-                const chestMat = new THREE.MeshStandardMaterial({ color: 0x52525b, roughness: 0.5 });
+                const furMat = makeAnimeMat({ color: new THREE.Color(bodyColorHex || '#27272a') });
+                const chestMat = makeAnimeMat({ color: 0x52525b });
 
-                // Broad Muscular Gorilla Torso
-                const torso = new THREE.Mesh(new THREE.BoxGeometry(1.8 * scale, 2.1 * scale, 1.3 * scale), furMat);
+                const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.95 * scale, 0.75 * scale, 2.1 * scale, 12), furMat);
                 torso.position.y = 2.0 * scale;
                 g.add(torso);
 
-                const chest = new THREE.Mesh(new THREE.BoxGeometry(1.5 * scale, 1.4 * scale, 0.2 * scale), chestMat);
-                chest.position.set(0, 2.15 * scale, 0.62 * scale);
+                const chest = new THREE.Mesh(new THREE.SphereGeometry(0.75 * scale, 12, 12), chestMat);
+                chest.scale.set(1.1, 0.9, 0.5);
+                chest.position.set(0, 2.2 * scale, 0.55 * scale);
                 g.add(chest);
 
-                // Gorilla Head & Brow Ridge
-                const head = new THREE.Mesh(new THREE.BoxGeometry(1.15 * scale, 1.15 * scale, 1.15 * scale), furMat);
+                const head = new THREE.Mesh(new THREE.SphereGeometry(0.68 * scale, 14, 14), furMat);
                 head.position.set(0, 3.45 * scale, 0.15 * scale);
                 g.add(head);
 
-                const brow = new THREE.Mesh(new THREE.BoxGeometry(1.2 * scale, 0.28 * scale, 0.4 * scale), chestMat);
-                brow.position.set(0, 3.82 * scale, 0.65 * scale);
+                const brow = new THREE.Mesh(new THREE.BoxGeometry(1.1 * scale, 0.25 * scale, 0.45 * scale), chestMat);
+                brow.position.set(0, 3.78 * scale, 0.58 * scale);
                 g.add(brow);
 
-                const jaw = new THREE.Mesh(new THREE.BoxGeometry(0.85 * scale, 0.55 * scale, 0.5 * scale), chestMat);
-                jaw.position.set(0, 3.15 * scale, 0.68 * scale);
-                g.add(jaw);
-
-                // Glowing Eyes
-                [-0.28 * scale, 0.28 * scale].forEach(ex => {
+                [-0.25 * scale, 0.25 * scale].forEach(ex => {
                     const eye = new THREE.Mesh(new THREE.SphereGeometry(0.11 * scale, 10, 10), new THREE.MeshBasicMaterial({ color: 0xfef08a }));
-                    eye.position.set(ex, 3.55 * scale, 0.72 * scale);
+                    eye.position.set(ex, 3.55 * scale, 0.68 * scale);
                     g.add(eye);
                 });
 
-                // Thick Gorilla Arms & Legs
-                const leftArm = new THREE.Mesh(new THREE.BoxGeometry(0.6 * scale, 2.2 * scale, 0.6 * scale), furMat);
-                leftArm.position.set(-1.25 * scale, 1.8 * scale, 0.1 * scale);
-                const rightArm = new THREE.Mesh(new THREE.BoxGeometry(0.6 * scale, 2.2 * scale, 0.6 * scale), furMat);
-                rightArm.position.set(1.25 * scale, 1.8 * scale, 0.1 * scale);
+                const leftArm = new THREE.Mesh(new THREE.CylinderGeometry(0.32 * scale, 0.28 * scale, 2.2 * scale, 10), furMat);
+                leftArm.position.set(-1.18 * scale, 1.8 * scale, 0.1 * scale);
+                const rightArm = new THREE.Mesh(new THREE.CylinderGeometry(0.32 * scale, 0.28 * scale, 2.2 * scale, 10), furMat);
+                rightArm.position.set(1.18 * scale, 1.8 * scale, 0.1 * scale);
 
-                const leftLeg = new THREE.Mesh(new THREE.BoxGeometry(0.65 * scale, 1.3 * scale, 0.65 * scale), furMat);
-                leftLeg.position.set(-0.5 * scale, 0.65 * scale, 0);
-                const rightLeg = new THREE.Mesh(new THREE.BoxGeometry(0.65 * scale, 1.3 * scale, 0.65 * scale), furMat);
-                rightLeg.position.set(0.5 * scale, 0.65 * scale, 0);
+                const leftLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.34 * scale, 0.3 * scale, 1.3 * scale, 10), furMat);
+                leftLeg.position.set(-0.48 * scale, 0.65 * scale, 0);
+                const rightLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.34 * scale, 0.3 * scale, 1.3 * scale, 10), furMat);
+                rightLeg.position.set(0.48 * scale, 0.65 * scale, 0);
 
                 g.add(leftArm, rightArm, leftLeg, rightLeg);
+                applyAnimeInkOutlines(g);
 
                 if (nameLabel) {
                     const nameTex = makeSignTexture('🦍 ' + nameLabel, '#111318', bodyColorHex);
@@ -1154,7 +1452,7 @@
             const remoteGodMeshes = {};
 
             // =========================================================
-            // 5. MODULAR & WHOLE-BUILDING FACTORY (+ STATUE & MERCHANT)
+            // 6. SCHEDULE I ARCHITECTURAL BUILDER (MECHANIC, PC, SIGNS)
             // =========================================================
             const cityPropsGroup = new THREE.Group();
             scene.add(cityPropsGroup);
@@ -1165,7 +1463,8 @@
             let buildElevation = 0;
             let ghostMesh = null;
 
-            const glassMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.65, roughness: 0.1 });
+            const glassMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.6, roughness: 0.1 });
+            const darkTrimMat = makeAnimeMat({ color: 0x1e222d });
 
             function buildModularMesh(type, colorHex, isGhost, itemData) {
                 const group = new THREE.Group();
@@ -1174,36 +1473,46 @@
                 const ghostMat = isGhost ? new THREE.MeshBasicMaterial({
                     color: type === 'delete' ? 0xef4444 : 0x38bdf8,
                     transparent: true,
-                    opacity: 0.5
+                    opacity: 0.48
                 }) : null;
 
-                const paintedBrickMat = isGhost ? ghostMat : new THREE.MeshStandardMaterial({ map: brickPatternTex, color: baseColor, roughness: 0.75 });
-                const paintedConcreteMat = isGhost ? ghostMat : new THREE.MeshStandardMaterial({ map: concreteTex, color: baseColor, roughness: 0.7 });
-                const paintedWoodMat = isGhost ? ghostMat : new THREE.MeshStandardMaterial({ map: woodTex, roughness: 0.6 });
+                const wallMat = isGhost ? ghostMat : makeAnimeMat({ map: stuccoWallTex, color: baseColor });
+                const concreteMat = isGhost ? ghostMat : makeAnimeMat({ map: concreteTex, color: baseColor });
+                const woodMat = isGhost ? ghostMat : makeAnimeMat({ map: woodTex });
+                const trimMat = isGhost ? ghostMat : darkTrimMat;
                 const fenceMat = isGhost ? ghostMat : new THREE.MeshStandardMaterial({ map: fenceTex, color: baseColor, transparent: true, alphaTest: 0.2, side: THREE.DoubleSide });
 
                 if (type === 'foundation') {
-                    const m = new THREE.Mesh(new THREE.BoxGeometry(4, 0.4, 4), paintedConcreteMat);
-                    m.position.y = 0.2;
-                    group.add(m);
+                    const slab = new THREE.Mesh(new THREE.BoxGeometry(4, 0.36, 4), concreteMat);
+                    slab.position.y = 0.18;
+                    const curb = new THREE.Mesh(new THREE.BoxGeometry(4.08, 0.08, 4.08), trimMat);
+                    curb.position.y = 0.38;
+                    group.add(slab, curb);
                 } else if (type === 'wall') {
-                    const m = new THREE.Mesh(new THREE.BoxGeometry(4, 4, 0.4), paintedBrickMat);
-                    m.position.y = 2.0;
-                    m.userData.isSolidWall = !isGhost;
-                    group.add(m);
+                    // Architectural Wall with Baseboard & Crown Molding Trim (Not a plain Minecraft block)
+                    const mainW = new THREE.Mesh(new THREE.BoxGeometry(4, 3.6, 0.34), wallMat);
+                    mainW.position.y = 2.0;
+                    mainW.userData.isSolidWall = !isGhost;
+                    const baseboard = new THREE.Mesh(new THREE.BoxGeometry(4.04, 0.25, 0.42), trimMat);
+                    baseboard.position.y = 0.125;
+                    const crown = new THREE.Mesh(new THREE.BoxGeometry(4.06, 0.22, 0.44), trimMat);
+                    crown.position.y = 3.89;
+                    group.add(mainW, baseboard, crown);
                 } else if (type === 'doorway') {
-                    const leftPillar = new THREE.Mesh(new THREE.BoxGeometry(1.2, 4, 0.4), paintedBrickMat);
+                    const leftPillar = new THREE.Mesh(new THREE.BoxGeometry(1.2, 4, 0.36), wallMat);
                     leftPillar.position.set(-1.4, 2.0, 0); leftPillar.userData.isSolidWall = !isGhost;
-                    const rightPillar = new THREE.Mesh(new THREE.BoxGeometry(1.2, 4, 0.4), paintedBrickMat);
+                    const rightPillar = new THREE.Mesh(new THREE.BoxGeometry(1.2, 4, 0.36), wallMat);
                     rightPillar.position.set(1.4, 2.0, 0); rightPillar.userData.isSolidWall = !isGhost;
-                    const header = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.2, 0.4), paintedBrickMat);
-                    header.position.set(0, 3.4, 0);
+                    const header = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.1, 0.36), wallMat);
+                    header.position.set(0, 3.45, 0);
+                    const frameTop = new THREE.Mesh(new THREE.BoxGeometry(1.75, 0.14, 0.44), trimMat);
+                    frameTop.position.set(0, 2.9, 0);
 
                     const doorHinge = new THREE.Group();
                     doorHinge.position.set(-0.8, 0, 0);
-                    const doorPanel = new THREE.Mesh(new THREE.BoxGeometry(1.6, 2.8, 0.16), paintedWoodMat);
-                    doorPanel.position.set(0.8, 1.4, 0);
-                    const knob = new THREE.Mesh(new THREE.SphereGeometry(0.08, 8, 8), new THREE.MeshStandardMaterial({ color: 0xfacc15 }));
+                    const doorPanel = new THREE.Mesh(new THREE.BoxGeometry(1.6, 2.85, 0.14), woodMat);
+                    doorPanel.position.set(0.8, 1.42, 0);
+                    const knob = new THREE.Mesh(new THREE.SphereGeometry(0.09, 8, 8), makeAnimeMat({ color: 0xfacc15 }));
                     knob.position.set(1.4, 1.35, 0.12);
                     doorPanel.add(knob);
 
@@ -1212,47 +1521,153 @@
                     doorPanel.userData.isSolidWall = (!isGhost && !isOpen);
                     doorPanel.userData.interactType = 'door';
                     doorHinge.add(doorPanel);
-                    group.add(leftPillar, rightPillar, header, doorHinge);
+                    group.add(leftPillar, rightPillar, header, frameTop, doorHinge);
                 } else if (type === 'window') {
-                    const bottom = new THREE.Mesh(new THREE.BoxGeometry(4, 1.2, 0.4), paintedBrickMat);
+                    const bottom = new THREE.Mesh(new THREE.BoxGeometry(4, 1.2, 0.36), wallMat);
                     bottom.position.set(0, 0.6, 0); bottom.userData.isSolidWall = !isGhost;
-                    const top = new THREE.Mesh(new THREE.BoxGeometry(4, 1.0, 0.4), paintedBrickMat);
+                    const top = new THREE.Mesh(new THREE.BoxGeometry(4, 1.0, 0.36), wallMat);
                     top.position.set(0, 3.5, 0);
-                    const left = new THREE.Mesh(new THREE.BoxGeometry(1.0, 1.8, 0.4), paintedBrickMat);
+                    const left = new THREE.Mesh(new THREE.BoxGeometry(1.0, 1.8, 0.36), wallMat);
                     left.position.set(-1.5, 2.1, 0); left.userData.isSolidWall = !isGhost;
-                    const right = new THREE.Mesh(new THREE.BoxGeometry(1.0, 1.8, 0.4), paintedBrickMat);
+                    const right = new THREE.Mesh(new THREE.BoxGeometry(1.0, 1.8, 0.36), wallMat);
                     right.position.set(1.5, 2.1, 0); right.userData.isSolidWall = !isGhost;
-                    const pane = new THREE.Mesh(new THREE.BoxGeometry(2.0, 1.8, 0.12), isGhost ? ghostMat : glassMat);
+                    const sill = new THREE.Mesh(new THREE.BoxGeometry(2.3, 0.12, 0.52), trimMat);
+                    sill.position.set(0, 1.2, 0);
+                    const pane = new THREE.Mesh(new THREE.BoxGeometry(2.0, 1.8, 0.1), isGhost ? ghostMat : glassMat);
                     pane.position.set(0, 2.1, 0); pane.userData.isSolidWall = !isGhost;
-                    group.add(bottom, top, left, right, pane);
+                    group.add(bottom, top, left, right, sill, pane);
                 } else if (type === 'stairs') {
                     for (let i = 0; i < 10; i++) {
-                        const step = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.4, 0.45), paintedWoodMat);
+                        const step = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.35, 0.45), woodMat);
                         step.position.set(0, (i + 0.5) * 0.4, -1.8 + i * 0.4);
                         group.add(step);
                     }
                 } else if (type === 'roof_flat') {
-                    const m = new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.35, 4.2), paintedConcreteMat);
+                    const m = new THREE.Mesh(new THREE.BoxGeometry(4.3, 0.35, 4.3), concreteMat);
                     m.position.y = 4.0;
                     group.add(m);
                 } else if (type === 'roof_pitched') {
-                    const m = new THREE.Mesh(new THREE.ConeGeometry(3.2, 2.6, 4), paintedBrickMat);
+                    const m = new THREE.Mesh(new THREE.ConeGeometry(3.3, 2.6, 4), wallMat);
                     m.position.y = 5.3; m.rotation.y = Math.PI / 4;
                     group.add(m);
                 } else if (type === 'fence') {
-                    const panel = new THREE.Mesh(new THREE.BoxGeometry(4, 2.4, 0.15), fenceMat);
+                    const panel = new THREE.Mesh(new THREE.BoxGeometry(4, 2.4, 0.14), fenceMat);
                     panel.position.y = 1.2; panel.userData.isSolidWall = !isGhost;
                     group.add(panel);
                 } else if (type === 'streetlight') {
-                    const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.16, 5.5), poleMat);
+                    const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.18, 5.5), poleMat);
                     pole.position.y = 2.75;
-                    const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.28, 12, 12), new THREE.MeshBasicMaterial({ color: 0xfef08a }));
+                    const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.32, 12, 12), new THREE.MeshBasicMaterial({ color: 0xfef08a }));
                     bulb.position.set(0.8, 5.2, 0);
                     group.add(pole, bulb);
+                } else if (type === 'sign_post') {
+                    // Placeable Custom Text Sign
+                    const sText = (itemData && itemData.signText) ? itemData.signText : 'WELCOME TO\nTHE BADABING';
+                    const sColor = (itemData && itemData.signColor) ? itemData.signColor : '#fde047';
+                    const sBg = (itemData && itemData.signBg) ? itemData.signBg : '#111318';
+
+                    const postL = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 2.8), poleMat);
+                    postL.position.set(-1.3, 1.4, 0);
+                    const postR = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 2.8), poleMat);
+                    postR.position.set(1.3, 1.4, 0);
+
+                    const sTex = makeSignTexture(sText, sBg, sColor);
+                    const boardMat = isGhost ? ghostMat : new THREE.MeshBasicMaterial({ map: sTex });
+                    const board = new THREE.Mesh(new THREE.BoxGeometry(3.4, 1.35, 0.22), boardMat);
+                    board.position.set(0, 2.35, 0);
+                    board.userData.interactType = 'sign';
+                    board.userData.isSolidWall = !isGhost;
+                    group.add(postL, postR, board);
+                } else if (type === 'computer_desk') {
+                    // Placeable Computer Terminal with Real Internet Access
+                    const deskTop = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.14, 1.2), woodMat);
+                    deskTop.position.y = 1.1;
+                    deskTop.userData.isSolidWall = !isGhost;
+                    deskTop.userData.interactType = 'computer';
+                    const legL = new THREE.Mesh(new THREE.BoxGeometry(0.14, 1.1, 1.1), trimMat); legL.position.set(-0.95, 0.55, 0);
+                    const legR = new THREE.Mesh(new THREE.BoxGeometry(0.14, 1.1, 1.1), trimMat); legR.position.set(0.95, 0.55, 0);
+
+                    const monitorBezel = new THREE.Mesh(new THREE.BoxGeometry(1.25, 0.85, 0.1), trimMat);
+                    monitorBezel.position.set(0, 1.68, -0.25);
+                    monitorBezel.userData.interactType = 'computer';
+
+                    const screenTex = makeSignTexture('🌐 CLICK [F]\nINTERNET PC', '#0284c7', '#ffffff');
+                    const screen = new THREE.Mesh(new THREE.PlaneGeometry(1.15, 0.72), isGhost ? ghostMat : new THREE.MeshBasicMaterial({ map: screenTex }));
+                    screen.position.set(0, 1.68, -0.19);
+                    screen.userData.interactType = 'computer';
+
+                    const tower = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.75, 0.75), trimMat);
+                    tower.position.set(0.78, 1.5, -0.1);
+                    tower.userData.interactType = 'computer';
+
+                    group.add(deskTop, legL, legR, monitorBezel, screen, tower);
+                } else if (type === 'mechanic_shop') {
+                    // Large Accessible Mechanic Shop & Garage
+                    const shopWallMat = isGhost ? ghostMat : makeAnimeMat({ map: stuccoWallTex, color: new THREE.Color(colorHex || '#334155') });
+                    const redMetalMat = isGhost ? ghostMat : makeAnimeMat({ color: 0xdc2626 });
+                    const yellowLiftMat = isGhost ? ghostMat : makeAnimeMat({ color: 0xfacc15 });
+
+                    // Concrete Garage Floor (20m wide x 16m deep)
+                    const floor = new THREE.Mesh(new THREE.BoxGeometry(20, 0.3, 16), concreteMat);
+                    floor.position.y = 0.15;
+                    group.add(floor);
+
+                    // Back & Side Walls (6m tall)
+                    const backW = new THREE.Mesh(new THREE.BoxGeometry(20, 6, 0.45), shopWallMat);
+                    backW.position.set(0, 3, -8); backW.userData.isSolidWall = !isGhost;
+                    const leftW = new THREE.Mesh(new THREE.BoxGeometry(0.45, 6, 16), shopWallMat);
+                    leftW.position.set(-10, 3, 0); leftW.userData.isSolidWall = !isGhost;
+                    const rightW = new THREE.Mesh(new THREE.BoxGeometry(0.45, 6, 16), shopWallMat);
+                    rightW.position.set(10, 3, 0); rightW.userData.isSolidWall = !isGhost;
+
+                    // Front Walls with Wide 9-Meter Open Garage Bay in Center
+                    const frontL = new THREE.Mesh(new THREE.BoxGeometry(5.5, 6, 0.45), shopWallMat);
+                    frontL.position.set(-7.25, 3, 8); frontL.userData.isSolidWall = !isGhost;
+                    const frontR = new THREE.Mesh(new THREE.BoxGeometry(5.5, 6, 0.45), shopWallMat);
+                    frontR.position.set(7.25, 3, 8); frontR.userData.isSolidWall = !isGhost;
+                    const bayHeader = new THREE.Mesh(new THREE.BoxGeometry(9.0, 1.5, 0.5), redMetalMat);
+                    bayHeader.position.set(0, 5.25, 8);
+
+                    // Rolled-Up Corrugated Garage Door Overhead
+                    const rolledDoor = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 8.8, 12), trimMat);
+                    rolledDoor.rotation.z = Math.PI / 2;
+                    rolledDoor.position.set(0, 4.4, 7.7);
+
+                    // 2-Post Hydraulic Car Lift Inside Garage
+                    const liftPostL = new THREE.Mesh(new THREE.BoxGeometry(0.45, 4.2, 0.45), yellowLiftMat);
+                    liftPostL.position.set(-2.6, 2.1, -1.5); liftPostL.userData.isSolidWall = !isGhost;
+                    const liftPostR = new THREE.Mesh(new THREE.BoxGeometry(0.45, 4.2, 0.45), yellowLiftMat);
+                    liftPostR.position.set(2.6, 2.1, -1.5); liftPostR.userData.isSolidWall = !isGhost;
+                    const rampL = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.18, 5.2), redMetalMat);
+                    rampL.position.set(-1.5, 1.2, -1.5);
+                    const rampR = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.18, 5.2), redMetalMat);
+                    rampR.position.set(1.5, 1.2, -1.5);
+
+                    // Red Mechanic Tool Chest & Stacked Tires
+                    const toolChest = new THREE.Mesh(new THREE.BoxGeometry(3.2, 1.6, 1.1), redMetalMat);
+                    toolChest.position.set(-7.5, 0.95, -5.8); toolChest.userData.isSolidWall = !isGhost;
+
+                    for (let t = 0; t < 4; t++) {
+                        const tire = new THREE.Mesh(new THREE.TorusGeometry(0.55, 0.24, 10, 18), poleMat);
+                        tire.rotation.x = Math.PI / 2;
+                        tire.position.set(8.2, 0.5 + t * 0.48, -5.5);
+                        group.add(tire);
+                    }
+
+                    const roof = new THREE.Mesh(new THREE.BoxGeometry(20.8, 0.5, 16.8), redMetalMat);
+                    roof.position.y = 6.25;
+
+                    const sign = new THREE.Mesh(
+                        new THREE.BoxGeometry(13, 2.4, 0.5),
+                        isGhost ? ghostMat : new THREE.MeshBasicMaterial({ map: mechSignTex })
+                    );
+                    sign.position.set(0, 7.7, 8);
+
+                    group.add(backW, leftW, rightW, frontL, frontR, bayHeader, rolledDoor, liftPostL, liftPostR, rampL, rampR, toolChest, roof, sign);
                 } else if (type === 'mcdonalds') {
-                    const redMat = isGhost ? ghostMat : new THREE.MeshStandardMaterial({ map: brickPatternTex, color: new THREE.Color(colorHex || '#b91c1c') });
-                    const yellowMat = isGhost ? ghostMat : new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.4 });
-                    const floor = new THREE.Mesh(new THREE.BoxGeometry(16, 0.3, 12), paintedConcreteMat); floor.position.y = 0.15;
+                    const redMat = isGhost ? ghostMat : makeAnimeMat({ map: stuccoWallTex, color: new THREE.Color(colorHex || '#b91c1c') });
+                    const yellowMat = isGhost ? ghostMat : makeAnimeMat({ color: 0xfacc15 });
+                    const floor = new THREE.Mesh(new THREE.BoxGeometry(16, 0.3, 12), concreteMat); floor.position.y = 0.15;
                     const backW = new THREE.Mesh(new THREE.BoxGeometry(16, 4.5, 0.4), redMat); backW.position.set(0, 2.25, -6); backW.userData.isSolidWall = !isGhost;
                     const leftW = new THREE.Mesh(new THREE.BoxGeometry(0.4, 4.5, 12), redMat); leftW.position.set(-8, 2.25, 0); leftW.userData.isSolidWall = !isGhost;
                     const rightW = new THREE.Mesh(new THREE.BoxGeometry(0.4, 4.5, 12), redMat); rightW.position.set(8, 2.25, 0); rightW.userData.isSolidWall = !isGhost;
@@ -1263,38 +1678,28 @@
                     const sign = new THREE.Mesh(new THREE.BoxGeometry(10, 2.2, 0.4), isGhost ? ghostMat : new THREE.MeshBasicMaterial({ map: mcdSignTex })); sign.position.set(0, 6.2, 6);
                     group.add(floor, backW, leftW, rightW, frontL, frontR, roof, counter, sign);
                 } else if (type === 'walmart') {
-                    const blueMat = isGhost ? ghostMat : new THREE.MeshStandardMaterial({ map: concreteTex, color: new THREE.Color(colorHex || '#1d4ed8') });
-                    const floor = new THREE.Mesh(new THREE.BoxGeometry(24, 0.3, 18), paintedConcreteMat); floor.position.y = 0.15;
+                    const blueMat = isGhost ? ghostMat : makeAnimeMat({ map: concreteTex, color: new THREE.Color(colorHex || '#1d4ed8') });
+                    const floor = new THREE.Mesh(new THREE.BoxGeometry(24, 0.3, 18), concreteMat); floor.position.y = 0.15;
                     const backW = new THREE.Mesh(new THREE.BoxGeometry(24, 6, 0.5), blueMat); backW.position.set(0, 3, -9); backW.userData.isSolidWall = !isGhost;
                     const leftW = new THREE.Mesh(new THREE.BoxGeometry(0.5, 6, 18), blueMat); leftW.position.set(-12, 3, 0); leftW.userData.isSolidWall = !isGhost;
                     const rightW = new THREE.Mesh(new THREE.BoxGeometry(0.5, 6, 18), blueMat); rightW.position.set(12, 3, 0); rightW.userData.isSolidWall = !isGhost;
                     const frontL = new THREE.Mesh(new THREE.BoxGeometry(9, 6, 0.5), blueMat); frontL.position.set(-7.5, 3, 9); frontL.userData.isSolidWall = !isGhost;
                     const frontR = new THREE.Mesh(new THREE.BoxGeometry(9, 6, 0.5), blueMat); frontR.position.set(7.5, 3, 9); frontR.userData.isSolidWall = !isGhost;
-                    const roof = new THREE.Mesh(new THREE.BoxGeometry(25, 0.6, 19), paintedConcreteMat); roof.position.y = 6.3;
+                    const roof = new THREE.Mesh(new THREE.BoxGeometry(25, 0.6, 19), concreteMat); roof.position.y = 6.3;
                     const sign = new THREE.Mesh(new THREE.BoxGeometry(14, 2.6, 0.5), isGhost ? ghostMat : new THREE.MeshBasicMaterial({ map: walmartSignTex })); sign.position.set(0, 8.0, 9);
                     group.add(floor, backW, leftW, rightW, frontL, frontR, roof, sign);
                 } else if (type === 'gorilla_statue') {
-                    // XL Gorilla Monument Statue
-                    const pedestal = new THREE.Mesh(new THREE.CylinderGeometry(3.6, 4.2, 2.0, 16), paintedConcreteMat);
-                    pedestal.position.y = 1.0;
-                    pedestal.userData.isSolidWall = !isGhost;
+                    const pedestal = new THREE.Mesh(new THREE.CylinderGeometry(3.6, 4.2, 2.0, 16), concreteMat);
+                    pedestal.position.y = 1.0; pedestal.userData.isSolidWall = !isGhost;
                     group.add(pedestal);
-
-                    const statueColor = colorHex || '#d97706';
-                    const giantGorilla = createGorillaModel(statueColor, 3.6, null);
+                    const giantGorilla = createGorillaModel(colorHex || '#d97706', 3.6, null);
                     giantGorilla.position.y = 2.0;
                     group.add(giantGorilla);
-
-                    const plaqueTex = makeSignTexture('🦍 XL GORILLA MONUMENT', '#1c1917', '#facc15');
-                    const plaque = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 0.9), new THREE.MeshBasicMaterial({ map: plaqueTex }));
-                    plaque.position.set(0, 1.2, 4.05);
-                    group.add(plaque);
                 } else if (type === 'merchant') {
-                    // Customizable Merchant Booth + 10-Skin NPC
                     const skinIdx = (itemData && typeof itemData.merchantSkin === 'number') ? itemData.merchantSkin : 0;
                     const skin = MERCHANT_SKINS[skinIdx % MERCHANT_SKINS.length];
 
-                    const counter = new THREE.Mesh(new THREE.BoxGeometry(3.6, 1.1, 1.4), paintedWoodMat);
+                    const counter = new THREE.Mesh(new THREE.BoxGeometry(3.6, 1.1, 1.4), woodMat);
                     counter.position.set(0, 0.55, 0.8);
                     counter.userData.isSolidWall = !isGhost;
                     counter.userData.interactType = 'merchant';
@@ -1302,20 +1707,19 @@
 
                     const postL = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 3.2), poleMat); postL.position.set(-1.6, 1.6, 0.8);
                     const postR = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 3.2), poleMat); postR.position.set(1.6, 1.6, 0.8);
-                    const canopy = new THREE.Mesh(new THREE.ConeGeometry(2.8, 1.2, 4), isGhost ? ghostMat : new THREE.MeshStandardMaterial({ color: skin.hat }));
+                    const canopy = new THREE.Mesh(new THREE.ConeGeometry(2.8, 1.2, 4), isGhost ? ghostMat : makeAnimeMat({ color: skin.hat }));
                     canopy.position.set(0, 3.5, 0.4); canopy.rotation.y = Math.PI / 4;
                     group.add(postL, postR, canopy);
 
-                    // Merchant Character Standing Behind Booth
                     const merchNpc = new THREE.Group();
                     merchNpc.position.set(0, 0, -0.3);
-                    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.5, 1.6, 14), new THREE.MeshStandardMaterial({ color: skin.body }));
+                    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.5, 1.6, 14), makeAnimeMat({ color: skin.body }));
                     body.position.y = 0.8;
-                    const apron = new THREE.Mesh(new THREE.BoxGeometry(0.7, 1.1, 0.15), new THREE.MeshStandardMaterial({ color: skin.apron }));
+                    const apron = new THREE.Mesh(new THREE.BoxGeometry(0.7, 1.1, 0.15), makeAnimeMat({ color: skin.apron }));
                     apron.position.set(0, 0.8, 0.42);
-                    const head = new THREE.Mesh(new THREE.SphereGeometry(0.42, 14, 14), new THREE.MeshStandardMaterial({ color: 0xfde68a }));
+                    const head = new THREE.Mesh(new THREE.SphereGeometry(0.42, 14, 14), makeAnimeMat({ color: 0xfde68a }));
                     head.position.y = 1.95;
-                    const hat = new THREE.Mesh(new THREE.CylinderGeometry(0.48, 0.55, 0.35, 12), new THREE.MeshStandardMaterial({ color: skin.hat }));
+                    const hat = new THREE.Mesh(new THREE.CylinderGeometry(0.48, 0.55, 0.35, 12), makeAnimeMat({ color: skin.hat }));
                     hat.position.y = 2.35;
                     merchNpc.add(body, apron, head, hat);
                     body.userData.interactType = 'merchant';
@@ -1328,27 +1732,27 @@
                     sign.position.set(0, 2.85, 1.5);
                     group.add(sign);
                 } else if (type === 'fountain') {
-                    const basin = new THREE.Mesh(new THREE.CylinderGeometry(3.2, 3.5, 0.8, 20), paintedConcreteMat);
+                    const basin = new THREE.Mesh(new THREE.CylinderGeometry(3.2, 3.5, 0.8, 20), concreteMat);
                     basin.position.y = 0.4; basin.userData.isSolidWall = !isGhost;
                     const waterMat = isGhost ? ghostMat : new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.1, transparent: true, opacity: 0.85 });
                     const water = new THREE.Mesh(new THREE.CylinderGeometry(2.9, 2.9, 0.65, 20), waterMat); water.position.y = 0.45;
-                    const pillar = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.7, 2.4, 16), paintedConcreteMat); pillar.position.y = 1.2;
+                    const pillar = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.7, 2.4, 16), concreteMat); pillar.position.y = 1.2;
                     const topBowl = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 0.6, 0.5, 16), waterMat); topBowl.position.y = 2.4;
                     group.add(basin, water, pillar, topBowl);
                 } else if (type === 'mailbox') {
                     const post = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 1.4), poleMat); post.position.y = 0.7;
-                    const box = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.65, 1.1), isGhost ? ghostMat : new THREE.MeshStandardMaterial({ color: baseColor, metalness: 0.3 }));
+                    const box = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.65, 1.1), isGhost ? ghostMat : makeAnimeMat({ color: baseColor }));
                     box.position.y = 1.5; box.userData.interactType = 'inventory';
                     group.add(post, box);
                 } else if (type === 'locker') {
-                    const lockerBox = new THREE.Mesh(new THREE.BoxGeometry(1.2, 2.4, 1.0), isGhost ? ghostMat : new THREE.MeshStandardMaterial({ color: baseColor, metalness: 0.5, roughness: 0.4 }));
+                    const lockerBox = new THREE.Mesh(new THREE.BoxGeometry(1.2, 2.4, 1.0), isGhost ? ghostMat : makeAnimeMat({ color: baseColor }));
                     lockerBox.position.y = 1.2; lockerBox.userData.isSolidWall = !isGhost; lockerBox.userData.interactType = 'inventory';
                     group.add(lockerBox);
                 } else if (type === 'bed') {
-                    const frame = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.6, 3.6), paintedWoodMat); frame.position.y = 0.3;
-                    const mattress = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.35, 3.3), isGhost ? ghostMat : new THREE.MeshStandardMaterial({ color: baseColor }));
+                    const frame = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.6, 3.6), woodMat); frame.position.y = 0.3;
+                    const mattress = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.35, 3.3), isGhost ? ghostMat : makeAnimeMat({ color: baseColor }));
                     mattress.position.y = 0.7; mattress.userData.interactType = 'bed';
-                    const pillow = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.25, 0.7), new THREE.MeshStandardMaterial({ color: 0xffffff }));
+                    const pillow = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.25, 0.7), makeAnimeMat({ color: 0xffffff }));
                     pillow.position.set(0, 0.95, -1.1);
                     group.add(frame, mattress, pillow);
 
@@ -1359,11 +1763,13 @@
                         group.add(tag);
                     }
                 }
+
+                if (!isGhost) applyAnimeInkOutlines(group);
                 return group;
             }
 
             // =========================================================
-            // 6. RESTART-PROOF HYBRID PERSISTENCE & CO-OP SYNC
+            // 7. RESTART-PROOF HYBRID PERSISTENCE & COMPANION MANAGER
             // =========================================================
             let worldDataList = [];
 
@@ -1383,7 +1789,7 @@
 
             async function pushWorldToServer() {
                 pieceCountEl.innerText = worldDataList.length;
-                localStorage.setItem('badabing_world_v4', JSON.stringify(worldDataList));
+                localStorage.setItem('badabing_world_v5', JSON.stringify(worldDataList));
                 try {
                     await fetch('/api/world', {
                         method: 'POST',
@@ -1394,8 +1800,8 @@
             }
 
             async function initWorldAndRehydrate() {
-                const localItemsRaw = localStorage.getItem('badabing_world_v4') || localStorage.getItem('badabing_coop_backup');
-                const localNpcsRaw = localStorage.getItem('badabing_npcs_v4');
+                const localItemsRaw = localStorage.getItem('badabing_world_v5') || localStorage.getItem('badabing_world_v4');
+                const localNpcsRaw = localStorage.getItem('badabing_npcs_v5') || localStorage.getItem('badabing_npcs_v4');
                 let localItems = [];
                 let localNpcs = [];
                 try { if (localItemsRaw) localItems = JSON.parse(localItemsRaw); } catch (e) {}
@@ -1405,21 +1811,21 @@
                     const res = await fetch('/api/world');
                     if (res.ok) {
                         const data = await res.json();
-                        const serverItems = Array.isArray(data.items) ? data.items : (Array.isArray(data) ? data : []);
+                        const serverItems = Array.isArray(data.items) ? data.items : [];
                         const serverNpcs = Array.isArray(data.npcs) ? data.npcs : [];
+                        if (typeof data.hoopScore === 'number') updateScoreboardDisplay(data.hoopScore);
 
-                        // If server restarted on Render free tier and lost its disk state, auto-restore from client cache!
                         if (serverItems.length === 0 && localItems.length > 0) {
                             await fetch('/api/world/rehydrate', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ items: localItems, savedNpcs: localNpcs })
+                                body: JSON.stringify({ items: localItems, savedNpcs: localNpcs, forceNpcs: true })
                             });
                             rebuildSceneFromData(localItems);
                         } else {
                             rebuildSceneFromData(serverItems);
                             if (serverItems.length > 0) {
-                                localStorage.setItem('badabing_world_v4', JSON.stringify(serverItems));
+                                localStorage.setItem('badabing_world_v5', JSON.stringify(serverItems));
                             }
                         }
                         if (serverNpcs.length > 0) {
@@ -1433,27 +1839,87 @@
             }
             initWorldAndRehydrate();
 
+            function renderCompanionManagerRoster() {
+                const container = document.getElementById('companion-roster-list');
+                if (!container || document.getElementById('companion-manager-modal').style.display !== 'block') return;
+
+                container.innerHTML = npcList.map(n => {
+                    const spec = ANIMAL_CATALOG.find(a => a.id === n.species) || ANIMAL_CATALOG[0];
+                    const isPeanut = n.id === 'peanut';
+                    return `
+                        <div class="comp-row">
+                            <div>
+                                <strong style="color:#fde047;font-size:13px;">${spec.icon} ${n.name}</strong>
+                                <span style="color:#94a3b8;font-size:11px;">(${spec.label}) • Pos: (${Math.round(n.x)}, ${Math.round(n.z)})</span><br>
+                                <span style="font-size:11px;color:#cbd5e1;">Mood: <strong style="color:#4ade80;">${n.mood}</strong> | Hunger: ${Math.round(n.hunger)}% | Energy: ${Math.round(n.energy)}% | ${n.activity}</span>
+                            </div>
+                            <div style="display:flex;gap:6px;">
+                                <button class="mini-ui-btn mgr-feed-btn" data-id="${n.id}">🍔 Feed</button>
+                                <button class="mini-ui-btn mgr-focus-btn" data-id="${n.id}">🔍 Select</button>
+                                ${!isPeanut ? `<button class="mini-ui-btn mgr-del-btn" data-id="${n.id}" style="background:#ef4444;color:#fff;">🗑️ Delete</button>` : `<span style="font-size:10px;color:#94a3b8;padding:4px;">👑 Founder</span>`}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                container.querySelectorAll('.mgr-feed-btn').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        const res = await fetch('/api/npcs/action', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ npcId: btn.getAttribute('data-id'), actionType: 'feed' })
+                        });
+                        if (res.ok) {
+                            const d = await res.json();
+                            if (d.npcs) syncNpcsClient(d.npcs);
+                        }
+                    });
+                });
+
+                container.querySelectorAll('.mgr-focus-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        selectedNpcId = btn.getAttribute('data-id');
+                        document.getElementById('npc-selector').value = selectedNpcId;
+                        syncNpcsClient(npcList);
+                    });
+                });
+
+                container.querySelectorAll('.mgr-del-btn').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        const targetId = btn.getAttribute('data-id');
+                        const res = await fetch('/api/npcs/delete', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ id: targetId })
+                        });
+                        if (res.ok) {
+                            const d = await res.json();
+                            if (d.npcs) {
+                                if (selectedNpcId === targetId) selectedNpcId = 'peanut';
+                                syncNpcsClient(d.npcs);
+                            }
+                        }
+                    });
+                });
+            }
+
             function syncNpcsClient(serverNpcs) {
                 npcList = serverNpcs;
-                localStorage.setItem('badabing_npcs_v4', JSON.stringify(serverNpcs));
+                localStorage.setItem('badabing_npcs_v5', JSON.stringify(serverNpcs));
 
-                // Populate companion dropdown selector
                 const sel = document.getElementById('npc-selector');
                 const currentVal = sel.value || selectedNpcId;
-                if (sel.options.length !== serverNpcs.length) {
-                    sel.innerHTML = '';
-                    serverNpcs.forEach(n => {
-                        const spec = ANIMAL_CATALOG.find(a => a.id === n.species) || ANIMAL_CATALOG[0];
-                        const opt = document.createElement('option');
-                        opt.value = n.id;
-                        opt.textContent = spec.icon + ' ' + n.name;
-                        sel.appendChild(opt);
-                    });
-                    if (serverNpcs.some(n => n.id === currentVal)) sel.value = currentVal;
-                }
+                sel.innerHTML = '';
+                serverNpcs.forEach(n => {
+                    const spec = ANIMAL_CATALOG.find(a => a.id === n.species) || ANIMAL_CATALOG[0];
+                    const opt = document.createElement('option');
+                    opt.value = n.id;
+                    opt.textContent = spec.icon + ' ' + n.name;
+                    sel.appendChild(opt);
+                });
+                if (serverNpcs.some(n => n.id === currentVal)) sel.value = currentVal;
                 selectedNpcId = sel.value || (serverNpcs[0] && serverNpcs[0].id);
 
-                // Create or update 3D Cute Anime Animal Meshes
                 const activeNpcIds = new Set();
                 serverNpcs.forEach(n => {
                     activeNpcIds.add(n.id);
@@ -1476,7 +1942,6 @@
                     }
                 });
 
-                // Update Top Bar & Mind Panel for Selected Companion
                 const activeNpc = serverNpcs.find(n => n.id === selectedNpcId) || serverNpcs[0];
                 if (activeNpc) {
                     document.getElementById('p-mood').innerText = activeNpc.mood;
@@ -1493,11 +1958,29 @@
                     document.getElementById('mind-diary-box').innerHTML = (activeNpc.diary || []).map(d => `<div style="margin-bottom:4px;">${d}</div>`).join('');
                     document.getElementById('mind-log-box').innerHTML = (activeNpc.activityLog || []).map(l => `<div>${l}</div>`).join('');
                 }
+
+                renderCompanionManagerRoster();
             }
 
             document.getElementById('npc-selector').addEventListener('change', (e) => {
                 selectedNpcId = e.target.value;
                 syncNpcsClient(npcList);
+            });
+
+            // Companion Manager Modal Toggle
+            const compMgrModal = document.getElementById('companion-manager-modal');
+            document.getElementById('btn-toggle-manager').addEventListener('click', (e) => {
+                e.stopPropagation();
+                const open = compMgrModal.style.display === 'block';
+                compMgrModal.style.display = open ? 'none' : 'block';
+                if (!open) {
+                    if (controls.isLocked) controls.unlock();
+                    renderCompanionManagerRoster();
+                }
+            });
+            document.getElementById('btn-close-manager').addEventListener('click', (e) => {
+                e.stopPropagation();
+                compMgrModal.style.display = 'none';
             });
 
             // Co-op Polling Interval
@@ -1518,6 +2001,10 @@
                     });
                     if (!res.ok) return;
                     const data = await res.json();
+
+                    if (typeof data.hoopScore === 'number' && data.hoopScore !== currentHoopScore) {
+                        updateScoreboardDisplay(data.hoopScore);
+                    }
 
                     if (Array.isArray(data.gods)) {
                         const pillsHtml = data.gods.map(g => {
@@ -1557,13 +2044,12 @@
             }, 350);
 
             // =========================================================
-            // 7. MIND PANEL, COMPANION SPAWNER & FLY PHYSICS TOGGLE
+            // 8. MIND PANEL, COMPANION SPAWNER & FLY PHYSICS TOGGLE
             // =========================================================
             const mindPanel = document.getElementById('companion-mind-panel');
             document.getElementById('btn-toggle-mind').addEventListener('click', (e) => {
                 e.stopPropagation();
-                const open = mindPanel.style.display === 'block';
-                mindPanel.style.display = open ? 'none' : 'block';
+                mindPanel.style.display = mindPanel.style.display === 'block' ? 'none' : 'block';
             });
             document.getElementById('btn-close-mind').addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -1575,7 +2061,6 @@
                 alert(`💬 Live AI Chat with ${activeNpc ? activeNpc.name : 'Peanut'} is ready to be hooked up next!`);
             });
 
-            // Feed / Energize / Cheer Selected Companion
             ['feed', 'rest', 'cheer'].forEach(act => {
                 document.getElementById('btn-' + act + '-npc').addEventListener('click', async (e) => {
                     e.stopPropagation();
@@ -1591,7 +2076,6 @@
                 });
             });
 
-            // Spawn New Companion Animal
             document.getElementById('btn-spawn-companion').addEventListener('click', async (e) => {
                 e.stopPropagation();
                 const nameInput = document.getElementById('new-companion-name');
@@ -1619,7 +2103,6 @@
                 }
             });
 
-            // Toggle Walking Physics vs Fly Mode
             const flyBtn = document.getElementById('btn-toggle-fly');
             const physLabel = document.getElementById('physics-mode-label');
             let verticalVelocity = 0;
@@ -1635,7 +2118,7 @@
             });
 
             // =========================================================
-            // 8. BUILD MENU TABS, COLOR SWATCHES & HOLOGRAM
+            // 9. BUILD MENU TABS, COLOR SWATCHES & HOLOGRAM
             // =========================================================
             function updateGhostPreview() {
                 if (ghostMesh) {
@@ -1720,7 +2203,7 @@
             });
 
             // =========================================================
-            // 9. INTERACTIONS: DOORS, INVENTORIES, BEDS & MERCHANT SHOPS
+            // 10. INTERACTIONS: DOORS, PC BROWSER, SIGNS, SHOPS & BEDS
             // =========================================================
             const raycaster = new THREE.Raycaster();
             const centerScreen = new THREE.Vector2(0, 0);
@@ -1728,11 +2211,60 @@
             const objectModal = document.getElementById('object-modal');
             const modalTitle = document.getElementById('modal-title');
             const modalContent = document.getElementById('modal-content');
+            const pcModal = document.getElementById('computer-browser-modal');
+            const browserIframe = document.getElementById('browser-iframe');
+            const browserUrlInput = document.getElementById('browser-url-bar');
             let currentHoveredInteract = null;
+            let activeComputerItem = null;
 
             document.getElementById('close-modal-btn').addEventListener('click', (e) => {
                 e.stopPropagation();
                 objectModal.style.display = 'none';
+            });
+
+            // Real Internet Browser Controls
+            function navigateInGameBrowser(rawUrl) {
+                let url = (rawUrl || '').trim();
+                if (!url) return;
+                if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                    url = 'https://' + url;
+                }
+                browserUrlInput.value = url;
+                browserIframe.src = url;
+                if (activeComputerItem) {
+                    activeComputerItem.lastUrl = url;
+                    fetch('/api/world/update-item', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id: activeComputerItem.id, lastUrl: url })
+                    });
+                }
+            }
+
+            document.getElementById('btn-browser-go').addEventListener('click', (e) => {
+                e.stopPropagation();
+                navigateInGameBrowser(browserUrlInput.value);
+            });
+            browserUrlInput.addEventListener('keydown', (e) => {
+                e.stopPropagation();
+                if (e.key === 'Enter') navigateInGameBrowser(browserUrlInput.value);
+            });
+            document.getElementById('btn-browser-ext').addEventListener('click', (e) => {
+                e.stopPropagation();
+                let url = browserUrlInput.value.trim();
+                if (!url.startsWith('http')) url = 'https://' + url;
+                window.open(url, '_blank', 'noopener,noreferrer');
+            });
+            document.getElementById('btn-browser-close').addEventListener('click', (e) => {
+                e.stopPropagation();
+                pcModal.style.display = 'none';
+                browserIframe.src = 'about:blank';
+            });
+            document.querySelectorAll('.bm-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    navigateInGameBrowser(btn.getAttribute('data-url'));
+                });
             });
 
             function findRootPieceGroup(obj) {
@@ -1756,6 +2288,8 @@
                         else if (interactType === 'inventory') promptEl.innerHTML = 'Press <span>[F]</span> or <span>🖐️</span> to Open 10-Slot Storage';
                         else if (interactType === 'bed') promptEl.innerHTML = 'Press <span>[F]</span> or <span>🖐️</span> to Assign Bed Owner';
                         else if (interactType === 'merchant') promptEl.innerHTML = 'Press <span>[F]</span> or <span>🖐️</span> to Trade & Customize Merchant';
+                        else if (interactType === 'sign') promptEl.innerHTML = 'Press <span>[F]</span> or <span>🖐️</span> to Edit Sign Text';
+                        else if (interactType === 'computer') promptEl.innerHTML = 'Press <span>[F]</span> or <span>🖐️</span> to Use Internet Computer';
                         return;
                     }
                 }
@@ -1772,7 +2306,7 @@
                 if (interactType === 'door') {
                     itemData.isOpen = !itemData.isOpen;
                     rebuildSceneFromData(worldDataList);
-                    localStorage.setItem('badabing_world_v4', JSON.stringify(worldDataList));
+                    localStorage.setItem('badabing_world_v5', JSON.stringify(worldDataList));
                     await fetch('/api/world/update-item', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -1787,7 +2321,61 @@
                 } else if (interactType === 'merchant') {
                     if (controls.isLocked) controls.unlock();
                     openMerchantModal(itemData);
+                } else if (interactType === 'sign') {
+                    if (controls.isLocked) controls.unlock();
+                    openSignEditorModal(itemData);
+                } else if (interactType === 'computer') {
+                    if (controls.isLocked) controls.unlock();
+                    activeComputerItem = itemData;
+                    pcModal.style.display = 'flex';
+                    navigateInGameBrowser(itemData.lastUrl || 'https://en.m.wikipedia.org/wiki/Giant_panda');
                 }
+            }
+
+            // Custom Text Sign Editor Modal
+            function openSignEditorModal(itemData) {
+                modalTitle.innerText = '🪧 Customize Structure Sign Text';
+                const curText = itemData.signText || 'WELCOME TO\nTHE BADABING';
+                const curColor = itemData.signColor || '#fde047';
+                const curBg = itemData.signBg || '#111318';
+
+                modalContent.innerHTML = `
+                    <div style="margin-bottom:10px;">
+                        <label style="font-size:11px;color:#94a3b8;display:block;margin-bottom:4px;">Sign Text (Supports up to 2 lines):</label>
+                        <textarea id="sign-text-input" class="merchant-input" rows="2" style="width:100%;font-size:14px;font-weight:bold;">${curText}</textarea>
+                    </div>
+                    <div style="display:flex;gap:12px;margin-bottom:12px;">
+                        <div style="flex:1;">
+                            <label style="font-size:11px;color:#94a3b8;display:block;margin-bottom:4px;">Text Color:</label>
+                            <input type="color" id="sign-color-input" value="${curColor}" style="width:100%;height:34px;border:none;background:none;cursor:pointer;" />
+                        </div>
+                        <div style="flex:1;">
+                            <label style="font-size:11px;color:#94a3b8;display:block;margin-bottom:4px;">Board Background:</label>
+                            <input type="color" id="sign-bg-input" value="${curBg}" style="width:100%;height:34px;border:none;background:none;cursor:pointer;" />
+                        </div>
+                    </div>
+                    <button class="mini-ui-btn" id="btn-save-sign" style="width:100%;padding:10px;background:#fa9549;color:#111;font-weight:900;">💾 Update 3D Sign</button>
+                `;
+                objectModal.style.display = 'block';
+
+                document.getElementById('btn-save-sign').addEventListener('click', async () => {
+                    itemData.signText = document.getElementById('sign-text-input').value || 'SIGN';
+                    itemData.signColor = document.getElementById('sign-color-input').value || '#fde047';
+                    itemData.signBg = document.getElementById('sign-bg-input').value || '#111318';
+                    rebuildSceneFromData(worldDataList);
+                    localStorage.setItem('badabing_world_v5', JSON.stringify(worldDataList));
+                    objectModal.style.display = 'none';
+                    await fetch('/api/world/update-item', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            id: itemData.id,
+                            signText: itemData.signText,
+                            signColor: itemData.signColor,
+                            signBg: itemData.signBg
+                        })
+                    });
+                });
             }
 
             function openInventoryModal(itemData) {
@@ -1815,7 +2403,7 @@
                         const idx = Number(slotEl.getAttribute('data-slot'));
                         itemData.inventory[idx] = '';
                         openInventoryModal(itemData);
-                        localStorage.setItem('badabing_world_v4', JSON.stringify(worldDataList));
+                        localStorage.setItem('badabing_world_v5', JSON.stringify(worldDataList));
                         await fetch('/api/world/update-item', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -1830,7 +2418,7 @@
                         if (emptyIdx !== -1) {
                             itemData.inventory[emptyIdx] = btn.getAttribute('data-item');
                             openInventoryModal(itemData);
-                            localStorage.setItem('badabing_world_v4', JSON.stringify(worldDataList));
+                            localStorage.setItem('badabing_world_v5', JSON.stringify(worldDataList));
                             await fetch('/api/world/update-item', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
@@ -1858,7 +2446,7 @@
                         const chosen = btn.getAttribute('data-owner');
                         itemData.assignedTo = chosen === 'Unassigned' ? null : chosen;
                         rebuildSceneFromData(worldDataList);
-                        localStorage.setItem('badabing_world_v4', JSON.stringify(worldDataList));
+                        localStorage.setItem('badabing_world_v5', JSON.stringify(worldDataList));
                         objectModal.style.display = 'none';
                         await fetch('/api/world/update-item', {
                             method: 'POST',
@@ -1869,7 +2457,6 @@
                 });
             }
 
-            // Merchant Customization (10 Skins, Editable Items/Prices, Purchase for Peanut & Companions)
             function openMerchantModal(itemData) {
                 if (typeof itemData.merchantSkin !== 'number') itemData.merchantSkin = 0;
                 if (!Array.isArray(itemData.shopItems) || itemData.shopItems.length === 0) {
@@ -1920,7 +2507,7 @@
                     itemData.merchantSkin = Number(e.target.value);
                     itemData.merchantName = MERCHANT_SKINS[itemData.merchantSkin].name;
                     rebuildSceneFromData(worldDataList);
-                    localStorage.setItem('badabing_world_v4', JSON.stringify(worldDataList));
+                    localStorage.setItem('badabing_world_v5', JSON.stringify(worldDataList));
                     await fetch('/api/world/update-item', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -1944,7 +2531,7 @@
                         name: inp.value,
                         price: Number(priceInputs[idx].value) || 0
                     }));
-                    localStorage.setItem('badabing_world_v4', JSON.stringify(worldDataList));
+                    localStorage.setItem('badabing_world_v5', JSON.stringify(worldDataList));
                     await fetch('/api/world/update-item', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -1983,7 +2570,7 @@
             }
 
             // =========================================================
-            // 10. PLACE / DISMANTLE & SOLID WALL COLLISIONS
+            // 11. PLACE / DISMANTLE & SOLID WALL COLLISIONS
             // =========================================================
             function getSnappedBuildPoint() {
                 raycaster.setFromCamera(centerScreen, camera);
@@ -2028,6 +2615,10 @@
                             inventory: new Array(10).fill(''),
                             assignedTo: null,
                             merchantSkin: 0,
+                            signText: 'WELCOME TO\nTHE BADABING',
+                            signColor: '#fde047',
+                            signBg: '#111318',
+                            lastUrl: 'https://en.m.wikipedia.org/wiki/Giant_panda',
                             shopItems: [
                                 { name: '🐼 Bamboo Ramen Bowl', price: 12 },
                                 { name: '🍔 Gorilla Smashburger', price: 15 },
@@ -2060,7 +2651,7 @@
             }
 
             // =========================================================
-            // 11. DESKTOP, GAMEPAD & FIXED MOBILE ZERO-TWIST LOOK
+            // 12. DESKTOP, GAMEPAD & ZERO-TWIST MOBILE CONTROLS
             // =========================================================
             const controls = new THREE.PointerLockControls(camera, document.body);
             const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
@@ -2072,7 +2663,10 @@
                     e.target.closest('#top-status-banner') ||
                     e.target.closest('#companion-bar') ||
                     e.target.closest('#companion-mind-panel') ||
+                    e.target.closest('#companion-manager-modal') ||
+                    e.target.closest('#computer-browser-modal') ||
                     e.target.closest('#object-modal') ||
+                    e.target.closest('#bball-hud') ||
                     e.target.closest('#mobile-controls')
                 ) return;
 
@@ -2086,7 +2680,8 @@
 
             const keys = { w: false, a: false, s: false, d: false, space: false, shift: false };
             window.addEventListener('keydown', (e) => {
-                if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
+                const tag = document.activeElement && document.activeElement.tagName;
+                if (tag === 'INPUT' || tag === 'TEXTAREA') return;
                 const k = e.key.toLowerCase();
                 if (k === 'w' || e.key === 'ArrowUp') keys.w = true;
                 if (k === 's' || e.key === 'ArrowDown') keys.s = true;
@@ -2100,6 +2695,7 @@
 
                 if (k === 'b') toggleBuildMenu();
                 if (k === 'f') triggerInteraction();
+                if (k === 'g') shootBasketball();
                 if (k === 'x') selectBuildTool(selectedTool === 'delete' ? 'none' : 'delete');
                 if (k === 'r') { buildRotation = (buildRotation + 90) % 360; updateGhostPreview(); }
                 if (k === 'e') { buildElevation = Math.min(40, buildElevation + 4); updateGhostPreview(); }
@@ -2116,7 +2712,6 @@
                 if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') keys.shift = false;
             });
 
-            // Mobile Touch Buttons + Fixed Zero-Twist Touch Look
             if (isTouchDevice) {
                 document.getElementById('mobile-controls').style.display = 'block';
             }
@@ -2135,7 +2730,6 @@
             document.getElementById('btn-place').addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); executeBuildAction(); });
             document.getElementById('btn-interact').addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); triggerInteraction(); });
 
-            // Dedicated Multi-Touch Look Tracker (Strictly Up/Down Pitch & Left/Right Yaw, Zero Roll)
             let lookTouchId = null;
             let lastLookX = 0;
             let lastLookY = 0;
@@ -2147,7 +2741,10 @@
                     e.target.closest('#top-status-banner') ||
                     e.target.closest('#companion-bar') ||
                     e.target.closest('#companion-mind-panel') ||
+                    e.target.closest('#companion-manager-modal') ||
+                    e.target.closest('#computer-browser-modal') ||
                     e.target.closest('#object-modal') ||
+                    e.target.closest('#bball-hud') ||
                     e.target.closest('.mob-btn')
                 ) return;
 
@@ -2175,7 +2772,7 @@
                         camera.rotation.order = 'YXZ';
                         camera.rotation.y -= dx * 0.0055;
                         camera.rotation.x = Math.max(-Math.PI * 0.44, Math.min(Math.PI * 0.44, camera.rotation.x - dy * 0.0055));
-                        camera.rotation.z = 0; // Explicitly prevent view twisting
+                        camera.rotation.z = 0;
                         break;
                     }
                 }
@@ -2196,8 +2793,9 @@
             // Gamepad Controller Support
             const allBuildTypes = [
                 'none', 'foundation', 'wall', 'doorway', 'window', 'stairs',
-                'roof_flat', 'roof_pitched', 'fence', 'streetlight',
-                'mcdonalds', 'walmart', 'gorilla_statue', 'merchant', 'fountain', 'mailbox', 'locker', 'bed', 'delete'
+                'roof_flat', 'roof_pitched', 'fence', 'sign_post', 'streetlight',
+                'mechanic_shop', 'computer_desk', 'mcdonalds', 'walmart', 'gorilla_statue',
+                'merchant', 'fountain', 'mailbox', 'locker', 'bed', 'delete'
             ];
             let prevGpButtons = {};
 
@@ -2245,7 +2843,10 @@
 
                 const tap = (idx) => gp.buttons[idx]?.pressed && !prevGpButtons[idx];
                 if (tap(3)) toggleBuildMenu();
-                if (tap(2)) triggerInteraction();
+                if (tap(2)) {
+                    if (bballState.held) shootBasketball();
+                    else triggerInteraction();
+                }
                 if (tap(7)) executeBuildAction();
                 if (tap(12)) { buildElevation = Math.min(40, buildElevation + 4); updateGhostPreview(); }
                 if (tap(13)) { buildElevation = Math.max(0, buildElevation - 4); updateGhostPreview(); }
@@ -2259,7 +2860,7 @@
             }
 
             // =========================================================
-            // 12. MAIN ANIMATION LOOP (WALKING GRAVITY + COMPANION GAIT)
+            // 13. MAIN ANIMATION LOOP (BASKETBALL + GRAVITY + COMPANIONS)
             // =========================================================
             const targetXEl = document.getElementById('target-x');
             const targetZEl = document.getElementById('target-z');
@@ -2270,7 +2871,6 @@
                 const delta = Math.min(0.1, clock.getDelta());
                 const elapsed = clock.getElapsedTime();
 
-                // Always keep horizon level (zero roll/twist)
                 camera.rotation.z = 0;
 
                 checkInteractiveTarget();
@@ -2283,6 +2883,60 @@
                     if (ghostMesh) {
                         ghostMesh.position.set(snapPt.x, snapPt.y, snapPt.z);
                         ghostMesh.rotation.y = THREE.MathUtils.degToRad(buildRotation);
+                    }
+                }
+
+                // Basketball Physics & Dribbling
+                if (bballState.held) {
+                    const forward = new THREE.Vector3();
+                    camera.getWorldDirection(forward);
+                    forward.y = 0; forward.normalize();
+                    const dribbleBounce = Math.abs(Math.sin(elapsed * 9.5)) * 0.85;
+                    bballState.pos.set(
+                        camera.position.x + forward.x * 1.65,
+                        0.48 + dribbleBounce,
+                        camera.position.z + forward.z * 1.65
+                    );
+                    basketballMesh.position.copy(bballState.pos);
+                    basketballMesh.rotation.x += 8 * delta;
+                } else {
+                    // Check if Gorilla God walks close to basketball to pick it up
+                    const distToBall = Math.hypot(camera.position.x - bballState.pos.x, camera.position.z - bballState.pos.z);
+                    if (distToBall < 1.85 && bballState.vel.length() < 3.5 && camera.position.y < 4.5) {
+                        bballState.held = true;
+                        document.getElementById('bball-hud').style.display = 'flex';
+                    } else {
+                        // Flight & Bounce Physics
+                        bballState.vel.y -= 22.0 * delta;
+                        bballState.pos.addScaledVector(bballState.vel, delta);
+
+                        if (bballState.pos.y <= 0.48) {
+                            bballState.pos.y = 0.48;
+                            bballState.vel.y = Math.abs(bballState.vel.y) * 0.62;
+                            bballState.vel.x *= 0.86;
+                            bballState.vel.z *= 0.86;
+                            if (bballState.vel.y < 1.2) bballState.vel.y = 0;
+                        }
+
+                        // Check Rim Collision & Hoop Swish Scoring
+                        hoopRims.forEach(hr => {
+                            const hDist = Math.hypot(bballState.pos.x - hr.x, bballState.pos.z - hr.z);
+                            const yDiff = Math.abs(bballState.pos.y - hr.y);
+                            if (hDist < 0.72 && yDiff < 0.45 && bballState.vel.y < 0 && !bballState.scoredThisShot) {
+                                bballState.scoredThisShot = true;
+                                updateScoreboardDisplay(currentHoopScore + 1);
+                                fetch('/api/basketball/score', { method: 'POST' });
+                            } else if (hDist >= 0.72 && hDist < 1.05 && yDiff < 0.35) {
+                                // Rim bounce
+                                bballState.vel.y = Math.abs(bballState.vel.y) * 0.55;
+                                bballState.vel.x = (bballState.pos.x - hr.x) * 4.5;
+                                bballState.vel.z = (bballState.pos.z - hr.z) * 4.5;
+                            }
+                        });
+
+                        basketballMesh.position.copy(bballState.pos);
+                        basketballMesh.rotation.x += bballState.vel.z * delta;
+                        basketballMesh.rotation.z -= bballState.vel.x * delta;
                     }
                 }
 
@@ -2328,14 +2982,13 @@
                     camera.position.z = oldPos.z;
                 }
 
-                // Vertical Physics: Walking Gravity (Default) vs Fly Mode Toggle
+                // Vertical Physics: Walking Gravity (Default) vs Fly Mode
                 if (isFlyingMode) {
                     if (keys.space) camera.position.y += moveSpeed;
                     if (keys.shift) camera.position.y = Math.max(2.2, camera.position.y - moveSpeed);
                 } else {
-                    verticalVelocity -= 24.0 * delta; // Gravity
+                    verticalVelocity -= 24.0 * delta;
                     camera.position.y += verticalVelocity * delta;
-                    const groundHeight = 2.2 + buildElevation;
                     if (camera.position.y <= 2.2) {
                         camera.position.y = 2.2;
                         verticalVelocity = 0;
