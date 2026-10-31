@@ -7,7 +7,10 @@ const PORT = process.env.PORT || 3000;
 const DATA_FILE = path.join(__dirname, 'world_data.json');
 
 app.use(express.json({ limit: '10mb' }));
+
+// Serve static files from both root and /public (if it exists)
 app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Initialize world_data.json if it doesn't exist
 if (!fs.existsSync(DATA_FILE)) {
@@ -43,8 +46,20 @@ app.post('/api/world', (req, res) => {
     }
 });
 
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+// Universal Fallback Route (Works on both Express 4 and Express 5, and checks root + /public)
+app.use((req, res) => {
+    const rootIndex = path.join(__dirname, 'index.html');
+    const publicIndex = path.join(__dirname, 'public', 'index.html');
+
+    if (fs.existsSync(rootIndex)) {
+        return res.sendFile(rootIndex);
+    } else if (fs.existsSync(publicIndex)) {
+        return res.sendFile(publicIndex);
+    } else {
+        return res.status(404).send(
+            'Error: index.html not found on server. Files in root: ' + fs.readdirSync(__dirname).join(', ')
+        );
+    }
 });
 
 app.listen(PORT, () => {
