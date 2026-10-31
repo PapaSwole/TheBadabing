@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>The Badabing - Silverback Gods, Sports Courts & Companions</title>
+    <title>The Badabing - Complete Anime Co-op World</title>
     <style>
         * { box-sizing: border-box; }
         body {
@@ -18,7 +18,7 @@
             touch-action: none;
         }
 
-        /* 1. Top Server, Sports Score & Visitor/God Password Banner */
+        /* 1. Top Status Banner with Custom God Name & Scores */
         #top-status-banner {
             position: absolute;
             top: 0;
@@ -66,13 +66,13 @@
             border: 1px solid #475569;
         }
 
-        /* Password Unlock Modal */
+        /* Password Unlock Modal with Custom Name Input */
         #password-modal {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 340px;
+            width: 360px;
             max-width: 92vw;
             background: rgba(16, 19, 27, 0.98);
             border: 3px solid #000;
@@ -175,7 +175,7 @@
         }
         .god-only-ui { display: none; }
 
-        /* 3. Companion Mind, Wallet & Inventory Bag Panel */
+        /* 3. Companion Mind, Wallet & Bag Panel */
         #companion-mind-panel {
             position: absolute;
             top: 88px;
@@ -219,11 +219,7 @@
             padding: 8px 12px;
             margin-bottom: 10px;
         }
-        .wallet-amount {
-            font-size: 18px;
-            font-weight: 900;
-            color: #fde047;
-        }
+        .wallet-amount { font-size: 18px; font-weight: 900; color: #fde047; }
         .companion-bag-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -240,10 +236,7 @@
             cursor: pointer;
             transition: 0.12s;
         }
-        .bag-item-chip:hover {
-            border-color: #4ade80;
-            background: #253042;
-        }
+        .bag-item-chip:hover { border-color: #4ade80; background: #253042; }
         .mind-section { margin-bottom: 10px; }
         .mind-section h4 {
             margin: 0 0 4px 0;
@@ -263,39 +256,35 @@
             line-height: 1.45;
         }
 
-        /* 4. Companion Manager Modal */
-        #companion-manager-modal {
+        /* 4. Retro Arcade Unit Screen Modal */
+        #arcade-modal {
             position: absolute;
-            top: 88px;
+            top: 50%;
             left: 50%;
-            transform: translateX(-50%);
-            width: 580px;
-            max-width: 94vw;
-            max-height: 78vh;
-            overflow-y: auto;
-            background: rgba(16, 19, 27, 0.98);
-            border: 3px solid #000;
-            outline: 2px solid #4ade80;
+            transform: translate(-50%, -50%);
+            width: 780px;
+            max-width: 95vw;
+            height: 75vh;
+            background: #000;
+            border: 4px solid #fa9549;
             border-radius: 12px;
-            padding: 16px;
-            z-index: 28;
+            z-index: 38;
             display: none;
-            box-shadow: 0 22px 55px rgba(0,0,0,0.92);
+            flex-direction: column;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.95);
+            overflow: hidden;
         }
-        .comp-row {
+        .arcade-bar {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: #161a24;
-            border: 2px solid #283040;
-            border-radius: 8px;
-            padding: 9px 12px;
-            margin-bottom: 8px;
-            gap: 10px;
-            flex-wrap: wrap;
+            background: #1e1b4b;
+            padding: 8px 12px;
+            border-bottom: 2px solid #fa9549;
         }
+        .arcade-tabs { display: flex; gap: 6px; }
 
-        /* 5. Real Internet Computer Browser Modal */
+        /* 5. Real Internet PC & Companion Roster Modals */
         #computer-browser-modal {
             position: absolute;
             top: 50%;
@@ -344,14 +333,40 @@
             flex-wrap: wrap;
             align-items: center;
         }
-        #browser-iframe {
-            flex: 1;
-            width: 100%;
-            border: none;
-            background: #fff;
+        #browser-iframe { flex: 1; width: 100%; border: none; background: #fff; }
+
+        #companion-manager-modal {
+            position: absolute;
+            top: 88px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 580px;
+            max-width: 94vw;
+            max-height: 78vh;
+            overflow-y: auto;
+            background: rgba(16, 19, 27, 0.98);
+            border: 3px solid #000;
+            outline: 2px solid #4ade80;
+            border-radius: 12px;
+            padding: 16px;
+            z-index: 28;
+            display: none;
+            box-shadow: 0 22px 55px rgba(0,0,0,0.92);
+        }
+        .comp-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #161a24;
+            border: 2px solid #283040;
+            border-radius: 8px;
+            padding: 9px 12px;
+            margin-bottom: 8px;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
-        /* 6. God / Build Menu Button & Modal (Hidden Until PEANUT Password Unlocked) */
+        /* 6. God & Build Menu Button & Modal */
         #toggle-build-btn {
             position: absolute;
             top: 88px;
@@ -379,7 +394,7 @@
             position: absolute;
             top: 136px;
             right: 16px;
-            width: 485px;
+            width: 500px;
             max-width: calc(100vw - 32px);
             max-height: calc(100vh - 155px);
             overflow-y: auto;
@@ -403,11 +418,7 @@
             margin-bottom: 10px;
             font-size: 12px;
         }
-        .tab-row {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 10px;
-        }
+        .tab-row { display: flex; gap: 6px; margin-bottom: 10px; }
         .tab-btn {
             flex: 1;
             padding: 8px 6px;
@@ -466,11 +477,7 @@
             display: flex;
             justify-content: space-between;
         }
-        .swatch-row {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
+        .swatch-row { display: flex; gap: 8px; flex-wrap: wrap; }
         .color-swatch {
             width: 25px;
             height: 25px;
@@ -495,7 +502,7 @@
             color: #94a3b8;
         }
 
-        /* Center Interaction & Sports Action HUD */
+        /* Center Interaction, Swimming/Skating Status & Sports HUD */
         #interaction-prompt {
             position: absolute;
             top: 56%;
@@ -533,7 +540,6 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.6);
         }
 
-        /* Object Inspector & Companion Direct Wave Modal */
         #object-modal {
             position: absolute;
             top: 50%;
@@ -582,21 +588,11 @@
             padding: 4px;
         }
         .inv-slot:hover { border-color: #fa9549; }
-        .merchant-item-row {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            margin-bottom: 6px;
-            background: #141720;
-            padding: 6px;
-            border-radius: 6px;
-            border: 1px solid #2e3444;
-        }
         .merchant-input {
             background: #232834;
             border: 1px solid #475569;
             color: #fff;
-            padding: 5px 8px;
+            padding: 6px 10px;
             border-radius: 5px;
             font-size: 12px;
         }
@@ -694,9 +690,6 @@
             pointer-events: auto;
             touch-action: none;
         }
-        @media (max-width: 900px) {
-            #controls-hint { display: none; }
-        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
@@ -705,7 +698,7 @@
 
     <div id="crosshair"></div>
 
-    <!-- 1. Top Server, Sports Scores & Visitor/God Password Toggle Banner -->
+    <!-- 1. Top Status Banner with Custom God Name & Scores -->
     <div id="top-status-banner">
         <div class="banner-left">
             <span class="brand-title">🦍 The Badabing</span>
@@ -726,15 +719,22 @@
         </div>
     </div>
 
-    <!-- Password Prompt Modal (Password: PEANUT) -->
+    <!-- Password Prompt Modal (With Custom God Name Input) -->
     <div id="password-modal">
-        <h3 style="margin:0 0 8px 0;color:#fa9549;">🦍 ENTER GOD MODE PASSWORD</h3>
-        <p style="font-size:12px;color:#cbd5e1;margin:0 0 12px 0;">Visitors float as a Halo. Enter the secret password to spawn into town as a Silverback Gorilla God!</p>
-        <input type="password" id="god-password-input" class="merchant-input" placeholder="Enter Password..." style="width:100%;padding:8px;font-size:14px;text-align:center;margin-bottom:10px;" />
-        <div id="password-error" style="color:#ef4444;font-size:11px;margin-bottom:8px;display:none;">Incorrect password! Try again.</div>
+        <h3 style="margin:0 0 6px 0;color:#fa9549;">🦍 UNLOCK SILVERBACK GOD MODE</h3>
+        <p style="font-size:11px;color:#cbd5e1;margin:0 0 10px 0;">Password is <strong>PEANUT</strong>. Choose your God name to appear in 3D town!</p>
+        <div style="margin-bottom:8px;text-align:left;">
+            <label style="font-size:11px;color:#94a3b8;display:block;margin-bottom:3px;">Your Custom God Name:</label>
+            <input type="text" id="god-custom-name-input" class="merchant-input" placeholder="e.g. Papa Swole, Kong, Caesar" style="width:100%;font-weight:bold;" />
+        </div>
+        <div style="margin-bottom:10px;text-align:left;">
+            <label style="font-size:11px;color:#94a3b8;display:block;margin-bottom:3px;">Password:</label>
+            <input type="password" id="god-password-input" class="merchant-input" placeholder="Enter PEANUT..." style="width:100%;text-align:center;font-size:14px;" />
+        </div>
+        <div id="password-error" style="color:#ef4444;font-size:11px;margin-bottom:8px;display:none;">Incorrect password! Enter PEANUT.</div>
         <div style="display:flex;gap:8px;">
             <button class="mini-ui-btn" id="btn-cancel-pw" style="flex:1;padding:8px;">Cancel</button>
-            <button class="mini-ui-btn" id="btn-submit-pw" style="flex:1;padding:8px;background:#4ade80;color:#111;">🔓 Spawn Gorilla God</button>
+            <button class="mini-ui-btn" id="btn-submit-pw" style="flex:1;padding:8px;background:#4ade80;color:#111;">🔓 Spawn as God</button>
         </div>
     </div>
 
@@ -767,7 +767,7 @@
         </div>
     </div>
 
-    <!-- 3. Toggleable Companion Mind, Wallet & Inventory Panel -->
+    <!-- 3. Companion Mind, Wallet & Inventory Panel -->
     <div id="companion-mind-panel">
         <div class="mind-header">
             <h3 id="mind-panel-title">🐼 Peanut's Mind, Wallet & Bag</h3>
@@ -775,7 +775,7 @@
         </div>
         <div class="wallet-card">
             <div>
-                <div style="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:bold;">Personal Companion Wallet</div>
+                <div style="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:bold;">Companion Wallet</div>
                 <div class="wallet-amount">💰 $<span id="mind-wallet-val">250</span></div>
             </div>
             <button class="mini-ui-btn god-only-ui" id="btn-give-allowance" style="background:#4ade80;color:#111;">💵 +$50 Allowance</button>
@@ -803,17 +803,23 @@
         </div>
     </div>
 
-    <!-- 4. Companion Manager Modal -->
-    <div id="companion-manager-modal">
-        <div class="mind-header">
-            <h3 style="margin:0;color:#4ade80;font-size:15px;">🐾 Town Companion Roster & Manager</h3>
-            <button class="mini-ui-btn" id="btn-close-manager">✖ Close</button>
+    <!-- 4. Playable Retro Arcade Cabinet Screen Modal -->
+    <div id="arcade-modal">
+        <div class="arcade-bar">
+            <div style="display:flex;align-items:center;gap:12px;">
+                <strong style="color:#fde047;font-size:14px;letter-spacing:1px;">🕹️ BADABING RETRO ARCADE</strong>
+                <div class="arcade-tabs">
+                    <button class="mini-ui-btn arcade-game-btn" data-url="https://funhtml5games.com/donkeykong/index.html" style="background:#dc2626;">🦍 Donkey Kong</button>
+                    <button class="mini-ui-btn arcade-game-btn" data-url="https://freepacman.org/">🟡 Pac-Man</button>
+                    <button class="mini-ui-btn arcade-game-btn" data-url="https://funhtml5games.com/spaceinvaders/index.html">👾 Space Invaders</button>
+                </div>
+            </div>
+            <button class="mini-ui-btn" id="btn-close-arcade" style="background:#ef4444;color:#fff;">✖ Exit Arcade</button>
         </div>
-        <p style="font-size:11px;color:#94a3b8;margin:0 0 10px 0;">All companions roam freely around obstacles and sync their coordinates, wallets, and bags to the server.</p>
-        <div id="companion-roster-list"></div>
+        <iframe id="arcade-iframe" src="about:blank" style="flex:1;width:100%;border:none;background:#000;"></iframe>
     </div>
 
-    <!-- 5. In-Game Real Internet Computer Terminal Modal -->
+    <!-- 5. Real Internet PC & Companion Roster Modals -->
     <div id="computer-browser-modal">
         <div class="browser-toolbar">
             <strong style="color:#38bdf8;font-size:13px;">💻 BADABING OS WEB BROWSER</strong>
@@ -832,7 +838,16 @@
         <iframe id="browser-iframe" src="about:blank" sandbox="allow-same-origin allow-scripts allow-forms allow-popups"></iframe>
     </div>
 
-    <!-- 6. God / Build Menu Toggle Button & Modal -->
+    <div id="companion-manager-modal">
+        <div class="mind-header">
+            <h3 style="margin:0;color:#4ade80;font-size:15px;">🐾 Town Companion Roster & Manager</h3>
+            <button class="mini-ui-btn" id="btn-close-manager">✖ Close</button>
+        </div>
+        <p style="font-size:11px;color:#94a3b8;margin:0 0 10px 0;">All companions roam freely around obstacles and sync their coordinates, wallets, and bags to the server.</p>
+        <div id="companion-roster-list"></div>
+    </div>
+
+    <!-- 6. God / Build Menu Button & Modal -->
     <button id="toggle-build-btn">🦍 God & Build Menu (B)</button>
 
     <div id="build-menu-modal">
@@ -843,7 +858,7 @@
 
         <div class="tab-row">
             <button class="tab-btn active" id="tab-modular">🧱 Modular Parts</button>
-            <button class="tab-btn" id="tab-buildings">🏢 Buildings & Sports</button>
+            <button class="tab-btn" id="tab-buildings">🏢 Buildings & Facilities</button>
             <button class="tab-btn" id="tab-companions">🐾 Spawn Companions</button>
         </div>
 
@@ -861,8 +876,15 @@
             <div class="build-card" data-type="streetlight"><span class="icon">🏮</span><span class="label">Streetlight</span><span class="sub">Lamp Post</span></div>
         </div>
 
-        <!-- Tab 2: Buildings, Sports Courts, Pond, Hobby Store, Deli & Props -->
+        <!-- Tab 2: Buildings, Watchtower, Library, Gym, Pool, Ice Rink, Arcade, Courts, Statue -->
         <div class="build-grid" id="grid-buildings" style="display:none;">
+            <div class="build-card" data-type="gorilla_statue"><span class="icon">🗿</span><span class="label">XL Gorilla Statue</span><span class="sub">Realistic Silverback</span></div>
+            <div class="build-card" data-type="arcade"><span class="icon">🕹️</span><span class="label">Retro Arcade</span><span class="sub">Playable Games</span></div>
+            <div class="build-card" data-type="watch_tower"><span class="icon">🗼</span><span class="label">Watch Tower</span><span class="sub">Climb to Top</span></div>
+            <div class="build-card" data-type="library"><span class="icon">📚</span><span class="label">Public Library</span><span class="sub">Read Cooking Books</span></div>
+            <div class="build-card" data-type="gym"><span class="icon">🏋️</span><span class="label">Iron Gym</span><span class="sub">Bench Press & Weights</span></div>
+            <div class="build-card" data-type="swimming_pool"><span class="icon">🏊</span><span class="label">Swimming Pool</span><span class="sub">Water Swim Physics</span></div>
+            <div class="build-card" data-type="ice_rink"><span class="icon">⛸️</span><span class="label">Ice Rink</span><span class="sub">Gliding Skate Physics</span></div>
             <div class="build-card" data-type="basketball_court"><span class="icon">🏀</span><span class="label">Basketball Court</span><span class="sub">Playable + Ball</span></div>
             <div class="build-card" data-type="tennis_court"><span class="icon">🎾</span><span class="label">Tennis Court</span><span class="sub">Playable + Racket</span></div>
             <div class="build-card" data-type="soccer_court"><span class="icon">⚽</span><span class="label">Soccer Pitch</span><span class="sub">Playable + Goals</span></div>
@@ -874,7 +896,6 @@
             <div class="build-card" data-type="merchant"><span class="icon">🏪</span><span class="label">Animal Merchant</span><span class="sub">10 Shopkeepers</span></div>
             <div class="build-card" data-type="mcdonalds"><span class="icon">🍔</span><span class="label">McDonald's</span><span class="sub">Full Restaurant</span></div>
             <div class="build-card" data-type="walmart"><span class="icon">🛒</span><span class="label">Walmart</span><span class="sub">Supercenter</span></div>
-            <div class="build-card" data-type="gorilla_statue"><span class="icon">🗿</span><span class="label">XL Gorilla Statue</span><span class="sub">Realistic Silverback</span></div>
             <div class="build-card" data-type="fountain"><span class="icon">⛲</span><span class="label">Fountain</span><span class="sub">Park Centerpiece</span></div>
             <div class="build-card" data-type="mailbox"><span class="icon">📫</span><span class="label">Mailbox</span><span class="sub">10 Inv. Slots</span></div>
             <div class="build-card" data-type="locker"><span class="icon">🗄️</span><span class="label">Locker</span><span class="sub">10 Inv. Slots</span></div>
@@ -927,13 +948,13 @@
     <!-- Center Screen Interaction Prompt -->
     <div id="interaction-prompt">Press <span>[F]</span> or <span>🖐️</span> to Interact</div>
 
-    <!-- Unified Sports Action Bar (Basketball / Tennis / Soccer) -->
+    <!-- Unified Sports Action Bar -->
     <div id="sports-hud">
         <span id="sports-hud-text">🏀 Playing Sport!</span>
-        <button class="mini-ui-btn" id="btn-sport-action" style="background:#fde047;color:#111;font-weight:900;">Shoot / Hit [G]</button>
+        <button class="mini-ui-btn" id="btn-sport-action" style="background:#fde047;color:#111;font-weight:900;">Action [G]</button>
     </div>
 
-    <!-- Object Inspector & Companion Wave Modal -->
+    <!-- Object Inspector & Interactive Modal -->
     <div id="object-modal">
         <h3>
             <span id="modal-title">Inspector</span>
@@ -966,8 +987,8 @@
     </div>
 
     <div id="controls-hint">
-        Walk: <span>WASD / L-Stick</span> | Jump/Fly: <span>Space/Shift</span> | Interact / Wave at Companion: <span>F</span><br>
-        Sport Action (Shoot Ball / Swing Racket / Kick Soccer): <span>G</span> | Unlock Gorilla God: <span>PEANUT</span>
+        Walk: <span>WASD / L-Stick</span> | Jump/Fly: <span>Space/Shift</span> | Interact: <span>F</span><br>
+        Sport Action (Shoot / Swing / Kick): <span>G</span> | Password: <span>PEANUT</span>
     </div>
 
     <script>
@@ -976,23 +997,26 @@
             const pieceCountEl = document.getElementById('piece-count');
             const myGodId = 'player_' + Math.random().toString(36).substring(2, 10);
 
-            // Visitor Halo Default vs Password-Unlocked Gorilla God Mode
+            // Visitor Halo vs Silverback God Status
             let isGodUnlocked = false;
+            let customGodName = '';
             let isFlyingMode = false;
 
             const pwModal = document.getElementById('password-modal');
             const pwInput = document.getElementById('god-password-input');
+            const nameInput = document.getElementById('god-custom-name-input');
             const pwErr = document.getElementById('password-error');
             const unlockBtn = document.getElementById('btn-unlock-god');
 
-            function setGodUnlockedState(unlocked) {
+            function setGodUnlockedState(unlocked, name) {
                 isGodUnlocked = unlocked;
+                if (unlocked && name) customGodName = name;
                 document.getElementById('toggle-build-btn').style.display = unlocked ? 'block' : 'none';
                 document.querySelectorAll('.god-only-ui').forEach(el => {
                     el.style.display = unlocked ? 'inline-block' : 'none';
                 });
-                document.getElementById('hud-role').innerText = unlocked ? '🦍 SILVERBACK GOD' : '😇 VISITOR HALO';
-                unlockBtn.innerText = unlocked ? '🦍 God Active' : '🔒 Unlock God Mode';
+                document.getElementById('hud-role').innerText = unlocked ? ('🦍 ' + (customGodName || 'SILVERBACK GOD').toUpperCase()) : '😇 VISITOR HALO';
+                unlockBtn.innerText = unlocked ? ('🦍 ' + (customGodName || 'God Active')) : '🔒 Unlock God Mode';
                 unlockBtn.style.background = unlocked ? '#4ade80' : '#fde047';
                 if (!unlocked) {
                     isFlyingMode = false;
@@ -1004,40 +1028,32 @@
             unlockBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 if (isGodUnlocked) {
-                    setGodUnlockedState(false);
+                    setGodUnlockedState(false, '');
                 } else {
                     if (controls.isLocked) controls.unlock();
                     pwInput.value = '';
                     pwErr.style.display = 'none';
                     pwModal.style.display = 'block';
-                    setTimeout(() => pwInput.focus(), 50);
+                    setTimeout(() => nameInput.focus(), 50);
                 }
             });
 
             function verifyGodPassword() {
                 if (pwInput.value.trim().toUpperCase() === 'PEANUT') {
                     pwModal.style.display = 'none';
-                    setGodUnlockedState(true);
+                    const chosen = (nameInput.value || '').trim() || 'Silverback God';
+                    setGodUnlockedState(true, chosen);
                 } else {
                     pwErr.style.display = 'block';
                 }
             }
 
-            document.getElementById('btn-submit-pw').addEventListener('click', (e) => {
-                e.stopPropagation();
-                verifyGodPassword();
-            });
-            document.getElementById('btn-cancel-pw').addEventListener('click', (e) => {
-                e.stopPropagation();
-                pwModal.style.display = 'none';
-            });
-            pwInput.addEventListener('keydown', (e) => {
-                e.stopPropagation();
-                if (e.key === 'Enter') verifyGodPassword();
-            });
+            document.getElementById('btn-submit-pw').addEventListener('click', (e) => { e.stopPropagation(); verifyGodPassword(); });
+            document.getElementById('btn-cancel-pw').addEventListener('click', (e) => { e.stopPropagation(); pwModal.style.display = 'none'; });
+            pwInput.addEventListener('keydown', (e) => { e.stopPropagation(); if (e.key === 'Enter') verifyGodPassword(); });
 
             // =========================================================
-            // 1. SCHEDULE I ANIME CEL-SHADING & INK OUTLINE ENGINE
+            // 1. SCHEDULE I ANIME CEL-SHADING ENGINE
             // =========================================================
             const toonGradientTex = (() => {
                 const c = document.createElement('canvas');
@@ -1056,9 +1072,7 @@
             const animeOutlineMat = new THREE.LineBasicMaterial({ color: 0x0b0d13, linewidth: 1.5 });
 
             function makeAnimeMat(opts) {
-                return new THREE.MeshToonMaterial(Object.assign({
-                    gradientMap: toonGradientTex
-                }, opts));
+                return new THREE.MeshToonMaterial(Object.assign({ gradientMap: toonGradientTex }, opts));
             }
 
             function applyAnimeInkOutlines(rootObj) {
@@ -1172,8 +1186,7 @@
 
             const concreteTex = makeScheduleTexture((ctx, w, h) => {
                 ctx.fillStyle = '#cbd5e1'; ctx.fillRect(0, 0, w, h);
-                ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 6;
-                ctx.strokeRect(3, 3, w - 6, h - 6);
+                ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 6; ctx.strokeRect(3, 3, w - 6, h - 6);
             }, 2, 2);
 
             const woodTex = makeScheduleTexture((ctx, w, h) => {
@@ -1239,9 +1252,11 @@
             const mechSignTex = makeSignTexture('BADABING CUSTOMS 🔧', '#0f172a', '#fa9549');
             const hobbySignTex = makeSignTexture('BADABING HOBBY & RC 🎨', '#4c1d95', '#fde047');
             const deliSignTex = makeSignTexture('BADABING ITALIAN DELI 🥪', '#14532d', '#ffffff');
+            const libSignTex = makeSignTexture('BADABING PUBLIC LIBRARY 📚', '#0f766e', '#fef08a');
+            const gymSignTex = makeSignTexture('IRON BADABING GYM 🏋️', '#1e293b', '#ef4444');
 
             // =========================================================
-            // 4. SCENE, CAMERA, 3D TENNIS RACKET & ENVIRONMENT (NO HARDCODED COURT)
+            // 4. SCENE, CAMERA, 3D TENNIS RACKET & WORLD ENVIRONMENT
             // =========================================================
             const scene = new THREE.Scene();
             scene.background = new THREE.Color(0x6897bb);
@@ -1252,7 +1267,6 @@
             camera.position.set(0, 2.2, 24);
             scene.add(camera);
 
-            // 1st-Person Tennis Racket (Automatically Appears When Standing on a Placed Tennis Court)
             const playerRacketGroup = new THREE.Group();
             const rHandle = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.035, 0.4, 10), makeAnimeMat({ color: 0x111827 }));
             const rHead = new THREE.Mesh(new THREE.TorusGeometry(0.22, 0.025, 10, 20), makeAnimeMat({ color: 0x38bdf8 }));
@@ -1335,7 +1349,7 @@
                 scene.add(roadEW);
             });
 
-            // Stylized Anime Cel-Shaded Trees
+            // Stylized Trees
             const trunkMat = makeAnimeMat({ map: woodTex });
             const leavesMat = makeAnimeMat({ color: 0x3b9c4c });
             [
@@ -1360,7 +1374,7 @@
             });
 
             // =========================================================
-            // 5. ANATOMICAL SILVERBACK GORILLA, VISITOR HALO & COMPANIONS
+            // 5. ANATOMICAL SILVERBACK GORILLA, VISITOR HALO & ANIMALS
             // =========================================================
             const npcsGroup = new THREE.Group();
             scene.add(npcsGroup);
@@ -1604,7 +1618,7 @@
                 return root;
             }
 
-            // Realistic Anatomical Silverback Gorilla Model (Used for Gorilla Gods & XL Statue)
+            // Realistic Anatomical Silverback Gorilla Model (Always Restored for Statue & Gods)
             function createRealisticSilverbackGorilla(furColorHex, scale, nameLabel, isStatue) {
                 const g = new THREE.Group();
                 const sc = scale || 1.0;
@@ -1612,9 +1626,8 @@
                 const darkFur = makeAnimeMat({ color: new THREE.Color(furColorHex || '#1f232a') });
                 const silverBackMat = makeAnimeMat({ color: isStatue ? new THREE.Color(furColorHex || '#d97706').lerp(new THREE.Color('#ffffff'), 0.25) : 0x9ca3af });
                 const skinMat = makeAnimeMat({ color: isStatue ? new THREE.Color(furColorHex || '#b45309') : 0x373a40 });
-                constamberEyeMat = new THREE.MeshBasicMaterial({ color: 0xf59e0b });
+                const amberEyeMat = new THREE.MeshBasicMaterial({ color: 0xf59e0b });
 
-                // Hunched Upper Torso & Silver Saddle Back
                 const upperTorso = new THREE.Mesh(new THREE.SphereGeometry(1.15 * sc, 24, 24), darkFur);
                 upperTorso.scale.set(1.28, 1.15, 1.05);
                 upperTorso.position.set(0, 2.35 * sc, 0.15 * sc);
@@ -1632,7 +1645,6 @@
                 pelvis.position.set(0, 1.45 * sc, -0.35 * sc);
                 g.add(pelvis);
 
-                // Sculpted Pectoral Chest Plates & Abs
                 [-0.45 * sc, 0.45 * sc].forEach(px => {
                     const pec = new THREE.Mesh(new THREE.SphereGeometry(0.55 * sc, 18, 18), skinMat);
                     pec.scale.set(1.15, 0.88, 0.65);
@@ -1640,7 +1652,6 @@
                     g.add(pec);
                 });
 
-                // Sagittal Crest Skull, Heavy Brow Ridge & Prognathic Jaw
                 const headGroup = new THREE.Group();
                 headGroup.position.set(0, 3.45 * sc, 0.55 * sc);
                 g.add(headGroup);
@@ -1664,7 +1675,6 @@
                 muzzle.position.set(0, -0.18 * sc, 0.55 * sc);
                 headGroup.add(muzzle);
 
-                // Flared Gorilla Nostrils
                 [-0.14 * sc, 0.14 * sc].forEach(nx => {
                     const nostril = new THREE.Mesh(new THREE.SphereGeometry(0.11 * sc, 12, 12), darkFur);
                     nostril.scale.set(0.9, 1.2, 0.8);
@@ -1672,14 +1682,12 @@
                     headGroup.add(nostril);
                 });
 
-                // Deep-Set Amber Eyes
                 [-0.24 * sc, 0.24 * sc].forEach(ex => {
-                    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.095 * sc, 12, 12), theamberEyeMat);
+                    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.095 * sc, 12, 12), amberEyeMat);
                     eye.position.set(ex, 0.12 * sc, 0.65 * sc);
                     headGroup.add(eye);
                 });
 
-                // Massive Deltoid Shoulders, Biceps, Forearms & Knuckle Hands
                 [-1, 1].forEach(side => {
                     const shoulder = new THREE.Mesh(new THREE.SphereGeometry(0.68 * sc, 18, 18), darkFur);
                     shoulder.scale.set(1.1, 1.0, 1.0);
@@ -1703,7 +1711,6 @@
                     g.add(knuckleFist);
                 });
 
-                // Thick Bent Hind Legs & Feet
                 [-1, 1].forEach(side => {
                     const thigh = new THREE.Mesh(new THREE.CylinderGeometry(0.46 * sc, 0.38 * sc, 1.15 * sc, 16), silverBackMat);
                     thigh.position.set(side * 0.68 * sc, 0.95 * sc, -0.35 * sc);
@@ -1735,7 +1742,6 @@
                 return g;
             }
 
-            // Floating Visitor Halo Avatar (For Visitors Who Haven't Entered PEANUT Password)
             function createVisitorHaloAvatar(nameLabel) {
                 const g = new THREE.Group();
                 const ring = new THREE.Mesh(
@@ -1768,7 +1774,7 @@
             const remoteGodMeshes = {};
 
             // =========================================================
-            // 6. PLACEABLE SPORTS COURTS, POND, HOBBY STORE & DELI
+            // 6. BUILDER FACTORY: STATUE, ARCADE, TOWER, LIBRARY, GYM, POOL, RINK
             // =========================================================
             const cityPropsGroup = new THREE.Group();
             scene.add(cityPropsGroup);
@@ -1779,6 +1785,8 @@
             let activeBasketballCourts = [];
             let activeTennisCourts = [];
             let activeSoccerCourts = [];
+            let activeIceRinks = [];
+            let activePools = [];
 
             let selectedTool = 'none';
             let selectedColor = '#8a483c';
@@ -1875,12 +1883,6 @@
                     const panel = new THREE.Mesh(new THREE.BoxGeometry(4, 2.4, 0.14), fenceMat);
                     panel.position.y = 1.2; panel.userData.isSolidWall = !isGhost;
                     group.add(panel);
-                } else if (type === 'streetlight') {
-                    const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.18, 5.5), poleMat);
-                    pole.position.y = 2.75;
-                    const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.32, 12, 12), new THREE.MeshBasicMaterial({ color: 0xfef08a }));
-                    bulb.position.set(0.8, 5.2, 0);
-                    group.add(pole, bulb);
                 } else if (type === 'sign_post') {
                     const sText = (itemData && itemData.signText) ? itemData.signText : 'WELCOME TO\nTHE BADABING';
                     const sColor = (itemData && itemData.signColor) ? itemData.signColor : '#fde047';
@@ -1896,16 +1898,122 @@
                     board.userData.interactType = 'sign';
                     board.userData.isSolidWall = !isGhost;
                     group.add(postL, postR, board);
-                } else if (type === 'basketball_court') {
-                    // Placeable Basketball Court (Basketball Spawns in Center)
-                    const cFloor = new THREE.Mesh(new THREE.BoxGeometry(28, 0.12, 18), isGhost ? ghostMat : makeAnimeMat({ color: 0xd96b27, map: concreteTex }));
-                    cFloor.position.y = 0.06;
-                    group.add(cFloor);
+                } else if (type === 'streetlight') {
+                    const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.18, 5.5), poleMat);
+                    pole.position.y = 2.75;
+                    const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.32, 12, 12), new THREE.MeshBasicMaterial({ color: 0xfef08a }));
+                    bulb.position.set(0.8, 5.2, 0);
+                    group.add(pole, bulb);
+                } else if (type === 'gorilla_statue') {
+                    // Restored XL Anatomical Silverback Statue
+                    const pedestal = new THREE.Mesh(new THREE.CylinderGeometry(3.8, 4.4, 2.2, 20), concreteMat);
+                    pedestal.position.y = 1.1; pedestal.userData.isSolidWall = !isGhost;
+                    group.add(pedestal);
+                    const giantSilverback = createRealisticSilverbackGorilla(colorHex || '#3f3f46', 2.8, null, true);
+                    giantSilverback.position.y = 2.2;
+                    group.add(giantSilverback);
+                } else if (type === 'arcade') {
+                    // Playable Retro Arcade Cabinet Unit
+                    const bodyMat = isGhost ? ghostMat : makeAnimeMat({ color: 0x4338ca });
+                    const screenGlow = isGhost ? ghostMat : new THREE.MeshBasicMaterial({ map: makeSignTexture('🕹️ RETRO ARCADE\nPRESS [F] TO PLAY', '#000000', '#facc15') });
 
+                    const cab = new THREE.Mesh(new THREE.BoxGeometry(1.4, 2.6, 1.2), bodyMat);
+                    cab.position.y = 1.3; cab.userData.isSolidWall = !isGhost; cab.userData.interactType = 'arcade';
+                    const scr = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 0.8), screenGlow);
+                    scr.position.set(0, 1.75, 0.61); scr.userData.interactType = 'arcade';
+                    const cp = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.15, 0.4), darkTrimMat);
+                    cp.position.set(0, 1.15, 0.7); cp.userData.interactType = 'arcade';
+
+                    const jStick = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.25), darkTrimMat);
+                    jStick.position.set(-0.3, 1.3, 0.65);
+                    const jBall = new THREE.Mesh(new THREE.SphereGeometry(0.08), makeAnimeMat({ color: 0xef4444 }));
+                    jBall.position.set(-0.3, 1.45, 0.65);
+                    group.add(cab, scr, cp, jStick, jBall);
+                } else if (type === 'watch_tower') {
+                    // Climbable Watch Tower (Interact with Ladder Teleports to Crow's Nest)
+                    const woodFrame = isGhost ? ghostMat : makeAnimeMat({ map: woodTex });
+                    const legs = [[-2, -2], [2, -2], [-2, 2], [2, 2]];
+                    legs.forEach(lp => {
+                        const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.26, 12, 10), woodFrame);
+                        leg.position.set(lp[0], 6, lp[1]); leg.userData.isSolidWall = !isGhost;
+                        group.add(leg);
+                    });
+                    const nest = new THREE.Mesh(new THREE.BoxGeometry(5.2, 0.4, 5.2), woodFrame);
+                    nest.position.y = 12; group.add(nest);
+
+                    const rail1 = new THREE.Mesh(new THREE.BoxGeometry(5.2, 1.2, 0.2), fenceMat); rail1.position.set(0, 12.8, -2.5);
+                    const rail2 = new THREE.Mesh(new THREE.BoxGeometry(5.2, 1.2, 0.2), fenceMat); rail2.position.set(0, 12.8, 2.5);
+                    group.add(rail1, rail2);
+
+                    const ladder = new THREE.Mesh(new THREE.BoxGeometry(0.8, 12, 0.2), isGhost ? ghostMat : makeAnimeMat({ color: 0xfacc15 }));
+                    ladder.position.set(0, 6, 2.5);
+                    ladder.userData.interactType = 'tower_ladder';
+                    ladder.userData.isSolidWall = !isGhost;
+                    group.add(ladder);
+                } else if (type === 'library') {
+                    // Public Library with Borrowable Cooking Books
+                    const tealWallMat = isGhost ? ghostMat : makeAnimeMat({ map: stuccoWallTex, color: new THREE.Color(colorHex || '#0f766e') });
+                    const floor = new THREE.Mesh(new THREE.BoxGeometry(16, 0.3, 12), concreteMat); floor.position.y = 0.15;
+                    const backW = new THREE.Mesh(new THREE.BoxGeometry(16, 4.6, 0.4), tealWallMat); backW.position.set(0, 2.3, -6); backW.userData.isSolidWall = !isGhost;
+                    const leftW = new THREE.Mesh(new THREE.BoxGeometry(0.4, 4.6, 12), tealWallMat); leftW.position.set(-8, 2.3, 0); leftW.userData.isSolidWall = !isGhost;
+                    const rightW = new THREE.Mesh(new THREE.BoxGeometry(0.4, 4.6, 12), tealWallMat); rightW.position.set(8, 2.3, 0); rightW.userData.isSolidWall = !isGhost;
+                    const frontL = new THREE.Mesh(new THREE.BoxGeometry(5.5, 4.6, 0.4), tealWallMat); frontL.position.set(-5.25, 2.3, 6); frontL.userData.isSolidWall = !isGhost;
+                    const frontR = new THREE.Mesh(new THREE.BoxGeometry(5.5, 4.6, 0.4), tealWallMat); frontR.position.set(5.25, 2.3, 6); frontR.userData.isSolidWall = !isGhost;
+
+                    // Bookshelves inside Library
+                    const bookshelf = new THREE.Mesh(new THREE.BoxGeometry(7, 3.4, 1.2), woodMat);
+                    bookshelf.position.set(0, 1.8, -5.1);
+                    bookshelf.userData.interactType = 'bookshelf';
+                    bookshelf.userData.isSolidWall = !isGhost;
+
+                    const roof = new THREE.Mesh(new THREE.BoxGeometry(17, 0.6, 13), darkTrimMat); roof.position.y = 4.9;
+                    const sign = new THREE.Mesh(new THREE.BoxGeometry(13.5, 2.2, 0.45), isGhost ? ghostMat : new THREE.MeshBasicMaterial({ map: libSignTex }));
+                    sign.position.set(0, 6.3, 6);
+                    group.add(floor, backW, leftW, rightW, frontL, frontR, bookshelf, roof, sign);
+                } else if (type === 'gym') {
+                    // Iron Badabing Gym with Bench Press & Squat Rack
+                    const darkMat = isGhost ? ghostMat : makeAnimeMat({ map: stuccoWallTex, color: new THREE.Color(colorHex || '#1e293b') });
+                    const floor = new THREE.Mesh(new THREE.BoxGeometry(16, 0.3, 12), concreteMat); floor.position.y = 0.15;
+                    const backW = new THREE.Mesh(new THREE.BoxGeometry(16, 4.5, 0.4), darkMat); backW.position.set(0, 2.25, -6); backW.userData.isSolidWall = !isGhost;
+                    const leftW = new THREE.Mesh(new THREE.BoxGeometry(0.4, 4.5, 12), darkMat); leftW.position.set(-8, 2.25, 0); leftW.userData.isSolidWall = !isGhost;
+                    const rightW = new THREE.Mesh(new THREE.BoxGeometry(0.4, 4.5, 12), darkMat); rightW.position.set(8, 2.25, 0); rightW.userData.isSolidWall = !isGhost;
+                    const frontL = new THREE.Mesh(new THREE.BoxGeometry(5.5, 4.5, 0.4), darkMat); frontL.position.set(-5.25, 2.25, 6); frontL.userData.isSolidWall = !isGhost;
+                    const frontR = new THREE.Mesh(new THREE.BoxGeometry(5.5, 4.5, 0.4), darkMat); frontR.position.set(5.25, 2.25, 6); frontR.userData.isSolidWall = !isGhost;
+
+                    // Bench Press & Barbell
+                    const bench = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.6, 2.6), darkTrimMat);
+                    bench.position.set(0, 0.3, -2);
+                    bench.userData.interactType = 'bench_press';
+                    bench.userData.isSolidWall = !isGhost;
+                    const barbell = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 2.8), isGhost ? ghostMat : makeAnimeMat({ color: 0x94a3b8 }));
+                    barbell.rotation.z = Math.PI / 2; barbell.position.set(0, 1.4, -2.8);
+
+                    const roof = new THREE.Mesh(new THREE.BoxGeometry(17, 0.6, 13), darkTrimMat); roof.position.y = 4.8;
+                    const sign = new THREE.Mesh(new THREE.BoxGeometry(12.5, 2.2, 0.45), isGhost ? ghostMat : new THREE.MeshBasicMaterial({ map: gymSignTex }));
+                    sign.position.set(0, 6.2, 6);
+                    group.add(floor, backW, leftW, rightW, frontL, frontR, bench, barbell, roof, sign);
+                } else if (type === 'swimming_pool') {
+                    // Swimming Pool with Deck, Water & Swim Physics
+                    const deck = new THREE.Mesh(new THREE.BoxGeometry(18, 0.4, 12), concreteMat);
+                    deck.position.y = 0.2; group.add(deck);
+                    const water = new THREE.Mesh(new THREE.BoxGeometry(15, 0.38, 9), isGhost ? ghostMat : new THREE.MeshStandardMaterial({ color: 0x06b6d4, roughness: 0.1, transparent: true, opacity: 0.85 }));
+                    water.position.y = 0.22;
+                    group.add(water);
+                } else if (type === 'ice_rink') {
+                    // Ice Skating Rink with Glacial Ice & Dashboards
+                    const rinkDeck = new THREE.Mesh(new THREE.BoxGeometry(24, 0.2, 16), darkTrimMat);
+                    rinkDeck.position.y = 0.1;
+                    const iceSheet = new THREE.Mesh(new THREE.BoxGeometry(22, 0.24, 14), isGhost ? ghostMat : new THREE.MeshStandardMaterial({ color: 0xe0f2fe, roughness: 0.05, metalness: 0.15 }));
+                    iceSheet.position.y = 0.14;
+                    const boards = new THREE.Mesh(new THREE.BoxGeometry(22.6, 0.9, 14.6), isGhost ? ghostMat : makeAnimeMat({ color: 0xffffff }));
+                    boards.position.y = 0.55; boards.userData.isSolidWall = !isGhost;
+                    group.add(rinkDeck, iceSheet);
+                } else if (type === 'basketball_court') {
+                    const cFloor = new THREE.Mesh(new THREE.BoxGeometry(28, 0.12, 18), isGhost ? ghostMat : makeAnimeMat({ color: 0xd96b27, map: concreteTex }));
+                    cFloor.position.y = 0.06; group.add(cFloor);
                     const lineMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
                     const centerLine = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.14, 18), lineMat);
-                    centerLine.position.y = 0.07;
-                    group.add(centerLine);
+                    centerLine.position.y = 0.07; group.add(centerLine);
 
                     [-13, 13].forEach(hx => {
                         const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 5.5), poleMat);
@@ -1918,28 +2026,17 @@
                         group.add(pole, backboard, rim);
                     });
                 } else if (type === 'tennis_court') {
-                    // Placeable Tennis Court with Net & Lines
                     const tFloor = new THREE.Mesh(new THREE.BoxGeometry(26, 0.12, 14), isGhost ? ghostMat : makeAnimeMat({ color: 0x15803d, map: concreteTex }));
-                    tFloor.position.y = 0.06;
-                    group.add(tFloor);
-
+                    tFloor.position.y = 0.06; group.add(tFloor);
                     const netPostL = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 1.4), poleMat); netPostL.position.set(0, 0.7, -6.8);
                     const netPostR = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 1.4), poleMat); netPostR.position.set(0, 0.7, 6.8);
                     const netMesh = new THREE.Mesh(new THREE.BoxGeometry(0.12, 1.05, 13.6), isGhost ? ghostMat : fenceMat);
                     netMesh.position.set(0, 0.6, 0);
-                    const netTape = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.1, 13.6), new THREE.MeshBasicMaterial({ color: 0xffffff }));
-                    netTape.position.set(0, 1.12, 0);
-                    group.add(netPostL, netPostR, netMesh, netTape);
+                    group.add(netPostL, netPostR, netMesh);
                 } else if (type === 'soccer_court') {
-                    // Placeable Soccer Pitch with Goal Posts & Nets
                     const sFloor = new THREE.Mesh(new THREE.BoxGeometry(34, 0.1, 22), isGhost ? ghostMat : makeAnimeMat({ color: 0x16a34a, map: grassTex }));
-                    sFloor.position.y = 0.05;
-                    group.add(sFloor);
-
+                    sFloor.position.y = 0.05; group.add(sFloor);
                     const whiteMat = isGhost ? ghostMat : makeAnimeMat({ color: 0xffffff });
-                    const midLine = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.12, 22), whiteMat); midLine.position.y = 0.06;
-                    group.add(midLine);
-
                     [-16, 16].forEach(gx => {
                         const post1 = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 3.0), whiteMat); post1.position.set(gx, 1.5, -3.2);
                         const post2 = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 3.0), whiteMat); post2.position.set(gx, 1.5, 3.2);
@@ -1950,40 +2047,13 @@
                         group.add(post1, post2, crossbar, netBack);
                     });
                 } else if (type === 'pond') {
-                    // Placeable Nature Pond with Lily Pads, Reeds, Rocks & Koi Fish
                     const bank = new THREE.Mesh(new THREE.CylinderGeometry(7.2, 7.6, 0.25, 24), isGhost ? ghostMat : makeAnimeMat({ color: 0x785a3c }));
                     bank.scale.set(1.3, 1, 1.0); bank.position.y = 0.12;
                     const water = new THREE.Mesh(new THREE.CylinderGeometry(6.6, 6.6, 0.28, 24), isGhost ? ghostMat : new THREE.MeshStandardMaterial({ color: 0x0ea5e9, roughness: 0.1, transparent: true, opacity: 0.88 }));
                     water.scale.set(1.3, 1, 1.0); water.position.y = 0.15;
                     water.userData.isSolidWall = !isGhost;
                     group.add(bank, water);
-
-                    // Shoreline Rocks
-                    for (let r = 0; r < 14; r++) {
-                        const ang = (r / 14) * Math.PI * 2;
-                        const rock = new THREE.Mesh(new THREE.DodecahedronGeometry(0.65 + (r % 3) * 0.2, 0), concreteMat);
-                        rock.position.set(Math.cos(ang) * 9.0, 0.35, Math.sin(ang) * 6.8);
-                        group.add(rock);
-                    }
-
-                    // Lily Pads & Lotus Flowers
-                    [[-2.5, 1.5], [1.8, -2.0], [3.5, 1.2], [-1.0, -3.2]].forEach(lp => {
-                        const pad = new THREE.Mesh(new THREE.CylinderGeometry(0.65, 0.65, 0.05, 14), makeAnimeMat({ color: 0x22c55e }));
-                        pad.position.set(lp[0], 0.3, lp[1]);
-                        const flower = new THREE.Mesh(new THREE.ConeGeometry(0.22, 0.28, 8), makeAnimeMat({ color: 0xf472b6 }));
-                        flower.position.set(lp[0], 0.42, lp[1]);
-                        group.add(pad, flower);
-                    });
-
-                    // Koi Fish
-                    [[-1.2, 0.5], [2.2, -0.4], [0.4, 2.0]].forEach(kf => {
-                        const koi = new THREE.Mesh(new THREE.SphereGeometry(0.22, 10, 10), makeAnimeMat({ color: 0xf97316 }));
-                        koi.scale.set(2.2, 0.6, 0.8);
-                        koi.position.set(kf[0], 0.26, kf[1]);
-                        group.add(koi);
-                    });
                 } else if (type === 'hobby_store') {
-                    // Placeable Hobby & RC Store
                     const purpleWallMat = isGhost ? ghostMat : makeAnimeMat({ map: stuccoWallTex, color: new THREE.Color(colorHex || '#5b21b6') });
                     const yellowTrim = isGhost ? ghostMat : makeAnimeMat({ color: 0xfacc15 });
                     const floor = new THREE.Mesh(new THREE.BoxGeometry(16, 0.3, 12), concreteMat); floor.position.y = 0.15;
@@ -1992,16 +2062,11 @@
                     const rightW = new THREE.Mesh(new THREE.BoxGeometry(0.4, 4.6, 12), purpleWallMat); rightW.position.set(8, 2.3, 0); rightW.userData.isSolidWall = !isGhost;
                     const frontL = new THREE.Mesh(new THREE.BoxGeometry(5.5, 4.6, 0.4), purpleWallMat); frontL.position.set(-5.25, 2.3, 6); frontL.userData.isSolidWall = !isGhost;
                     const frontR = new THREE.Mesh(new THREE.BoxGeometry(5.5, 4.6, 0.4), purpleWallMat); frontR.position.set(5.25, 2.3, 6); frontR.userData.isSolidWall = !isGhost;
-
-                    // Display Shelving & RC Display Table Inside
-                    const shelfL = new THREE.Mesh(new THREE.BoxGeometry(1.2, 3.2, 8), woodMat); shelfL.position.set(-6.8, 1.7, -1);
-                    const rcTable = new THREE.Mesh(new THREE.BoxGeometry(5.5, 1.0, 3.0), yellowTrim); rcTable.position.set(2.0, 0.65, -1.5);
                     const roof = new THREE.Mesh(new THREE.BoxGeometry(17, 0.6, 13), yellowTrim); roof.position.y = 4.9;
                     const sign = new THREE.Mesh(new THREE.BoxGeometry(11.5, 2.2, 0.45), isGhost ? ghostMat : new THREE.MeshBasicMaterial({ map: hobbySignTex }));
                     sign.position.set(0, 6.3, 6);
-                    group.add(floor, backW, leftW, rightW, frontL, frontR, shelfL, rcTable, roof, sign);
+                    group.add(floor, backW, leftW, rightW, frontL, frontR, roof, sign);
                 } else if (type === 'deli') {
-                    // Placeable Neighborhood Italian Deli
                     const brickMat = isGhost ? ghostMat : makeAnimeMat({ map: stuccoWallTex, color: new THREE.Color(colorHex || '#991b1b') });
                     const greenAwningMat = isGhost ? ghostMat : makeAnimeMat({ color: 0x15803d });
                     const floor = new THREE.Mesh(new THREE.BoxGeometry(16, 0.3, 12), concreteMat); floor.position.y = 0.15;
@@ -2010,65 +2075,34 @@
                     const rightW = new THREE.Mesh(new THREE.BoxGeometry(0.4, 4.5, 12), brickMat); rightW.position.set(8, 2.25, 0); rightW.userData.isSolidWall = !isGhost;
                     const frontL = new THREE.Mesh(new THREE.BoxGeometry(5.5, 4.5, 0.4), brickMat); frontL.position.set(-5.25, 2.25, 6); frontL.userData.isSolidWall = !isGhost;
                     const frontR = new THREE.Mesh(new THREE.BoxGeometry(5.5, 4.5, 0.4), brickMat); frontR.position.set(5.25, 2.25, 6); frontR.userData.isSolidWall = !isGhost;
-
-                    // Glass Deli Counter & Awning
-                    const deliCase = new THREE.Mesh(new THREE.BoxGeometry(9, 1.3, 1.4), isGhost ? ghostMat : glassMat);
-                    deliCase.position.set(0, 0.8, -2.5);
-                    const awning = new THREE.Mesh(new THREE.BoxGeometry(16.4, 0.8, 2.4), greenAwningMat);
-                    awning.position.set(0, 3.6, 7.0); awning.rotation.x = 0.25;
                     const roof = new THREE.Mesh(new THREE.BoxGeometry(17, 0.6, 13), greenAwningMat); roof.position.y = 4.8;
                     const sign = new THREE.Mesh(new THREE.BoxGeometry(11.5, 2.2, 0.45), isGhost ? ghostMat : new THREE.MeshBasicMaterial({ map: deliSignTex }));
                     sign.position.set(0, 6.2, 6);
-                    group.add(floor, backW, leftW, rightW, frontL, frontR, deliCase, awning, roof, sign);
+                    group.add(floor, backW, leftW, rightW, frontL, frontR, roof, sign);
                 } else if (type === 'computer_desk') {
                     const deskTop = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.14, 1.2), woodMat);
                     deskTop.position.y = 1.1; deskTop.userData.isSolidWall = !isGhost; deskTop.userData.interactType = 'computer';
                     const legL = new THREE.Mesh(new THREE.BoxGeometry(0.14, 1.1, 1.1), trimMat); legL.position.set(-0.95, 0.55, 0);
                     const legR = new THREE.Mesh(new THREE.BoxGeometry(0.14, 1.1, 1.1), trimMat); legR.position.set(0.95, 0.55, 0);
-
                     const monitorBezel = new THREE.Mesh(new THREE.BoxGeometry(1.25, 0.85, 0.1), trimMat);
                     monitorBezel.position.set(0, 1.68, -0.25); monitorBezel.userData.interactType = 'computer';
-
                     const screenTex = makeSignTexture('🌐 CLICK [F]\nINTERNET PC', '#0284c7', '#ffffff');
                     const screen = new THREE.Mesh(new THREE.PlaneGeometry(1.15, 0.72), isGhost ? ghostMat : new THREE.MeshBasicMaterial({ map: screenTex }));
                     screen.position.set(0, 1.68, -0.19); screen.userData.interactType = 'computer';
-
-                    const tower = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.75, 0.75), trimMat);
-                    tower.position.set(0.78, 1.5, -0.1); tower.userData.interactType = 'computer';
-
-                    group.add(deskTop, legL, legR, monitorBezel, screen, tower);
+                    group.add(deskTop, legL, legR, monitorBezel, screen);
                 } else if (type === 'mechanic_shop') {
                     const shopWallMat = isGhost ? ghostMat : makeAnimeMat({ map: stuccoWallTex, color: new THREE.Color(colorHex || '#334155') });
                     const redMetalMat = isGhost ? ghostMat : makeAnimeMat({ color: 0xdc2626 });
-                    const yellowLiftMat = isGhost ? ghostMat : makeAnimeMat({ color: 0xfacc15 });
-
                     const floor = new THREE.Mesh(new THREE.BoxGeometry(20, 0.3, 16), concreteMat); floor.position.y = 0.15;
-                    group.add(floor);
-
                     const backW = new THREE.Mesh(new THREE.BoxGeometry(20, 6, 0.45), shopWallMat); backW.position.set(0, 3, -8); backW.userData.isSolidWall = !isGhost;
                     const leftW = new THREE.Mesh(new THREE.BoxGeometry(0.45, 6, 16), shopWallMat); leftW.position.set(-10, 3, 0); leftW.userData.isSolidWall = !isGhost;
                     const rightW = new THREE.Mesh(new THREE.BoxGeometry(0.45, 6, 16), shopWallMat); rightW.position.set(10, 3, 0); rightW.userData.isSolidWall = !isGhost;
-
                     const frontL = new THREE.Mesh(new THREE.BoxGeometry(5.5, 6, 0.45), shopWallMat); frontL.position.set(-7.25, 3, 8); frontL.userData.isSolidWall = !isGhost;
                     const frontR = new THREE.Mesh(new THREE.BoxGeometry(5.5, 6, 0.45), shopWallMat); frontR.position.set(7.25, 3, 8); frontR.userData.isSolidWall = !isGhost;
-                    const bayHeader = new THREE.Mesh(new THREE.BoxGeometry(9.0, 1.5, 0.5), redMetalMat); bayHeader.position.set(0, 5.25, 8);
-
-                    const rolledDoor = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 8.8, 12), trimMat);
-                    rolledDoor.rotation.z = Math.PI / 2; rolledDoor.position.set(0, 4.4, 7.7);
-
-                    const liftPostL = new THREE.Mesh(new THREE.BoxGeometry(0.45, 4.2, 0.45), yellowLiftMat); liftPostL.position.set(-2.6, 2.1, -1.5); liftPostL.userData.isSolidWall = !isGhost;
-                    const liftPostR = new THREE.Mesh(new THREE.BoxGeometry(0.45, 4.2, 0.45), yellowLiftMat); liftPostR.position.set(2.6, 2.1, -1.5); liftPostR.userData.isSolidWall = !isGhost;
-                    const rampL = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.18, 5.2), redMetalMat); rampL.position.set(-1.5, 1.2, -1.5);
-                    const rampR = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.18, 5.2), redMetalMat); rampR.position.set(1.5, 1.2, -1.5);
-
-                    const toolChest = new THREE.Mesh(new THREE.BoxGeometry(3.2, 1.6, 1.1), redMetalMat);
-                    toolChest.position.set(-7.5, 0.95, -5.8); toolChest.userData.isSolidWall = !isGhost;
-
                     const roof = new THREE.Mesh(new THREE.BoxGeometry(20.8, 0.5, 16.8), redMetalMat); roof.position.y = 6.25;
                     const sign = new THREE.Mesh(new THREE.BoxGeometry(13, 2.4, 0.5), isGhost ? ghostMat : new THREE.MeshBasicMaterial({ map: mechSignTex }));
                     sign.position.set(0, 7.7, 8);
-
-                    group.add(backW, leftW, rightW, frontL, frontR, bayHeader, rolledDoor, liftPostL, liftPostR, rampL, rampR, toolChest, roof, sign);
+                    group.add(floor, backW, leftW, rightW, frontL, frontR, roof, sign);
                 } else if (type === 'mcdonalds') {
                     const redMat = isGhost ? ghostMat : makeAnimeMat({ map: stuccoWallTex, color: new THREE.Color(colorHex || '#b91c1c') });
                     const yellowMat = isGhost ? ghostMat : makeAnimeMat({ color: 0xfacc15 });
@@ -2079,9 +2113,8 @@
                     const frontL = new THREE.Mesh(new THREE.BoxGeometry(5.5, 4.5, 0.4), redMat); frontL.position.set(-5.25, 2.25, 6); frontL.userData.isSolidWall = !isGhost;
                     const frontR = new THREE.Mesh(new THREE.BoxGeometry(5.5, 4.5, 0.4), redMat); frontR.position.set(5.25, 2.25, 6); frontR.userData.isSolidWall = !isGhost;
                     const roof = new THREE.Mesh(new THREE.BoxGeometry(17, 0.6, 13), yellowMat); roof.position.y = 4.8;
-                    const counter = new THREE.Mesh(new THREE.BoxGeometry(8, 1.2, 1.2), yellowMat); counter.position.set(0, 0.6, -2.5);
                     const sign = new THREE.Mesh(new THREE.BoxGeometry(10, 2.2, 0.4), isGhost ? ghostMat : new THREE.MeshBasicMaterial({ map: mcdSignTex })); sign.position.set(0, 6.2, 6);
-                    group.add(floor, backW, leftW, rightW, frontL, frontR, roof, counter, sign);
+                    group.add(floor, backW, leftW, rightW, frontL, frontR, roof, sign);
                 } else if (type === 'walmart') {
                     const blueMat = isGhost ? ghostMat : makeAnimeMat({ map: concreteTex, color: new THREE.Color(colorHex || '#1d4ed8') });
                     const floor = new THREE.Mesh(new THREE.BoxGeometry(24, 0.3, 18), concreteMat); floor.position.y = 0.15;
@@ -2093,54 +2126,23 @@
                     const roof = new THREE.Mesh(new THREE.BoxGeometry(25, 0.6, 19), concreteMat); roof.position.y = 6.3;
                     const sign = new THREE.Mesh(new THREE.BoxGeometry(14, 2.6, 0.5), isGhost ? ghostMat : new THREE.MeshBasicMaterial({ map: walmartSignTex })); sign.position.set(0, 8.0, 9);
                     group.add(floor, backW, leftW, rightW, frontL, frontR, roof, sign);
-                } else if (type === 'gorilla_statue') {
-                    // Realistic Anatomical XL Silverback Gorilla Statue on Tiered Plinth
-                    const pedestal = new THREE.Mesh(new THREE.CylinderGeometry(3.8, 4.4, 2.2, 20), concreteMat);
-                    pedestal.position.y = 1.1; pedestal.userData.isSolidWall = !isGhost;
-                    group.add(pedestal);
-                    const giantSilverback = createRealisticSilverbackGorilla(colorHex || '#3f3f46', 2.8, null, true);
-                    giantSilverback.position.y = 2.2;
-                    group.add(giantSilverback);
                 } else if (type === 'merchant') {
                     const skinIdx = (itemData && typeof itemData.merchantSkin === 'number') ? itemData.merchantSkin : 0;
                     const skin = MERCHANT_SKINS[skinIdx % MERCHANT_SKINS.length];
-
                     const counter = new THREE.Mesh(new THREE.BoxGeometry(3.6, 1.05, 1.3), woodMat);
-                    counter.position.set(0, 0.52, 0.85);
-                    counter.userData.isSolidWall = !isGhost;
-                    counter.userData.interactType = 'merchant';
-                    group.add(counter);
-
-                    const postL = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 3.2), poleMat); postL.position.set(-1.6, 1.6, 0.8);
-                    const postR = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 3.2), poleMat); postR.position.set(1.6, 1.6, 0.8);
+                    counter.position.set(0, 0.52, 0.85); counter.userData.isSolidWall = !isGhost; counter.userData.interactType = 'merchant';
                     const canopy = new THREE.Mesh(new THREE.ConeGeometry(2.8, 1.2, 4), isGhost ? ghostMat : makeAnimeMat({ color: skin.hat }));
                     canopy.position.set(0, 3.5, 0.4); canopy.rotation.y = Math.PI / 4;
-                    group.add(postL, postR, canopy);
-
-                    const animalVendor = createCuteAnimeAnimalMesh(skin.species, null, 0.65, {
-                        hatColor: skin.hat,
-                        apronColor: skin.apron
-                    });
+                    const animalVendor = createCuteAnimeAnimalMesh(skin.species, null, 0.65, { hatColor: skin.hat, apronColor: skin.apron });
                     animalVendor.position.set(0, 0, -0.35);
-                    animalVendor.traverse(c => {
-                        if (c.isMesh) c.userData.interactType = 'merchant';
-                    });
-                    group.add(animalVendor);
-
-                    const shopTitle = (itemData && itemData.merchantName) ? itemData.merchantName : skin.name;
-                    const signTex = makeSignTexture('🏪 ' + shopTitle, '#111318', '#4ade80');
-                    const sign = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 0.65), new THREE.MeshBasicMaterial({ map: signTex, side: THREE.DoubleSide }));
-                    sign.position.set(0, 2.85, 1.5);
-                    sign.userData.noOutline = true;
-                    group.add(sign);
+                    animalVendor.traverse(c => { if (c.isMesh) c.userData.interactType = 'merchant'; });
+                    group.add(counter, canopy, animalVendor);
                 } else if (type === 'fountain') {
                     const basin = new THREE.Mesh(new THREE.CylinderGeometry(3.2, 3.5, 0.8, 20), concreteMat);
                     basin.position.y = 0.4; basin.userData.isSolidWall = !isGhost;
-                    const waterMat = isGhost ? ghostMat : new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.1, transparent: true, opacity: 0.85 });
-                    const water = new THREE.Mesh(new THREE.CylinderGeometry(2.9, 2.9, 0.65, 20), waterMat); water.position.y = 0.45;
-                    const pillar = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.7, 2.4, 16), concreteMat); pillar.position.y = 1.2;
-                    const topBowl = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 0.6, 0.5, 16), waterMat); topBowl.position.y = 2.4;
-                    group.add(basin, water, pillar, topBowl);
+                    const water = new THREE.Mesh(new THREE.CylinderGeometry(2.9, 2.9, 0.65, 20), isGhost ? ghostMat : new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.1, transparent: true, opacity: 0.85 }));
+                    water.position.y = 0.45;
+                    group.add(basin, water);
                 } else if (type === 'mailbox') {
                     const post = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 1.4), poleMat); post.position.y = 0.7;
                     const box = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.65, 1.1), isGhost ? ghostMat : makeAnimeMat({ color: baseColor }));
@@ -2154,17 +2156,7 @@
                     const frame = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.6, 3.6), woodMat); frame.position.y = 0.3;
                     const mattress = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.35, 3.3), isGhost ? ghostMat : makeAnimeMat({ color: baseColor }));
                     mattress.position.y = 0.7; mattress.userData.interactType = 'bed';
-                    const pillow = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.25, 0.7), makeAnimeMat({ color: 0xffffff }));
-                    pillow.position.set(0, 0.95, -1.1);
-                    group.add(frame, mattress, pillow);
-
-                    if (!isGhost && itemData && itemData.assignedTo) {
-                        const tagTex = makeSignTexture('🛏️ ' + itemData.assignedTo, '#1e1b4b', '#fde047');
-                        const tag = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 0.45), new THREE.MeshBasicMaterial({ map: tagTex, side: THREE.DoubleSide }));
-                        tag.position.set(0, 1.65, 0);
-                        tag.userData.noOutline = true;
-                        group.add(tag);
-                    }
+                    group.add(frame, mattress);
                 }
 
                 if (!isGhost) applyAnimeInkOutlines(group);
@@ -2172,7 +2164,7 @@
             }
 
             // =========================================================
-            // 7. DYNAMIC SPORTS BALLS FOR PLACED COURTS & PERSISTENCE
+            // 7. REHYDRATE WORLD & SYNC
             // =========================================================
             let worldDataList = [];
 
@@ -2182,6 +2174,8 @@
                 activeBasketballCourts = [];
                 activeTennisCourts = [];
                 activeSoccerCourts = [];
+                activeIceRinks = [];
+                activePools = [];
 
                 worldDataList = list;
                 pieceCountEl.innerText = list.length;
@@ -2193,7 +2187,6 @@
                     mesh.userData = Object.assign(mesh.userData || {}, item);
                     cityPropsGroup.add(mesh);
 
-                    // Spawn Playable Sport Ball in Center of Placed Court
                     const rad = THREE.MathUtils.degToRad(item.rot || 0);
                     const cosR = Math.cos(rad);
                     const sinR = Math.sin(rad);
@@ -2208,51 +2201,29 @@
                             y: (item.y || 0) + 3.85,
                             z: item.z - lx * sinR
                         }));
-                        activeBasketballCourts.push({
-                            item,
-                            mesh: bMesh,
-                            held: false,
-                            pos: bMesh.position.clone(),
-                            vel: new THREE.Vector3(0, 0, 0),
-                            cooldown: 0,
-                            scored: false,
-                            rims
-                        });
+                        activeBasketballCourts.push({ item, mesh: bMesh, held: false, pos: bMesh.position.clone(), vel: new THREE.Vector3(), cooldown: 0, scored: false, rims });
                     } else if (item.type === 'tennis_court') {
                         const tMesh = new THREE.Mesh(new THREE.SphereGeometry(0.24, 14, 14), new THREE.MeshBasicMaterial({ color: 0xd9f99d }));
                         tMesh.position.set(item.x, (item.y || 0) + 0.35, item.z);
                         dynamicSportBallsGroup.add(tMesh);
-
-                        activeTennisCourts.push({
-                            item,
-                            mesh: tMesh,
-                            pos: tMesh.position.clone(),
-                            vel: new THREE.Vector3(0, 0, 0),
-                            lastCrossSign: 0
-                        });
+                        activeTennisCourts.push({ item, mesh: tMesh, pos: tMesh.position.clone(), vel: new THREE.Vector3() });
                     } else if (item.type === 'soccer_court') {
                         const sMesh = new THREE.Mesh(new THREE.SphereGeometry(0.46, 18, 18), makeAnimeMat({ map: soccerBallTex }));
                         sMesh.position.set(item.x, (item.y || 0) + 0.5, item.z);
                         dynamicSportBallsGroup.add(sMesh);
-
-                        const goals = [-16, 16].map(gx => ({
-                            x: item.x + gx * cosR,
-                            z: item.z - gx * sinR
-                        }));
-                        activeSoccerCourts.push({
-                            item,
-                            mesh: sMesh,
-                            pos: sMesh.position.clone(),
-                            vel: new THREE.Vector3(0, 0, 0),
-                            goals
-                        });
+                        const goals = [-16, 16].map(gx => ({ x: item.x + gx * cosR, z: item.z - gx * sinR }));
+                        activeSoccerCourts.push({ item, mesh: sMesh, pos: sMesh.position.clone(), vel: new THREE.Vector3(), goals });
+                    } else if (item.type === 'ice_rink') {
+                        activeIceRinks.push({ item, rad });
+                    } else if (item.type === 'swimming_pool') {
+                        activePools.push({ item, rad });
                     }
                 });
             }
 
             async function pushWorldToServer() {
                 pieceCountEl.innerText = worldDataList.length;
-                localStorage.setItem('badabing_world_v7', JSON.stringify(worldDataList));
+                localStorage.setItem('badabing_world_v8', JSON.stringify(worldDataList));
                 try {
                     await fetch('/api/world', {
                         method: 'POST',
@@ -2270,8 +2241,8 @@
             }
 
             async function initWorldAndRehydrate() {
-                const localItemsRaw = localStorage.getItem('badabing_world_v7') || localStorage.getItem('badabing_world_v6');
-                const localNpcsRaw = localStorage.getItem('badabing_npcs_v7') || localStorage.getItem('badabing_npcs_v6');
+                const localItemsRaw = localStorage.getItem('badabing_world_v8') || localStorage.getItem('badabing_world_v7');
+                const localNpcsRaw = localStorage.getItem('badabing_npcs_v8') || localStorage.getItem('badabing_npcs_v7');
                 let localItems = [];
                 let localNpcs = [];
                 try { if (localItemsRaw) localItems = JSON.parse(localItemsRaw); } catch (e) {}
@@ -2295,12 +2266,10 @@
                         } else {
                             rebuildSceneFromData(serverItems);
                             if (serverItems.length > 0) {
-                                localStorage.setItem('badabing_world_v7', JSON.stringify(serverItems));
+                                localStorage.setItem('badabing_world_v8', JSON.stringify(serverItems));
                             }
                         }
-                        if (serverNpcs.length > 0) {
-                            syncNpcsClient(serverNpcs);
-                        }
+                        if (serverNpcs.length > 0) syncNpcsClient(serverNpcs);
                         return;
                     }
                 } catch (e) {}
@@ -2309,13 +2278,12 @@
             }
             initWorldAndRehydrate();
 
-            // Playable Sports Trigger [G] or 🏆 Button
+            // Sports Action Trigger [G] or 🏆 Button
             function triggerSportAction() {
                 const lookDir = new THREE.Vector3();
                 camera.getWorldDirection(lookDir);
                 lookDir.normalize();
 
-                // 1. Shoot Held Basketball in Facing Direction
                 for (let i = 0; i < activeBasketballCourts.length; i++) {
                     const bc = activeBasketballCourts[i];
                     if (bc.held) {
@@ -2330,11 +2298,9 @@
                     }
                 }
 
-                // 2. Swing Tennis Racket to Hit Nearby Tennis Ball Over Net
                 for (let i = 0; i < activeTennisCourts.length; i++) {
                     const tc = activeTennisCourts[i];
-                    const dist = Math.hypot(camera.position.x - tc.pos.x, camera.position.z - tc.pos.z);
-                    if (dist < 4.5) {
+                    if (Math.hypot(camera.position.x - tc.pos.x, camera.position.z - tc.pos.z) < 4.5) {
                         playerRacketGroup.rotation.x = -0.8;
                         setTimeout(() => { playerRacketGroup.rotation.x = 0.25; }, 180);
                         tc.vel.set(lookDir.x * 19.0, 6.8, lookDir.z * 19.0);
@@ -2347,98 +2313,24 @@
                     }
                 }
 
-                // 3. Power Kick Nearby Soccer Ball Toward Facing Direction
                 for (let i = 0; i < activeSoccerCourts.length; i++) {
                     const sc = activeSoccerCourts[i];
-                    const dist = Math.hypot(camera.position.x - sc.pos.x, camera.position.z - sc.pos.z);
-                    if (dist < 3.6) {
+                    if (Math.hypot(camera.position.x - sc.pos.x, camera.position.z - sc.pos.z) < 3.6) {
                         sc.vel.set(lookDir.x * 22.0, 3.8, lookDir.z * 22.0);
                         return;
                     }
                 }
             }
 
-            document.getElementById('btn-sport-action').addEventListener('click', (e) => {
-                e.stopPropagation();
-                triggerSportAction();
-            });
-            document.getElementById('btn-mob-shoot').addEventListener('touchstart', (e) => {
-                e.preventDefault(); e.stopPropagation();
-                triggerSportAction();
-            });
+            document.getElementById('btn-sport-action').addEventListener('click', (e) => { e.stopPropagation(); triggerSportAction(); });
+            document.getElementById('btn-mob-shoot').addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); triggerSportAction(); });
 
             // =========================================================
-            // 8. COMPANION ROSTER, MIND PANEL & DIRECT "WAVE" INTERACTION
+            // 8. COMPANION ROSTER & DIRECT "WAVE" INTERACTION
             // =========================================================
-            function renderCompanionManagerRoster() {
-                const container = document.getElementById('companion-roster-list');
-                if (!container || document.getElementById('companion-manager-modal').style.display !== 'block') return;
-
-                container.innerHTML = npcList.map(n => {
-                    const spec = ANIMAL_CATALOG.find(a => a.id === n.species) || ANIMAL_CATALOG[0];
-                    const isPeanut = n.id === 'peanut';
-                    return `
-                        <div class="comp-row">
-                            <div>
-                                <strong style="color:#fde047;font-size:13px;">${spec.icon} ${n.name}</strong>
-                                <span style="color:#94a3b8;font-size:11px;">(${spec.label}) • Pos: (${Math.round(n.x)}, ${Math.round(n.z)}) • 💰 $${n.wallet ?? 200}</span><br>
-                                <span style="font-size:11px;color:#cbd5e1;">Mood: <strong style="color:#4ade80;">${n.mood}</strong> | Bag: ${(n.inventory || []).length} items | ${n.activity}</span>
-                            </div>
-                            <div style="display:flex;gap:6px;">
-                                <button class="mini-ui-btn mgr-feed-btn" data-id="${n.id}">🍔 Feed</button>
-                                <button class="mini-ui-btn mgr-focus-btn" data-id="${n.id}">🎒 Bag</button>
-                                ${!isPeanut ? `<button class="mini-ui-btn mgr-del-btn" data-id="${n.id}" style="background:#ef4444;color:#fff;">🗑️ Delete</button>` : `<span style="font-size:10px;color:#94a3b8;padding:4px;">👑 Founder</span>`}
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-
-                container.querySelectorAll('.mgr-feed-btn').forEach(btn => {
-                    btn.addEventListener('click', async () => {
-                        const res = await fetch('/api/npcs/action', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ npcId: btn.getAttribute('data-id'), actionType: 'feed' })
-                        });
-                        if (res.ok) {
-                            const d = await res.json();
-                            if (d.npcs) syncNpcsClient(d.npcs);
-                        }
-                    });
-                });
-
-                container.querySelectorAll('.mgr-focus-btn').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        selectedNpcId = btn.getAttribute('data-id');
-                        document.getElementById('npc-selector').value = selectedNpcId;
-                        document.getElementById('companion-manager-modal').style.display = 'none';
-                        document.getElementById('companion-mind-panel').style.display = 'block';
-                        syncNpcsClient(npcList);
-                    });
-                });
-
-                container.querySelectorAll('.mgr-del-btn').forEach(btn => {
-                    btn.addEventListener('click', async () => {
-                        const targetId = btn.getAttribute('data-id');
-                        const res = await fetch('/api/npcs/delete', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ id: targetId })
-                        });
-                        if (res.ok) {
-                            const d = await res.json();
-                            if (d.npcs) {
-                                if (selectedNpcId === targetId) selectedNpcId = 'peanut';
-                                syncNpcsClient(d.npcs);
-                            }
-                        }
-                    });
-                });
-            }
-
             function syncNpcsClient(serverNpcs) {
                 npcList = serverNpcs;
-                localStorage.setItem('badabing_npcs_v7', JSON.stringify(serverNpcs));
+                localStorage.setItem('badabing_npcs_v8', JSON.stringify(serverNpcs));
 
                 const sel = document.getElementById('npc-selector');
                 const currentVal = sel.value || selectedNpcId;
@@ -2504,11 +2396,11 @@
                     const bagGrid = document.getElementById('mind-bag-grid');
                     const bagItems = Array.isArray(activeNpc.inventory) ? activeNpc.inventory : [];
                     if (bagItems.length === 0) {
-                        bagGrid.innerHTML = `<div style="grid-column:span 3;color:#94a3b8;font-size:11px;padding:6px;">Bag is empty — buy treats at an Animal Merchant!</div>`;
+                        bagGrid.innerHTML = `<div style="grid-column:span 3;color:#94a3b8;font-size:11px;padding:6px;">Bag is empty.</div>`;
                     } else {
                         bagGrid.innerHTML = bagItems.map((it, idx) => `
-                            <div class="bag-item-chip" data-idx="${idx}" title="Click to consume/use">
-                                <strong>${it}</strong><br><span style="font-size:9px;color:#4ade80;">[Click to Use]</span>
+                            <div class="bag-item-chip" data-idx="${idx}" title="Click to use">
+                                <strong>${it}</strong><br><span style="font-size:9px;color:#4ade80;">[Use Item]</span>
                             </div>
                         `).join('');
                         bagGrid.querySelectorAll('.bag-item-chip').forEach(chip => {
@@ -2530,8 +2422,6 @@
                         });
                     }
                 }
-
-                renderCompanionManagerRoster();
             }
 
             document.getElementById('npc-selector').addEventListener('change', (e) => {
@@ -2552,22 +2442,7 @@
                 }
             });
 
-            const compMgrModal = document.getElementById('companion-manager-modal');
-            document.getElementById('btn-toggle-manager').addEventListener('click', (e) => {
-                e.stopPropagation();
-                const open = compMgrModal.style.display === 'block';
-                compMgrModal.style.display = open ? 'none' : 'block';
-                if (!open) {
-                    if (controls.isLocked) controls.unlock();
-                    renderCompanionManagerRoster();
-                }
-            });
-            document.getElementById('btn-close-manager').addEventListener('click', (e) => {
-                e.stopPropagation();
-                compMgrModal.style.display = 'none';
-            });
-
-            // Co-op Polling Interval (Renders Floating Halo Visitors & Silverback Gorilla Gods)
+            // Co-op Polling
             setInterval(async () => {
                 try {
                     const res = await fetch('/api/coop/sync', {
@@ -2580,7 +2455,8 @@
                             z: +(camera.position.z).toFixed(2),
                             rotY: +(camera.rotation.y).toFixed(2),
                             isFlying: isFlyingMode,
-                            isGod: isGodUnlocked
+                            isGod: isGodUnlocked,
+                            customName: customGodName
                         })
                     });
                     if (!res.ok) return;
@@ -2600,7 +2476,7 @@
                         data.gods.forEach(g => {
                             if (g.id === myGodId) return;
                             activeIds.add(g.id);
-                            const modeKey = g.isGod ? 'gorilla' : 'halo';
+                            const modeKey = (g.isGod ? 'gorilla_' : 'halo_') + g.name;
                             if (!remoteGodMeshes[g.id] || remoteGodMeshes[g.id].userData.modeKey !== modeKey) {
                                 if (remoteGodMeshes[g.id]) coopGodsGroup.remove(remoteGodMeshes[g.id]);
                                 const av = g.isGod
@@ -2621,9 +2497,7 @@
                         });
                     }
 
-                    if (Array.isArray(data.npcs)) {
-                        syncNpcsClient(data.npcs);
-                    }
+                    if (Array.isArray(data.npcs)) syncNpcsClient(data.npcs);
 
                     if (typeof data.worldCount === 'number' && data.worldCount !== worldDataList.length) {
                         initWorldAndRehydrate();
@@ -2632,7 +2506,7 @@
             }, 350);
 
             // =========================================================
-            // 9. MIND PANEL, COMPANION SPAWNER & FLY PHYSICS TOGGLE
+            // 9. UI TOGGLES, ARCADE & BUILD MENU
             // =========================================================
             const mindPanel = document.getElementById('companion-mind-panel');
             document.getElementById('btn-toggle-mind').addEventListener('click', (e) => {
@@ -2640,13 +2514,27 @@
                 mindPanel.style.display = mindPanel.style.display === 'block' ? 'none' : 'block';
             });
             document.getElementById('btn-close-mind').addEventListener('click', (e) => {
-                e.stopPropagation();
-                mindPanel.style.display = 'none';
+                e.stopPropagation(); mindPanel.style.display = 'none';
             });
             document.getElementById('btn-live-chat').addEventListener('click', (e) => {
                 e.stopPropagation();
                 const activeNpc = npcList.find(n => n.id === selectedNpcId) || npcList[0];
                 alert(`💬 Live AI Chat with ${activeNpc ? activeNpc.name : 'Peanut'} is ready to be hooked up next!`);
+            });
+
+            // Playable Retro Arcade Controls
+            const arcadeModal = document.getElementById('arcade-modal');
+            const arcadeIframe = document.getElementById('arcade-iframe');
+            document.getElementById('btn-close-arcade').addEventListener('click', (e) => {
+                e.stopPropagation();
+                arcadeModal.style.display = 'none';
+                arcadeIframe.src = 'about:blank';
+            });
+            document.querySelectorAll('.arcade-game-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    arcadeIframe.src = btn.getAttribute('data-url');
+                });
             });
 
             ['feed', 'rest', 'cheer'].forEach(act => {
@@ -2666,9 +2554,9 @@
 
             document.getElementById('btn-spawn-companion').addEventListener('click', async (e) => {
                 e.stopPropagation();
-                const nameInput = document.getElementById('new-companion-name');
+                const nameInp = document.getElementById('new-companion-name');
                 const specObj = ANIMAL_CATALOG.find(a => a.id === selectedAnimalSpecies) || ANIMAL_CATALOG[0];
-                const chosenName = (nameInput.value || '').trim() || ('Cute ' + specObj.label);
+                const chosenName = (nameInp.value || '').trim() || ('Cute ' + specObj.label);
 
                 const pt = getSnappedBuildPoint() || { x: camera.position.x, z: camera.position.z - 5 };
                 const res = await fetch('/api/npcs/spawn', {
@@ -2683,7 +2571,7 @@
                 });
                 if (res.ok) {
                     const data = await res.json();
-                    nameInput.value = '';
+                    nameInp.value = '';
                     if (data.npcs) {
                         selectedNpcId = data.companion.id;
                         syncNpcsClient(data.npcs);
@@ -2705,9 +2593,6 @@
                 flyBtn.classList.toggle('active', isFlyingMode);
             });
 
-            // =========================================================
-            // 10. BUILD MENU TABS, COLOR SWATCHES & HOLOGRAM
-            // =========================================================
             function updateGhostPreview() {
                 if (ghostMesh) {
                     scene.remove(ghostMesh);
@@ -2798,7 +2683,7 @@
             });
 
             // =========================================================
-            // 11. INTERACTIONS: COMPANION "WAVE", DOORS, PC, SIGNS & SHOPS
+            // 10. INTERACTIONS: WAVE, ARCADE, TOWER, BOOKS, DOORS
             // =========================================================
             const raycaster = new THREE.Raycaster();
             const centerScreen = new THREE.Vector2(0, 0);
@@ -2806,59 +2691,10 @@
             const objectModal = document.getElementById('object-modal');
             const modalTitle = document.getElementById('modal-title');
             const modalContent = document.getElementById('modal-content');
-            const pcModal = document.getElementById('computer-browser-modal');
-            const browserIframe = document.getElementById('browser-iframe');
-            const browserUrlInput = document.getElementById('browser-url-bar');
             let currentHoveredInteract = null;
-            let activeComputerItem = null;
 
             document.getElementById('close-modal-btn').addEventListener('click', (e) => {
-                e.stopPropagation();
-                objectModal.style.display = 'none';
-            });
-
-            function navigateInGameBrowser(rawUrl) {
-                let url = (rawUrl || '').trim();
-                if (!url) return;
-                if (!url.startsWith('http://') && !url.startsWith('https://')) {
-                    url = 'https://' + url;
-                }
-                browserUrlInput.value = url;
-                browserIframe.src = url;
-                if (activeComputerItem) {
-                    activeComputerItem.lastUrl = url;
-                    fetch('/api/world/update-item', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ id: activeComputerItem.id, lastUrl: url })
-                    });
-                }
-            }
-
-            document.getElementById('btn-browser-go').addEventListener('click', (e) => {
-                e.stopPropagation();
-                navigateInGameBrowser(browserUrlInput.value);
-            });
-            browserUrlInput.addEventListener('keydown', (e) => {
-                e.stopPropagation();
-                if (e.key === 'Enter') navigateInGameBrowser(browserUrlInput.value);
-            });
-            document.getElementById('btn-browser-ext').addEventListener('click', (e) => {
-                e.stopPropagation();
-                let url = browserUrlInput.value.trim();
-                if (!url.startsWith('http')) url = 'https://' + url;
-                window.open(url, '_blank', 'noopener,noreferrer');
-            });
-            document.getElementById('btn-browser-close').addEventListener('click', (e) => {
-                e.stopPropagation();
-                pcModal.style.display = 'none';
-                browserIframe.src = 'about:blank';
-            });
-            document.querySelectorAll('.bm-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    navigateInGameBrowser(btn.getAttribute('data-url'));
-                });
+                e.stopPropagation(); objectModal.style.display = 'none';
             });
 
             function findRootPieceGroup(obj) {
@@ -2870,7 +2706,6 @@
             function checkInteractiveTarget() {
                 raycaster.setFromCamera(centerScreen, camera);
 
-                // First check direct companion interaction ("Wave")
                 const npcHits = raycaster.intersectObjects(npcsGroup.children, true);
                 if (npcHits.length > 0 && npcHits[0].distance < 9.5) {
                     const npcId = npcHits[0].object.userData.npcId;
@@ -2878,12 +2713,11 @@
                     if (foundNpc) {
                         currentHoveredInteract = { interactType: 'companion', npc: foundNpc };
                         promptEl.style.display = 'block';
-                        promptEl.innerHTML = `Press <span>[F]</span> or <span>🖐️</span> to Interact with <span>${foundNpc.name}</span>`;
+                        promptEl.innerHTML = `Press <span>[F]</span> to Wave at <span>${foundNpc.name}</span>`;
                         return;
                     }
                 }
 
-                // Then check world structures
                 const hits = raycaster.intersectObjects(cityPropsGroup.children, true);
                 if (hits.length > 0 && hits[0].distance < 11) {
                     let obj = hits[0].object;
@@ -2893,12 +2727,16 @@
                         const rootGroup = findRootPieceGroup(hits[0].object);
                         currentHoveredInteract = { interactType, rootGroup };
                         promptEl.style.display = 'block';
-                        if (interactType === 'door') promptEl.innerHTML = 'Press <span>[F]</span> or <span>🖐️</span> to Open / Close Door';
-                        else if (interactType === 'inventory') promptEl.innerHTML = 'Press <span>[F]</span> or <span>🖐️</span> to Open 10-Slot Storage';
-                        else if (interactType === 'bed') promptEl.innerHTML = 'Press <span>[F]</span> or <span>🖐️</span> to Assign Bed Owner';
-                        else if (interactType === 'merchant') promptEl.innerHTML = 'Press <span>[F]</span> or <span>🖐️</span> to Trade with Animal Merchant';
-                        else if (interactType === 'sign') promptEl.innerHTML = 'Press <span>[F]</span> or <span>🖐️</span> to Edit Sign Text';
-                        else if (interactType === 'computer') promptEl.innerHTML = 'Press <span>[F]</span> or <span>🖐️</span> to Use Internet Computer';
+                        if (interactType === 'arcade') promptEl.innerHTML = 'Press <span>[F]</span> to Play Retro Arcade';
+                        else if (interactType === 'tower_ladder') promptEl.innerHTML = 'Press <span>[F]</span> to Climb Watch Tower';
+                        else if (interactType === 'bookshelf') promptEl.innerHTML = 'Press <span>[F]</span> to Browse & Read Books';
+                        else if (interactType === 'bench_press') promptEl.innerHTML = 'Press <span>[F]</span> to Work Out (Pump Iron)';
+                        else if (interactType === 'door') promptEl.innerHTML = 'Press <span>[F]</span> to Open / Close Door';
+                        else if (interactType === 'merchant') promptEl.innerHTML = 'Press <span>[F]</span> to Trade with Merchant';
+                        else if (interactType === 'sign') promptEl.innerHTML = 'Press <span>[F]</span> to Edit Sign';
+                        else if (interactType === 'computer') promptEl.innerHTML = 'Press <span>[F]</span> to Use Internet PC';
+                        else if (interactType === 'bed') promptEl.innerHTML = 'Press <span>[F]</span> to Assign Bed';
+                        else if (interactType === 'inventory') promptEl.innerHTML = 'Press <span>[F]</span> to Open Storage';
                         return;
                     }
                 }
@@ -2910,61 +2748,9 @@
                 if (!currentHoveredInteract) return;
                 const { interactType, rootGroup, npc } = currentHoveredInteract;
 
+                // 1. Direct Companion 1-Second Wave
                 if (interactType === 'companion' && npc) {
-                    if (controls.isLocked) controls.unlock();
-                    openCompanionDirectModal(npc);
-                    return;
-                }
-
-                const itemData = worldDataList.find(it => it.id === rootGroup.userData.id);
-                if (!itemData) return;
-
-                if (interactType === 'door') {
-                    itemData.isOpen = !itemData.isOpen;
-                    rebuildSceneFromData(worldDataList);
-                    localStorage.setItem('badabing_world_v7', JSON.stringify(worldDataList));
-                    await fetch('/api/world/update-item', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ id: itemData.id, isOpen: itemData.isOpen })
-                    });
-                } else if (interactType === 'inventory') {
-                    if (controls.isLocked) controls.unlock();
-                    openInventoryModal(itemData);
-                } else if (interactType === 'bed') {
-                    if (controls.isLocked) controls.unlock();
-                    openBedModal(itemData);
-                } else if (interactType === 'merchant') {
-                    if (controls.isLocked) controls.unlock();
-                    openMerchantModal(itemData);
-                } else if (interactType === 'sign') {
-                    if (controls.isLocked) controls.unlock();
-                    openSignEditorModal(itemData);
-                } else if (interactType === 'computer') {
-                    if (controls.isLocked) controls.unlock();
-                    activeComputerItem = itemData;
-                    pcModal.style.display = 'flex';
-                    navigateInGameBrowser(itemData.lastUrl || 'https://en.m.wikipedia.org/wiki/Giant_panda');
-                }
-            }
-
-            // Direct Companion Interaction Modal (Currently: "👋 Wave")
-            function openCompanionDirectModal(npc) {
-                const spec = ANIMAL_CATALOG.find(a => a.id === npc.species) || ANIMAL_CATALOG[0];
-                modalTitle.innerText = `${spec.icon} Interact with ${npc.name}`;
-                modalContent.innerHTML = `
-                    <p style="font-size:12px;color:#cbd5e1;margin:0 0 12px 0;">
-                        Mood: <strong style="color:#fde047;">${npc.mood}</strong> • Activity: <strong style="color:#4ade80;">${npc.activity}</strong>
-                    </p>
-                    <button class="mini-ui-btn" id="btn-direct-wave" style="width:100%;padding:12px;font-size:14px;background:#4ade80;color:#111;font-weight:900;">
-                        👋 Wave at ${npc.name}
-                    </button>
-                `;
-                objectModal.style.display = 'block';
-
-                document.getElementById('btn-direct-wave').addEventListener('click', async () => {
-                    objectModal.style.display = 'none';
-                    const res = await fetch('/api/npcs/action', {
+                    await fetch('/api/npcs/action', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -2974,253 +2760,73 @@
                             playerZ: camera.position.z
                         })
                     });
-                    if (res.ok) {
-                        const d = await res.json();
-                        if (d.npcs) syncNpcsClient(d.npcs);
-                    }
-                });
-            }
-
-            function openSignEditorModal(itemData) {
-                modalTitle.innerText = '🪧 Customize Structure Sign Text';
-                const curText = itemData.signText || 'WELCOME TO\nTHE BADABING';
-                const curColor = itemData.signColor || '#fde047';
-                const curBg = itemData.signBg || '#111318';
-
-                modalContent.innerHTML = `
-                    <div style="margin-bottom:10px;">
-                        <label style="font-size:11px;color:#94a3b8;display:block;margin-bottom:4px;">Sign Text (Supports up to 2 lines):</label>
-                        <textarea id="sign-text-input" class="merchant-input" rows="2" style="width:100%;font-size:14px;font-weight:bold;">${curText}</textarea>
-                    </div>
-                    <div style="display:flex;gap:12px;margin-bottom:12px;">
-                        <div style="flex:1;">
-                            <label style="font-size:11px;color:#94a3b8;display:block;margin-bottom:4px;">Text Color:</label>
-                            <input type="color" id="sign-color-input" value="${curColor}" style="width:100%;height:34px;border:none;background:none;cursor:pointer;" />
-                        </div>
-                        <div style="flex:1;">
-                            <label style="font-size:11px;color:#94a3b8;display:block;margin-bottom:4px;">Board Background:</label>
-                            <input type="color" id="sign-bg-input" value="${curBg}" style="width:100%;height:34px;border:none;background:none;cursor:pointer;" />
-                        </div>
-                    </div>
-                    <button class="mini-ui-btn" id="btn-save-sign" style="width:100%;padding:10px;background:#fa9549;color:#111;font-weight:900;">💾 Update 3D Sign</button>
-                `;
-                objectModal.style.display = 'block';
-
-                document.getElementById('btn-save-sign').addEventListener('click', async () => {
-                    itemData.signText = document.getElementById('sign-text-input').value || 'SIGN';
-                    itemData.signColor = document.getElementById('sign-color-input').value || '#fde047';
-                    itemData.signBg = document.getElementById('sign-bg-input').value || '#111318';
-                    rebuildSceneFromData(worldDataList);
-                    localStorage.setItem('badabing_world_v7', JSON.stringify(worldDataList));
-                    objectModal.style.display = 'none';
-                    await fetch('/api/world/update-item', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            id: itemData.id,
-                            signText: itemData.signText,
-                            signColor: itemData.signColor,
-                            signBg: itemData.signBg
-                        })
-                    });
-                });
-            }
-
-            function openInventoryModal(itemData) {
-                if (!Array.isArray(itemData.inventory)) itemData.inventory = new Array(10).fill('');
-                modalTitle.innerText = (itemData.type === 'mailbox' ? '📫 Mailbox' : '🗄️ Storage Locker') + ' (10 Slots)';
-                const sampleItems = ['🍔 Burger', '🥪 Deli Sub', '🏎️ RC Car', '🛠️ Wrench', '💎 Gem', '✉️ Letter'];
-                let html = '<div class="inv-grid">';
-                for (let i = 0; i < 10; i++) {
-                    const val = itemData.inventory[i] || '';
-                    html += `<div class="inv-slot" data-slot="${i}">
-                        <span style="color:#94a3b8;font-size:9px;">Slot ${i + 1}</span>
-                        <strong style="color:#f8fafc;margin-top:3px;">${val || 'Empty'}</strong>
-                    </div>`;
+                    const d = await (await fetch('/api/world')).json();
+                    if (d.npcs) syncNpcsClient(d.npcs);
+                    return;
                 }
-                html += '</div><div style="display:flex;gap:6px;flex-wrap:wrap;">';
-                sampleItems.forEach(st => {
-                    html += `<button class="mini-ui-btn add-inv-btn" data-item="${st}">+ ${st}</button>`;
-                });
-                html += '</div>';
-                modalContent.innerHTML = html;
-                objectModal.style.display = 'block';
 
-                modalContent.querySelectorAll('.inv-slot').forEach(slotEl => {
-                    slotEl.addEventListener('click', async () => {
-                        const idx = Number(slotEl.getAttribute('data-slot'));
-                        itemData.inventory[idx] = '';
-                        openInventoryModal(itemData);
-                        localStorage.setItem('badabing_world_v7', JSON.stringify(worldDataList));
-                        await fetch('/api/world/update-item', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ id: itemData.id, inventory: itemData.inventory })
-                        });
-                    });
-                });
+                const itemData = worldDataList.find(it => it.id === rootGroup.userData.id);
+                if (!itemData) return;
 
-                modalContent.querySelectorAll('.add-inv-btn').forEach(btn => {
-                    btn.addEventListener('click', async () => {
-                        const emptyIdx = itemData.inventory.findIndex(v => !v);
-                        if (emptyIdx !== -1) {
-                            itemData.inventory[emptyIdx] = btn.getAttribute('data-item');
-                            openInventoryModal(itemData);
-                            localStorage.setItem('badabing_world_v7', JSON.stringify(worldDataList));
-                            await fetch('/api/world/update-item', {
+                if (interactType === 'arcade') {
+                    if (controls.isLocked) controls.unlock();
+                    arcadeModal.style.display = 'flex';
+                    arcadeIframe.src = 'https://funhtml5games.com/donkeykong/index.html';
+                } else if (interactType === 'tower_ladder') {
+                    // Teleport up to Watch Tower Crow's Nest!
+                    camera.position.set(itemData.x, (itemData.y || 0) + 13.5, itemData.z);
+                    verticalVelocity = 0;
+                } else if (interactType === 'bench_press') {
+                    // Pump iron workout
+                    alert('🏋️ You pumped iron on the bench press! Energy & Speed boosted!');
+                    camera.position.y += 0.5;
+                } else if (interactType === 'bookshelf') {
+                    // Library Cooking & Recipe Books
+                    if (controls.isLocked) controls.unlock();
+                    modalTitle.innerText = '📚 Badabing Library — Cooking & Recipe Books';
+                    modalContent.innerHTML = `
+                        <p style="font-size:12px;color:#cbd5e1;margin-bottom:10px;">Select a recipe book to check out into your bag:</p>
+                        <div style="display:flex;flex-direction:column;gap:8px;">
+                            <button class="mini-ui-btn lib-book-btn" data-title="📖 Gourmet Burger & Fries Secrets">🍔 Gourmet Burger & Fries Secrets</button>
+                            <button class="mini-ui-btn lib-book-btn" data-title="📖 Italian Deli Sandwiches Masterclass">🥪 Italian Deli Sandwiches Masterclass</button>
+                            <button class="mini-ui-btn lib-book-btn" data-title="📖 Sweet Boba & Dessert Recipes">🧋 Sweet Boba & Dessert Recipes</button>
+                            <button class="mini-ui-btn lib-book-btn" data-title="📖 Organic Bamboo Cuisine for Pandas">🎋 Organic Bamboo Cuisine for Pandas</button>
+                        </div>
+                    `;
+                    objectModal.style.display = 'block';
+
+                    modalContent.querySelectorAll('.lib-book-btn').forEach(btn => {
+                        btn.addEventListener('click', async () => {
+                            const bTitle = btn.getAttribute('data-title');
+                            await fetch('/api/npcs/action', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ id: itemData.id, inventory: itemData.inventory })
+                                body: JSON.stringify({ npcId: selectedNpcId, actionType: 'add_book', itemName: bTitle })
                             });
-                        }
-                    });
-                });
-            }
-
-            function openBedModal(itemData) {
-                modalTitle.innerText = '🛌 Assign Bed to Companion or God';
-                const companionNames = npcList.map(n => n.name);
-                const owners = [...companionNames, 'Gorilla God 1', 'Gorilla God 2', 'Gorilla God 3', 'Gorilla God 4', 'Unassigned'];
-                let html = `<p style="font-size:12px;color:#cbd5e1;margin-bottom:10px;">Current Owner: <strong style="color:#fde047;">${itemData.assignedTo || 'Unassigned'}</strong></p><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;">`;
-                owners.forEach(ow => {
-                    html += `<button class="mini-ui-btn assign-bed-btn" data-owner="${ow}" style="padding:9px;">Assign to ${ow}</button>`;
-                });
-                html += '</div>';
-                modalContent.innerHTML = html;
-                objectModal.style.display = 'block';
-
-                modalContent.querySelectorAll('.assign-bed-btn').forEach(btn => {
-                    btn.addEventListener('click', async () => {
-                        const chosen = btn.getAttribute('data-owner');
-                        itemData.assignedTo = chosen === 'Unassigned' ? null : chosen;
-                        rebuildSceneFromData(worldDataList);
-                        localStorage.setItem('badabing_world_v7', JSON.stringify(worldDataList));
-                        objectModal.style.display = 'none';
-                        await fetch('/api/world/update-item', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ id: itemData.id, assignedTo: itemData.assignedTo })
-                        });
-                    });
-                });
-            }
-
-            function openMerchantModal(itemData) {
-                if (typeof itemData.merchantSkin !== 'number') itemData.merchantSkin = 0;
-                if (!Array.isArray(itemData.shopItems) || itemData.shopItems.length === 0) {
-                    itemData.shopItems = [
-                        { name: '🐼 Bamboo Ramen Bowl', price: 12 },
-                        { name: '🥪 Deli Pastrami Hero', price: 14 },
-                        { name: '🏎️ Hobby RC Drift Car', price: 35 },
-                        { name: '🧋 Anime Boba Tea', price: 8 }
-                    ];
-                }
-
-                modalTitle.innerText = '🏪 Animal Merchant Shop & Skin Editor';
-                const currentNpc = npcList.find(n => n.id === selectedNpcId) || npcList[0];
-
-                let html = `
-                    <div style="margin-bottom:10px;">
-                        <label style="font-size:11px;color:#94a3b8;display:block;margin-bottom:4px;">Choose Animal Shopkeeper Skin (10 Animals):</label>
-                        <select id="merchant-skin-select" class="merchant-input" style="width:100%;padding:6px;">
-                            ${MERCHANT_SKINS.map((sk, idx) => `<option value="${idx}" ${itemData.merchantSkin === idx ? 'selected' : ''}>Skin #${idx + 1}: ${sk.name} (${sk.species.toUpperCase()})</option>`).join('')}
-                        </select>
-                    </div>
-                    <div style="margin-bottom:10px;">
-                        <label style="font-size:11px;color:#94a3b8;display:block;margin-bottom:4px;">Select Companion Buyer (Uses their Wallet & Bag):</label>
-                        <select id="merchant-buyer-select" class="merchant-input" style="width:100%;padding:6px;color:#fde047;font-weight:bold;">
-                            ${npcList.map(n => `<option value="${n.id}" ${n.id === (currentNpc && currentNpc.id) ? 'selected' : ''}>${n.name} (${n.species}) — Wallet: $${n.wallet ?? 200}</option>`).join('')}
-                        </select>
-                    </div>
-                    <div style="font-size:11px;color:#38bdf8;font-weight:bold;margin-bottom:6px;">Editable Shop Inventory & Prices:</div>
-                    <div id="merchant-items-container">
-                        ${itemData.shopItems.map((it, i) => `
-                            <div class="merchant-item-row">
-                                <input type="text" class="merchant-input edit-item-name" data-idx="${i}" value="${it.name}" style="flex:1;" />
-                                <span style="font-size:11px;color:#94a3b8;">$</span>
-                                <input type="number" class="merchant-input edit-item-price" data-idx="${i}" value="${it.price}" style="width:58px;" />
-                                <button class="mini-ui-btn buy-item-btn" data-idx="${i}" style="background:#4ade80;color:#111;font-weight:bold;">🛍️ Buy</button>
-                            </div>
-                        `).join('')}
-                    </div>
-                    <div style="display:flex;justify-content:space-between;margin-top:10px;">
-                        <button class="mini-ui-btn" id="btn-add-shop-row">➕ Add Item</button>
-                        <button class="mini-ui-btn" id="btn-save-merchant" style="background:#fa9549;color:#111;font-weight:bold;">💾 Save Shop Changes</button>
-                    </div>
-                `;
-                modalContent.innerHTML = html;
-                objectModal.style.display = 'block';
-
-                document.getElementById('merchant-skin-select').addEventListener('change', async (e) => {
-                    itemData.merchantSkin = Number(e.target.value);
-                    itemData.merchantName = MERCHANT_SKINS[itemData.merchantSkin].name;
-                    rebuildSceneFromData(worldDataList);
-                    localStorage.setItem('badabing_world_v7', JSON.stringify(worldDataList));
-                    await fetch('/api/world/update-item', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            id: itemData.id,
-                            merchantSkin: itemData.merchantSkin,
-                            merchantName: itemData.merchantName
-                        })
-                    });
-                });
-
-                document.getElementById('btn-add-shop-row').addEventListener('click', () => {
-                    itemData.shopItems.push({ name: '✨ Mystery Treat', price: 10 });
-                    openMerchantModal(itemData);
-                });
-
-                document.getElementById('btn-save-merchant').addEventListener('click', async () => {
-                    const nameInputs = modalContent.querySelectorAll('.edit-item-name');
-                    const priceInputs = modalContent.querySelectorAll('.edit-item-price');
-                    itemData.shopItems = Array.from(nameInputs).map((inp, idx) => ({
-                        name: inp.value,
-                        price: Number(priceInputs[idx].value) || 0
-                    }));
-                    localStorage.setItem('badabing_world_v7', JSON.stringify(worldDataList));
-                    await fetch('/api/world/update-item', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ id: itemData.id, shopItems: itemData.shopItems })
-                    });
-                    openMerchantModal(itemData);
-                });
-
-                modalContent.querySelectorAll('.buy-item-btn').forEach(btn => {
-                    btn.addEventListener('click', async () => {
-                        const idx = Number(btn.getAttribute('data-idx'));
-                        const nameInputs = modalContent.querySelectorAll('.edit-item-name');
-                        const priceInputs = modalContent.querySelectorAll('.edit-item-price');
-                        const chosenItemName = nameInputs[idx].value;
-                        const chosenPrice = Number(priceInputs[idx].value) || 0;
-                        const buyerId = document.getElementById('merchant-buyer-select').value;
-
-                        const res = await fetch('/api/npcs/action', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                npcId: buyerId,
-                                actionType: 'buy',
-                                itemName: chosenItemName,
-                                itemPrice: chosenPrice
-                            })
-                        });
-                        if (res.ok) {
-                            const d = await res.json();
+                            objectModal.style.display = 'none';
+                            alert('📘 Checked out "' + bTitle + '"! Added to ' + (selectedNpcId === 'peanut' ? 'Peanut' : 'companion') + '\'s bag.');
+                            const d = await (await fetch('/api/world')).json();
                             if (d.npcs) syncNpcsClient(d.npcs);
-                            openMerchantModal(itemData);
-                        } else {
-                            const err = await res.json();
-                            alert(err.error || 'Not enough funds in companion wallet!');
-                        }
+                        });
                     });
-                });
+                } else if (interactType === 'door') {
+                    itemData.isOpen = !itemData.isOpen;
+                    rebuildSceneFromData(worldDataList);
+                    localStorage.setItem('badabing_world_v8', JSON.stringify(worldDataList));
+                    await fetch('/api/world/update-item', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id: itemData.id, isOpen: itemData.isOpen })
+                    });
+                } else if (interactType === 'computer') {
+                    if (controls.isLocked) controls.unlock();
+                    document.getElementById('computer-browser-modal').style.display = 'flex';
+                    document.getElementById('browser-iframe').src = itemData.lastUrl || 'https://en.m.wikipedia.org/wiki/Giant_panda';
+                }
             }
 
             // =========================================================
-            // 12. PLACE / DISMANTLE & SOLID WALL COLLISIONS
+            // 11. FIXED ITEM PLACEMENT & RAYCASTING SYSTEM
             // =========================================================
             function getSnappedBuildPoint() {
                 raycaster.setFromCamera(centerScreen, camera);
@@ -3271,8 +2877,7 @@
                             lastUrl: 'https://en.m.wikipedia.org/wiki/Giant_panda',
                             shopItems: [
                                 { name: '🐼 Bamboo Ramen Bowl', price: 12 },
-                                { name: '🥪 Deli Pastrami Hero', price: 14 },
-                                { name: '🏎️ Hobby RC Drift Car', price: 35 }
+                                { name: '🥪 Deli Pastrami Hero', price: 14 }
                             ]
                         };
                         worldDataList.push(newItem);
@@ -3282,6 +2887,7 @@
                 }
             }
 
+            // Solid Wall & Bounds Collision
             const collisionRay = new THREE.Raycaster();
             function canMoveTo(oldPos, newPos) {
                 const moveVec = new THREE.Vector3().subVectors(newPos, oldPos);
@@ -3301,7 +2907,7 @@
             }
 
             // =========================================================
-            // 13. DESKTOP, GAMEPAD & ZERO-TWIST MOBILE CONTROLS
+            // 12. DESKTOP, GAMEPAD & TOUCH LISTENERS
             // =========================================================
             const controls = new THREE.PointerLockControls(camera, document.body);
             const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
@@ -3316,6 +2922,7 @@
                     e.target.closest('#companion-mind-panel') ||
                     e.target.closest('#companion-manager-modal') ||
                     e.target.closest('#computer-browser-modal') ||
+                    e.target.closest('#arcade-modal') ||
                     e.target.closest('#object-modal') ||
                     e.target.closest('#sports-hud') ||
                     e.target.closest('#mobile-controls')
@@ -3363,9 +2970,7 @@
                 if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') keys.shift = false;
             });
 
-            if (isTouchDevice) {
-                document.getElementById('mobile-controls').style.display = 'block';
-            }
+            if (isTouchDevice) document.getElementById('mobile-controls').style.display = 'block';
             document.getElementById('btn-forward').addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); keys.w = true; });
             document.getElementById('btn-forward').addEventListener('touchend', (e) => { e.preventDefault(); e.stopPropagation(); keys.w = false; });
             document.getElementById('btn-backward').addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); keys.s = true; });
@@ -3381,31 +2986,13 @@
             document.getElementById('btn-place').addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); executeBuildAction(); });
             document.getElementById('btn-interact').addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); triggerInteraction(); });
 
-            let lookTouchId = null;
-            let lastLookX = 0;
-            let lastLookY = 0;
-
+            let lookTouchId = null, lastLookX = 0, lastLookY = 0;
             window.addEventListener('touchstart', (e) => {
-                if (
-                    e.target.closest('#build-menu-modal') ||
-                    e.target.closest('#toggle-build-btn') ||
-                    e.target.closest('#top-status-banner') ||
-                    e.target.closest('#password-modal') ||
-                    e.target.closest('#companion-bar') ||
-                    e.target.closest('#companion-mind-panel') ||
-                    e.target.closest('#companion-manager-modal') ||
-                    e.target.closest('#computer-browser-modal') ||
-                    e.target.closest('#object-modal') ||
-                    e.target.closest('#sports-hud') ||
-                    e.target.closest('.mob-btn')
-                ) return;
-
+                if (e.target.closest('#build-menu-modal, #toggle-build-btn, #top-status-banner, #password-modal, #companion-bar, #companion-mind-panel, #companion-manager-modal, #computer-browser-modal, #arcade-modal, #object-modal, #sports-hud, .mob-btn')) return;
                 for (let i = 0; i < e.changedTouches.length; i++) {
                     if (lookTouchId === null) {
                         const t = e.changedTouches[i];
-                        lookTouchId = t.identifier;
-                        lastLookX = t.clientX;
-                        lastLookY = t.clientY;
+                        lookTouchId = t.identifier; lastLookX = t.clientX; lastLookY = t.clientY;
                         break;
                     }
                 }
@@ -3416,11 +3003,8 @@
                 for (let i = 0; i < e.changedTouches.length; i++) {
                     const t = e.changedTouches[i];
                     if (t.identifier === lookTouchId) {
-                        const dx = t.clientX - lastLookX;
-                        const dy = t.clientY - lastLookY;
-                        lastLookX = t.clientX;
-                        lastLookY = t.clientY;
-
+                        const dx = t.clientX - lastLookX; const dy = t.clientY - lastLookY;
+                        lastLookX = t.clientX; lastLookY = t.clientY;
                         camera.rotation.order = 'YXZ';
                         camera.rotation.y -= dx * 0.0055;
                         camera.rotation.x = Math.max(-Math.PI * 0.44, Math.min(Math.PI * 0.44, camera.rotation.x - dy * 0.0055));
@@ -3433,87 +3017,14 @@
             function endLookTouch(e) {
                 if (lookTouchId === null) return;
                 for (let i = 0; i < e.changedTouches.length; i++) {
-                    if (e.changedTouches[i].identifier === lookTouchId) {
-                        lookTouchId = null;
-                        break;
-                    }
+                    if (e.changedTouches[i].identifier === lookTouchId) { lookTouchId = null; break; }
                 }
             }
             window.addEventListener('touchend', endLookTouch);
             window.addEventListener('touchcancel', endLookTouch);
 
-            // Gamepad Controller Support
-            const allBuildTypes = [
-                'none', 'foundation', 'wall', 'doorway', 'window', 'stairs',
-                'roof_flat', 'roof_pitched', 'fence', 'sign_post', 'streetlight',
-                'basketball_court', 'tennis_court', 'soccer_court', 'pond', 'hobby_store', 'deli',
-                'mechanic_shop', 'computer_desk', 'merchant', 'mcdonalds', 'walmart', 'gorilla_statue',
-                'fountain', 'mailbox', 'locker', 'bed', 'delete'
-            ];
-            let prevGpButtons = {};
-
-            function pollGamepad(delta) {
-                const pads = navigator.getGamepads ? navigator.getGamepads() : [];
-                const gp = pads[0];
-                const ind = document.getElementById('gamepad-indicator');
-                if (!gp) {
-                    ind.innerText = '🎮 No Pad';
-                    ind.style.color = '#94a3b8';
-                    return;
-                }
-                ind.innerText = '🎮 Pad On';
-                ind.style.color = '#4ade80';
-
-                const deadzone = 0.18;
-                const lx = Math.abs(gp.axes[0]) > deadzone ? gp.axes[0] : 0;
-                const ly = Math.abs(gp.axes[1]) > deadzone ? gp.axes[1] : 0;
-                const rx = Math.abs(gp.axes[2]) > deadzone ? gp.axes[2] : 0;
-                const ry = Math.abs(gp.axes[3]) > deadzone ? gp.axes[3] : 0;
-
-                camera.rotation.order = 'YXZ';
-                camera.rotation.y -= rx * 2.4 * delta;
-                camera.rotation.x = Math.max(-Math.PI * 0.44, Math.min(Math.PI * 0.44, camera.rotation.x - ry * 2.0 * delta));
-                camera.rotation.z = 0;
-
-                if (lx !== 0 || ly !== 0) {
-                    const dir = new THREE.Vector3();
-                    camera.getWorldDirection(dir);
-                    dir.y = 0; dir.normalize();
-                    const side = new THREE.Vector3(-dir.z, 0, dir.x);
-                    const nextPos = camera.position.clone();
-                    nextPos.addScaledVector(dir, -ly * 20 * delta);
-                    nextPos.addScaledVector(side, -lx * 20 * delta);
-                    if (canMoveTo(camera.position, nextPos)) camera.position.copy(nextPos);
-                }
-
-                if (gp.buttons[0]?.pressed || gp.buttons[5]?.pressed) {
-                    if (isFlyingMode) camera.position.y += 18 * delta;
-                    else if (camera.position.y <= 2.25) verticalVelocity = 9.5;
-                }
-                if (isFlyingMode && (gp.buttons[1]?.pressed || gp.buttons[4]?.pressed)) {
-                    camera.position.y = Math.max(2.2, camera.position.y - 18 * delta);
-                }
-
-                const tap = (idx) => gp.buttons[idx]?.pressed && !prevGpButtons[idx];
-                if (tap(3)) toggleBuildMenu();
-                if (tap(2)) triggerInteraction();
-                if (tap(6)) triggerSportAction();
-                if (tap(7)) executeBuildAction();
-                if (isGodUnlocked) {
-                    if (tap(12)) { buildElevation = Math.min(40, buildElevation + 4); updateGhostPreview(); }
-                    if (tap(13)) { buildElevation = Math.max(0, buildElevation - 4); updateGhostPreview(); }
-                    if (tap(14)) { buildRotation = (buildRotation + 90) % 360; updateGhostPreview(); }
-                    if (tap(15)) {
-                        const idx = (allBuildTypes.indexOf(selectedTool) + 1) % allBuildTypes.length;
-                        selectBuildTool(allBuildTypes[idx]);
-                    }
-                }
-
-                gp.buttons.forEach((b, i) => { prevGpButtons[i] = b.pressed; });
-            }
-
             // =========================================================
-            // 14. MAIN ANIMATION LOOP (SPORTS COURTS + WAVING + PHYSICS)
+            // 13. ANIMATION LOOP: POOL SWIM, ICE SKATE, SPORTS & ROAMING
             // =========================================================
             const targetXEl = document.getElementById('target-x');
             const targetZEl = document.getElementById('target-z');
@@ -3521,15 +3032,15 @@
             const sportsHudText = document.getElementById('sports-hud-text');
             const clock = new THREE.Clock();
 
+            let playerSlideVelocity = new THREE.Vector2(0, 0);
+
             function animate() {
                 requestAnimationFrame(animate);
                 const delta = Math.min(0.1, clock.getDelta());
                 const elapsed = clock.getElapsedTime();
 
                 camera.rotation.z = 0;
-
                 checkInteractiveTarget();
-                pollGamepad(delta);
 
                 const snapPt = getSnappedBuildPoint();
                 if (snapPt) {
@@ -3541,22 +3052,37 @@
                     }
                 }
 
-                let showSportsBar = false;
-                let nearAnyTennisCourt = false;
+                // Swimming Pool & Ice Rink Detection
+                let inPool = false;
+                let onIce = false;
 
-                // 1. Update All Placed Basketball Courts & Balls
+                activePools.forEach(p => {
+                    if (Math.abs(camera.position.x - p.item.x) < 7.5 && Math.abs(camera.position.z - p.item.z) < 4.5 && camera.position.y < 3.2) {
+                        inPool = true;
+                    }
+                });
+
+                activeIceRinks.forEach(r => {
+                    if (Math.abs(camera.position.x - r.item.x) < 11.0 && Math.abs(camera.position.z - r.item.z) < 7.0 && camera.position.y <= 2.35) {
+                        onIce = true;
+                    }
+                });
+
+                let showSportsBar = false;
+                let nearTennis = false;
+
+                // Update Placed Sports Balls
                 activeBasketballCourts.forEach(bc => {
                     if (bc.cooldown > 0) bc.cooldown -= delta;
                     if (bc.held) {
                         showSportsBar = true;
-                        sportsHudText.innerText = '🏀 Dribbling Basketball!';
+                        sportsHudText.innerText = '🏀 Dribbling Ball! Shoot [G]';
                         const forward = new THREE.Vector3();
                         camera.getWorldDirection(forward);
                         forward.y = 0; forward.normalize();
                         const bounce = Math.abs(Math.sin(elapsed * 9.5)) * 0.8;
                         bc.pos.set(camera.position.x + forward.x * 1.5, (bc.item.y || 0) + 0.44 + bounce, camera.position.z + forward.z * 1.5);
                         bc.mesh.position.copy(bc.pos);
-                        bc.mesh.rotation.x += 8 * delta;
                     } else {
                         const dist = Math.hypot(camera.position.x - bc.pos.x, camera.position.z - bc.pos.z);
                         if (bc.cooldown <= 0 && dist < 1.85 && bc.vel.length() < 4.5 && camera.position.y < 5.0) {
@@ -3568,20 +3094,13 @@
                             if (bc.pos.y <= floorY) {
                                 bc.pos.y = floorY;
                                 bc.vel.y = Math.abs(bc.vel.y) * 0.62;
-                                bc.vel.x *= 0.88;
-                                bc.vel.z *= 0.88;
+                                bc.vel.x *= 0.88; bc.vel.z *= 0.88;
                                 if (bc.vel.y < 1.2) bc.vel.y = 0;
                             }
                             bc.rims.forEach(hr => {
-                                const hDist = Math.hypot(bc.pos.x - hr.x, bc.pos.z - hr.z);
-                                const yDiff = Math.abs(bc.pos.y - hr.y);
-                                if (hDist < 0.82 && yDiff < 0.5 && bc.vel.y < 0 && !bc.scored) {
+                                if (Math.hypot(bc.pos.x - hr.x, bc.pos.z - hr.z) < 0.82 && Math.abs(bc.pos.y - hr.y) < 0.5 && bc.vel.y < 0 && !bc.scored) {
                                     bc.scored = true;
-                                    fetch('/api/sports/score', {
-                                        method: 'POST',
-                                        headers: { 'Content-Type': 'application/json' },
-                                        body: JSON.stringify({ sport: 'basketball' })
-                                    });
+                                    fetch('/api/sports/score', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sport: 'basketball' }) });
                                 }
                             });
                             bc.mesh.position.copy(bc.pos);
@@ -3589,119 +3108,90 @@
                     }
                 });
 
-                // 2. Update All Placed Tennis Courts & Auto-Rally Returner
                 activeTennisCourts.forEach(tc => {
-                    const distToCourt = Math.hypot(camera.position.x - tc.item.x, camera.position.z - tc.item.z);
-                    if (distToCourt < 15) {
-                        nearAnyTennisCourt = true;
-                        const distToBall = Math.hypot(camera.position.x - tc.pos.x, camera.position.z - tc.pos.z);
-                        if (distToBall < 4.5) {
+                    if (Math.hypot(camera.position.x - tc.item.x, camera.position.z - tc.item.z) < 15) {
+                        nearTennis = true;
+                        if (Math.hypot(camera.position.x - tc.pos.x, camera.position.z - tc.pos.z) < 4.5) {
                             showSportsBar = true;
-                            sportsHudText.innerText = '🎾 Tennis Ball in Range! Swing Racket [G]';
+                            sportsHudText.innerText = '🎾 Tennis Ball Nearby! Swing [G]';
                         }
                     }
-
                     tc.vel.y -= 18.0 * delta;
                     tc.pos.addScaledVector(tc.vel, delta);
                     const floorY = (tc.item.y || 0) + 0.25;
                     if (tc.pos.y <= floorY) {
-                        tc.pos.y = floorY;
-                        tc.vel.y = Math.abs(tc.vel.y) * 0.72;
-                        tc.vel.x *= 0.92;
-                        tc.vel.z *= 0.92;
+                        tc.pos.y = floorY; tc.vel.y = Math.abs(tc.vel.y) * 0.72;
+                        tc.vel.x *= 0.92; tc.vel.z *= 0.92;
                         if (tc.vel.y < 1.0) tc.vel.y = 0;
-                    }
-
-                    // Automated Rally Return when ball reaches opposite end of court
-                    const dx = tc.pos.x - tc.item.x;
-                    const dz = tc.pos.z - tc.item.z;
-                    if (Math.hypot(dx, dz) > 9.5 && Math.hypot(dx, dz) < 14.0 && tc.vel.length() > 2.0) {
-                        tc.vel.x = -dx * 1.15;
-                        tc.vel.z = -dz * 1.15;
-                        tc.vel.y = 6.5;
-                    }
-                    if (Math.hypot(dx, dz) > 22) {
-                        tc.pos.set(tc.item.x, floorY + 0.2, tc.item.z);
-                        tc.vel.set(0, 0, 0);
                     }
                     tc.mesh.position.copy(tc.pos);
                 });
-                playerRacketGroup.visible = nearAnyTennisCourt;
+                playerRacketGroup.visible = nearTennis;
 
-                // 3. Update All Placed Soccer Pitches & Goal Detection
                 activeSoccerCourts.forEach(sc => {
-                    const distToBall = Math.hypot(camera.position.x - sc.pos.x, camera.position.z - sc.pos.z);
-                    if (distToBall < 3.6) {
+                    const dist = Math.hypot(camera.position.x - sc.pos.x, camera.position.z - sc.pos.z);
+                    if (dist < 3.6) {
                         showSportsBar = true;
-                        sportsHudText.innerText = '⚽ Soccer Ball Nearby! Power Kick [G]';
+                        sportsHudText.innerText = '⚽ Soccer Ball! Kick [G]';
                     }
-                    // Dribble push when walking into the soccer ball
-                    if (distToBall < 1.35 && camera.position.y < 3.5) {
+                    if (dist < 1.35 && camera.position.y < 3.5) {
                         const pushX = sc.pos.x - camera.position.x;
                         const pushZ = sc.pos.z - camera.position.z;
                         const len = Math.hypot(pushX, pushZ) || 1;
-                        sc.vel.x = (pushX / len) * 9.5;
-                        sc.vel.z = (pushZ / len) * 9.5;
-                        sc.vel.y = 1.8;
+                        sc.vel.x = (pushX / len) * 9.5; sc.vel.z = (pushZ / len) * 9.5; sc.vel.y = 1.8;
                     }
-
                     sc.vel.y -= 20.0 * delta;
                     sc.pos.addScaledVector(sc.vel, delta);
                     const floorY = (sc.item.y || 0) + 0.46;
                     if (sc.pos.y <= floorY) {
-                        sc.pos.y = floorY;
-                        sc.vel.y = Math.abs(sc.vel.y) * 0.5;
-                        sc.vel.x *= 0.94;
-                        sc.vel.z *= 0.94;
+                        sc.pos.y = floorY; sc.vel.y = Math.abs(sc.vel.y) * 0.5;
+                        sc.vel.x *= 0.94; sc.vel.z *= 0.94;
                         if (sc.vel.y < 0.8) sc.vel.y = 0;
                     }
-
-                    // Check Soccer Goal Scoring
                     sc.goals.forEach(g => {
                         if (Math.hypot(sc.pos.x - g.x, sc.pos.z - g.z) < 2.6 && sc.pos.y < floorY + 2.8 && sc.vel.length() > 1.5) {
                             sc.pos.set(sc.item.x, floorY + 0.5, sc.item.z);
                             sc.vel.set(0, 5, 0);
-                            fetch('/api/sports/score', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ sport: 'soccer' })
-                            });
+                            fetch('/api/sports/score', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sport: 'soccer' }) });
                         }
                     });
                     sc.mesh.position.copy(sc.pos);
-                    sc.mesh.rotation.x += sc.vel.z * delta;
-                    sc.mesh.rotation.z -= sc.vel.x * delta;
                 });
 
                 sportsHud.style.display = showSportsBar ? 'flex' : 'none';
 
-                // Animate Organic 70%-Scale Companions (Walking + Waving Back Animation!)
+                // Natural Smooth Roaming & 1-Second Wave Animation
                 Object.keys(npcMeshes).forEach((id, idx) => {
                     const mesh = npcMeshes[id];
                     let isMoving = false;
                     if (typeof mesh.userData.targetX === 'number') {
                         const dx = mesh.userData.targetX - mesh.position.x;
                         const dz = mesh.userData.targetZ - mesh.position.z;
-                        if (Math.hypot(dx, dz) > 0.03) isMoving = true;
-                        mesh.position.x += dx * 0.16;
-                        mesh.position.z += dz * 0.16;
-                        mesh.rotation.y = mesh.userData.targetRotY || 0;
+                        if (Math.hypot(dx, dz) > 0.05) isMoving = true;
+                        mesh.position.x += dx * 0.12;
+                        mesh.position.z += dz * 0.12;
+
+                        if (typeof mesh.userData.targetRotY === 'number') {
+                            let diff = mesh.userData.targetRotY - mesh.rotation.y;
+                            while (diff < -Math.PI) diff += Math.PI * 2;
+                            while (diff > Math.PI) diff -= Math.PI * 2;
+                            mesh.rotation.y += diff * 0.08;
+                        }
                     }
                     const stride = elapsed * 6.5 + idx;
-                    mesh.position.y = isMoving ? Math.abs(Math.sin(stride)) * 0.05 : 0;
+                    mesh.position.y = isMoving ? Math.abs(Math.sin(stride)) * 0.04 : 0;
 
                     if (mesh.userData.waveBubble) {
                         mesh.userData.waveBubble.visible = !!mesh.userData.isWaving;
                     }
 
                     if (mesh.userData.leftLeg) {
-                        const swing = isMoving ? 0.58 : 0.06;
+                        const swing = isMoving ? 0.55 : 0.05;
                         mesh.userData.leftLeg.rotation.x = Math.sin(stride) * swing;
                         mesh.userData.rightLeg.rotation.x = -Math.sin(stride) * swing;
                         mesh.userData.leftArm.rotation.x = -Math.sin(stride) * (swing * 0.8);
 
                         if (mesh.userData.isWaving) {
-                            // Raise right arm and wave side-to-side happily!
                             mesh.userData.rightArm.rotation.x = -2.6;
                             mesh.userData.rightArm.rotation.z = Math.sin(elapsed * 14.0) * 0.45 - 0.35;
                         } else {
@@ -3710,38 +3200,60 @@
                         }
                         mesh.userData.eyeGroup.scale.y = ((elapsed + idx) % 4.0 < 0.14) ? 0.08 : 1.0;
                     }
-                    if (mesh.userData.tailPivot) {
-                        mesh.userData.tailPivot.rotation.y = Math.sin(elapsed * 8.0 + idx) * (mesh.userData.isWaving ? 0.75 : 0.35);
-                    }
                 });
 
-                // Player Horizontal Movement with Solid Wall Collisions
-                const moveSpeed = 20.0 * delta;
+                // Player Movement Physics (Swimming / Skating / Normal Walking)
+                let moveSpeed = 20.0 * delta;
+                if (inPool) moveSpeed = 10.0 * delta; // Water resistance
                 const oldPos = camera.position.clone();
-                if (controls.isLocked) {
-                    if (keys.w) controls.moveForward(moveSpeed);
-                    if (keys.s) controls.moveForward(-moveSpeed);
-                    if (keys.a) controls.moveRight(-moveSpeed);
-                    if (keys.d) controls.moveRight(moveSpeed);
+
+                const inputDir = new THREE.Vector2(0, 0);
+                if (keys.w) inputDir.y += 1;
+                if (keys.s) inputDir.y -= 1;
+                if (keys.a) inputDir.x -= 1;
+                if (keys.d) inputDir.x += 1;
+                inputDir.normalize();
+
+                const camDir = new THREE.Vector3();
+                camera.getWorldDirection(camDir);
+                camDir.y = 0; camDir.normalize();
+                const sideDir = new THREE.Vector3(-camDir.z, 0, camDir.x);
+
+                if (onIce) {
+                    // Ice Rink Gliding Slide Momentum
+                    playerSlideVelocity.x += (camDir.x * inputDir.y + sideDir.x * inputDir.x) * 35.0 * delta;
+                    playerSlideVelocity.y += (camDir.z * inputDir.y + sideDir.z * inputDir.x) * 35.0 * delta;
+                    playerSlideVelocity.multiplyScalar(0.975); // Low friction slide
+                    camera.position.x += playerSlideVelocity.x * delta;
+                    camera.position.z += playerSlideVelocity.y * delta;
                 } else {
-                    const dir = new THREE.Vector3();
-                    camera.getWorldDirection(dir);
-                    dir.y = 0; dir.normalize();
-                    const sideDir = new THREE.Vector3(-dir.z, 0, dir.x);
-                    if (keys.w) camera.position.addScaledVector(dir, moveSpeed);
-                    if (keys.s) camera.position.addScaledVector(dir, -moveSpeed);
-                    if (keys.a) camera.position.addScaledVector(sideDir, moveSpeed);
-                    if (keys.d) camera.position.addScaledVector(sideDir, -moveSpeed);
+                    playerSlideVelocity.set(0, 0);
+                    if (controls.isLocked) {
+                        if (keys.w) controls.moveForward(moveSpeed);
+                        if (keys.s) controls.moveForward(-moveSpeed);
+                        if (keys.a) controls.moveRight(-moveSpeed);
+                        if (keys.d) controls.moveRight(moveSpeed);
+                    } else {
+                        if (keys.w) camera.position.addScaledVector(camDir, moveSpeed);
+                        if (keys.s) camera.position.addScaledVector(camDir, -moveSpeed);
+                        if (keys.a) camera.position.addScaledVector(sideDir, moveSpeed);
+                        if (keys.d) camera.position.addScaledVector(sideDir, -moveSpeed);
+                    }
                 }
+
                 if (!canMoveTo(oldPos, camera.position)) {
                     camera.position.x = oldPos.x;
                     camera.position.z = oldPos.z;
                 }
 
-                // Vertical Physics: Walking Gravity (Default) vs Fly Mode
+                // Vertical Physics: Gravity / Swimming Buoyancy / Fly Mode
                 if (isFlyingMode) {
                     if (keys.space) camera.position.y += moveSpeed;
                     if (keys.shift) camera.position.y = Math.max(2.2, camera.position.y - moveSpeed);
+                } else if (inPool) {
+                    // Buoyant water bobbing
+                    verticalVelocity = (keys.space ? 6.0 : (keys.shift ? -6.0 : Math.sin(elapsed * 4.0) * 0.4));
+                    camera.position.y = Math.max(1.4, Math.min(2.4, camera.position.y + verticalVelocity * delta));
                 } else {
                     verticalVelocity -= 24.0 * delta;
                     camera.position.y += verticalVelocity * delta;
