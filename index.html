@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>The Badabing - Realistic 3D Anime World & EST Sky</title>
+    <title>The Badabing - Realistic 3D Architecture, Fur Companions & EST Sky</title>
     <style>
         :root {
             --anime-bg: rgba(13, 18, 30, 0.86);
             --anime-panel: rgba(16, 23, 40, 0.94);
             --anime-cyan: #38bdf8;
             --anime-gold: #facc15;
-            --anime-pink: #f472b6;
             --anime-green: #4ade80;
             --anime-border: rgba(56, 189, 248, 0.45);
         }
@@ -28,7 +27,7 @@
             position: absolute; top: 0; left: 0; width: 100%; min-height: 44px;
             background: linear-gradient(90deg, rgba(10, 14, 26, 0.92), rgba(20, 29, 52, 0.88));
             border-bottom: 2px solid var(--anime-cyan);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 15px rgba(56, 189, 248, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
             display: flex; align-items: center; justify-content: space-between;
             padding: 4px 14px; z-index: 25; font-size: 12px;
             backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
@@ -60,10 +59,9 @@
             padding: 3px 10px; border-radius: 20px; font-size: 11px;
             font-weight: 800; background: rgba(30, 41, 59, 0.9);
             border: 1px solid var(--anime-cyan);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
         }
 
-        /* 2. Modern Anime Companion Telemetry Bar */
+        /* 2. Companion Telemetry Bar */
         #companion-bar {
             position: absolute; top: 44px; left: 0; width: 100%; min-height: 44px;
             background: rgba(13, 19, 34, 0.84);
@@ -98,7 +96,6 @@
             transition: width 0.3s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
-        /* Anime Pill Buttons */
         .mini-ui-btn {
             background: linear-gradient(135deg, #2563eb, #1d4ed8);
             border: 1.5px solid rgba(255, 255, 255, 0.25);
@@ -106,24 +103,22 @@
             color: #fff; padding: 5px 11px; border-radius: 8px;
             font-size: 11px; cursor: pointer; font-weight: 800;
             transition: all 0.15s cubic-bezier(0.22, 1, 0.36, 1);
-            letter-spacing: 0.3px;
         }
         .mini-ui-btn:hover, .mini-ui-btn.active {
             background: linear-gradient(135deg, #facc15, #f97316);
             color: #090d16; border-color: #fff;
             transform: translateY(-1.5px) scale(1.02);
-            box-shadow: 0 5px 14px rgba(250, 204, 21, 0.4);
         }
         .god-only-ui { display: none; }
 
-        /* 3. Anime Floating Modals & Mind Panel */
+        /* 3. Floating Modals & Mind Panel */
         .game-modal {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 450px; max-width: 94vw; max-height: 82vh; overflow-y: auto;
             background: var(--anime-panel);
             border: 2px solid var(--anime-cyan);
             border-radius: 16px; padding: 18px; z-index: 40; display: none;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.9), 0 0 25px rgba(56, 189, 248, 0.25);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.9);
             backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
         }
         #companion-mind-panel {
@@ -149,13 +144,10 @@
         .bag-item-chip {
             background: rgba(30, 41, 59, 0.85); border: 1px solid rgba(148, 163, 184, 0.3);
             border-radius: 8px; padding: 6px; font-size: 11px; text-align: center; cursor: pointer;
-            transition: 0.15s;
         }
         .bag-item-chip:hover { border-color: var(--anime-green); background: rgba(16, 185, 129, 0.2); }
 
-        .inv-grid {
-            display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 12px;
-        }
+        .inv-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 12px; }
         .inv-slot {
             height: 56px; background: #1e293b; border: 1px solid #475569; border-radius: 8px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -434,22 +426,22 @@
         </div>
 
         <div class="tab-row">
-            <button class="tab-btn active" id="tab-modular">🧱 3D Structures</button>
-            <button class="tab-btn" id="tab-buildings">🏢 Farming, Portals & City</button>
+            <button class="tab-btn active" id="tab-modular">🧱 Snap-Fit Parts</button>
+            <button class="tab-btn" id="tab-buildings">🏢 Enclosed Buildings</button>
             <button class="tab-btn" id="tab-companions">🐾 Spawn Companions</button>
         </div>
 
         <div class="build-grid" id="grid-modular">
-            <div class="build-card" data-type="foundation"><span class="icon">⬛</span><span class="label">3D Foundation</span><span class="sub">Stone Terrace</span></div>
-            <div class="build-card" data-type="wall"><span class="icon">🧱</span><span class="label">3D Colonnade Wall</span><span class="sub">Rounded Pillars</span></div>
-            <div class="build-card" data-type="doorway"><span class="icon">🚪</span><span class="label">Arched Doorway</span><span class="sub">Interactive Door</span></div>
-            <div class="build-card" data-type="window"><span class="icon">🪟</span><span class="label">Bay Window Wall</span><span class="sub">Curved Awning</span></div>
-            <div class="build-card" data-type="stairs"><span class="icon">🪜</span><span class="label">3D Balustrade Stairs</span><span class="sub">Carved Rails</span></div>
-            <div class="build-card" data-type="roof_flat"><span class="icon">⬜</span><span class="label">Terrace Ceiling</span><span class="sub">Molded Slab</span></div>
-            <div class="build-card" data-type="roof_pitched"><span class="icon">⛺</span><span class="label">Barrel-Tile Roof</span><span class="sub">Sculpted Gable</span></div>
-            <div class="build-card" data-type="fence"><span class="icon">⛓️</span><span class="label">Wrought Iron Fence</span><span class="sub">Finial Posts</span></div>
+            <div class="build-card" data-type="foundation"><span class="icon">⬛</span><span class="label">4x4m Foundation</span><span class="sub">Snap Terrace</span></div>
+            <div class="build-card" data-type="wall"><span class="icon">🧱</span><span class="label">4x4m Wall</span><span class="sub">Flush Snap</span></div>
+            <div class="build-card" data-type="doorway"><span class="icon">🚪</span><span class="label">4x4m Doorway</span><span class="sub">Interactive Door</span></div>
+            <div class="build-card" data-type="window"><span class="icon">🪟</span><span class="label">4x4m Window</span><span class="sub">Framed Glass</span></div>
+            <div class="build-card" data-type="stairs"><span class="icon">🪜</span><span class="label">4x4m Stairs</span><span class="sub">Side Stringers</span></div>
+            <div class="build-card" data-type="roof_flat"><span class="icon">⬜</span><span class="label">4x4m Flat Roof</span><span class="sub">Solid Ceiling</span></div>
+            <div class="build-card" data-type="roof_pitched"><span class="icon">⛺</span><span class="label">4x4m Hip Roof</span><span class="sub">Solid Underside</span></div>
+            <div class="build-card" data-type="fence"><span class="icon">⛓️</span><span class="label">Wrought Fence</span><span class="sub">4m Barrier</span></div>
             <div class="build-card" data-type="sign_post"><span class="icon">🪧</span><span class="label">3D Arch Sign</span><span class="sub">Live Word Edits</span></div>
-            <div class="build-card" data-type="streetlight"><span class="icon">🏮</span><span class="label"> Streetlight</span><span class="sub">Warm Lantern</span></div>
+            <div class="build-card" data-type="streetlight"><span class="icon">🏮</span><span class="label">Streetlight</span><span class="sub">Warm Lantern</span></div>
         </div>
 
         <div class="build-grid" id="grid-buildings" style="display:none;">
@@ -458,21 +450,21 @@
             <div class="build-card" data-type="gorilla_statue"><span class="icon">🗿</span><span class="label">XL Gorilla Statue</span><span class="sub">Silverback Monument</span></div>
             <div class="build-card" data-type="arcade"><span class="icon">🕹️</span><span class="label">Retro Arcade</span><span class="sub">Donkey Kong & More</span></div>
             <div class="build-card" data-type="watch_tower"><span class="icon">🗼</span><span class="label">Watch Tower</span><span class="sub">Climb to Top</span></div>
-            <div class="build-card" data-type="library"><span class="icon">📚</span><span class="label">Public Library</span><span class="sub">Cooking Books</span></div>
-            <div class="build-card" data-type="gym"><span class="icon">🏋️</span><span class="label">Iron Gym</span><span class="sub">Bench Press</span></div>
+            <div class="build-card" data-type="library"><span class="icon">📚</span><span class="label">Public Library</span><span class="sub">Full Roof & Books</span></div>
+            <div class="build-card" data-type="gym"><span class="icon">🏋️</span><span class="label">Iron Gym</span><span class="sub">Full Roof & Weights</span></div>
             <div class="build-card" data-type="swimming_pool"><span class="icon">🏊</span><span class="label">Swimming Pool</span><span class="sub">Swim Physics</span></div>
             <div class="build-card" data-type="ice_rink"><span class="icon">⛸️</span><span class="label">Ice Rink</span><span class="sub">Skate Slide</span></div>
-            <div class="build-card" data-type="basketball_court"><span class="icon">🏀</span><span class="label">Basketball Court</span><span class="sub">Playable + Ball</span></div>
-            <div class="build-card" data-type="tennis_court"><span class="icon">🎾</span><span class="label">Tennis Court</span><span class="sub">Playable + Racket</span></div>
-            <div class="build-card" data-type="soccer_court"><span class="icon">⚽</span><span class="label">Soccer Pitch</span><span class="sub">Playable + Goals</span></div>
+            <div class="build-card" data-type="basketball_court"><span class="icon">🏀</span><span class="label">Basketball Court</span><span class="sub">Hoops & Ball</span></div>
+            <div class="build-card" data-type="tennis_court"><span class="icon">🎾</span><span class="label">Tennis Court</span><span class="sub">Net & Ball</span></div>
+            <div class="build-card" data-type="soccer_court"><span class="icon">⚽</span><span class="label">Soccer Pitch</span><span class="sub">Goals & Ball</span></div>
             <div class="build-card" data-type="pond"><span class="icon">🦆</span><span class="label">Nature Pond</span><span class="sub">Lily Pads & Koi</span></div>
-            <div class="build-card" data-type="hobby_store"><span class="icon">🎨</span><span class="label">Hobby Store</span><span class="sub">RC & Models</span></div>
-            <div class="build-card" data-type="deli"><span class="icon">🥪</span><span class="label">Italian Deli</span><span class="sub">Subs & Meats</span></div>
-            <div class="build-card" data-type="mechanic_shop"><span class="icon">🔧</span><span class="label">Mechanic Shop</span><span class="sub">Open Garage</span></div>
+            <div class="build-card" data-type="hobby_store"><span class="icon">🎨</span><span class="label">Hobby Store</span><span class="sub">Enclosed Shop</span></div>
+            <div class="build-card" data-type="deli"><span class="icon">🥪</span><span class="label">Italian Deli</span><span class="sub">Enclosed Cafe</span></div>
+            <div class="build-card" data-type="mechanic_shop"><span class="icon">🔧</span><span class="label">Mechanic Shop</span><span class="sub">Enclosed Garage</span></div>
             <div class="build-card" data-type="computer_desk"><span class="icon">💻</span><span class="label">Internet PC</span><span class="sub">Live Browser</span></div>
             <div class="build-card" data-type="merchant"><span class="icon">🏪</span><span class="label">Animal Merchant</span><span class="sub">10 Shopkeepers</span></div>
-            <div class="build-card" data-type="mcdonalds"><span class="icon">🍔</span><span class="label">McDonald's</span><span class="sub">Golden Arches</span></div>
-            <div class="build-card" data-type="walmart"><span class="icon">🛒</span><span class="label">Walmart</span><span class="sub">Supercenter</span></div>
+            <div class="build-card" data-type="mcdonalds"><span class="icon">🍔</span><span class="label">McDonald's</span><span class="sub">Enclosed Restaurant</span></div>
+            <div class="build-card" data-type="walmart"><span class="icon">🛒</span><span class="label">Walmart</span><span class="sub">Enclosed Superstore</span></div>
             <div class="build-card" data-type="fountain"><span class="icon">⛲</span><span class="label">3D Fountain</span><span class="sub">Tiered Marble</span></div>
             <div class="build-card" data-type="mailbox"><span class="icon">📫</span><span class="label">Curved Mailbox</span><span class="sub">10 Inv. Slots</span></div>
             <div class="build-card" data-type="locker"><span class="icon">🗄️</span><span class="label">Storage Vault</span><span class="sub">10 Inv. Slots</span></div>
@@ -536,7 +528,7 @@
         <div>Rot: <span id="hud-rot">0°</span></div>
     </div>
 
-    <!-- 5. Mobile Touch Controls (Fixed Left/Right Analog Thumbstick + D-Pad + Right Action Pad) -->
+    <!-- 5. Mobile Touch Controls -->
     <div id="mobile-controls">
         <div id="mobile-dpad">
             <div class="mob-btn" id="btn-forward" title="Forward">▲</div>
@@ -605,13 +597,13 @@
             pwInput.addEventListener('keydown', (e) => { e.stopPropagation(); if (e.key === 'Enter') verifyGodPassword(); });
 
             // =========================================================
-            // 1. REALISTIC 3D ENGINE & REAL-TIME EST 3D ATMOSPHERIC SKY
+            // 1. REALISTIC 3D ENGINE, FUR TEXTURES & NATURAL HORIZON SKY
             // =========================================================
             const scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x0ea5e9);
-            scene.fog = new THREE.FogExp2(0x38bdf8, 0.00075);
+            scene.background = new THREE.Color(0x8ec5fc);
+            scene.fog = new THREE.FogExp2(0xcbe5ff, 0.0011);
 
-            const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 4500);
+            const camera = new THREE.PerspectiveCamera(62, window.innerWidth / window.innerHeight, 0.1, 4500);
             camera.rotation.order = 'YXZ';
             camera.position.set(0, 2.2, 24);
             scene.add(camera);
@@ -622,22 +614,22 @@
             renderer.shadowMap.enabled = true;
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
             renderer.toneMapping = THREE.ACESFilmicToneMapping;
-            renderer.toneMappingExposure = 1.15;
+            renderer.toneMappingExposure = 1.08;
             document.body.appendChild(renderer.domElement);
 
             const maxAniso = renderer.capabilities.getMaxAnisotropy();
 
-            const hemiLight = new THREE.HemisphereLight(0xbae6fd, 0x15803d, 0.85);
+            const hemiLight = new THREE.HemisphereLight(0xdbeafe, 0x3b6e3c, 0.85);
             scene.add(hemiLight);
 
-            const sunLight = new THREE.DirectionalLight(0xfffbeb, 1.55);
+            const sunLight = new THREE.DirectionalLight(0xfff8eb, 1.45);
             sunLight.position.set(90, 150, 80);
             sunLight.castShadow = true;
             sunLight.shadow.mapSize.width = 2048;
             sunLight.shadow.mapSize.height = 2048;
             sunLight.shadow.camera.near = 10;
             sunLight.shadow.camera.far = 420;
-            const dCam = 130;
+            const dCam = 135;
             sunLight.shadow.camera.left = -dCam;
             sunLight.shadow.camera.right = dCam;
             sunLight.shadow.camera.top = dCam;
@@ -665,11 +657,36 @@
                 return { map, bumpMap };
             }
 
+            // Soft 512px Procedural Animal Fur Albedo & Micro-Strand Bump Texture
+            const furPair = make3DTexturePair((ctx, w, h) => {
+                ctx.fillStyle = '#f4f4f6'; ctx.fillRect(0, 0, w, h);
+                for (let i = 0; i < 6500; i++) {
+                    ctx.strokeStyle = (i % 3 === 0) ? 'rgba(255,255,255,0.65)' : ((i % 2 === 0) ? 'rgba(215,218,225,0.55)' : 'rgba(235,238,242,0.6)');
+                    ctx.lineWidth = 1.4;
+                    const x = Math.random() * w, y = Math.random() * h;
+                    ctx.beginPath();
+                    ctx.moveTo(x, y);
+                    ctx.quadraticCurveTo(x + 2, y + 5, x + (Math.random() - 0.5) * 3, y + 10);
+                    ctx.stroke();
+                }
+            }, (ctx, w, h) => {
+                ctx.fillStyle = '#808080'; ctx.fillRect(0, 0, w, h);
+                for (let i = 0; i < 6500; i++) {
+                    ctx.strokeStyle = (i % 2 === 0) ? '#d8d8d8' : '#404040';
+                    ctx.lineWidth = 1.4;
+                    const x = Math.random() * w, y = Math.random() * h;
+                    ctx.beginPath();
+                    ctx.moveTo(x, y);
+                    ctx.lineTo(x + (Math.random() - 0.5) * 2, y + 9);
+                    ctx.stroke();
+                }
+            }, 3, 3);
+
             const grassPair = make3DTexturePair((ctx, w, h) => {
-                ctx.fillStyle = '#22a84a'; ctx.fillRect(0, 0, w, h);
-                for (let i = 0; i < 2600; i++) {
-                    ctx.fillStyle = (i % 3 === 0) ? '#188238' : ((i % 2 === 0) ? '#34c759' : '#1f9d45');
-                    ctx.fillRect(Math.random() * w, Math.random() * h, 3, 9);
+                ctx.fillStyle = '#2d8a47'; ctx.fillRect(0, 0, w, h);
+                for (let i = 0; i < 2800; i++) {
+                    ctx.fillStyle = (i % 3 === 0) ? '#236e38' : ((i % 2 === 0) ? '#3da35a' : '#287d3f');
+                    ctx.fillRect(Math.random() * w, Math.random() * h, 3, 8);
                 }
             }, (ctx, w, h) => {
                 ctx.fillStyle = '#808080'; ctx.fillRect(0, 0, w, h);
@@ -707,7 +724,7 @@
                     ctx.fillStyle = (i % 2 === 0) ? '#a35c2b' : '#c2743d';
                     ctx.fillRect(0, i * (h / 6), w, h / 6);
                     ctx.fillStyle = '#3b1e0a';
-                    ctx.fillRect(0, i * (h / 6), w, 5);
+                    ctx.fillRect(0, i * (h / 6), w, 4);
                 }
                 for (let g = 0; g < 400; g++) {
                     ctx.fillStyle = 'rgba(60, 28, 10, 0.22)';
@@ -721,14 +738,14 @@
                     ctx.fillStyle = (i % 2 === 0) ? '#cbd5e1' : '#64748b';
                     ctx.fillRect(Math.random() * w, Math.random() * h, 5, 5);
                 }
-                ctx.strokeStyle = '#475569'; ctx.lineWidth = 8;
-                ctx.strokeRect(4, 4, w - 8, h - 8);
+                ctx.strokeStyle = '#475569'; ctx.lineWidth = 6;
+                ctx.strokeRect(3, 3, w - 6, h - 6);
             }, null, 2, 2);
 
             const roofShinglePair = make3DTexturePair((ctx, w, h) => {
-                ctx.fillStyle = '#7c2d12'; ctx.fillRect(0, 0, w, h);
+                ctx.fillStyle = '#5c2410'; ctx.fillRect(0, 0, w, h);
                 for (let y = 0; y < h; y += 32) {
-                    ctx.fillStyle = (y % 64 === 0) ? '#9a3412' : '#7c2d12';
+                    ctx.fillStyle = (y % 64 === 0) ? '#783016' : '#632712';
                     ctx.fillRect(0, y, w, 28);
                     ctx.fillStyle = '#290f05';
                     ctx.fillRect(0, y + 28, w, 4);
@@ -748,10 +765,20 @@
             }, null, 1, 35);
 
             function makeAnimeMat(opts) {
-                return new THREE.MeshStandardMaterial(Object.assign({ roughness: 0.42, metalness: 0.08 }, opts));
+                return new THREE.MeshStandardMaterial(Object.assign({ roughness: 0.45, metalness: 0.06, side: THREE.DoubleSide }, opts));
             }
 
-            // Enable realistic 3D shadow casting without ugly black blocky wireframes!
+            function makeFurMat(colorHex) {
+                return new THREE.MeshStandardMaterial({
+                    color: new THREE.Color(colorHex),
+                    map: furPair.map,
+                    bumpMap: furPair.bumpMap,
+                    bumpScale: 0.038,
+                    roughness: 0.58,
+                    metalness: 0.02
+                });
+            }
+
             function enableRealistic3DShadows(rootObj) {
                 rootObj.traverse(c => {
                     if (c.isMesh) {
@@ -761,14 +788,17 @@
                 });
             }
 
-            // 3D Atmospheric Sky Shader with Solar Mie Glow + Starfield + Moon + Volumetric Clouds
-            const skyGeo = new THREE.SphereGeometry(2800, 48, 24);
+            // =========================================================
+            // 2. NATURAL ATMOSPHERIC SKY, SMOOTH HORIZON & ROLLING HILLS
+            // =========================================================
+            const skyGeo = new THREE.SphereGeometry(2800, 48, 32);
             const skyMat = new THREE.ShaderMaterial({
                 uniforms: {
-                    topColor: { value: new THREE.Color(0x0284c7) },
-                    horizonColor: { value: new THREE.Color(0xbae6fd) },
+                    zenithColor: { value: new THREE.Color(0x2563eb) },
+                    horizonColor: { value: new THREE.Color(0xcbe5ff) },
+                    nadirColor: { value: new THREE.Color(0x7ca682) },
                     sunPosition: { value: new THREE.Vector3(0, 500, -250) },
-                    sunColor: { value: new THREE.Color(0xfffbeb) }
+                    sunColor: { value: new THREE.Color(0xfff8e7) }
                 },
                 vertexShader: `
                     varying vec3 vWorldPosition;
@@ -779,72 +809,95 @@
                     }
                 `,
                 fragmentShader: `
-                    uniform vec3 topColor;
+                    uniform vec3 zenithColor;
                     uniform vec3 horizonColor;
+                    uniform vec3 nadirColor;
                     uniform vec3 sunPosition;
                     uniform vec3 sunColor;
                     varying vec3 vWorldPosition;
                     void main() {
                         vec3 viewDir = normalize(vWorldPosition - cameraPosition);
-                        float h = clamp(viewDir.y, 0.0, 1.0);
-                        vec3 baseSky = mix(horizonColor, topColor, pow(h, 0.55));
+                        float y = viewDir.y;
+
+                        // Smooth upper sky blend & soft lower horizon mist (no sharp horizon seam!)
+                        float upperFactor = pow(smoothstep(0.0, 0.85, max(y, 0.0)), 0.65);
+                        vec3 skyGrad = mix(horizonColor, zenithColor, upperFactor);
+
+                        float lowerFactor = smoothstep(-0.28, 0.04, y);
+                        vec3 finalSky = mix(nadirColor, skyGrad, lowerFactor);
+
+                        // Soft natural atmospheric sun scattering
                         vec3 sunDir = normalize(sunPosition);
-                        float sunAmt = max(dot(viewDir, sunDir), 0.0);
-                        vec3 mieGlow = sunColor * pow(sunAmt, 14.0) * 0.45 + sunColor * pow(sunAmt, 180.0) * 0.9;
-                        gl_FragColor = vec4(baseSky + mieGlow, 1.0);
+                        float sunDot = max(dot(viewDir, sunDir), 0.0);
+                        float horizonMask = smoothstep(-0.08, 0.15, y);
+                        vec3 sunGlow = sunColor * (pow(sunDot, 10.0) * 0.28 + pow(sunDot, 120.0) * 0.55) * horizonMask;
+
+                        gl_FragColor = vec4(finalSky + sunGlow, 1.0);
                     }
                 `,
-                side: THREE.BackSide
+                side: THREE.BackSide,
+                depthWrite: false
             });
             const skyDome = new THREE.Mesh(skyGeo, skyMat);
             scene.add(skyDome);
 
-            // 3D Sun & Cratered Moon Orbs
             const sunOrb = new THREE.Mesh(
-                new THREE.SphereGeometry(32, 24, 24),
-                new THREE.MeshBasicMaterial({ color: 0xfffbeb })
+                new THREE.SphereGeometry(28, 24, 24),
+                new THREE.MeshBasicMaterial({ color: 0xfffbeb, fog: false })
             );
             scene.add(sunOrb);
 
             const moonOrb = new THREE.Mesh(
-                new THREE.SphereGeometry(26, 24, 24),
-                makeAnimeMat({ map: stonePair.map, bumpMap: stonePair.bumpMap, bumpScale: 0.3, color: 0xe2e8f0, emissive: 0x64748b, emissiveIntensity: 0.4 })
+                new THREE.SphereGeometry(22, 24, 24),
+                new THREE.MeshBasicMaterial({ color: 0xe2e8f0, fog: false })
             );
             scene.add(moonOrb);
 
-            // 1,600-Star 3D Night Starfield Dome
             const starGeo = new THREE.BufferGeometry();
-            const starPositions = new Float32Array(1600 * 3);
-            for (let i = 0; i < 1600; i++) {
+            const starPositions = new Float32Array(1400 * 3);
+            for (let i = 0; i < 1400; i++) {
                 const theta = Math.random() * Math.PI * 2;
-                const phi = Math.acos(Math.random() * 0.85 + 0.12);
+                const phi = Math.acos(Math.random() * 0.8 + 0.15);
                 const r = 2400;
                 starPositions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
                 starPositions[i * 3 + 1] = r * Math.cos(phi);
                 starPositions[i * 3 + 2] = r * Math.sin(phi) * Math.sin(theta);
             }
             starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
-            const starMat = new THREE.PointsMaterial({ color: 0xffffff, size: 6.5, transparent: true, opacity: 0.0 });
+            const starMat = new THREE.PointsMaterial({ color: 0xffffff, size: 5.5, transparent: true, opacity: 0.0, fog: false });
             const starField = new THREE.Points(starGeo, starMat);
             scene.add(starField);
 
-            // Soft Sculpted 3D Cumulus Clouds
+            // Distant Rolling 3D Hills Ring to Smooth Out the Horizon Line Naturally
+            const horizonHillsGroup = new THREE.Group();
+            const hillMat = makeAnimeMat({ map: grassPair.map, color: 0x2e6f40, roughness: 0.85 });
+            for (let i = 0; i < 36; i++) {
+                const ang = (i / 36) * Math.PI * 2;
+                const dist = 420 + (i % 3) * 25;
+                const hill = new THREE.Mesh(new THREE.SphereGeometry(65 + (i % 4) * 18, 24, 16), hillMat);
+                hill.scale.set(1.8, 0.42 + (i % 3) * 0.12, 1.2);
+                hill.position.set(Math.cos(ang) * dist, -6, Math.sin(ang) * dist);
+                hill.rotation.y = -ang + Math.PI / 2;
+                horizonHillsGroup.add(hill);
+            }
+            scene.add(horizonHillsGroup);
+
+            // Soft Volumetric Clouds (Fog-Enabled so they fade into the horizon naturally)
             const cloudsGroup = new THREE.Group();
             scene.add(cloudsGroup);
-            const cloudMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.85, metalness: 0.0 });
-            for (let i = 0; i < 22; i++) {
+            const cloudMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9, metalness: 0.0, transparent: true, opacity: 0.92 });
+            for (let i = 0; i < 20; i++) {
                 const cg = new THREE.Group();
-                [[0, 0, 0, 15], [12, -2, 3, 11], [-12, -1, -2, 12], [6, 5, -3, 10], [-6, 4, 4, 9], [0, 3, 7, 10]].forEach(b => {
+                [[0, 0, 0, 16], [13, -2, 3, 12], [-13, -1, -2, 13], [6, 5, -3, 11], [-6, 4, 4, 10]].forEach(b => {
                     const puff = new THREE.Mesh(new THREE.SphereGeometry(b[3], 18, 18), cloudMat);
-                    puff.scale.set(1.35, 0.72, 1.05);
+                    puff.scale.set(1.45, 0.55, 1.1);
                     puff.position.set(b[0], b[1], b[2]);
                     cg.add(puff);
                 });
-                cg.position.set((Math.random() - 0.5) * 750, 105 + Math.random() * 45, (Math.random() - 0.5) * 750);
+                cg.position.set((Math.random() - 0.5) * 750, 115 + Math.random() * 45, (Math.random() - 0.5) * 750);
                 cloudsGroup.add(cg);
             }
 
-            // REAL-TIME EASTERN STANDARD TIME (`America/New_York`) CLOCK & SKY UPDATER
             const clockEl = document.getElementById('world-clock');
             const estFormatter = new Intl.DateTimeFormat('en-US', {
                 timeZone: 'America/New_York',
@@ -869,15 +922,14 @@
                 const icon = (hourFloat >= 6.5 && hourFloat < 17.0) ? '☀️' : ((hourFloat >= 17.0 && hourFloat < 19.5) || (hourFloat >= 5.5 && hourFloat < 6.5) ? '🌅' : '🌙');
                 clockEl.innerText = `${icon} ${hr12}:${min < 10 ? '0' + min : min} ${ampm} EST`;
 
-                // Orbit 3D Sun & Moon according to real-time EST hour
                 const sunAngle = ((hourFloat - 6.0) / 24.0) * Math.PI * 2;
-                const sx = Math.cos(sunAngle) * 750;
-                const sy = Math.sin(sunAngle) * 750;
+                const sx = Math.cos(sunAngle) * 780;
+                const sy = Math.sin(sunAngle) * 780;
                 const sz = -280;
 
                 sunOrb.position.set(camera.position.x + sx, sy, camera.position.z + sz);
                 moonOrb.position.set(camera.position.x - sx, -sy, camera.position.z + sz);
-                skyMat.uniforms.sunPosition.value.set(sx, Math.max(-80, sy), sz);
+                skyMat.uniforms.sunPosition.value.set(sx, Math.max(-60, sy), sz);
 
                 const activeLightY = sy > 0 ? sy : -sy;
                 const activeLightX = sy > 0 ? sx : -sx;
@@ -885,53 +937,62 @@
 
                 skyDome.position.copy(camera.position);
                 starField.position.copy(camera.position);
-                starField.rotation.y += delta * 0.004;
 
                 cloudsGroup.children.forEach(c => {
-                    c.position.x += delta * 2.2;
-                    if (c.position.x > 380) c.position.x = -380;
+                    c.position.x += delta * 2.0;
+                    if (c.position.x > 390) c.position.x = -390;
                 });
 
                 if (hourFloat >= 5.5 && hourFloat < 7.5) {
-                    // Dawn / Sunrise
-                    skyMat.uniforms.topColor.value.setHex(0x1e3a8a);
-                    skyMat.uniforms.horizonColor.value.setHex(0xfb923c);
-                    skyMat.uniforms.sunColor.value.setHex(0xf97316);
-                    sunLight.intensity = 1.05; hemiLight.intensity = 0.65;
-                    cloudMat.color.setHex(0xfed7aa);
-                    starMat.opacity = 0.25;
+                    // Soft Dawn
+                    skyMat.uniforms.zenithColor.value.setHex(0x3b6998);
+                    skyMat.uniforms.horizonColor.value.setHex(0xf6bd95);
+                    skyMat.uniforms.nadirColor.value.setHex(0x8ba38e);
+                    skyMat.uniforms.sunColor.value.setHex(0xffb07c);
+                    sunLight.intensity = 1.05; hemiLight.intensity = 0.7;
+                    cloudMat.color.setHex(0xffe4d1);
+                    starMat.opacity = 0.15;
                 } else if (hourFloat >= 7.5 && hourFloat < 16.75) {
-                    // Bright Daytime
-                    skyMat.uniforms.topColor.value.setHex(0x0284c7);
-                    skyMat.uniforms.horizonColor.value.setHex(0xbae6fd);
+                    // Natural Clear Daytime Sky
+                    skyMat.uniforms.zenithColor.value.setHex(0x2b6cb0);
+                    skyMat.uniforms.horizonColor.value.setHex(0xd4eaf7);
+                    skyMat.uniforms.nadirColor.value.setHex(0x88ab8e);
                     skyMat.uniforms.sunColor.value.setHex(0xfffbeb);
-                    sunLight.intensity = 1.55; hemiLight.intensity = 0.88;
+                    sunLight.intensity = 1.45; hemiLight.intensity = 0.85;
                     cloudMat.color.setHex(0xffffff);
                     starMat.opacity = 0.0;
                 } else if (hourFloat >= 16.75 && hourFloat < 19.25) {
-                    // Golden Hour / Sunset (5:08 PM EST falls right in this gorgeous golden sunset!)
+                    // Natural Warm Golden-Hour / Dusk (Smoothly transitions without harsh purple bands)
                     const t = (hourFloat - 16.75) / 2.5;
-                    skyMat.uniforms.topColor.value.setHex(0x1e1b4b).lerp(new THREE.Color(0x0284c7), 1 - t * 0.7);
-                    skyMat.uniforms.horizonColor.value.setHex(0xf97316);
-                    skyMat.uniforms.sunColor.value.setHex(0xfb7185);
-                    sunLight.intensity = 1.15 - t * 0.4;
-                    hemiLight.intensity = 0.7 - t * 0.2;
-                    cloudMat.color.setHex(0xfed7aa);
-                    starMat.opacity = t * 0.6;
+                    const dayZenith = new THREE.Color(0x2b6cb0);
+                    const duskZenith = new THREE.Color(0x1e293b);
+                    const dayHoriz = new THREE.Color(0xd4eaf7);
+                    const duskHoriz = new THREE.Color(0xe89b72);
+
+                    skyMat.uniforms.zenithColor.value.copy(dayZenith).lerp(duskZenith, t);
+                    skyMat.uniforms.horizonColor.value.copy(dayHoriz).lerp(duskHoriz, Math.sin(t * Math.PI));
+                    skyMat.uniforms.nadirColor.value.setHex(0x4a5d4e);
+                    skyMat.uniforms.sunColor.value.setHex(0xffae73);
+                    sunLight.intensity = 1.25 - t * 0.45;
+                    hemiLight.intensity = 0.78 - t * 0.25;
+                    cloudMat.color.setHex(0xfde2cf);
+                    starMat.opacity = Math.max(0, (t - 0.3) * 0.85);
                 } else {
-                    // Starry Night
-                    skyMat.uniforms.topColor.value.setHex(0x030712);
-                    skyMat.uniforms.horizonColor.value.setHex(0x1e1b4b);
-                    skyMat.uniforms.sunColor.value.setHex(0x38bdf8);
-                    sunLight.intensity = 0.45; hemiLight.intensity = 0.4;
-                    cloudMat.color.setHex(0x475569);
-                    starMat.opacity = 0.95;
+                    // Calm Moonlit Night
+                    skyMat.uniforms.zenithColor.value.setHex(0x091122);
+                    skyMat.uniforms.horizonColor.value.setHex(0x1e2d4a);
+                    skyMat.uniforms.nadirColor.value.setHex(0x0f1a2c);
+                    skyMat.uniforms.sunColor.value.setHex(0x93c5fd);
+                    sunLight.intensity = 0.48; hemiLight.intensity = 0.42;
+                    cloudMat.color.setHex(0x64748b);
+                    starMat.opacity = 0.9;
                 }
                 scene.fog.color.copy(skyMat.uniforms.horizonColor.value);
+                scene.background.copy(skyMat.uniforms.horizonColor.value);
             }
 
             // =========================================================
-            // 2. EXTRA TEXTURES & CATALOGS
+            // 3. EXTRA TEXTURES & CATALOGS
             // =========================================================
             function makeSimpleTex(drawFn, rx, ry) {
                 const c = document.createElement('canvas'); c.width = 256; c.height = 256;
@@ -970,21 +1031,21 @@
             }
 
             const ANIMAL_CATALOG = [
-                { id: 'panda', label: 'Panda', icon: '🐼', primary: 0xf8fafc, secondary: 0x141619, earType: 'round', tailType: 'puff' },
+                { id: 'panda', label: 'Panda', icon: '🐼', primary: 0xf8fafc, secondary: 0x181a20, earType: 'round', tailType: 'puff' },
                 { id: 'gorilla', label: 'Gorilla', icon: '🦍', primary: 0x374151, secondary: 0x1f2937, earType: 'small', tailType: 'none' },
-                { id: 'cat', label: 'Kitty', icon: '🐱', primary: 0xfb923c, secondary: 0xffffff, earType: 'pointy', tailType: 'long', whiskers: true, stripes: true },
-                { id: 'dog', label: 'Puppy', icon: '🐶', primary: 0xd97706, secondary: 0x78350f, earType: 'floppy', tailType: 'wag' },
+                { id: 'cat', label: 'Kitty', icon: '🐱', primary: 0xfb923c, secondary: 0xffffff, earType: 'pointy', tailType: 'spline', whiskers: true, stripes: true },
+                { id: 'dog', label: 'Puppy', icon: '🐶', primary: 0xd97706, secondary: 0x78350f, earType: 'floppy', tailType: 'spline' },
                 { id: 'bunny', label: 'Bunny', icon: '🐰', primary: 0xfce7f3, secondary: 0xf472b6, earType: 'tall', tailType: 'puff', whiskers: true },
                 { id: 'fox', label: 'Fox', icon: '🦊', primary: 0xea580c, secondary: 0xffffff, earType: 'pointy', tailType: 'bushy', whiskers: true },
                 { id: 'bear', label: 'Grizzly', icon: '🐻', primary: 0x78350f, secondary: 0x451a03, earType: 'round', tailType: 'puff' },
                 { id: 'koala', label: 'Koala', icon: '🐨', primary: 0x94a3b8, secondary: 0x475569, earType: 'big_side', tailType: 'puff', koalaNose: true },
                 { id: 'penguin', label: 'Penguin', icon: '🐧', primary: 0x1e293b, secondary: 0xf8fafc, earType: 'none', tailType: 'puff', beak: true, wings: true },
                 { id: 'frog', label: 'Froggy', icon: '🐸', primary: 0x4ade80, secondary: 0x16a34a, earType: 'top_eyes', tailType: 'none' },
-                { id: 'tiger', label: 'Tiger', icon: '🐯', primary: 0xf97316, secondary: 0x111827, earType: 'round', tailType: 'long', whiskers: true, stripes: true },
-                { id: 'lion', label: 'Lion', icon: '🦁', primary: 0xfbbf24, secondary: 0x92400e, earType: 'mane', tailType: 'long', whiskers: true },
+                { id: 'tiger', label: 'Tiger', icon: '🐯', primary: 0xf97316, secondary: 0x111827, earType: 'round', tailType: 'spline', whiskers: true, stripes: true },
+                { id: 'lion', label: 'Lion', icon: '🦁', primary: 0xfbbf24, secondary: 0x92400e, earType: 'mane', tailType: 'spline', whiskers: true },
                 { id: 'pig', label: 'Piggy', icon: '🐷', primary: 0xf9a8d4, secondary: 0xf472b6, earType: 'floppy', tailType: 'puff', pigNose: true },
-                { id: 'cow', label: 'Moo Cow', icon: '🐮', primary: 0xffffff, secondary: 0x111827, earType: 'horns', tailType: 'long', spots: true, cowSnout: true },
-                { id: 'monkey', label: 'Monkey', icon: '🐵', primary: 0x9a3412, secondary: 0xfde68a, earType: 'big_side', tailType: 'long' },
+                { id: 'cow', label: 'Moo Cow', icon: '🐮', primary: 0xffffff, secondary: 0x111827, earType: 'horns', tailType: 'spline', spots: true, cowSnout: true },
+                { id: 'monkey', label: 'Monkey', icon: '🐵', primary: 0x9a3412, secondary: 0xfde68a, earType: 'big_side', tailType: 'spline' },
                 { id: 'hamster', label: 'Hamster', icon: '🐹', primary: 0xfdba74, secondary: 0xffffff, earType: 'round', tailType: 'puff', whiskers: true, puffyCheeks: true },
                 { id: 'owl', label: 'Night Owl', icon: '🦉', primary: 0x6b4423, secondary: 0xfef08a, earType: 'pointy', tailType: 'puff', beak: true, wings: true },
                 { id: 'duck', label: 'Duckling', icon: '🦆', primary: 0xfacc15, secondary: 0xf97316, earType: 'none', tailType: 'puff', duckBill: true, wings: true },
@@ -1021,8 +1082,8 @@
             });
 
             const ground = new THREE.Mesh(
-                new THREE.PlaneGeometry(900, 900),
-                makeAnimeMat({ map: grassPair.map, bumpMap: grassPair.bumpMap, bumpScale: 0.08, roughness: 0.72 })
+                new THREE.PlaneGeometry(1000, 1000),
+                makeAnimeMat({ map: grassPair.map, bumpMap: grassPair.bumpMap, bumpScale: 0.08, roughness: 0.78 })
             );
             ground.rotation.x = -Math.PI / 2;
             ground.receiveShadow = true;
@@ -1035,10 +1096,10 @@
             [-180, -90, 0, 90, 180].forEach(pos => {
                 const rNS = new THREE.Mesh(new THREE.PlaneGeometry(16, 750), roadMat);
                 rNS.rotation.x = -Math.PI / 2; rNS.position.set(pos, 0.03, 0); rNS.receiveShadow = true; scene.add(rNS);
-                const curbL = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 750, 12), curbMat);
-                curbL.rotation.x = Math.PI / 2; curbL.position.set(pos - 8.4, 0.1, 0); curbL.receiveShadow = true; scene.add(curbL);
-                const curbR = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 750, 12), curbMat);
-                curbR.rotation.x = Math.PI / 2; curbR.position.set(pos + 8.4, 0.1, 0); curbR.receiveShadow = true; scene.add(curbR);
+                const curbL = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 750, 12), curbMat);
+                curbL.rotation.x = Math.PI / 2; curbL.position.set(pos - 8.3, 0.08, 0); curbL.receiveShadow = true; scene.add(curbL);
+                const curbR = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 750, 12), curbMat);
+                curbR.rotation.x = Math.PI / 2; curbR.position.set(pos + 8.3, 0.08, 0); curbR.receiveShadow = true; scene.add(curbR);
 
                 const rEW = new THREE.Mesh(new THREE.PlaneGeometry(16, 750), roadMat);
                 rEW.rotation.x = -Math.PI / 2; rEW.rotation.z = Math.PI / 2; rEW.position.set(0, 0.04, pos); rEW.receiveShadow = true; scene.add(rEW);
@@ -1059,7 +1120,7 @@
             });
 
             // =========================================================
-            // 3. SERVER-SYNCED TYCOON SUB-WORLD (AT X: 2000, Z: 2000)
+            // 4. SERVER-SYNCED TYCOON SUB-WORLD (AT X: 2000, Z: 2000)
             // =========================================================
             const TYCOON_ORIGIN = { x: 2000, y: 0, z: 2000 };
             const tycoonGroup = new THREE.Group();
@@ -1107,7 +1168,7 @@
             tycoonGroup.add(tycoonBuiltProps);
 
             // =========================================================
-            // 4. SPECIES-ACCURATE 3D CUTE ANIME ANIMALS (ALL 20 SPECIES)
+            // 5. SMOOTH, FUR-TEXTURED 3D COMPANIONS (ALL 20 SPECIES)
             // =========================================================
             const npcsGroup = new THREE.Group();
             scene.add(npcsGroup);
@@ -1120,25 +1181,34 @@
                 const sc = scaleMultiplier || 0.68;
                 const root = new THREE.Group();
 
-                const primMat = makeAnimeMat({ color: spec.primary, roughness: 0.36 });
-                const secMat = makeAnimeMat({ color: spec.secondary, roughness: 0.4 });
-                const bellyMat = makeAnimeMat({ color: 0xffffff, roughness: 0.38 });
-                const pinkMat = new THREE.MeshBasicMaterial({ color: 0xff8da1 });
+                // Soft Fur-Mapped PBR Materials for Organic Realism
+                const primMat = makeFurMat(spec.primary);
+                const secMat = makeFurMat(spec.secondary);
+                const bellyMat = makeFurMat(0xffffff);
+                const pinkMat = new THREE.MeshStandardMaterial({ color: 0xff8da1, roughness: 0.4 });
                 const eyeWhite = new THREE.MeshBasicMaterial({ color: 0xffffff });
                 const eyeIris = new THREE.MeshBasicMaterial({ color: spec.id === 'owl' ? 0xf59e0b : 0x2563eb });
                 const eyeBlack = new THREE.MeshBasicMaterial({ color: 0x050505 });
 
-                // Sculpted Organic Torso + Soft Rounded Tummy
-                const torso = new THREE.Mesh(new THREE.SphereGeometry(1.05 * sc, 28, 28), primMat);
-                torso.scale.set(1.02, 1.16, 0.96); torso.position.y = 1.75 * sc; torso.castShadow = true; root.add(torso);
+                // Seamless Subdivided Torso + Neck Collar + Hip Blend (No blocky seams!)
+                const torso = new THREE.Mesh(new THREE.SphereGeometry(1.04 * sc, 32, 32), primMat);
+                torso.scale.set(1.02, 1.18, 0.96); torso.position.y = 1.75 * sc; torso.castShadow = true; root.add(torso);
 
-                const tummy = new THREE.Mesh(new THREE.SphereGeometry(0.84 * sc, 24, 24), spec.id === 'panda' ? secMat : bellyMat);
-                tummy.scale.set(0.92, 1.06, 0.58); tummy.position.set(0, 1.72 * sc, 0.62 * sc); root.add(tummy);
+                const neckBlend = new THREE.Mesh(new THREE.CylinderGeometry(0.68 * sc, 0.85 * sc, 0.55 * sc, 24), spec.id === 'panda' ? secMat : primMat);
+                neckBlend.position.set(0, 2.68 * sc, 0.06 * sc); root.add(neckBlend);
 
-                // Dairy Cow Spots or Tiger Stripes on Torso
+                const tummy = new THREE.Mesh(new THREE.SphereGeometry(0.84 * sc, 28, 28), spec.id === 'panda' ? primMat : bellyMat);
+                tummy.scale.set(0.92, 1.05, 0.58); tummy.position.set(0, 1.68 * sc, 0.58 * sc); root.add(tummy);
+
+                if (spec.id === 'panda') {
+                    const shoulderWrap = new THREE.Mesh(new THREE.SphereGeometry(0.96 * sc, 28, 24), secMat);
+                    shoulderWrap.scale.set(1.12, 0.55, 1.02); shoulderWrap.position.set(0, 2.32 * sc, 0.02 * sc);
+                    root.add(shoulderWrap);
+                }
+
                 if (spec.spots) {
                     [[-0.65, 2.0, 0.3], [0.7, 1.6, -0.2], [-0.4, 1.4, -0.65]].forEach(sp => {
-                        const spot = new THREE.Mesh(new THREE.SphereGeometry(0.38 * sc, 16, 16), secMat);
+                        const spot = new THREE.Mesh(new THREE.SphereGeometry(0.38 * sc, 20, 20), secMat);
                         spot.scale.set(1.1, 0.85, 0.5);
                         spot.position.set(sp[0] * sc, sp[1] * sc, sp[2] * sc);
                         root.add(spot);
@@ -1146,7 +1216,7 @@
                 }
                 if (spec.stripes) {
                     [1.45, 1.85, 2.2].forEach(sy => {
-                        const band = new THREE.Mesh(new THREE.TorusGeometry(0.96 * sc, 0.07 * sc, 10, 24), secMat);
+                        const band = new THREE.Mesh(new THREE.TorusGeometry(0.96 * sc, 0.065 * sc, 12, 28), secMat);
                         band.rotation.x = Math.PI / 2;
                         band.scale.set(1.02, 0.94, 1);
                         band.position.y = sy * sc;
@@ -1154,12 +1224,11 @@
                     });
                 }
 
-                // Feathered Side Wings for Penguin, Duckling & Night Owl
                 if (spec.wings) {
                     [-1.02 * sc, 1.02 * sc].forEach(wx => {
                         const side = wx > 0 ? 1 : -1;
-                        const wing = new THREE.Mesh(new THREE.SphereGeometry(0.45 * sc, 18, 18), spec.id === 'penguin' ? primMat : secMat);
-                        wing.scale.set(0.35, 1.45, 0.75);
+                        const wing = new THREE.Mesh(new THREE.SphereGeometry(0.45 * sc, 24, 24), spec.id === 'penguin' ? primMat : secMat);
+                        wing.scale.set(0.32, 1.45, 0.78);
                         wing.position.set(wx, 1.82 * sc, 0.05 * sc);
                         wing.rotation.z = side * -0.18;
                         root.add(wing);
@@ -1171,17 +1240,17 @@
                     apron.position.set(0, 1.55 * sc, 0.08 * sc); root.add(apron);
                 }
 
-                // Sculpted 3D Anime Head with Chubby Cheeks
+                // Sculpted High-Segment Organic Head & Blended Cheeks
                 const head = new THREE.Group();
-                head.position.set(0, 3.25 * sc, 0.12 * sc); root.add(head);
-                const headSphere = new THREE.Mesh(new THREE.SphereGeometry(0.96 * sc, 28, 28), primMat);
-                headSphere.scale.set(1.14, 0.98, 0.98); headSphere.castShadow = true; head.add(headSphere);
+                head.position.set(0, 3.22 * sc, 0.12 * sc); root.add(head);
+                const headSphere = new THREE.Mesh(new THREE.SphereGeometry(0.96 * sc, 32, 32), primMat);
+                headSphere.scale.set(1.12, 0.98, 0.98); headSphere.castShadow = true; head.add(headSphere);
 
-                const cheekRadius = spec.puffyCheeks ? 0.56 : 0.42;
-                [-0.75 * sc, 0.75 * sc].forEach(cx => {
-                    const cheek = new THREE.Mesh(new THREE.SphereGeometry(cheekRadius * sc, 18, 18), spec.puffyCheeks || spec.id === 'fox' ? bellyMat : primMat);
-                    cheek.scale.set(1.12, 0.82, 0.88);
-                    cheek.position.set(cx, -0.22 * sc, 0.28 * sc);
+                const cheekRadius = spec.puffyCheeks ? 0.56 : 0.46;
+                [-0.68 * sc, 0.68 * sc].forEach(cx => {
+                    const cheek = new THREE.Mesh(new THREE.SphereGeometry(cheekRadius * sc, 24, 24), spec.puffyCheeks || spec.id === 'fox' ? bellyMat : primMat);
+                    cheek.scale.set(1.15, 0.82, 0.92);
+                    cheek.position.set(cx, -0.2 * sc, 0.28 * sc);
                     head.add(cheek);
                 });
 
@@ -1194,97 +1263,105 @@
                     head.add(hatBrim, hatTop);
                 }
 
-                // 16-Petal Sculpted Lion Mane
                 if (spec.earType === 'mane') {
-                    for (let m = 0; m < 16; m++) {
-                        const ang = (m / 16) * Math.PI * 2;
-                        const tuft = new THREE.Mesh(new THREE.SphereGeometry(0.44 * sc, 16, 16), secMat);
+                    for (let m = 0; m < 18; m++) {
+                        const ang = (m / 18) * Math.PI * 2;
+                        const tuft = new THREE.Mesh(new THREE.SphereGeometry(0.45 * sc, 18, 18), secMat);
                         tuft.position.set(Math.cos(ang) * 0.96 * sc, Math.sin(ang) * 0.92 * sc, -0.16 * sc);
                         head.add(tuft);
                     }
                 }
 
-                // Species-Specific 3D Ears & Horns
+                // Organic Sculpted Ears (Using Rounded Ellipsoids Instead of Sharp Cones)
                 [-0.68 * sc, 0.68 * sc].forEach(ex => {
                     const side = ex > 0 ? 1 : -1;
                     if (spec.earType === 'tall') {
-                        const ear = new THREE.Mesh(new THREE.SphereGeometry(0.25 * sc, 18, 18), primMat);
-                        ear.scale.set(0.82, 2.9, 0.48); ear.position.set(ex * 0.78, 1.28 * sc, -0.05 * sc); ear.rotation.z = side * -0.12;
-                        const inner = new THREE.Mesh(new THREE.SphereGeometry(0.16 * sc, 14, 14), pinkMat);
-                        inner.scale.set(0.7, 2.5, 0.32); inner.position.set(ex * 0.78, 1.25 * sc, 0.05 * sc); inner.rotation.z = side * -0.12;
+                        const ear = new THREE.Mesh(new THREE.SphereGeometry(0.25 * sc, 24, 24), primMat);
+                        ear.scale.set(0.82, 2.85, 0.48); ear.position.set(ex * 0.78, 1.28 * sc, -0.05 * sc); ear.rotation.z = side * -0.12;
+                        const inner = new THREE.Mesh(new THREE.SphereGeometry(0.16 * sc, 18, 18), pinkMat);
+                        inner.scale.set(0.7, 2.45, 0.32); inner.position.set(ex * 0.78, 1.25 * sc, 0.05 * sc); inner.rotation.z = side * -0.12;
                         head.add(ear, inner);
                     } else if (spec.earType === 'pointy') {
-                        const ear = new THREE.Mesh(new THREE.ConeGeometry(0.38 * sc, 0.76 * sc, 16), secMat);
-                        ear.position.set(ex, 0.86 * sc, -0.05 * sc); ear.rotation.z = side * -0.25;
-                        const inner = new THREE.Mesh(new THREE.ConeGeometry(0.22 * sc, 0.5 * sc, 12), pinkMat);
-                        inner.position.set(ex, 0.82 * sc, 0.08 * sc); inner.rotation.z = side * -0.25;
+                        // Smooth organic tapered cat/fox ear using stretched sphere + tip
+                        const ear = new THREE.Mesh(new THREE.SphereGeometry(0.34 * sc, 24, 24), secMat);
+                        ear.scale.set(0.85, 1.55, 0.45);
+                        ear.position.set(ex * 1.05, 0.78 * sc, -0.05 * sc);
+                        ear.rotation.z = side * -0.28;
+                        const inner = new THREE.Mesh(new THREE.SphereGeometry(0.22 * sc, 18, 18), pinkMat);
+                        inner.scale.set(0.75, 1.35, 0.35);
+                        inner.position.set(ex * 1.05, 0.76 * sc, 0.05 * sc);
+                        inner.rotation.z = side * -0.28;
                         head.add(ear, inner);
                     } else if (spec.earType === 'floppy') {
-                        const ear = new THREE.Mesh(new THREE.SphereGeometry(0.34 * sc, 18, 18), secMat);
+                        const ear = new THREE.Mesh(new THREE.SphereGeometry(0.34 * sc, 24, 24), secMat);
                         ear.scale.set(0.55, 1.75, 0.88);
                         ear.position.set(ex * 1.38, 0.12 * sc, 0.06 * sc);
                         ear.rotation.z = side * 0.28;
                         head.add(ear);
                     } else if (spec.earType === 'big_side') {
-                        const ear = new THREE.Mesh(new THREE.SphereGeometry(0.48 * sc, 18, 18), secMat);
+                        const ear = new THREE.Mesh(new THREE.SphereGeometry(0.48 * sc, 24, 24), secMat);
                         ear.scale.set(0.95, 0.95, 0.48);
                         ear.position.set(ex * 1.45, 0.28 * sc, -0.05 * sc);
-                        const tuft = new THREE.Mesh(new THREE.SphereGeometry(0.28 * sc, 14, 14), bellyMat);
+                        const tuft = new THREE.Mesh(new THREE.SphereGeometry(0.28 * sc, 18, 18), bellyMat);
                         tuft.position.set(ex * 1.45, 0.28 * sc, 0.12 * sc);
                         head.add(ear, tuft);
                     } else if (spec.earType === 'horns') {
-                        const horn = new THREE.Mesh(new THREE.ConeGeometry(0.16 * sc, 0.58 * sc, 16), makeAnimeMat({ color: 0xfef08a }));
-                        horn.position.set(ex * 0.85, 0.94 * sc, -0.05 * sc); horn.rotation.z = side * -0.32;
-                        const cowEar = new THREE.Mesh(new THREE.SphereGeometry(0.26 * sc, 14, 14), secMat);
+                        const hornCurve = new THREE.CatmullRomCurve3([
+                            new THREE.Vector3(ex * 0.7, 0.65 * sc, -0.05 * sc),
+                            new THREE.Vector3(ex * 1.05, 0.98 * sc, 0.02 * sc),
+                            new THREE.Vector3(ex * 0.92, 1.25 * sc, 0.12 * sc)
+                        ]);
+                        const horn = new THREE.Mesh(new THREE.TubeGeometry(hornCurve, 12, 0.11 * sc, 12, false), makeAnimeMat({ color: 0xfef08a }));
+                        const cowEar = new THREE.Mesh(new THREE.SphereGeometry(0.26 * sc, 18, 18), secMat);
                         cowEar.scale.set(1.4, 0.6, 0.5); cowEar.position.set(ex * 1.35, 0.45 * sc, -0.05 * sc);
                         head.add(horn, cowEar);
                     } else if (spec.earType !== 'none' && spec.earType !== 'top_eyes') {
-                        const ear = new THREE.Mesh(new THREE.SphereGeometry(0.35 * sc, 18, 18), secMat);
+                        const ear = new THREE.Mesh(new THREE.SphereGeometry(0.36 * sc, 24, 24), secMat);
+                        ear.scale.set(1.0, 1.0, 0.65);
                         ear.position.set(ex, 0.78 * sc, -0.08 * sc); head.add(ear);
                     }
                 });
 
-                // Species-Specific Snouts, Bills, Beaks & Noses
+                // Blended Muzzles, Bills, Beaks & Noses
                 if (spec.duckBill) {
-                    const billMat = makeAnimeMat({ color: 0xf97316 });
-                    const bill = new THREE.Mesh(new THREE.SphereGeometry(0.36 * sc, 18, 18), billMat);
+                    const billMat = makeAnimeMat({ color: 0xf97316, roughness: 0.35 });
+                    const bill = new THREE.Mesh(new THREE.SphereGeometry(0.36 * sc, 24, 24), billMat);
                     bill.scale.set(1.35, 0.45, 1.25);
-                    bill.position.set(0, -0.14 * sc, 0.95 * sc);
+                    bill.position.set(0, -0.14 * sc, 0.92 * sc);
                     head.add(bill);
                 } else if (spec.beak) {
-                    const beakMat = makeAnimeMat({ color: 0xf59e0b });
-                    const beak = new THREE.Mesh(new THREE.ConeGeometry(0.26 * sc, 0.55 * sc, 16), beakMat);
+                    const beakMat = makeAnimeMat({ color: 0xf59e0b, roughness: 0.35 });
+                    const beak = new THREE.Mesh(new THREE.ConeGeometry(0.26 * sc, 0.52 * sc, 20), beakMat);
                     beak.rotation.x = Math.PI / 2;
-                    beak.position.set(0, -0.12 * sc, 1.04 * sc);
+                    beak.position.set(0, -0.12 * sc, 0.98 * sc);
                     head.add(beak);
                 } else if (spec.pigNose) {
-                    const snout = new THREE.Mesh(new THREE.CylinderGeometry(0.32 * sc, 0.35 * sc, 0.28 * sc, 20), pinkMat);
-                    snout.rotation.x = Math.PI / 2;
-                    snout.position.set(0, -0.12 * sc, 0.92 * sc);
+                    const snout = new THREE.Mesh(new THREE.SphereGeometry(0.36 * sc, 24, 24), pinkMat);
+                    snout.scale.set(1.15, 0.85, 0.75);
+                    snout.position.set(0, -0.12 * sc, 0.86 * sc);
                     [-0.1 * sc, 0.1 * sc].forEach(nx => {
-                        const hole = new THREE.Mesh(new THREE.SphereGeometry(0.06 * sc, 10, 10), eyeBlack);
-                        hole.position.set(nx, -0.12 * sc, 1.06 * sc);
+                        const hole = new THREE.Mesh(new THREE.SphereGeometry(0.06 * sc, 12, 12), eyeBlack);
+                        hole.position.set(nx, -0.12 * sc, 1.1 * sc);
                         head.add(hole);
                     });
                     head.add(snout);
                 } else if (spec.cowSnout) {
-                    const muzzle = new THREE.Mesh(new THREE.SphereGeometry(0.42 * sc, 18, 18), pinkMat);
+                    const muzzle = new THREE.Mesh(new THREE.SphereGeometry(0.44 * sc, 24, 24), pinkMat);
                     muzzle.scale.set(1.35, 0.78, 0.85);
-                    muzzle.position.set(0, -0.2 * sc, 0.84 * sc);
+                    muzzle.position.set(0, -0.2 * sc, 0.82 * sc);
                     head.add(muzzle);
                 } else if (spec.koalaNose) {
-                    const kNose = new THREE.Mesh(new THREE.SphereGeometry(0.24 * sc, 16, 16), eyeBlack);
+                    const kNose = new THREE.Mesh(new THREE.SphereGeometry(0.24 * sc, 20, 20), eyeBlack);
                     kNose.scale.set(0.85, 1.35, 0.85);
-                    kNose.position.set(0, -0.05 * sc, 0.98 * sc);
+                    kNose.position.set(0, -0.05 * sc, 0.96 * sc);
                     head.add(kNose);
                 } else {
-                    const snout = new THREE.Mesh(new THREE.SphereGeometry(0.35 * sc, 18, 18), bellyMat);
-                    snout.scale.set(1.25, 0.85, 0.95); snout.position.set(0, -0.16 * sc, 0.82 * sc); head.add(snout);
-                    const nose = new THREE.Mesh(new THREE.SphereGeometry(0.14 * sc, 14, 14), spec.id === 'bunny' || spec.id === 'cat' ? pinkMat : secMat);
-                    nose.scale.set(1.3, 0.85, 0.9); nose.position.set(0, -0.06 * sc, 1.1 * sc); head.add(nose);
+                    const snout = new THREE.Mesh(new THREE.SphereGeometry(0.42 * sc, 24, 24), bellyMat);
+                    snout.scale.set(1.18, 0.82, 0.88); snout.position.set(0, -0.16 * sc, 0.72 * sc); head.add(snout);
+                    const nose = new THREE.Mesh(new THREE.SphereGeometry(0.14 * sc, 18, 18), spec.id === 'bunny' || spec.id === 'cat' ? pinkMat : secMat);
+                    nose.scale.set(1.3, 0.85, 0.9); nose.position.set(0, -0.06 * sc, 1.06 * sc); head.add(nose);
                 }
 
-                // 3D Whiskers
                 if (spec.whiskers) {
                     [-1, 1].forEach(side => {
                         [-0.06, 0.04].forEach(wy => {
@@ -1296,79 +1373,87 @@
                     });
                 }
 
-                // Multi-Layered Glossy 3D Anime Eyes
                 const eyeGroup = new THREE.Group();
                 head.add(eyeGroup);
                 [-0.36 * sc, 0.36 * sc].forEach(ex => {
                     const side = ex > 0 ? 1 : -1;
                     const ey = spec.earType === 'top_eyes' ? 0.68 * sc : 0.11 * sc;
                     if (spec.earType === 'top_eyes') {
-                        const dome = new THREE.Mesh(new THREE.SphereGeometry(0.32 * sc, 16, 16), primMat);
+                        const dome = new THREE.Mesh(new THREE.SphereGeometry(0.32 * sc, 20, 20), primMat);
                         dome.position.set(ex * 1.1, ey, 0.45 * sc);
                         eyeGroup.add(dome);
                     }
                     if (spec.id === 'panda' || spec.id === 'raccoon' || spec.id === 'red_panda') {
-                        const patch = new THREE.Mesh(new THREE.SphereGeometry(0.32 * sc, 16, 16), secMat);
+                        const patch = new THREE.Mesh(new THREE.SphereGeometry(0.32 * sc, 20, 20), secMat);
                         patch.scale.set(1.18, 1.25, 0.45);
-                        patch.position.set(ex, ey, 0.74 * sc);
+                        patch.position.set(ex, ey, 0.72 * sc);
                         eyeGroup.add(patch);
                     }
-                    const iris = new THREE.Mesh(new THREE.SphereGeometry(0.23 * sc, 18, 18), eyeIris);
-                    iris.scale.set(1.0, 1.2, 0.5); iris.position.set(ex, ey, 0.84 * sc); eyeGroup.add(iris);
-                    const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.17 * sc, 16, 16), eyeBlack);
-                    pupil.scale.set(1.0, 1.16, 0.52); pupil.position.set(ex, ey, 0.88 * sc); eyeGroup.add(pupil);
-                    const shineBig = new THREE.Mesh(new THREE.SphereGeometry(0.085 * sc, 12, 12), eyeWhite);
-                    shineBig.position.set(ex + (side * 0.06 * sc), ey + 0.1 * sc, 0.97 * sc); eyeGroup.add(shineBig);
-                    const shineSmall = new THREE.Mesh(new THREE.SphereGeometry(0.042 * sc, 10, 10), eyeWhite);
-                    shineSmall.position.set(ex - (side * 0.05 * sc), ey - 0.08 * sc, 0.97 * sc); eyeGroup.add(shineSmall);
-                    const blush = new THREE.Mesh(new THREE.SphereGeometry(0.16 * sc, 12, 12), pinkMat);
-                    blush.scale.set(1.4, 0.65, 0.4); blush.position.set(ex * 1.42, -0.18 * sc, 0.78 * sc); head.add(blush);
+                    const iris = new THREE.Mesh(new THREE.SphereGeometry(0.23 * sc, 22, 22), eyeIris);
+                    iris.scale.set(1.0, 1.2, 0.5); iris.position.set(ex, ey, 0.82 * sc); eyeGroup.add(iris);
+                    const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.17 * sc, 20, 20), eyeBlack);
+                    pupil.scale.set(1.0, 1.16, 0.52); pupil.position.set(ex, ey, 0.86 * sc); eyeGroup.add(pupil);
+                    const shineBig = new THREE.Mesh(new THREE.SphereGeometry(0.085 * sc, 14, 14), eyeWhite);
+                    shineBig.position.set(ex + (side * 0.06 * sc), ey + 0.1 * sc, 0.95 * sc); eyeGroup.add(shineBig);
+                    const shineSmall = new THREE.Mesh(new THREE.SphereGeometry(0.042 * sc, 12, 12), eyeWhite);
+                    shineSmall.position.set(ex - (side * 0.05 * sc), ey - 0.08 * sc, 0.95 * sc); eyeGroup.add(shineSmall);
+                    const blush = new THREE.Mesh(new THREE.SphereGeometry(0.16 * sc, 16, 16), pinkMat);
+                    blush.scale.set(1.4, 0.65, 0.4); blush.position.set(ex * 1.42, -0.18 * sc, 0.76 * sc); head.add(blush);
                 });
 
-                // Species-Specific 3D Tails (Ringed, Bushy, Long, Wagging, Puff)
+                // Spline-Curved 3D Tails (`CatmullRomCurve3` + `TubeGeometry`)
                 if (spec.tailType && spec.tailType !== 'none') {
                     const tailGroup = new THREE.Group();
-                    tailGroup.position.set(0, 1.25 * sc, -0.88 * sc);
-                    if (spec.tailType === 'ringed') {
-                        for (let seg = 0; seg < 5; seg++) {
-                            const sMesh = new THREE.Mesh(new THREE.SphereGeometry(0.34 * sc, 14, 14), seg % 2 === 0 ? primMat : secMat);
-                            sMesh.position.set(0, seg * 0.14 * sc, -seg * 0.24 * sc);
+                    tailGroup.position.set(0, 1.22 * sc, -0.82 * sc);
+                    if (spec.tailType === 'spline') {
+                        const curve = new THREE.CatmullRomCurve3([
+                            new THREE.Vector3(0, 0, 0),
+                            new THREE.Vector3(0, 0.15 * sc, -0.45 * sc),
+                            new THREE.Vector3(0, 0.55 * sc, -0.75 * sc),
+                            new THREE.Vector3(0, 0.85 * sc, -0.62 * sc)
+                        ]);
+                        const tube = new THREE.Mesh(new THREE.TubeGeometry(curve, 16, 0.13 * sc, 14, false), secMat);
+                        const tip = new THREE.Mesh(new THREE.SphereGeometry(0.15 * sc, 14, 14), secMat);
+                        tip.position.set(0, 0.85 * sc, -0.62 * sc);
+                        tailGroup.add(tube, tip);
+                    } else if (spec.tailType === 'ringed') {
+                        for (let seg = 0; seg < 6; seg++) {
+                            const sMesh = new THREE.Mesh(new THREE.SphereGeometry(0.34 * sc, 18, 18), seg % 2 === 0 ? primMat : secMat);
+                            sMesh.position.set(0, Math.sin(seg * 0.35) * 0.35 * sc, -seg * 0.22 * sc);
                             tailGroup.add(sMesh);
                         }
                     } else if (spec.tailType === 'bushy') {
-                        const bush = new THREE.Mesh(new THREE.SphereGeometry(0.44 * sc, 18, 18), primMat);
-                        bush.scale.set(0.8, 0.8, 1.85); bush.position.set(0, 0.25 * sc, -0.55 * sc); bush.rotation.x = 0.45;
-                        const tip = new THREE.Mesh(new THREE.SphereGeometry(0.32 * sc, 14, 14), bellyMat);
+                        const bush = new THREE.Mesh(new THREE.SphereGeometry(0.44 * sc, 22, 22), primMat);
+                        bush.scale.set(0.82, 0.82, 1.85); bush.position.set(0, 0.25 * sc, -0.55 * sc); bush.rotation.x = 0.45;
+                        const tip = new THREE.Mesh(new THREE.SphereGeometry(0.32 * sc, 18, 18), bellyMat);
                         tip.position.set(0, 0.45 * sc, -0.95 * sc);
                         tailGroup.add(bush, tip);
-                    } else if (spec.tailType === 'long' || spec.tailType === 'wag') {
-                        const tCyl = new THREE.Mesh(new THREE.CylinderGeometry(0.11 * sc, 0.15 * sc, 1.15 * sc, 14), secMat);
-                        tCyl.position.set(0, 0.35 * sc, -0.45 * sc); tCyl.rotation.x = -0.85;
-                        tailGroup.add(tCyl);
                     } else {
-                        const puff = new THREE.Mesh(new THREE.SphereGeometry(0.28 * sc, 14, 14), bellyMat);
+                        const puff = new THREE.Mesh(new THREE.SphereGeometry(0.3 * sc, 18, 18), bellyMat);
                         puff.position.set(0, 0.05 * sc, -0.18 * sc);
                         tailGroup.add(puff);
                     }
                     root.add(tailGroup);
                 }
 
-                // Smooth Capsule Limbs with Rounded 3D Paw Pads
-                function makeLimb(radius, len, isFoot) {
+                // Organic Sculpted Limbs with Shoulder/Hip Joint Spheres & Soft Paws
+                function makeOrganicLimb(radius, len, isFoot) {
                     const pivot = new THREE.Group();
                     const limbMat = (spec.id === 'duck' || spec.id === 'penguin') && isFoot ? makeAnimeMat({ color: 0xf97316 }) : secMat;
-                    const m = new THREE.Mesh(new THREE.CylinderGeometry(radius * sc, radius * 0.88 * sc, len * sc, 16), limbMat);
+                    const joint = new THREE.Mesh(new THREE.SphereGeometry(radius * 1.05 * sc, 18, 18), limbMat);
+                    pivot.add(joint);
+                    const m = new THREE.Mesh(new THREE.CylinderGeometry(radius * sc, radius * 0.86 * sc, len * sc, 20), limbMat);
                     m.position.y = -(len * sc) / 2; m.castShadow = true; pivot.add(m);
-                    const paw = new THREE.Mesh(new THREE.SphereGeometry(radius * 1.12 * sc, 16, 16), limbMat);
-                    paw.scale.set(1.05, 0.68, 1.3);
+                    const paw = new THREE.Mesh(new THREE.SphereGeometry(radius * 1.12 * sc, 20, 20), limbMat);
+                    paw.scale.set(1.05, 0.68, 1.32);
                     paw.position.set(0, -len * sc, 0.08 * sc);
                     pivot.add(paw);
                     return pivot;
                 }
-                const leftLeg = makeLimb(0.34, 0.95, true); leftLeg.position.set(-0.46 * sc, 1.0 * sc, 0); root.add(leftLeg);
-                const rightLeg = makeLimb(0.34, 0.95, true); rightLeg.position.set(0.46 * sc, 1.0 * sc, 0); root.add(rightLeg);
-                const leftArm = makeLimb(0.28, 0.95, false); leftArm.position.set(-1.02 * sc, 2.4 * sc, 0); root.add(leftArm);
-                const rightArm = makeLimb(0.28, 0.95, false); rightArm.position.set(1.02 * sc, 2.4 * sc, 0); root.add(rightArm);
+                const leftLeg = makeOrganicLimb(0.34, 0.95, true); leftLeg.position.set(-0.46 * sc, 1.0 * sc, 0); root.add(leftLeg);
+                const rightLeg = makeOrganicLimb(0.34, 0.95, true); rightLeg.position.set(0.46 * sc, 1.0 * sc, 0); root.add(rightLeg);
+                const leftArm = makeOrganicLimb(0.28, 0.95, false); leftArm.position.set(-0.96 * sc, 2.35 * sc, 0); root.add(leftArm);
+                const rightArm = makeOrganicLimb(0.28, 0.95, false); rightArm.position.set(0.96 * sc, 2.35 * sc, 0); root.add(rightArm);
 
                 let waveBubble = null;
                 if (nameText) {
@@ -1385,33 +1470,37 @@
             function createRealisticSilverbackGorilla(furColorHex, scale, nameLabel, isStatue) {
                 const g = new THREE.Group();
                 const sc = scale || 1.0;
-                const darkFur = makeAnimeMat({ color: new THREE.Color(furColorHex || '#1f232a'), bumpMap: stonePair.bumpMap, bumpScale: 0.04, roughness: isStatue ? 0.25 : 0.52, metalness: isStatue ? 0.65 : 0.1 });
-                const silverMat = makeAnimeMat({ color: isStatue ? 0xfbbf24 : 0x9ca3af, roughness: 0.35, metalness: isStatue ? 0.75 : 0.15 });
+                const darkFur = isStatue
+                    ? makeAnimeMat({ color: new THREE.Color(furColorHex || '#3f3f46'), bumpMap: stonePair.bumpMap, bumpScale: 0.05, roughness: 0.28, metalness: 0.65 })
+                    : makeFurMat(furColorHex || '#1f232a');
+                const silverMat = isStatue
+                    ? makeAnimeMat({ color: 0xfbbf24, roughness: 0.3, metalness: 0.75 })
+                    : makeFurMat(0x9ca3af);
                 const skinMat = makeAnimeMat({ color: 0x373a40, roughness: 0.45 });
 
-                const torso = new THREE.Mesh(new THREE.SphereGeometry(1.15 * sc, 26, 26), darkFur);
+                const torso = new THREE.Mesh(new THREE.SphereGeometry(1.15 * sc, 28, 28), darkFur);
                 torso.scale.set(1.28, 1.15, 1.05); torso.position.set(0, 2.35 * sc, 0.15 * sc); torso.castShadow = true; g.add(torso);
-                const saddle = new THREE.Mesh(new THREE.SphereGeometry(1.08 * sc, 22, 22), silverMat);
+                const saddle = new THREE.Mesh(new THREE.SphereGeometry(1.08 * sc, 24, 24), silverMat);
                 saddle.scale.set(1.22, 0.95, 0.85); saddle.position.set(0, 2.15 * sc, -0.22 * sc); g.add(saddle);
 
                 [-0.44 * sc, 0.44 * sc].forEach(px => {
-                    const pec = new THREE.Mesh(new THREE.SphereGeometry(0.54 * sc, 18, 18), skinMat);
+                    const pec = new THREE.Mesh(new THREE.SphereGeometry(0.54 * sc, 20, 20), skinMat);
                     pec.scale.set(1.15, 0.88, 0.65); pec.position.set(px, 2.45 * sc, 0.84 * sc); g.add(pec);
                 });
 
-                const head = new THREE.Mesh(new THREE.SphereGeometry(0.68 * sc, 24, 24), darkFur);
+                const head = new THREE.Mesh(new THREE.SphereGeometry(0.68 * sc, 26, 26), darkFur);
                 head.scale.set(1.02, 1.16, 1.05); head.position.set(0, 3.45 * sc, 0.55 * sc); head.castShadow = true; g.add(head);
-                const brow = new THREE.Mesh(new THREE.SphereGeometry(0.46 * sc, 18, 18), skinMat);
+                const brow = new THREE.Mesh(new THREE.SphereGeometry(0.46 * sc, 20, 20), skinMat);
                 brow.scale.set(1.45, 0.42, 0.85); brow.position.set(0, 3.7 * sc, 1.0 * sc); g.add(brow);
 
                 [-1, 1].forEach(side => {
-                    const shoulder = new THREE.Mesh(new THREE.SphereGeometry(0.65 * sc, 18, 18), darkFur);
+                    const shoulder = new THREE.Mesh(new THREE.SphereGeometry(0.65 * sc, 20, 20), darkFur);
                     shoulder.position.set(side * 1.38 * sc, 2.75 * sc, 0.25 * sc); g.add(shoulder);
-                    const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.45 * sc, 0.38 * sc, 2.3 * sc, 18), darkFur);
+                    const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.45 * sc, 0.38 * sc, 2.3 * sc, 20), darkFur);
                     arm.position.set(side * 1.45 * sc, 1.55 * sc, 0.45 * sc); arm.castShadow = true; g.add(arm);
-                    const knuckle = new THREE.Mesh(new THREE.SphereGeometry(0.42 * sc, 16, 16), skinMat);
+                    const knuckle = new THREE.Mesh(new THREE.SphereGeometry(0.42 * sc, 18, 18), skinMat);
                     knuckle.scale.set(1.15, 0.75, 1.25); knuckle.position.set(side * 1.45 * sc, 0.35 * sc, 0.55 * sc); g.add(knuckle);
-                    const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.42 * sc, 0.34 * sc, 1.4 * sc, 18), silverMat);
+                    const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.42 * sc, 0.34 * sc, 1.4 * sc, 20), silverMat);
                     leg.position.set(side * 0.68 * sc, 0.75 * sc, -0.25 * sc); leg.castShadow = true; g.add(leg);
                 });
 
@@ -1506,7 +1595,7 @@
             const remoteGodMeshes = {};
 
             // =========================================================
-            // 5. NON-BLOCKY 3D ARCHITECTURAL BUILDER FACTORY
+            // 6. WATERTIGHT, FLUSH-FITTING 3D ARCHITECTURAL FACTORY
             // =========================================================
             const cityPropsGroup = new THREE.Group();
             scene.add(cityPropsGroup);
@@ -1517,8 +1606,109 @@
             const farmPlotVisuals = {};
 
             let selectedTool = 'none', selectedColor = '#b45309', buildRotation = 0, buildElevation = 0, ghostMesh = null;
-            const glassMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.58, roughness: 0.08, metalness: 0.4 });
+            const glassMat = new THREE.MeshStandardMaterial({ color: 0x7dd3fc, transparent: true, opacity: 0.52, roughness: 0.08, metalness: 0.4, side: THREE.DoubleSide });
             const darkTrimMat = makeAnimeMat({ map: stonePair.map, bumpMap: stonePair.bumpMap, bumpScale: 0.04, color: 0x1e293b });
+            const ceilingMat = makeAnimeMat({ color: 0xf8fafc, roughness: 0.7, side: THREE.DoubleSide });
+
+            // Helper: Builds a 100% enclosed, watertight building with 4 flush walls, front entrance, solid ceiling & pitched/hipped roof
+            function buildEnclosedBuilding(group, opts) {
+                const { w, d, h, doorW, doorH, wallMat, trimMat, roofMat, floorMat, signTitle, signBg, signFg, isGhost } = opts;
+                const wallThick = 0.45;
+
+                // 1. Solid Foundation & Interior Floor
+                const floor = new THREE.Mesh(new THREE.BoxGeometry(w + 0.4, 0.3, d + 0.4), floorMat);
+                floor.position.y = 0.15;
+                group.add(floor);
+
+                // 2. Back Wall (Full Width)
+                const backW = new THREE.Mesh(new THREE.BoxGeometry(w, h, wallThick), wallMat);
+                backW.position.set(0, h / 2 + 0.15, -d / 2);
+                backW.userData.isSolidWall = !isGhost;
+                group.add(backW);
+
+                // 3. Left & Right Walls (Full Depth + Mitered Overlap)
+                const leftW = new THREE.Mesh(new THREE.BoxGeometry(wallThick, h, d + wallThick), wallMat);
+                leftW.position.set(-w / 2, h / 2 + 0.15, 0);
+                leftW.userData.isSolidWall = !isGhost;
+
+                const rightW = new THREE.Mesh(new THREE.BoxGeometry(wallThick, h, d + wallThick), wallMat);
+                rightW.position.set(w / 2, h / 2 + 0.15, 0);
+                rightW.userData.isSolidWall = !isGhost;
+                group.add(leftW, rightW);
+
+                // 4. Front Left Wall, Front Right Wall & Top Entrance Header Wall (Zero Gaps!)
+                const sideFrontW = (w - doorW) / 2;
+                const frontL = new THREE.Mesh(new THREE.BoxGeometry(sideFrontW, h, wallThick), wallMat);
+                frontL.position.set(-(doorW / 2 + sideFrontW / 2), h / 2 + 0.15, d / 2);
+                frontL.userData.isSolidWall = !isGhost;
+
+                const frontR = new THREE.Mesh(new THREE.BoxGeometry(sideFrontW, h, wallThick), wallMat);
+                frontR.position.set(doorW / 2 + sideFrontW / 2, h / 2 + 0.15, d / 2);
+                frontR.userData.isSolidWall = !isGhost;
+
+                const headerH = h - doorH;
+                const frontHeader = new THREE.Mesh(new THREE.BoxGeometry(doorW + 0.1, headerH, wallThick), wallMat);
+                frontHeader.position.set(0, doorH + headerH / 2 + 0.15, d / 2);
+                group.add(frontL, frontR, frontHeader);
+
+                // Framed Storefront Windows on Front Side Walls
+                if (sideFrontW > 3.5) {
+                    [-1, 1].forEach(side => {
+                        const wx = side * (doorW / 2 + sideFrontW / 2);
+                        const winFrame = new THREE.Mesh(new THREE.BoxGeometry(sideFrontW * 0.55, 2.0, wallThick + 0.08), isGhost ? wallMat : glassMat);
+                        winFrame.position.set(wx, 2.2, d / 2);
+                        const awning = new THREE.Mesh(new THREE.BoxGeometry(sideFrontW * 0.65, 0.25, 1.2), roofMat);
+                        awning.position.set(wx, 3.4, d / 2 + 0.55);
+                        awning.rotation.x = 0.22;
+                        group.add(winFrame, awning);
+                    });
+                }
+
+                // 4 Corner Architectural Columns (Seals all vertical wall seams)
+                [[-w / 2, -d / 2], [w / 2, -d / 2], [-w / 2, d / 2], [w / 2, d / 2]].forEach(cp => {
+                    const col = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.46, h + 0.3, 16), trimMat);
+                    col.position.set(cp[0], h / 2 + 0.15, cp[1]);
+                    group.add(col);
+                });
+
+                // 5. SOLID INTERIOR CEILING SLAB + WARM CEILING LIGHT PANELS (Never see through the roof from inside!)
+                const ceilingSlab = new THREE.Mesh(new THREE.BoxGeometry(w + 1.4, 0.45, d + 1.4), isGhost ? wallMat : ceilingMat);
+                ceilingSlab.position.set(0, h + 0.25, 0);
+                group.add(ceilingSlab);
+
+                const corniceTrim = new THREE.Mesh(new THREE.BoxGeometry(w + 1.6, 0.52, d + 1.6), trimMat);
+                corniceTrim.position.set(0, h + 0.3, 0);
+                group.add(corniceTrim);
+
+                if (!isGhost) {
+                    [-w * 0.22, w * 0.22].forEach(lx => {
+                        const lightPanel = new THREE.Mesh(
+                            new THREE.BoxGeometry(2.4, 0.08, 1.2),
+                            new THREE.MeshBasicMaterial({ color: 0xfffbeb })
+                        );
+                        lightPanel.position.set(lx, h - 0.02, 0);
+                        group.add(lightPanel);
+                    });
+                }
+
+                // 6. Flush-Mounted 4-Sided Hipped Roof Sitting Directly on Top of Ceiling Cornice
+                const roofRadius = Math.hypot(w / 2 + 1.0, d / 2 + 1.0);
+                const hippedRoof = new THREE.Mesh(new THREE.ConeGeometry(roofRadius, 2.8, 4), roofMat);
+                hippedRoof.rotation.y = Math.PI / 4;
+                hippedRoof.scale.set((w + 1.6) / (roofRadius * 1.414), 1, (d + 1.6) / (roofRadius * 1.414));
+                hippedRoof.position.set(0, h + 0.52 + 1.4, 0);
+                group.add(hippedRoof);
+
+                // 7. Front Sign Board Mounted Cleanly on Roof Facade
+                if (signTitle) {
+                    const sBoard = new THREE.Mesh(
+                        new THREE.BoxGeometry(Math.min(w - 2, 11.5), 1.95, 0.38),
+                        isGhost ? wallMat : new THREE.MeshBasicMaterial({ map: makeSignTexture(signTitle, signBg || '#090d16', signFg || '#fde047') })
+                    );
+                    sBoard.position.set(0, h + 1.45, d / 2 + 0.65);
+                    group.add(sBoard);
+                }
+            }
 
             function buildModularMesh(type, colorHex, isGhost, itemData) {
                 const group = new THREE.Group();
@@ -1532,53 +1722,58 @@
                 const trimMat = isGhost ? ghostMat : darkTrimMat;
                 const fenceMat = isGhost ? ghostMat : new THREE.MeshStandardMaterial({ map: fenceTex, color: baseColor, transparent: true, alphaTest: 0.2, side: THREE.DoubleSide });
 
+                // SNAP-FIT 4x4m MODULAR PIECES
                 if (type === 'foundation') {
-                    const slab = new THREE.Mesh(new THREE.BoxGeometry(4, 0.34, 4), concreteMat); slab.position.y = 0.17;
-                    [-1.95, 1.95].forEach(cx => {
-                        [-1.95, 1.95].forEach(cz => {
-                            const post = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.22, 0.42, 16), trimMat);
-                            post.position.set(cx, 0.21, cz); group.add(post);
-                        });
-                    });
-                    group.add(slab);
+                    const slab = new THREE.Mesh(new THREE.BoxGeometry(4.0, 0.36, 4.0), concreteMat); slab.position.y = 0.18;
+                    const trim = new THREE.Mesh(new THREE.BoxGeometry(4.06, 0.08, 4.06), trimMat); trim.position.y = 0.36;
+                    group.add(slab, trim);
                 } else if (type === 'wall') {
-                    // 3D Wall with Cylindrical Colonnade Pillars & Molded Cornice
-                    const mainW = new THREE.Mesh(new THREE.BoxGeometry(3.7, 3.6, 0.34), wallMat); mainW.position.y = 2.0; mainW.userData.isSolidWall = !isGhost;
-                    const pilL = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.26, 4.0, 18), trimMat); pilL.position.set(-1.9, 2.0, 0);
-                    const pilR = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.26, 4.0, 18), trimMat); pilR.position.set(1.9, 2.0, 0);
-                    const topBeam = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 4.1, 16), trimMat); topBeam.rotation.z = Math.PI / 2; topBeam.position.y = 3.92;
-                    group.add(mainW, pilL, pilR, topBeam);
+                    // Full 4.0m Width x 4.0m Height so adjacent walls and roofs connect with zero gaps
+                    const mainW = new THREE.Mesh(new THREE.BoxGeometry(4.0, 4.0, 0.38), wallMat); mainW.position.y = 2.0; mainW.userData.isSolidWall = !isGhost;
+                    const baseB = new THREE.Mesh(new THREE.BoxGeometry(4.04, 0.24, 0.44), trimMat); baseB.position.y = 0.12;
+                    const crown = new THREE.Mesh(new THREE.BoxGeometry(4.04, 0.24, 0.44), trimMat); crown.position.y = 3.88;
+                    group.add(mainW, baseB, crown);
                 } else if (type === 'doorway') {
-                    const lP = new THREE.Mesh(new THREE.BoxGeometry(1.15, 4, 0.36), wallMat); lP.position.set(-1.4, 2.0, 0); lP.userData.isSolidWall = !isGhost;
-                    const rP = new THREE.Mesh(new THREE.BoxGeometry(1.15, 4, 0.36), wallMat); rP.position.set(1.4, 2.0, 0); rP.userData.isSolidWall = !isGhost;
-                    const arch = new THREE.Mesh(new THREE.TorusGeometry(0.85, 0.24, 14, 24, Math.PI), trimMat); arch.position.set(0, 2.85, 0);
+                    const lP = new THREE.Mesh(new THREE.BoxGeometry(1.2, 4.0, 0.38), wallMat); lP.position.set(-1.4, 2.0, 0); lP.userData.isSolidWall = !isGhost;
+                    const rP = new THREE.Mesh(new THREE.BoxGeometry(1.2, 4.0, 0.38), wallMat); rP.position.set(1.4, 2.0, 0); rP.userData.isSolidWall = !isGhost;
+                    const topH = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.15, 0.38), wallMat); topH.position.set(0, 3.425, 0);
+                    const frame = new THREE.Mesh(new THREE.BoxGeometry(1.75, 0.15, 0.44), trimMat); frame.position.set(0, 2.85, 0);
                     const dHinge = new THREE.Group(); dHinge.position.set(-0.8, 0, 0);
-                    const dPanel = new THREE.Mesh(new THREE.BoxGeometry(1.6, 2.85, 0.14), woodMat); dPanel.position.set(0.8, 1.42, 0);
+                    const dPanel = new THREE.Mesh(new THREE.BoxGeometry(1.6, 2.85, 0.14), woodMat); dPanel.position.set(0.8, 1.425, 0);
                     const isOpen = itemData && itemData.isOpen;
                     dHinge.rotation.y = isOpen ? -Math.PI * 0.55 : 0;
                     dPanel.userData.isSolidWall = (!isGhost && !isOpen);
                     dPanel.userData.interactType = 'door';
                     dHinge.add(dPanel);
-                    group.add(lP, rP, arch, dHinge);
+                    group.add(lP, rP, topH, frame, dHinge);
                 } else if (type === 'window') {
-                    const b = new THREE.Mesh(new THREE.BoxGeometry(3.8, 1.2, 0.36), wallMat); b.position.set(0, 0.6, 0); b.userData.isSolidWall = !isGhost;
-                    const pane = new THREE.Mesh(new THREE.CylinderGeometry(1.15, 1.15, 2.0, 16, 1, false, -Math.PI * 0.5, Math.PI), isGhost ? ghostMat : glassMat);
-                    pane.position.set(0, 2.2, 0); pane.userData.isSolidWall = !isGhost;
-                    const awning = new THREE.Mesh(new THREE.CylinderGeometry(1.35, 1.35, 2.8, 16, 1, false, 0, Math.PI), shingleMat);
-                    awning.rotation.z = Math.PI / 2; awning.position.set(0, 3.25, 0.25);
-                    group.add(b, pane, awning);
+                    const b = new THREE.Mesh(new THREE.BoxGeometry(4.0, 1.2, 0.38), wallMat); b.position.set(0, 0.6, 0); b.userData.isSolidWall = !isGhost;
+                    const t = new THREE.Mesh(new THREE.BoxGeometry(4.0, 0.9, 0.38), wallMat); t.position.set(0, 3.55, 0);
+                    const l = new THREE.Mesh(new THREE.BoxGeometry(0.95, 1.9, 0.38), wallMat); l.position.set(-1.525, 2.15, 0); l.userData.isSolidWall = !isGhost;
+                    const r = new THREE.Mesh(new THREE.BoxGeometry(0.95, 1.9, 0.38), wallMat); r.position.set(1.525, 2.15, 0); r.userData.isSolidWall = !isGhost;
+                    const sill = new THREE.Mesh(new THREE.BoxGeometry(2.3, 0.14, 0.5), trimMat); sill.position.set(0, 1.2, 0);
+                    const pane = new THREE.Mesh(new THREE.BoxGeometry(2.1, 1.9, 0.1), isGhost ? ghostMat : glassMat); pane.position.set(0, 2.15, 0); pane.userData.isSolidWall = !isGhost;
+                    group.add(b, t, l, r, sill, pane);
                 } else if (type === 'stairs') {
                     for (let i = 0; i < 10; i++) {
-                        const s = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 2.6, 14), woodMat);
-                        s.rotation.z = Math.PI / 2;
+                        const s = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.35, 0.45), woodMat);
                         s.position.set(0, (i + 0.5) * 0.4, -1.8 + i * 0.4); group.add(s);
                     }
                 } else if (type === 'roof_flat') {
-                    const m = new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.32, 4.2), concreteMat); m.position.y = 4.0; group.add(m);
+                    // Solid 4x4m Ceiling/Roof Slab with Finished White Underside
+                    const topSlab = new THREE.Mesh(new THREE.BoxGeometry(4.1, 0.28, 4.1), concreteMat); topSlab.position.y = 4.06;
+                    const underCeiling = new THREE.Mesh(new THREE.BoxGeometry(4.0, 0.12, 4.0), isGhost ? ghostMat : ceilingMat); underCeiling.position.y = 3.92;
+                    group.add(topSlab, underCeiling);
                 } else if (type === 'roof_pitched') {
-                    const m = new THREE.Mesh(new THREE.ConeGeometry(3.35, 2.65, 16), shingleMat); m.position.y = 5.3; group.add(m);
+                    // 4-Sided Hip Roof that sits flush on 4x4m walls + Solid Ceiling Underside
+                    const underSlab = new THREE.Mesh(new THREE.BoxGeometry(4.15, 0.25, 4.15), isGhost ? ghostMat : ceilingMat);
+                    underSlab.position.y = 4.0;
+                    const hipCone = new THREE.Mesh(new THREE.ConeGeometry(3.05, 2.4, 4), shingleMat);
+                    hipCone.rotation.y = Math.PI / 4;
+                    hipCone.position.y = 5.3;
+                    group.add(underSlab, hipCone);
                 } else if (type === 'fence') {
-                    const p = new THREE.Mesh(new THREE.BoxGeometry(4, 2.4, 0.12), fenceMat); p.position.y = 1.2; p.userData.isSolidWall = !isGhost;
+                    const p = new THREE.Mesh(new THREE.BoxGeometry(4.0, 2.4, 0.12), fenceMat); p.position.y = 1.2; p.userData.isSolidWall = !isGhost;
                     [-1.95, 1.95].forEach(fx => {
                         const post = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.12, 2.6, 12), poleMat);
                         post.position.set(fx, 1.3, 0); group.add(post);
@@ -1588,23 +1783,23 @@
                     const sText = (itemData && itemData.signText) ? itemData.signText : 'WELCOME TO\nTHE BADABING';
                     const postL = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.14, 2.8, 14), poleMat); postL.position.set(-1.4, 1.4, 0);
                     const postR = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.14, 2.8, 14), poleMat); postR.position.set(1.4, 1.4, 0);
-                    const board = new THREE.Mesh(new THREE.BoxGeometry(3.2, 1.35, 0.2), isGhost ? ghostMat : new THREE.MeshBasicMaterial({ map: makeSignTexture(sText, itemData?.signBg || '#111318', itemData?.signColor || '#fde047') }));
+                    const board = new THREE.Mesh(new THREE.BoxGeometry(3.2, 1.35, 0.22), isGhost ? ghostMat : new THREE.MeshBasicMaterial({ map: makeSignTexture(sText, itemData?.signBg || '#111318', itemData?.signColor || '#fde047') }));
                     board.position.set(0, 2.2, 0); board.userData.interactType = 'sign';
                     group.add(postL, postR, board);
                 } else if (type === 'streetlight') {
                     const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.2, 5.5, 16), poleMat); pole.position.y = 2.75;
-                    const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.42, 18, 18), new THREE.MeshBasicMaterial({ color: 0xfef08a })); bulb.position.set(0.8, 5.2, 0);
-                    group.add(pole, bulb);
+                    const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 1.2, 12), poleMat); arm.rotation.z = Math.PI / 2; arm.position.set(0.45, 5.3, 0);
+                    const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.38, 18, 18), new THREE.MeshBasicMaterial({ color: 0xfef08a })); bulb.position.set(0.95, 5.1, 0);
+                    group.add(pole, arm, bulb);
                 } else if (type === 'farm_plot') {
-                    // Sculpted Log-Bordered Garden Bed with Mound Furrows
                     [[-2.2, 0, Math.PI / 2], [2.2, 0, Math.PI / 2], [0, -2.2, 0], [0, 2.2, 0]].forEach(b => {
                         const log = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.28, 4.6, 16), woodMat);
                         log.rotation.z = Math.PI / 2; log.rotation.y = b[2];
                         log.position.set(b[0], 0.28, b[1]); log.userData.interactType = 'farm_plot';
                         group.add(log);
                     });
-                    const soil = new THREE.Mesh(new THREE.CylinderGeometry(2.8, 3.0, 0.38, 24), isGhost ? ghostMat : makeAnimeMat({ bumpMap: grassPair.bumpMap, bumpScale: 0.12, color: 0x3e2723, roughness: 0.9 }));
-                    soil.position.y = 0.19; soil.userData.interactType = 'farm_plot';
+                    const soil = new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.36, 4.2), isGhost ? ghostMat : makeAnimeMat({ bumpMap: grassPair.bumpMap, bumpScale: 0.12, color: 0x3e2723, roughness: 0.9 }));
+                    soil.position.y = 0.18; soil.userData.interactType = 'farm_plot';
                     group.add(soil);
 
                     const cropsContainer = new THREE.Group();
@@ -1643,65 +1838,92 @@
                     const silverback = createRealisticSilverbackGorilla(colorHex || '#3f3f46', 2.8, null, true); silverback.position.y = 2.2;
                     group.add(ped, silverback);
                 } else if (type === 'arcade') {
-                    const cab = new THREE.Mesh(new THREE.CylinderGeometry(0.85, 0.95, 2.6, 20), isGhost ? ghostMat : makeAnimeMat({ color: 0x4338ca }));
+                    const cab = new THREE.Mesh(new THREE.BoxGeometry(1.4, 2.6, 1.2), isGhost ? ghostMat : makeAnimeMat({ color: 0x4338ca }));
                     cab.position.y = 1.3; cab.userData.isSolidWall = !isGhost; cab.userData.interactType = 'arcade';
                     const scr = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 0.8), new THREE.MeshBasicMaterial({ map: makeSignTexture('🕹️ RETRO ARCADE\nPRESS [F]', '#000', '#facc15') }));
-                    scr.position.set(0, 1.75, 0.88); scr.userData.interactType = 'arcade';
+                    scr.position.set(0, 1.75, 0.62); scr.userData.interactType = 'arcade';
                     group.add(cab, scr);
                 } else if (type === 'watch_tower') {
-                    [[-2, -2], [2, -2], [-2, 2], [2, 2]].forEach(lp => {
-                        const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.34, 12, 16), woodMat);
-                        leg.position.set(lp[0], 6, lp[1]); group.add(leg);
+                    [[-2.2, -2.2], [2.2, -2.2], [-2.2, 2.2], [2.2, 2.2]].forEach(lp => {
+                        const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.36, 12, 16), woodMat);
+                        leg.position.set(lp[0], 6, lp[1]); leg.userData.isSolidWall = !isGhost; group.add(leg);
                     });
-                    const nest = new THREE.Mesh(new THREE.CylinderGeometry(3.6, 3.4, 0.5, 24), woodMat); nest.position.y = 12;
-                    const roof = new THREE.Mesh(new THREE.ConeGeometry(4.2, 2.6, 24), shingleMat); roof.position.y = 15.2;
-                    const ladder = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 12, 14), makeAnimeMat({ color: 0xfacc15 }));
-                    ladder.position.set(0, 6, 2.5); ladder.userData.interactType = 'tower_ladder';
+                    const nest = new THREE.Mesh(new THREE.BoxGeometry(5.6, 0.45, 5.6), woodMat); nest.position.y = 12;
+                    const roof = new THREE.Mesh(new THREE.ConeGeometry(4.4, 2.8, 4), shingleMat); roof.rotation.y = Math.PI / 4; roof.position.y = 15.6;
+                    const ladder = new THREE.Mesh(new THREE.BoxGeometry(0.9, 12, 0.22), makeAnimeMat({ color: 0xfacc15 }));
+                    ladder.position.set(0, 6, 2.6); ladder.userData.interactType = 'tower_ladder';
                     group.add(nest, roof, ladder);
-                } else if (type === 'library' || type === 'gym' || type === 'mcdonalds' || type === 'hobby_store' || type === 'deli' || type === 'walmart' || type === 'mechanic_shop') {
-                    const w = type === 'walmart' ? 24 : (type === 'mechanic_shop' ? 20 : 16);
-                    const d = type === 'walmart' ? 18 : (type === 'mechanic_shop' ? 16 : 12);
-                    const fl = new THREE.Mesh(new THREE.BoxGeometry(w, 0.35, d), concreteMat); fl.position.y = 0.17;
-                    const bW = new THREE.Mesh(new THREE.BoxGeometry(w, 4.8, 0.45), wallMat); bW.position.set(0, 2.4, -d / 2); bW.userData.isSolidWall = !isGhost;
-                    const lW = new THREE.Mesh(new THREE.BoxGeometry(0.45, 4.8, d), wallMat); lW.position.set(-w / 2, 2.4, 0); lW.userData.isSolidWall = !isGhost;
-                    const rW = new THREE.Mesh(new THREE.BoxGeometry(0.45, 4.8, d), wallMat); rW.position.set(w / 2, 2.4, 0); rW.userData.isSolidWall = !isGhost;
-                    // Rounded Front Colonnade Pillars + Arched Entrance Canopy
-                    [-w / 2 + 0.4, -3.2, 3.2, w / 2 - 0.4].forEach(px => {
-                        const col = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.48, 5.0, 20), trimMat);
-                        col.position.set(px, 2.5, d / 2); group.add(col);
+                } else if (type === 'mcdonalds' || type === 'walmart' || type === 'mechanic_shop' || type === 'library' || type === 'gym' || type === 'hobby_store' || type === 'deli') {
+                    // WATERTIGHT ENCLOSED BUILDINGS WITH SOLID CEILINGS & FLUSH ROOFS
+                    const cfgMap = {
+                        mcdonalds: { w: 16, d: 12, h: 4.8, doorW: 3.6, doorH: 3.2, wColor: '#b91c1c', rColor: '#facc15', title: "McDONALD'S 🍔", bg: '#b91c1c', fg: '#fde047' },
+                        walmart: { w: 24, d: 18, h: 5.6, doorW: 5.0, doorH: 3.6, wColor: '#1d4ed8', rColor: '#334155', title: 'WALMART SUPERCENTER ✳️', bg: '#1e3a8a', fg: '#ffffff' },
+                        mechanic_shop: { w: 20, d: 16, h: 5.4, doorW: 7.5, doorH: 4.2, wColor: '#334155', rColor: '#991b1b', title: 'BADABING CUSTOMS GARAGE 🔧', bg: '#090d16', fg: '#f97316' },
+                        library: { w: 16, d: 12, h: 4.8, doorW: 3.6, doorH: 3.2, wColor: '#0f766e', rColor: '#5c2410', title: 'PUBLIC LIBRARY 📚', bg: '#064e3b', fg: '#fde047' },
+                        gym: { w: 16, d: 12, h: 4.8, doorW: 3.6, doorH: 3.2, wColor: '#1e293b', rColor: '#7f1d1d', title: 'IRON BADABING GYM 🏋️', bg: '#090d16', fg: '#ef4444' },
+                        hobby_store: { w: 16, d: 12, h: 4.8, doorW: 3.6, doorH: 3.2, wColor: '#5b21b6', rColor: '#b45309', title: 'HOBBY & RC SHOP 🎨', bg: '#3b0764', fg: '#fde047' },
+                        deli: { w: 16, d: 12, h: 4.8, doorW: 3.6, doorH: 3.2, wColor: '#991b1b', rColor: '#14532d', title: 'ITALIAN DELI & SUBS 🥪', bg: '#14532d', fg: '#ffffff' }
+                    };
+                    const cfg = cfgMap[type];
+                    const customWallMat = isGhost ? ghostMat : makeAnimeMat({ map: brickPair.map, bumpMap: brickPair.bumpMap, bumpScale: 0.09, color: new THREE.Color(colorHex || cfg.wColor) });
+                    const customRoofMat = isGhost ? ghostMat : makeAnimeMat({ map: roofShinglePair.map, bumpMap: roofShinglePair.bumpMap, bumpScale: 0.1, color: new THREE.Color(cfg.rColor) });
+
+                    buildEnclosedBuilding(group, {
+                        w: cfg.w, d: cfg.d, h: cfg.h, doorW: cfg.doorW, doorH: cfg.doorH,
+                        wallMat: customWallMat, trimMat, roofMat: customRoofMat, floorMat: concreteMat,
+                        signTitle: cfg.title, signBg: cfg.bg, signFg: cfg.fg, isGhost
                     });
-                    const roof = new THREE.Mesh(new THREE.CylinderGeometry(d * 0.65, d * 0.72, w + 1.2, 24, 1, false, 0, Math.PI), shingleMat);
-                    roof.rotation.z = Math.PI / 2; roof.scale.set(0.45, 1, 1); roof.position.y = 4.9;
-                    const sBoard = new THREE.Mesh(new THREE.PlaneGeometry(11.5, 2.1), new THREE.MeshBasicMaterial({ map: makeSignTexture(type.toUpperCase().replace('_', ' '), '#090d16', '#fde047'), side: THREE.DoubleSide }));
-                    sBoard.position.set(0, 6.4, d / 2 + 0.5);
-                    if (type === 'mcdonalds') {
-                        [-1.6, 1.6].forEach(ax => {
-                            const arch = new THREE.Mesh(new THREE.TorusGeometry(1.5, 0.24, 14, 28, Math.PI), makeAnimeMat({ color: 0xfacc15 }));
-                            arch.position.set(ax, 6.8, d / 2); group.add(arch);
-                        });
-                    }
+
+                    // Interior Props
                     if (type === 'library') {
-                        const shelf = new THREE.Mesh(new THREE.BoxGeometry(6, 3.2, 1.0), woodMat);
-                        shelf.position.set(0, 1.6, -d / 2 + 1); shelf.userData.interactType = 'bookshelf'; group.add(shelf);
+                        const shelf = new THREE.Mesh(new THREE.BoxGeometry(7.0, 3.4, 1.0), woodMat);
+                        shelf.position.set(0, 1.9, -cfg.d / 2 + 1.0);
+                        shelf.userData.interactType = 'bookshelf';
+                        shelf.userData.isSolidWall = !isGhost;
+                        group.add(shelf);
+                    } else if (type === 'gym') {
+                        const bench = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.7, 2.8), trimMat);
+                        bench.position.set(0, 0.55, -2.0);
+                        bench.userData.interactType = 'bench_press';
+                        bench.userData.isSolidWall = !isGhost;
+                        group.add(bench);
+                    } else if (type === 'mcdonalds' || type === 'deli' || type === 'hobby_store') {
+                        const counter = new THREE.Mesh(new THREE.BoxGeometry(7.5, 1.2, 1.3), woodMat);
+                        counter.position.set(0, 0.8, -2.5);
+                        counter.userData.isSolidWall = !isGhost;
+                        group.add(counter);
                     }
-                    if (type === 'gym') {
-                        const bench = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.7, 2.6), trimMat);
-                        bench.position.set(0, 0.4, -2); bench.userData.interactType = 'bench_press'; group.add(bench);
-                    }
-                    group.add(fl, bW, lW, rW, roof, sBoard);
                 } else if (type === 'swimming_pool') {
-                    const deck = new THREE.Mesh(new THREE.CylinderGeometry(9.5, 10, 0.45, 32), concreteMat); deck.scale.set(1.3, 1, 0.9); deck.position.y = 0.22;
-                    const water = new THREE.Mesh(new THREE.CylinderGeometry(8.2, 8.2, 0.48, 32), new THREE.MeshStandardMaterial({ color: 0x06b6d4, roughness: 0.08, metalness: 0.2, transparent: true, opacity: 0.86 }));
-                    water.scale.set(1.3, 1, 0.9); water.position.y = 0.26;
+                    const deck = new THREE.Mesh(new THREE.BoxGeometry(18, 0.45, 12), concreteMat); deck.position.y = 0.22;
+                    const water = new THREE.Mesh(new THREE.BoxGeometry(15, 0.48, 9), new THREE.MeshStandardMaterial({ color: 0x06b6d4, roughness: 0.08, metalness: 0.2, transparent: true, opacity: 0.86 }));
+                    water.position.y = 0.26;
                     group.add(deck, water);
                 } else if (type === 'ice_rink') {
-                    const ice = new THREE.Mesh(new THREE.CylinderGeometry(11, 11, 0.26, 36), new THREE.MeshStandardMaterial({ color: 0xe0f2fe, roughness: 0.04, metalness: 0.25 }));
-                    ice.scale.set(1.35, 1, 0.95); ice.position.y = 0.13;
-                    group.add(ice);
-                } else if (type === 'basketball_court' || type === 'tennis_court' || type === 'soccer_court') {
-                    const cColor = type === 'basketball_court' ? 0xd96b27 : (type === 'tennis_court' ? 0x15803d : 0x16a34a);
-                    const surf = new THREE.Mesh(new THREE.BoxGeometry(28, 0.15, 18), makeAnimeMat({ map: stonePair.map, bumpMap: stonePair.bumpMap, bumpScale: 0.04, color: cColor })); surf.position.y = 0.08;
-                    group.add(surf);
+                    const boards = new THREE.Mesh(new THREE.BoxGeometry(22.6, 0.85, 14.6), concreteMat); boards.position.y = 0.42;
+                    const ice = new THREE.Mesh(new THREE.BoxGeometry(21.8, 0.9, 13.8), new THREE.MeshStandardMaterial({ color: 0xe0f2fe, roughness: 0.04, metalness: 0.25 }));
+                    ice.position.y = 0.44;
+                    group.add(boards, ice);
+                } else if (type === 'basketball_court') {
+                    const surf = new THREE.Mesh(new THREE.BoxGeometry(28, 0.16, 18), makeAnimeMat({ map: stonePair.map, bumpMap: stonePair.bumpMap, bumpScale: 0.04, color: 0xd96b27 }));
+                    surf.position.y = 0.08; group.add(surf);
+                    [-13, 13].forEach(hx => {
+                        const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 5.5), poleMat); pole.position.set(hx, 2.75, 0);
+                        const board = new THREE.Mesh(new THREE.BoxGeometry(0.25, 2.0, 3.0), makeAnimeMat({ color: 0xffffff })); board.position.set(hx > 0 ? hx - 0.45 : hx + 0.45, 4.3, 0);
+                        const rim = new THREE.Mesh(new THREE.TorusGeometry(0.82, 0.08, 12, 24), makeAnimeMat({ color: 0xff4500 })); rim.rotation.x = Math.PI / 2; rim.position.set(hx > 0 ? hx - 1.35 : hx + 1.35, 3.85, 0);
+                        group.add(pole, board, rim);
+                    });
+                } else if (type === 'tennis_court') {
+                    const surf = new THREE.Mesh(new THREE.BoxGeometry(26, 0.16, 14), makeAnimeMat({ map: stonePair.map, color: 0x15803d }));
+                    surf.position.y = 0.08;
+                    const net = new THREE.Mesh(new THREE.BoxGeometry(0.15, 1.1, 13.6), fenceMat); net.position.y = 0.65;
+                    group.add(surf, net);
+                } else if (type === 'soccer_court') {
+                    const surf = new THREE.Mesh(new THREE.BoxGeometry(34, 0.14, 22), makeAnimeMat({ map: grassPair.map, color: 0x16a34a }));
+                    surf.position.y = 0.07; group.add(surf);
+                    [-16, 16].forEach(gx => {
+                        const gFrame = new THREE.Mesh(new THREE.BoxGeometry(1.4, 3.0, 6.4), fenceMat);
+                        gFrame.position.set(gx, 1.5, 0); group.add(gFrame);
+                    });
                 } else if (type === 'pond') {
                     const water = new THREE.Mesh(new THREE.CylinderGeometry(7, 7, 0.28, 32), new THREE.MeshStandardMaterial({ color: 0x0ea5e9, roughness: 0.08, transparent: true, opacity: 0.88 }));
                     water.scale.set(1.3, 1, 1); water.position.y = 0.14;
@@ -1719,30 +1941,33 @@
                     const bowl = new THREE.Mesh(new THREE.SphereGeometry(1.5, 24, 16, 0, Math.PI * 2, Math.PI * 0.5, Math.PI * 0.5), concreteMat); bowl.position.y = 2.6;
                     group.add(basin, pillar, bowl);
                 } else if (type === 'computer_desk') {
-                    const desk = new THREE.Mesh(new THREE.CylinderGeometry(1.3, 1.3, 1.1, 24), woodMat); desk.position.y = 0.55; desk.userData.interactType = 'computer';
+                    const desk = new THREE.Mesh(new THREE.BoxGeometry(2.2, 1.1, 1.2), woodMat); desk.position.y = 0.55; desk.userData.interactType = 'computer';
                     const scr = new THREE.Mesh(new THREE.PlaneGeometry(1.15, 0.72), new THREE.MeshBasicMaterial({ map: makeSignTexture('🌐 INTERNET PC\nPRESS [F]', '#0284c7', '#fff') }));
                     scr.position.set(0, 1.55, 0); scr.userData.interactType = 'computer';
                     group.add(desk, scr);
                 } else if (type === 'merchant') {
                     const skinIdx = (itemData && typeof itemData.merchantSkin === 'number') ? itemData.merchantSkin : 0;
                     const skin = MERCHANT_SKINS[skinIdx % MERCHANT_SKINS.length];
-                    const counter = new THREE.Mesh(new THREE.CylinderGeometry(1.9, 1.9, 1.05, 24, 1, false, -Math.PI * 0.5, Math.PI), woodMat);
-                    counter.position.set(0, 0.52, 0.4); counter.userData.interactType = 'merchant';
-                    const canopy = new THREE.Mesh(new THREE.ConeGeometry(2.9, 1.3, 24), shingleMat);
-                    canopy.position.set(0, 3.4, 0.2);
+                    const counter = new THREE.Mesh(new THREE.BoxGeometry(3.6, 1.05, 1.3), woodMat);
+                    counter.position.set(0, 0.52, 0.85); counter.userData.interactType = 'merchant';
+                    const postL = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 3.2), poleMat); postL.position.set(-1.6, 1.6, 0.8);
+                    const postR = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 3.2), poleMat); postR.position.set(1.6, 1.6, 0.8);
+                    const canopy = new THREE.Mesh(new THREE.ConeGeometry(2.9, 1.3, 4), shingleMat);
+                    canopy.rotation.y = Math.PI / 4; canopy.position.set(0, 3.4, 0.3);
                     const vendor = createCuteAnimeAnimalMesh(skin.species, null, 0.65, { hatColor: skin.hat, apronColor: skin.apron });
                     vendor.position.set(0, 0, -0.35);
                     vendor.traverse(c => { if (c.isMesh) c.userData.interactType = 'merchant'; });
                     const shopTitle = (itemData && itemData.merchantName) ? itemData.merchantName : skin.name;
                     const sPlane = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 0.65), new THREE.MeshBasicMaterial({ map: makeSignTexture('🏪 ' + shopTitle, '#090d16', '#4ade80'), side: THREE.DoubleSide }));
-                    sPlane.position.set(0, 2.8, 1.4);
-                    group.add(counter, canopy, vendor, sPlane);
+                    sPlane.position.set(0, 2.8, 1.45);
+                    group.add(counter, postL, postR, canopy, vendor, sPlane);
                 } else if (type === 'bed') {
-                    const mattress = new THREE.Mesh(new THREE.SphereGeometry(1.6, 24, 24), concreteMat);
-                    mattress.scale.set(0.85, 0.35, 1.25); mattress.position.y = 0.55; mattress.userData.interactType = 'bed';
-                    const pillow = new THREE.Mesh(new THREE.SphereGeometry(0.65, 18, 18), makeAnimeMat({ color: 0xffffff }));
-                    pillow.scale.set(1.2, 0.4, 0.7); pillow.position.set(0, 0.95, -1.1);
-                    group.add(mattress, pillow);
+                    const frame = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.45, 3.5), woodMat); frame.position.y = 0.22;
+                    const mattress = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.35, 3.2), concreteMat);
+                    mattress.position.y = 0.6; mattress.userData.interactType = 'bed';
+                    const pillow = new THREE.Mesh(new THREE.SphereGeometry(0.55, 18, 18), makeAnimeMat({ color: 0xffffff }));
+                    pillow.scale.set(1.4, 0.4, 0.7); pillow.position.set(0, 0.9, -1.1);
+                    group.add(frame, mattress, pillow);
                     if (!isGhost && itemData && itemData.assignedTo) {
                         const tag = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 0.45), new THREE.MeshBasicMaterial({ map: makeSignTexture('🛏️ ' + itemData.assignedTo, '#1e1b4b', '#fde047'), side: THREE.DoubleSide }));
                         tag.position.set(0, 1.65, 0); group.add(tag);
@@ -1759,7 +1984,7 @@
             }
 
             // =========================================================
-            // 6. REAL-TIME REVISION SYNC & REHYDRATION
+            // 7. REAL-TIME REVISION SYNC & REHYDRATION
             // =========================================================
             let worldDataList = [];
             let popInAnimations = [];
@@ -1981,7 +2206,7 @@
             }, 350);
 
             // =========================================================
-            // 7. INTERACTIONS: SIGNS, MERCHANTS, BEDS, STORAGE, FARMS
+            // 8. INTERACTIONS: SIGNS, MERCHANTS, BEDS, STORAGE, FARMS
             // =========================================================
             const raycaster = new THREE.Raycaster();
             const centerScreen = new THREE.Vector2(0, 0);
@@ -2361,7 +2586,7 @@
             }
 
             // =========================================================
-            // 8. UI MENUS, BUILD PLACEMENT & MOBILE TOUCH CONTROLS
+            // 9. UI MENUS, BUILD PLACEMENT & MOBILE TOUCH CONTROLS
             // =========================================================
             const mindPanel = document.getElementById('companion-mind-panel');
             document.getElementById('btn-toggle-mind').addEventListener('click', (e) => { e.stopPropagation(); mindPanel.style.display = mindPanel.style.display === 'block' ? 'none' : 'block'; });
@@ -2519,7 +2744,7 @@
             }
 
             // =========================================================
-            // 9. DESKTOP + MULTI-TOUCH MOBILE CONTROLS (FIXED LEFT/RIGHT)
+            // 10. DESKTOP + MULTI-TOUCH MOBILE CONTROLS
             // =========================================================
             const controls = new THREE.PointerLockControls(camera, document.body);
             const mobileControlsEl = document.getElementById('mobile-controls');
@@ -2688,7 +2913,7 @@
             window.addEventListener('touchcancel', endLookTouch);
 
             // =========================================================
-            // 10. MAIN ANIMATION LOOP
+            // 11. MAIN ANIMATION LOOP
             // =========================================================
             const targetXEl = document.getElementById('target-x');
             const targetZEl = document.getElementById('target-z');
@@ -2816,7 +3041,6 @@
                     }
                 });
 
-                // Player Movement (Fixed Right-Vector so Analog Stick Left = Left & Right = Right!)
                 const baseSpeed = (!isFlyingMode && keys.shift) ? 30.0 : 20.0;
                 const moveSpeed = baseSpeed * delta;
                 const oldPos = camera.position.clone();
@@ -2828,7 +3052,6 @@
                     const camDir = new THREE.Vector3();
                     camera.getWorldDirection(camDir);
                     camDir.y = 0; camDir.normalize();
-                    // True Right Vector = camDir x UP(0,1,0) = (-camDir.z, 0, camDir.x)
                     const rightDir = new THREE.Vector3(-camDir.z, 0, camDir.x);
 
                     camera.position.addScaledVector(camDir, forwardInput * moveSpeed);
