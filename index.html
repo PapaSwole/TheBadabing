@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>The Badabing - 3D Anime World, Farming & Tycoon Portals</title>
+    <title>The Badabing - 3D Anime World, Live Edits & Tycoon Portals</title>
     <style>
         :root {
             --anime-bg: rgba(13, 18, 30, 0.86);
@@ -153,6 +153,20 @@
         }
         .bag-item-chip:hover { border-color: var(--anime-green); background: rgba(16, 185, 129, 0.2); }
 
+        .inv-grid {
+            display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 12px;
+        }
+        .inv-slot {
+            height: 56px; background: #1e293b; border: 1px solid #475569; border-radius: 8px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 11px; text-align: center; padding: 4px;
+        }
+        .inv-slot:hover { border-color: var(--anime-gold); }
+        .merchant-item-row {
+            display: flex; align-items: center; gap: 6px; margin-bottom: 6px;
+            background: #0f172a; padding: 6px; border-radius: 8px; border: 1px solid #334155;
+        }
+
         /* 4. God & Build Menu */
         #toggle-build-btn {
             position: absolute; top: 96px; right: 14px;
@@ -235,7 +249,7 @@
             padding: 7px 10px; border-radius: 8px; font-size: 12px; outline: none;
         }
 
-        /* 6. Fixed Dual Mobile Touch Controls (Analog Thumbstick + D-Pad + Action Buttons) */
+        /* 6. Dual Mobile Touch Controls (Analog Thumbstick + D-Pad + Action Buttons) */
         #mobile-controls {
             display: none; position: absolute; inset: 0; pointer-events: none; z-index: 28;
         }
@@ -256,7 +270,6 @@
             pointer-events: none;
             transform: translate(0px, 0px);
         }
-        /* Backup D-Pad arrows above thumbstick */
         #mobile-dpad {
             position: absolute; bottom: 162px; left: 26px;
             display: flex; gap: 8px; pointer-events: auto;
@@ -313,9 +326,9 @@
 
     <!-- Tycoon Dimension Banner -->
     <div id="tycoon-hud">
-        <span>🏭 TYCOON SKY-ISLAND</span>
-        <span>💰 Cash: $<strong id="tycoon-cash-val">50</strong></span>
-        <span>⚡ Rate: $<strong id="tycoon-rate-val">10</strong>/drop</span>
+        <span>🏭 TYCOON SKY-ISLAND (LIVE SYNC)</span>
+        <span>💰 Wallet: $<strong id="tycoon-cash-val">50</strong></span>
+        <span>⚡ Value: $<strong id="tycoon-rate-val">10</strong>/drop</span>
         <button class="mini-ui-btn" id="btn-return-main-world" style="background:#38bdf8;color:#090d16;">🌀 Return to Main World</button>
     </div>
 
@@ -435,7 +448,7 @@
             <div class="build-card" data-type="roof_flat"><span class="icon">⬜</span><span class="label">Floor / Ceiling</span><span class="sub">4x4m Tile</span></div>
             <div class="build-card" data-type="roof_pitched"><span class="icon">⛺</span><span class="label">Shingle Roof</span><span class="sub">3D Gable</span></div>
             <div class="build-card" data-type="fence"><span class="icon">⛓️</span><span class="label">Iron Fence</span><span class="sub">Barrier</span></div>
-            <div class="build-card" data-type="sign_post"><span class="icon">🪧</span><span class="label">Text Sign</span><span class="sub">Editable Text</span></div>
+            <div class="build-card" data-type="sign_post"><span class="icon">🪧</span><span class="label">Text Sign</span><span class="sub">Live Word Edits</span></div>
             <div class="build-card" data-type="streetlight"><span class="icon">🏮</span><span class="label">Streetlight</span><span class="sub">Warm Lantern</span></div>
         </div>
 
@@ -460,6 +473,9 @@
             <div class="build-card" data-type="merchant"><span class="icon">🏪</span><span class="label">Animal Merchant</span><span class="sub">10 Shopkeepers</span></div>
             <div class="build-card" data-type="mcdonalds"><span class="icon">🍔</span><span class="label">McDonald's</span><span class="sub">Restaurant</span></div>
             <div class="build-card" data-type="walmart"><span class="icon">🛒</span><span class="label">Walmart</span><span class="sub">Supercenter</span></div>
+            <div class="build-card" data-type="fountain"><span class="icon">⛲</span><span class="label">Fountain</span><span class="sub">Park Centerpiece</span></div>
+            <div class="build-card" data-type="mailbox"><span class="icon">📫</span><span class="label">Mailbox</span><span class="sub">10 Inv. Slots</span></div>
+            <div class="build-card" data-type="locker"><span class="icon">🗄️</span><span class="label">Locker</span><span class="sub">10 Inv. Slots</span></div>
             <div class="build-card" data-type="bed"><span class="icon">🛌</span><span class="label">Assignable Bed</span><span class="sub">Assign Owner</span></div>
         </div>
 
@@ -504,7 +520,7 @@
         <button class="mini-ui-btn" id="btn-sport-action" style="background:#facc15;color:#090d16;">Shoot / Hit [G]</button>
     </div>
 
-    <!-- Universal Object Inspector Modal -->
+    <!-- Universal Object Inspector Modal (Signs, Merchants, Farms, Beds, Storage) -->
     <div id="object-modal" class="game-modal">
         <div class="mind-header">
             <strong id="modal-title" style="color:#fde047;">Inspector</strong>
@@ -520,7 +536,7 @@
         <div>Rot: <span id="hud-rot">0°</span></div>
     </div>
 
-    <!-- 5. Rebuilt Mobile Touch Controls (Analog Thumbstick + Backup D-Pad + Right Action Pad) -->
+    <!-- 5. Mobile Touch Controls (Analog Thumbstick + Backup D-Pad + Right Action Pad) -->
     <div id="mobile-controls">
         <div id="mobile-dpad">
             <div class="mob-btn" id="btn-forward" title="Forward">▲</div>
@@ -546,6 +562,7 @@
             let isGodUnlocked = false;
             let customGodName = '';
             let isFlyingMode = false;
+            let currentWorldRev = 0;
 
             const pwModal = document.getElementById('password-modal');
             const pwInput = document.getElementById('god-password-input');
@@ -628,7 +645,6 @@
             sunLight.shadow.bias = -0.0005;
             scene.add(sunLight);
 
-            // High-Detail 512px Procedural Albedo + 3D Bump Texture Generator
             function make3DTexturePair(drawColorFn, drawBumpFn, repeatX, repeatY) {
                 const cCol = document.createElement('canvas');
                 cCol.width = 512; cCol.height = 512;
@@ -649,13 +665,11 @@
                 return { map, bumpMap };
             }
 
-            // 1. Lush 3D Grass Texture + Relief Bump
             const grassPair = make3DTexturePair((ctx, w, h) => {
                 ctx.fillStyle = '#22a84a'; ctx.fillRect(0, 0, w, h);
                 for (let i = 0; i < 2400; i++) {
                     ctx.fillStyle = (i % 3 === 0) ? '#188238' : ((i % 2 === 0) ? '#34c759' : '#1f9d45');
-                    const x = Math.random() * w, y = Math.random() * h;
-                    ctx.fillRect(x, y, 3, 9);
+                    ctx.fillRect(Math.random() * w, Math.random() * h, 3, 9);
                 }
             }, (ctx, w, h) => {
                 ctx.fillStyle = '#808080'; ctx.fillRect(0, 0, w, h);
@@ -665,7 +679,6 @@
                 }
             }, 85, 85);
 
-            // 2. 3D Brick & Stucco Wall Texture + Deep Mortar Bump
             const brickPair = make3DTexturePair((ctx, w, h) => {
                 ctx.fillStyle = '#cbd5e1'; ctx.fillRect(0, 0, w, h);
                 const rows = 8, cols = 4, rh = h / rows, cw = w / cols;
@@ -688,7 +701,6 @@
                 }
             }, 2, 2);
 
-            // 3. 3D Wood Plank Grain + Groove Bump
             const woodPair = make3DTexturePair((ctx, w, h) => {
                 ctx.fillStyle = '#b46934'; ctx.fillRect(0, 0, w, h);
                 for (let i = 0; i < 6; i++) {
@@ -703,7 +715,6 @@
                 }
             }, null, 2, 2);
 
-            // 4. 3D Cobblestone / Concrete Slab + Bevel Bump
             const stonePair = make3DTexturePair((ctx, w, h) => {
                 ctx.fillStyle = '#94a3b8'; ctx.fillRect(0, 0, w, h);
                 for (let i = 0; i < 900; i++) {
@@ -715,7 +726,6 @@
                 ctx.strokeRect(w / 2, 0, 2, h); ctx.strokeRect(0, h / 2, w, 2);
             }, null, 2, 2);
 
-            // 5. 3D Roof Shingles Texture
             const roofShinglePair = make3DTexturePair((ctx, w, h) => {
                 ctx.fillStyle = '#7c2d12'; ctx.fillRect(0, 0, w, h);
                 for (let y = 0; y < h; y += 32) {
@@ -726,7 +736,6 @@
                 }
             }, null, 3, 3);
 
-            // 6. Asphalt Road with Sidewalk Curbs
             const roadPair = make3DTexturePair((ctx, w, h) => {
                 ctx.fillStyle = '#1e2430'; ctx.fillRect(0, 0, w, h);
                 for (let i = 0; i < 1200; i++) {
@@ -740,11 +749,7 @@
             }, null, 1, 35);
 
             function makeAnimeMat(opts) {
-                const mat = new THREE.MeshStandardMaterial(Object.assign({
-                    roughness: 0.48,
-                    metalness: 0.08
-                }, opts));
-                return mat;
+                return new THREE.MeshStandardMaterial(Object.assign({ roughness: 0.48, metalness: 0.08 }, opts));
             }
 
             const animeOutlineMat = new THREE.LineBasicMaterial({ color: 0x090d16, transparent: true, opacity: 0.65 });
@@ -766,7 +771,6 @@
                 });
             }
 
-            // Sky Shader Dome, Sun/Moon & 3D Volumetric Clouds
             const skyGeo = new THREE.SphereGeometry(2800, 32, 16);
             const skyMat = new THREE.ShaderMaterial({
                 uniforms: {
@@ -805,7 +809,6 @@
             );
             scene.add(celestialOrb);
 
-            // 3D Drifting Anime Clouds
             const cloudsGroup = new THREE.Group();
             scene.add(cloudsGroup);
             const cloudMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9, metalness: 0.0 });
@@ -954,7 +957,6 @@
                 speciesGrid.appendChild(div);
             });
 
-            // 3D Ground with Bump Relief + 3D Extruded Roads & Sidewalk Curbs
             const ground = new THREE.Mesh(
                 new THREE.PlaneGeometry(900, 900),
                 makeAnimeMat({ map: grassPair.map, bumpMap: grassPair.bumpMap, bumpScale: 0.08, roughness: 0.72 })
@@ -971,7 +973,6 @@
             [-180, -90, 0, 90, 180].forEach(pos => {
                 const rNS = new THREE.Mesh(new THREE.PlaneGeometry(16, 750), roadMat);
                 rNS.rotation.x = -Math.PI / 2; rNS.position.set(pos, 0.03, 0); rNS.receiveShadow = true; scene.add(rNS);
-                // 3D Raised Sidewalk Curbs
                 const curbL = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.22, 750), curbMat);
                 curbL.position.set(pos - 8.7, 0.11, 0); curbL.receiveShadow = true; scene.add(curbL);
                 const curbR = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.22, 750), curbMat);
@@ -981,7 +982,6 @@
                 rEW.rotation.x = -Math.PI / 2; rEW.rotation.z = Math.PI / 2; rEW.position.set(0, 0.04, pos); rEW.receiveShadow = true; scene.add(rEW);
             });
 
-            // 3D Trees with Bark Bump & Multi-Sphere Canopy Shadows
             const trunkMat = makeAnimeMat({ map: woodPair.map, bumpMap: woodPair.bumpMap, bumpScale: 0.12, roughness: 0.75 });
             const leavesMat = makeAnimeMat({ map: grassPair.map, bumpMap: grassPair.bumpMap, bumpScale: 0.06, color: 0x22c55e, roughness: 0.45 });
             [[-55, -55], [-75, -30], [75, 30], [35, 75], [-55, 55], [55, -55], [-125, -55], [125, 55], [-35, 75], [45, -75]].forEach(c => {
@@ -997,7 +997,7 @@
             });
 
             // =========================================================
-            // 3. PLAYABLE BADABING TYCOON SUB-WORLD (AT X: 2000, Z: 2000)
+            // 3. SERVER-SYNCED TYCOON SUB-WORLD (AT X: 2000, Z: 2000)
             // =========================================================
             const TYCOON_ORIGIN = { x: 2000, y: 0, z: 2000 };
             const tycoonGroup = new THREE.Group();
@@ -1029,7 +1029,8 @@
             let tycoonState = {
                 inTycoonWorld: false, walletCash: 50, storedCollectorCash: 0,
                 unlockedPads: { dropper1: true, speed: false, upgrader: false, megaDropper: false, tower: false },
-                crates: []
+                crates: [],
+                actionCooldown: 0
             };
 
             const TYCOON_BUTTON_DEFS = [
@@ -1206,6 +1207,34 @@
                 tycoonPadMeshes[def.key] = { def, pad, lbl };
             });
 
+            function syncTycoonClient(serverTycoon) {
+                if (!serverTycoon) return;
+                tycoonState.walletCash = serverTycoon.walletCash ?? 50;
+                tycoonState.storedCollectorCash = serverTycoon.storedCollectorCash ?? 0;
+                const prevJson = JSON.stringify(tycoonState.unlockedPads);
+                tycoonState.unlockedPads = Object.assign({ dropper1: true }, serverTycoon.unlockedPads || {});
+                localStorage.setItem('badabing_tycoon_v10', JSON.stringify(serverTycoon));
+
+                document.getElementById('tycoon-cash-val').innerText = tycoonState.walletCash;
+                const baseVal = tycoonState.unlockedPads.megaDropper ? 25 : 10;
+                const mult = tycoonState.unlockedPads.upgrader ? 3 : 1;
+                const towerBonus = tycoonState.unlockedPads.tower ? 50 : 0;
+                document.getElementById('tycoon-rate-val').innerText = (baseVal * mult) + towerBonus;
+
+                claimSign.material.map = makeSignTexture(`💰 STEP TO COLLECT\n$${tycoonState.storedCollectorCash} READY`, '#064e3b', '#fde047');
+                claimSign.material.needsUpdate = true;
+
+                Object.keys(tycoonPadMeshes).forEach(k => {
+                    const isUnlocked = !!tycoonState.unlockedPads[k];
+                    tycoonPadMeshes[k].pad.visible = !isUnlocked;
+                    tycoonPadMeshes[k].lbl.visible = !isUnlocked;
+                });
+
+                if (prevJson !== JSON.stringify(tycoonState.unlockedPads)) {
+                    rebuildTycoonUpgrades();
+                }
+            }
+
             function enterTycoonWorld() {
                 tycoonState.inTycoonWorld = true;
                 camera.position.set(TYCOON_ORIGIN.x, 2.2, TYCOON_ORIGIN.z + 18);
@@ -1254,7 +1283,6 @@
                     const lip = new THREE.Mesh(new THREE.BoxGeometry(4.12, 0.08, 4.12), trimMat); lip.position.y = 0.38;
                     group.add(slab, lip);
                 } else if (type === 'wall') {
-                    // 3D Textured Wall with Baseboard, Crown Molding & Corner Pillars
                     const mainW = new THREE.Mesh(new THREE.BoxGeometry(3.8, 3.6, 0.36), wallMat); mainW.position.y = 2.0; mainW.userData.isSolidWall = !isGhost;
                     const baseB = new THREE.Mesh(new THREE.BoxGeometry(4.06, 0.26, 0.46), trimMat); baseB.position.y = 0.13;
                     const crown = new THREE.Mesh(new THREE.BoxGeometry(4.08, 0.24, 0.48), trimMat); crown.position.y = 3.88;
@@ -1291,8 +1319,11 @@
                     const p = new THREE.Mesh(new THREE.BoxGeometry(4, 2.4, 0.14), fenceMat); p.position.y = 1.2; p.userData.isSolidWall = !isGhost; group.add(p);
                 } else if (type === 'sign_post') {
                     const sText = (itemData && itemData.signText) ? itemData.signText : 'WELCOME TO\nTHE BADABING';
+                    const postL = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 2.6), poleMat); postL.position.set(-1.3, 1.3, 0);
+                    const postR = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 2.6), poleMat); postR.position.set(1.3, 1.3, 0);
                     const board = new THREE.Mesh(new THREE.BoxGeometry(3.4, 1.35, 0.24), isGhost ? ghostMat : new THREE.MeshBasicMaterial({ map: makeSignTexture(sText, itemData?.signBg || '#111318', itemData?.signColor || '#fde047') }));
-                    board.position.set(0, 2.2, 0); board.userData.interactType = 'sign'; group.add(board);
+                    board.position.set(0, 2.2, 0); board.userData.interactType = 'sign';
+                    group.add(postL, postR, board);
                 } else if (type === 'streetlight') {
                     const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.2, 5.5), poleMat); pole.position.y = 2.75;
                     const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.36, 14, 14), new THREE.MeshBasicMaterial({ color: 0xfef08a })); bulb.position.set(0.8, 5.2, 0);
@@ -1362,7 +1393,6 @@
                     const bW = new THREE.Mesh(new THREE.BoxGeometry(w, 4.8, 0.45), wallMat); bW.position.set(0, 2.4, -d / 2); bW.userData.isSolidWall = !isGhost;
                     const lW = new THREE.Mesh(new THREE.BoxGeometry(0.45, 4.8, d), wallMat); lW.position.set(-w / 2, 2.4, 0); lW.userData.isSolidWall = !isGhost;
                     const rW = new THREE.Mesh(new THREE.BoxGeometry(0.45, 4.8, d), wallMat); rW.position.set(w / 2, 2.4, 0); rW.userData.isSolidWall = !isGhost;
-                    // 3D Overhanging Cornice Roof + Rooftop AC Unit
                     const roof = new THREE.Mesh(new THREE.BoxGeometry(w + 1.2, 0.6, d + 1.2), shingleMat); roof.position.y = 5.1;
                     const acBox = new THREE.Mesh(new THREE.BoxGeometry(2.4, 1.1, 2.0), trimMat); acBox.position.set(w * 0.22, 5.9, -d * 0.18);
                     const sBoard = new THREE.Mesh(new THREE.BoxGeometry(11.5, 2.1, 0.45), new THREE.MeshBasicMaterial({ map: makeSignTexture(type.toUpperCase().replace('_', ' '), '#090d16', '#fde047') }));
@@ -1405,11 +1435,21 @@
                     const vendor = createCuteAnimeAnimalMesh(skin.species, null, 0.65, { hatColor: skin.hat, apronColor: skin.apron });
                     vendor.position.set(0, 0, -0.35);
                     vendor.traverse(c => { if (c.isMesh) c.userData.interactType = 'merchant'; });
-                    group.add(counter, canopy, vendor);
+                    const shopTitle = (itemData && itemData.merchantName) ? itemData.merchantName : skin.name;
+                    const sPlane = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 0.65), new THREE.MeshBasicMaterial({ map: makeSignTexture('🏪 ' + shopTitle, '#090d16', '#4ade80'), side: THREE.DoubleSide }));
+                    sPlane.position.set(0, 2.8, 1.4);
+                    group.add(counter, canopy, vendor, sPlane);
+                } else if (type === 'bed') {
+                    const frame = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.6, 3.6), woodMat); frame.position.y = 0.3;
+                    const mattress = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.35, 3.3), concreteMat); mattress.position.y = 0.7; mattress.userData.interactType = 'bed';
+                    group.add(frame, mattress);
+                    if (!isGhost && itemData && itemData.assignedTo) {
+                        const tag = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 0.45), new THREE.MeshBasicMaterial({ map: makeSignTexture('🛏️ ' + itemData.assignedTo, '#1e1b4b', '#fde047'), side: THREE.DoubleSide }));
+                        tag.position.set(0, 1.65, 0); group.add(tag);
+                    }
                 } else {
-                    const box = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.9, 3.4), woodMat);
-                    box.position.y = 0.45;
-                    if (type === 'bed') box.userData.interactType = 'bed';
+                    const box = new THREE.Mesh(new THREE.BoxGeometry(1.4, 1.8, 1.2), concreteMat);
+                    box.position.y = 0.9;
                     if (type === 'mailbox' || type === 'locker') box.userData.interactType = 'inventory';
                     group.add(box);
                 }
@@ -1419,7 +1459,7 @@
             }
 
             // =========================================================
-            // 6. WORLD SYNC & REHYDRATION
+            // 6. REAL-TIME REVISION SYNC & REHYDRATION
             // =========================================================
             let worldDataList = [];
             let popInAnimations = [];
@@ -1460,26 +1500,50 @@
 
             async function pushWorldToServer() {
                 pieceCountEl.innerText = worldDataList.length;
-                localStorage.setItem('badabing_world_v9', JSON.stringify(worldDataList));
+                localStorage.setItem('badabing_world_v10', JSON.stringify(worldDataList));
                 try {
-                    await fetch('/api/world', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(worldDataList) });
+                    const res = await fetch('/api/world', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(worldDataList) });
+                    if (res.ok) {
+                        const d = await res.json();
+                        if (d.worldRev) currentWorldRev = d.worldRev;
+                    }
                 } catch (e) {}
             }
 
             async function initWorldAndRehydrate() {
-                const localItemsRaw = localStorage.getItem('badabing_world_v9') || localStorage.getItem('badabing_world_v8');
-                let localItems = [];
+                const localItemsRaw = localStorage.getItem('badabing_world_v10') || localStorage.getItem('badabing_world_v9');
+                const localNpcsRaw = localStorage.getItem('badabing_npcs_v10') || localStorage.getItem('badabing_npcs_v9');
+                const localTycoonRaw = localStorage.getItem('badabing_tycoon_v10');
+                let localItems = [], localNpcs = [], localTycoon = null;
                 try { if (localItemsRaw) localItems = JSON.parse(localItemsRaw); } catch (e) {}
+                try { if (localNpcsRaw) localNpcs = JSON.parse(localNpcsRaw); } catch (e) {}
+                try { if (localTycoonRaw) localTycoon = JSON.parse(localTycoonRaw); } catch (e) {}
+
                 try {
                     const res = await fetch('/api/world');
                     if (res.ok) {
                         const data = await res.json();
                         const sItems = Array.isArray(data.items) ? data.items : [];
-                        if (sItems.length === 0 && localItems.length > 0) {
-                            await fetch('/api/world/rehydrate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ items: localItems }) });
+                        if (data.worldRev) currentWorldRev = data.worldRev;
+                        if (data.tycoon) syncTycoonClient(data.tycoon);
+
+                        if (sItems.length === 0 && (localItems.length > 0 || localTycoon)) {
+                            const rehRes = await fetch('/api/world/rehydrate', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ items: localItems, savedNpcs: localNpcs, savedTycoon: localTycoon })
+                            });
+                            if (rehRes.ok) {
+                                const rehData = await rehRes.json();
+                                if (rehData.worldRev) currentWorldRev = rehData.worldRev;
+                                if (rehData.tycoon) syncTycoonClient(rehData.tycoon);
+                            }
                             rebuildSceneFromData(localItems, false);
                         } else {
                             rebuildSceneFromData(sItems, false);
+                            if (sItems.length > 0) {
+                                localStorage.setItem('badabing_world_v10', JSON.stringify(sItems));
+                            }
                         }
                         if (Array.isArray(data.npcs)) syncNpcsClient(data.npcs);
                         return;
@@ -1491,6 +1555,7 @@
 
             function syncNpcsClient(serverNpcs) {
                 npcList = serverNpcs;
+                localStorage.setItem('badabing_npcs_v10', JSON.stringify(serverNpcs));
                 const sel = document.getElementById('npc-selector');
                 const cur = sel.value || selectedNpcId;
                 sel.innerHTML = '';
@@ -1549,6 +1614,7 @@
                 }
             }
 
+            // Real-Time Co-op, Word Edit (`worldRev`), and Tycoon Polling Loop (350ms)
             setInterval(async () => {
                 try {
                     const res = await fetch('/api/coop/sync', {
@@ -1590,6 +1656,12 @@
                         });
                     }
 
+                    // Sync live Tycoon state across all players
+                    if (data.tycoon) {
+                        syncTycoonClient(data.tycoon);
+                    }
+
+                    // Sync live Farm Plot growth stages
                     if (Array.isArray(data.farmStates)) {
                         data.farmStates.forEach(fsItem => {
                             const vis = farmPlotVisuals[fsItem.id];
@@ -1605,12 +1677,17 @@
                     }
 
                     if (Array.isArray(data.npcs)) syncNpcsClient(data.npcs);
-                    if (typeof data.worldCount === 'number' && data.worldCount !== worldDataList.length) initWorldAndRehydrate();
+
+                    // If any placement OR in-place word edit occurred on the server, pull immediately!
+                    if ((typeof data.worldRev === 'number' && data.worldRev !== currentWorldRev) ||
+                        (typeof data.worldCount === 'number' && data.worldCount !== worldDataList.length)) {
+                        initWorldAndRehydrate();
+                    }
                 } catch (e) {}
             }, 350);
 
             // =========================================================
-            // 7. INTERACTIONS: FARMING, PORTALS, WAVE, SHOPS
+            // 7. INTERACTIONS: SIGNS, MERCHANTS, BEDS, STORAGE, FARMS
             // =========================================================
             const raycaster = new THREE.Raycaster();
             const centerScreen = new THREE.Vector2(0, 0);
@@ -1619,6 +1696,7 @@
             const modalTitle = document.getElementById('modal-title');
             const modalContent = document.getElementById('modal-content');
             let currentHoveredInteract = null;
+            let activeComputerItem = null;
 
             document.getElementById('close-modal-btn').addEventListener('click', (e) => { e.stopPropagation(); objectModal.style.display = 'none'; });
 
@@ -1658,8 +1736,10 @@
                             bookshelf: 'Check Out Cooking Book 📚',
                             bench_press: 'Pump Iron 🏋️',
                             door: 'Open / Close Door 🚪',
-                            merchant: 'Trade with Animal Merchant 🏪',
-                            sign: 'Edit Sign Text 🪧',
+                            merchant: 'Trade & Edit Animal Merchant 🏪',
+                            sign: 'Edit 3D Sign Text & Colors 🪧',
+                            bed: 'Assign Bed Owner 🛌',
+                            inventory: 'Open 10-Slot Storage 📫',
                             computer: 'Use Internet PC 💻'
                         };
                         promptEl.innerHTML = `Press <span>[F]</span> or Tap <span>🖐️</span> to ${labels[interactType] || 'Interact'}`;
@@ -1687,6 +1767,18 @@
 
                 if (interactType === 'portal') {
                     enterTycoonWorld();
+                } else if (interactType === 'sign') {
+                    if (controls.isLocked) controls.unlock();
+                    openSignEditorModal(itemData);
+                } else if (interactType === 'merchant') {
+                    if (controls.isLocked) controls.unlock();
+                    openMerchantModal(itemData);
+                } else if (interactType === 'bed') {
+                    if (controls.isLocked) controls.unlock();
+                    openBedModal(itemData);
+                } else if (interactType === 'inventory') {
+                    if (controls.isLocked) controls.unlock();
+                    openInventoryModal(itemData);
                 } else if (interactType === 'farm_plot') {
                     if (!isGodUnlocked) {
                         alert('🔒 Only Gorilla Gods can assign crops to a Farm Plot! Unlock God Mode with password PEANUT.');
@@ -1717,12 +1809,220 @@
                 } else if (interactType === 'door') {
                     itemData.isOpen = !itemData.isOpen;
                     rebuildSceneFromData(worldDataList, false);
-                    await fetch('/api/world/update-item', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: itemData.id, isOpen: itemData.isOpen }) });
+                    localStorage.setItem('badabing_world_v10', JSON.stringify(worldDataList));
+                    const res = await fetch('/api/world/update-item', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: itemData.id, isOpen: itemData.isOpen }) });
+                    if (res.ok) { const d = await res.json(); if (d.worldRev) currentWorldRev = d.worldRev; }
                 } else if (interactType === 'computer') {
                     if (controls.isLocked) controls.unlock();
+                    activeComputerItem = itemData;
                     document.getElementById('computer-browser-modal').style.display = 'flex';
-                    document.getElementById('browser-iframe').src = itemData.lastUrl || 'https://en.m.wikipedia.org/wiki/Giant_panda';
+                    const url = itemData.lastUrl || 'https://en.m.wikipedia.org/wiki/Giant_panda';
+                    document.getElementById('browser-url-bar').value = url;
+                    document.getElementById('browser-iframe').src = url;
                 }
+            }
+
+            // Live Sign Word Editor Modal (Broadcasts to All Players Immediately)
+            function openSignEditorModal(itemData) {
+                modalTitle.innerText = '🪧 Edit 3D Sign Text & Colors (Live Sync)';
+                const curText = itemData.signText || 'WELCOME TO\nTHE BADABING';
+                const curColor = itemData.signColor || '#fde047';
+                const curBg = itemData.signBg || '#111318';
+
+                modalContent.innerHTML = `
+                    <div style="margin-bottom:10px;">
+                        <label style="font-size:11px;color:#38bdf8;display:block;margin-bottom:4px;">Sign Words (Supports 2 lines):</label>
+                        <textarea id="sign-text-input" class="merchant-input" rows="2" style="width:100%;font-size:14px;font-weight:bold;">${curText}</textarea>
+                    </div>
+                    <div style="display:flex;gap:12px;margin-bottom:12px;">
+                        <div style="flex:1;">
+                            <label style="font-size:11px;color:#38bdf8;display:block;margin-bottom:4px;">Text Color:</label>
+                            <input type="color" id="sign-color-input" value="${curColor}" style="width:100%;height:34px;border:none;background:none;cursor:pointer;" />
+                        </div>
+                        <div style="flex:1;">
+                            <label style="font-size:11px;color:#38bdf8;display:block;margin-bottom:4px;">Board Background:</label>
+                            <input type="color" id="sign-bg-input" value="${curBg}" style="width:100%;height:34px;border:none;background:none;cursor:pointer;" />
+                        </div>
+                    </div>
+                    <button class="mini-ui-btn" id="btn-save-sign" style="width:100%;padding:10px;background:#4ade80;color:#090d16;font-size:13px;">💾 Save & Sync Sign Live</button>
+                `;
+                objectModal.style.display = 'block';
+
+                document.getElementById('btn-save-sign').addEventListener('click', async () => {
+                    itemData.signText = document.getElementById('sign-text-input').value || 'SIGN';
+                    itemData.signColor = document.getElementById('sign-color-input').value || '#fde047';
+                    itemData.signBg = document.getElementById('sign-bg-input').value || '#111318';
+                    rebuildSceneFromData(worldDataList, false);
+                    localStorage.setItem('badabing_world_v10', JSON.stringify(worldDataList));
+                    objectModal.style.display = 'none';
+                    const res = await fetch('/api/world/update-item', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            id: itemData.id,
+                            signText: itemData.signText,
+                            signColor: itemData.signColor,
+                            signBg: itemData.signBg
+                        })
+                    });
+                    if (res.ok) { const d = await res.json(); if (d.worldRev) currentWorldRev = d.worldRev; }
+                });
+            }
+
+            // Live Animal Merchant Word & Price Editor Modal
+            function openMerchantModal(itemData) {
+                if (typeof itemData.merchantSkin !== 'number') itemData.merchantSkin = 0;
+                if (!Array.isArray(itemData.shopItems) || itemData.shopItems.length === 0) {
+                    itemData.shopItems = [
+                        { name: '🐼 Bamboo Ramen Bowl', price: 12 },
+                        { name: '🥪 Deli Pastrami Hero', price: 14 },
+                        { name: '🏎️ Hobby RC Drift Car', price: 35 }
+                    ];
+                }
+                modalTitle.innerText = '🏪 Animal Merchant Shop & Live Word Editor';
+                const currentNpc = npcList.find(n => n.id === selectedNpcId) || npcList[0];
+
+                modalContent.innerHTML = `
+                    <div style="margin-bottom:8px;">
+                        <label style="font-size:11px;color:#38bdf8;display:block;margin-bottom:3px;">Shopkeeper Skin:</label>
+                        <select id="merchant-skin-select" class="merchant-input" style="width:100%;">
+                            ${MERCHANT_SKINS.map((sk, idx) => `<option value="${idx}" ${itemData.merchantSkin === idx ? 'selected' : ''}>Skin #${idx + 1}: ${sk.name}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div style="margin-bottom:8px;">
+                        <label style="font-size:11px;color:#38bdf8;display:block;margin-bottom:3px;">Custom Shop Sign Name:</label>
+                        <input type="text" id="merchant-name-input" class="merchant-input" value="${itemData.merchantName || MERCHANT_SKINS[itemData.merchantSkin].name}" style="width:100%;font-weight:bold;" />
+                    </div>
+                    <div style="margin-bottom:8px;">
+                        <label style="font-size:11px;color:#38bdf8;display:block;margin-bottom:3px;">Companion Buyer:</label>
+                        <select id="merchant-buyer-select" class="merchant-input" style="width:100%;color:#fde047;font-weight:bold;">
+                            ${npcList.map(n => `<option value="${n.id}" ${n.id === (currentNpc && currentNpc.id) ? 'selected' : ''}>${n.name} — Wallet: $${n.wallet ?? 200}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div style="font-size:11px;color:#38bdf8;font-weight:bold;margin-bottom:5px;">Editable Items & Prices:</div>
+                    <div id="merchant-items-container">
+                        ${itemData.shopItems.map((it, i) => `
+                            <div class="merchant-item-row">
+                                <input type="text" class="merchant-input edit-item-name" data-idx="${i}" value="${it.name}" style="flex:1;" />
+                                <span>$</span>
+                                <input type="number" class="merchant-input edit-item-price" data-idx="${i}" value="${it.price}" style="width:60px;" />
+                                <button class="mini-ui-btn buy-item-btn" data-idx="${i}" style="background:#4ade80;color:#090d16;">🛍️ Buy</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div style="display:flex;justify-content:space-between;margin-top:10px;">
+                        <button class="mini-ui-btn" id="btn-add-shop-row">➕ Add Item</button>
+                        <button class="mini-ui-btn" id="btn-save-merchant" style="background:#facc15;color:#090d16;">💾 Save Shop Edits Live</button>
+                    </div>
+                `;
+                objectModal.style.display = 'block';
+
+                document.getElementById('btn-add-shop-row').addEventListener('click', () => {
+                    itemData.shopItems.push({ name: '✨ New Item', price: 10 });
+                    openMerchantModal(itemData);
+                });
+
+                document.getElementById('btn-save-merchant').addEventListener('click', async () => {
+                    itemData.merchantSkin = Number(document.getElementById('merchant-skin-select').value);
+                    itemData.merchantName = document.getElementById('merchant-name-input').value.trim() || MERCHANT_SKINS[itemData.merchantSkin].name;
+                    const nameInputs = modalContent.querySelectorAll('.edit-item-name');
+                    const priceInputs = modalContent.querySelectorAll('.edit-item-price');
+                    itemData.shopItems = Array.from(nameInputs).map((inp, idx) => ({
+                        name: inp.value,
+                        price: Number(priceInputs[idx].value) || 0
+                    }));
+                    rebuildSceneFromData(worldDataList, false);
+                    localStorage.setItem('badabing_world_v10', JSON.stringify(worldDataList));
+                    const res = await fetch('/api/world/update-item', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            id: itemData.id,
+                            merchantSkin: itemData.merchantSkin,
+                            merchantName: itemData.merchantName,
+                            shopItems: itemData.shopItems
+                        })
+                    });
+                    if (res.ok) { const d = await res.json(); if (d.worldRev) currentWorldRev = d.worldRev; }
+                    objectModal.style.display = 'none';
+                });
+
+                modalContent.querySelectorAll('.buy-item-btn').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        const idx = Number(btn.getAttribute('data-idx'));
+                        const nameInputs = modalContent.querySelectorAll('.edit-item-name');
+                        const priceInputs = modalContent.querySelectorAll('.edit-item-price');
+                        const buyerId = document.getElementById('merchant-buyer-select').value;
+                        const res = await fetch('/api/npcs/action', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                npcId: buyerId,
+                                actionType: 'buy',
+                                itemName: nameInputs[idx].value,
+                                itemPrice: Number(priceInputs[idx].value) || 0
+                            })
+                        });
+                        if (res.ok) {
+                            syncNpcsClient((await res.json()).npcs);
+                            openMerchantModal(itemData);
+                        } else {
+                            alert('Not enough funds in companion wallet!');
+                        }
+                    });
+                });
+            }
+
+            function openBedModal(itemData) {
+                modalTitle.innerText = '🛌 Assign Bed Owner (Live Sync)';
+                const owners = [...npcList.map(n => n.name), 'Gorilla God 1', 'Gorilla God 2', 'Unassigned'];
+                modalContent.innerHTML = `<p style="font-size:12px;color:#cbd5e1;margin-bottom:10px;">Current Owner: <strong style="color:#fde047;">${itemData.assignedTo || 'Unassigned'}</strong></p><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;">` +
+                    owners.map(ow => `<button class="mini-ui-btn assign-bed-btn" data-owner="${ow}" style="padding:9px;">Assign to ${ow}</button>`).join('') + `</div>`;
+                objectModal.style.display = 'block';
+                modalContent.querySelectorAll('.assign-bed-btn').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        const chosen = btn.getAttribute('data-owner');
+                        itemData.assignedTo = chosen === 'Unassigned' ? null : chosen;
+                        rebuildSceneFromData(worldDataList, false);
+                        localStorage.setItem('badabing_world_v10', JSON.stringify(worldDataList));
+                        objectModal.style.display = 'none';
+                        const res = await fetch('/api/world/update-item', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: itemData.id, assignedTo: itemData.assignedTo }) });
+                        if (res.ok) { const d = await res.json(); if (d.worldRev) currentWorldRev = d.worldRev; }
+                    });
+                });
+            }
+
+            function openInventoryModal(itemData) {
+                if (!Array.isArray(itemData.inventory)) itemData.inventory = new Array(10).fill('');
+                modalTitle.innerText = '📫 10-Slot Storage (Live Sync)';
+                const sampleItems = ['🍔 Burger', '🥪 Deli Sub', '🏎️ RC Car', '🛠️ Wrench', '💎 Gem', '✉️ Letter'];
+                modalContent.innerHTML = `<div class="inv-grid">` +
+                    itemData.inventory.map((val, i) => `<div class="inv-slot" data-slot="${i}"><span style="color:#94a3b8;font-size:9px;">Slot ${i + 1}</span><strong style="color:#fff;">${val || 'Empty'}</strong></div>`).join('') +
+                    `</div><div style="display:flex;gap:6px;flex-wrap:wrap;">` +
+                    sampleItems.map(st => `<button class="mini-ui-btn add-inv-btn" data-item="${st}">+ ${st}</button>`).join('') + `</div>`;
+                objectModal.style.display = 'block';
+
+                modalContent.querySelectorAll('.inv-slot').forEach(slotEl => {
+                    slotEl.addEventListener('click', async () => {
+                        itemData.inventory[Number(slotEl.getAttribute('data-slot'))] = '';
+                        openInventoryModal(itemData);
+                        localStorage.setItem('badabing_world_v10', JSON.stringify(worldDataList));
+                        const res = await fetch('/api/world/update-item', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: itemData.id, inventory: itemData.inventory }) });
+                        if (res.ok) { const d = await res.json(); if (d.worldRev) currentWorldRev = d.worldRev; }
+                    });
+                });
+                modalContent.querySelectorAll('.add-inv-btn').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        const emptyIdx = itemData.inventory.findIndex(v => !v);
+                        if (emptyIdx !== -1) {
+                            itemData.inventory[emptyIdx] = btn.getAttribute('data-item');
+                            openInventoryModal(itemData);
+                            localStorage.setItem('badabing_world_v10', JSON.stringify(worldDataList));
+                            const res = await fetch('/api/world/update-item', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: itemData.id, inventory: itemData.inventory }) });
+                            if (res.ok) { const d = await res.json(); if (d.worldRev) currentWorldRev = d.worldRev; }
+                        }
+                    });
+                });
             }
 
             function openFarmConfigModal(itemData) {
@@ -1760,15 +2060,16 @@
                     const cropType = document.getElementById('farm-crop-select').value;
                     const loops = Number(document.getElementById('farm-loops-select').value) || 1;
                     objectModal.style.display = 'none';
-                    await fetch('/api/world/update-item', {
+                    const res = await fetch('/api/world/update-item', {
                         method: 'POST', headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ id: itemData.id, farmConfig: { assignedNpcId, cropType, loops } })
                     });
+                    if (res.ok) { const d = await res.json(); if (d.worldRev) currentWorldRev = d.worldRev; }
                 });
             }
 
             // =========================================================
-            // 8. UI MENUS, BUILD PLACEMENT & FIXED MOBILE TOUCH CONTROLS
+            // 8. UI MENUS, BUILD PLACEMENT & MOBILE TOUCH CONTROLS
             // =========================================================
             const mindPanel = document.getElementById('companion-mind-panel');
             document.getElementById('btn-toggle-mind').addEventListener('click', (e) => { e.stopPropagation(); mindPanel.style.display = mindPanel.style.display === 'block' ? 'none' : 'block'; });
@@ -1782,6 +2083,16 @@
             document.getElementById('btn-close-manager').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('companion-manager-modal').style.display = 'none'; });
             document.getElementById('btn-close-arcade').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('arcade-modal').style.display = 'none'; document.getElementById('arcade-iframe').src = 'about:blank'; });
             document.getElementById('btn-browser-close').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('computer-browser-modal').style.display = 'none'; });
+            document.getElementById('btn-browser-go').addEventListener('click', async (e) => {
+                e.stopPropagation();
+                let url = document.getElementById('browser-url-bar').value.trim();
+                if (!url.startsWith('http')) url = 'https://' + url;
+                document.getElementById('browser-iframe').src = url;
+                if (activeComputerItem) {
+                    activeComputerItem.lastUrl = url;
+                    await fetch('/api/world/update-item', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: activeComputerItem.id, lastUrl: url }) });
+                }
+            });
 
             ['feed', 'rest'].forEach(act => {
                 document.getElementById('btn-' + act + '-npc').addEventListener('click', async (e) => {
@@ -1893,6 +2204,7 @@
                             id: 'piece_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
                             type: selectedTool, color: selectedColor, x: pt.x, y: pt.y, z: pt.z, rot: buildRotation,
                             isOpen: false, inventory: new Array(10).fill(''),
+                            signText: 'WELCOME TO\nTHE BADABING', signColor: '#fde047', signBg: '#111318',
                             farmState: selectedTool === 'farm_plot' ? { assignedNpcId: 'peanut', cropType: '🍅 Slurp Tomatoes', loopsRemaining: 0, stage: 'idle', waterCount: 0, progressPct: 0 } : undefined
                         });
                         rebuildSceneFromData(worldDataList, true);
@@ -1915,7 +2227,7 @@
             }
 
             // =========================================================
-            // 9. DESKTOP + COMPLETELY FIXED MULTI-TOUCH MOBILE CONTROLS
+            // 9. DESKTOP + MULTI-TOUCH MOBILE CONTROLS
             // =========================================================
             const controls = new THREE.PointerLockControls(camera, document.body);
             const mobileControlsEl = document.getElementById('mobile-controls');
@@ -1935,7 +2247,7 @@
             });
 
             const keys = { w: false, a: false, s: false, d: false, space: false, shift: false };
-            const joyVec = { x: 0, y: 0 }; // Analog Thumbstick Vector (-1 to 1)
+            const joyVec = { x: 0, y: 0 };
 
             window.addEventListener('keydown', (e) => {
                 const tag = document.activeElement && document.activeElement.tagName;
@@ -1964,7 +2276,6 @@
                 if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') keys.shift = false;
             });
 
-            // Helper to bind both touch and pointer events for 100% reliable mobile buttons
             function bindHoldButton(btnId, onDown, onUp) {
                 const el = document.getElementById(btnId);
                 if (!el) return;
@@ -1995,7 +2306,6 @@
                 });
             }, null);
 
-            // Virtual Left Analog Thumbstick (Multi-Touch Safe)
             const joyZone = document.getElementById('joystick-zone');
             const joyKnob = document.getElementById('joystick-knob');
             let joyTouchId = null;
@@ -2011,7 +2321,7 @@
                 if (dist > maxR) { dx = (dx / dist) * maxR; dy = (dy / dist) * maxR; }
                 joyKnob.style.transform = `translate(${dx}px, ${dy}px)`;
                 joyVec.x = +(dx / maxR).toFixed(2);
-                joyVec.y = +(-dy / maxR).toFixed(2); // Up is positive forward
+                joyVec.y = +(-dy / maxR).toFixed(2);
             }
 
             function resetJoystick() {
@@ -2044,9 +2354,7 @@
             });
             joyZone.addEventListener('touchcancel', resetJoystick);
 
-            // Multi-Touch Right-Screen Look Drag (Works Simultaneously While Moving with Left Thumb!)
             let lookTouchId = null, lastLookX = 0, lastLookY = 0;
-
             window.addEventListener('touchstart', (e) => {
                 if (e.target.closest('#build-menu-modal, #toggle-build-btn, #top-status-banner, #tycoon-hud, .game-modal, #companion-bar, #companion-mind-panel, #sports-hud, #joystick-zone, .mob-btn')) return;
                 for (let i = 0; i < e.changedTouches.length; i++) {
@@ -2072,7 +2380,7 @@
                         camera.rotation.order = 'YXZ';
                         camera.rotation.y -= dx * 0.0058;
                         camera.rotation.x = Math.max(-Math.PI * 0.44, Math.min(Math.PI * 0.44, camera.rotation.x - dy * 0.0058));
-                        camera.rotation.z = 0; // Strictly lock roll to zero so view never twists!
+                        camera.rotation.z = 0;
                         break;
                     }
                 }
@@ -2120,7 +2428,8 @@
                     if (ghostMesh) { ghostMesh.position.set(snapPt.x, snapPt.y, snapPt.z); ghostMesh.rotation.y = THREE.MathUtils.degToRad(buildRotation); }
                 }
 
-                // Portal & Tycoon Sub-World Logic
+                if (tycoonState.actionCooldown > 0) tycoonState.actionCooldown -= delta;
+
                 if (!tycoonState.inTycoonWorld) {
                     for (let i = 0; i < activePortals.length; i++) {
                         const p = activePortals[i];
@@ -2129,6 +2438,7 @@
                 } else {
                     if (Math.hypot(camera.position.x - TYCOON_ORIGIN.x, camera.position.z - (TYCOON_ORIGIN.z + 24)) < 2.2) exitTycoonWorld();
 
+                    // Visual Conveyor Crates
                     const interval = tycoonState.unlockedPads.speed ? 0.85 : 1.7;
                     if (elapsed - lastTycoonDrop > interval) {
                         lastTycoonDrop = elapsed;
@@ -2144,32 +2454,35 @@
                         if (cr.position.z >= 13.5) {
                             tycoonGroup.remove(cr);
                             tycoonState.crates.splice(c, 1);
-                            const baseVal = tycoonState.unlockedPads.megaDropper ? 25 : 10;
-                            const mult = tycoonState.unlockedPads.upgrader ? 3 : 1;
-                            tycoonState.storedCollectorCash += baseVal * mult;
-                            claimSign.material.map = makeSignTexture(`💰 STEP TO COLLECT\n$${tycoonState.storedCollectorCash} READY`, '#064e3b', '#fde047');
-                            claimSign.material.needsUpdate = true;
                         }
                     }
-                    if (Math.hypot(camera.position.x - (TYCOON_ORIGIN.x - 4), camera.position.z - (TYCOON_ORIGIN.z + 14)) < 2.3 && tycoonState.storedCollectorCash > 0) {
-                        tycoonState.walletCash += tycoonState.storedCollectorCash;
-                        tycoonState.storedCollectorCash = 0;
-                        document.getElementById('tycoon-cash-val').innerText = tycoonState.walletCash;
-                        claimSign.material.map = makeSignTexture('💰 COLLECTED!\n$0 READY', '#064e3b', '#fde047');
-                        claimSign.material.needsUpdate = true;
+
+                    // Step on Green Cash Claim Pad -> Server-Synced Collect
+                    if (tycoonState.actionCooldown <= 0 &&
+                        Math.hypot(camera.position.x - (TYCOON_ORIGIN.x - 4), camera.position.z - (TYCOON_ORIGIN.z + 14)) < 2.3 &&
+                        tycoonState.storedCollectorCash > 0) {
+                        tycoonState.actionCooldown = 0.8;
+                        fetch('/api/tycoon/collect', { method: 'POST' })
+                            .then(r => r.json())
+                            .then(d => { if (d.tycoon) syncTycoonClient(d.tycoon); })
+                            .catch(() => {});
                     }
+
+                    // Step on Tycoon Upgrade Pads -> Server-Synced Unlock
                     Object.keys(tycoonPadMeshes).forEach(k => {
-                        if (tycoonState.unlockedPads[k]) return;
+                        if (tycoonState.unlockedPads[k] || tycoonState.actionCooldown > 0) return;
                         const pm = tycoonPadMeshes[k];
                         if (Math.hypot(camera.position.x - (TYCOON_ORIGIN.x + pm.def.x), camera.position.z - (TYCOON_ORIGIN.z + pm.def.z)) < 1.9) {
                             if (tycoonState.walletCash >= pm.def.cost) {
-                                tycoonState.walletCash -= pm.def.cost;
-                                tycoonState.unlockedPads[k] = true;
-                                pm.pad.visible = false; pm.lbl.visible = false;
-                                document.getElementById('tycoon-cash-val').innerText = tycoonState.walletCash;
-                                const rate = (tycoonState.unlockedPads.megaDropper ? 25 : 10) * (tycoonState.unlockedPads.upgrader ? 3 : 1);
-                                document.getElementById('tycoon-rate-val').innerText = rate;
-                                rebuildTycoonUpgrades();
+                                tycoonState.actionCooldown = 0.8;
+                                fetch('/api/tycoon/unlock', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ padKey: k })
+                                })
+                                    .then(r => r.json())
+                                    .then(d => { if (d.tycoon) syncTycoonClient(d.tycoon); })
+                                    .catch(() => {});
                             }
                         }
                     });
@@ -2214,7 +2527,7 @@
                     }
                 });
 
-                // Player Movement (Combines Keyboard WASD + Mobile D-Pad + Mobile Analog Thumbstick)
+                // Player Movement (Keyboard WASD + Mobile D-Pad + Mobile Analog Thumbstick)
                 const baseSpeed = (!isFlyingMode && keys.shift) ? 30.0 : 20.0;
                 const moveSpeed = baseSpeed * delta;
                 const oldPos = camera.position.clone();
