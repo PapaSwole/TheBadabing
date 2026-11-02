@@ -6,10 +6,14 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const DATA_FILE = path.join(__dirname, 'world_data.json');
 const NPC_FILE = path.join(__dirname, 'npc_data.json');
+const TYCOON_FILE = path.join(__dirname, 'tycoon_data.json');
 
 app.use(express.json({ limit: '25mb' }));
 app.use(express.static(__dirname));
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Revision counter so in-place word edits (signs, merchants, doors, farms) sync to all players immediately
+let worldRev = Date.now();
 
 let worldItems = [];
 if (fs.existsSync(DATA_FILE)) {
@@ -38,7 +42,7 @@ function createDefaultPeanut() {
         assignedBedId: null,
         wants: ['Grow crops on a Farm Plot 🌱', 'Visit the Italian Deli 🥪', 'Wave at a Player 👋'],
         diary: [
-            'Dear Diary: The new Fortnite-style lighting and day/night sky look amazing!',
+            'Dear Diary: All signs, buildings, and Tycoon progress now sync live across the server!',
             'Ready to plant, water, and harvest crops whenever a Gorilla God assigns me a Farm Plot!'
         ],
         activityLog: ['[' + new Date().toLocaleTimeString() + '] Roaming town freely.']
@@ -51,10 +55,36 @@ if (fs.existsSync(NPC_FILE)) {
 }
 if (!Array.isArray(npcs) || npcs.length === 0) npcs = [createDefaultPeanut()];
 
+function createDefaultTycoon() {
+    return {
+        walletCash: 50,
+        storedCollectorCash: 0,
+        unlockedPads: {
+            dropper1: true,
+            speed: false,
+            upgrader: false,
+            megaDropper: false,
+            tower: false
+        },
+        rev: Date.now()
+    };
+}
+
+let tycoonState = createDefaultTycoon();
+if (fs.existsSync(TYCOON_FILE)) {
+    try {
+        const loaded = JSON.parse(fs.readFileSync(TYCOON_FILE, 'utf8') || '{}');
+        if (typeof loaded.walletCash === 'number') {
+            tycoonState = Object.assign(createDefaultTycoon(), loaded);
+        }
+    } catch (e) {}
+}
+
 function saveAllToDisk() {
     try {
         fs.writeFileSync(DATA_FILE, JSON.stringify(worldItems, null, 2), 'utf8');
         fs.writeFileSync(NPC_FILE, JSON.stringify(npcs, null, 2), 'utf8');
+        fs.writeFileSync(TYCOON_FILE, JSON.stringify(tycoonState, null, 2), 'utf8');
     } catch (e) { console.error('Disk save error:', e.message); }
 }
 
@@ -76,7 +106,7 @@ function addDiary(npc, text) {
     }
 }
 
-// Generous Bounding-Box Obstacle Check so Companions Never Clip or Loop on Structures
+// Bounding-Box Obstacle Check so Companions Never Clip or Loop on Structures
 const BUILDING_BOUNDS = {
     wall: [2.2, 0.6], window: [2.2, 0.6], fence: [2.2, 0.6], doorway: [2.2, 0.6],
     mcdonalds: [9.2, 7.2], hobby_store: [9.2, 7.2], deli: [9.2, 7.2], library: [9.2, 7.2], gym: [9.2, 7.2],
@@ -108,7 +138,6 @@ function isNpcBlockedByWall(nx, nz, ignoreItemId) {
     return false;
 }
 
-// Raycasts 8 steps along a path to guarantee no building sits between companion and target
 function isPathClear(x1, z1, x2, z2, ignoreItemId) {
     const steps = 8;
     for (let s = 1; s <= steps; s++) {
@@ -136,14 +165,12 @@ function pickRandomRoamWaypoint(npc) {
             return;
         }
     }
-    // Fallback: step gently toward open town road (X: 0, Z: 0)
     npc.targetX = 0;
     npc.targetZ = 0;
     npc.stallTicks = 0;
     npc.lastProgressDist = Math.hypot(npc.x, npc.z);
 }
 
-// Escape check on startup in case any companion was saved inside a structure
 npcs.forEach(n => {
     if (typeof n.wallet !== 'number') n.wallet = 200;
     if (!Array.isArray(n.inventory)) n.inventory = ['🍎 Sweet Apple'];
@@ -173,6 +200,13 @@ const CROP_REWARDS = {
     '🎃 Mythic Pumpkins': 75
 };
 
+const TYCOON_COSTS = {
+    speed: 50,
+    upgrader: 150,
+    megaDropper: 400,
+    tower: 1000
+};
+
 const activePlayers = {};
 const GOD_COLORS = ['#fa9549', '#38bdf8', '#4ade80', '#c084fc'];
 let sportsScores = { hoops: 0, goals: 0, rallies: 0 };
@@ -180,12 +214,21 @@ let sportsScores = { hoops: 0, goals: 0, rallies: 0 };
 let tickCount = 0;
 const STEER_ANGLES = [0, 0.35, -0.35, 0.75, -0.75, 1.25, -1.25, 1.85, -1.85, Math.PI];
 
-// Main Server Simulation Tick (100ms) — Handles 3-Min Farming Cycle & Smooth Unstuck Roaming
+// Main Server Simulation Tick (100ms) — Handles Tycoon Income, 3-Min Farming Cycle & Companion Roaming
 setInterval(() => {
     tickCount++;
     const now = Date.now();
 
-    // 1. Update All Active Farm Plots (3-Minute Total Completion = 90s Water 1 + 90s Water 2)
+    // 1. Server-Side Authoritative Tycoon Dropper Income
+    const dropTicks = tycoonState.unlockedPads.speed ? 10 : 18;
+    if (tickCount % dropTicks === 0) {
+        const baseVal = tycoonState.unlockedPads.megaDropper ? 25 : 10;
+        const mult = tycoonState.unlockedPads.upgrader ? 3 : 1;
+        const towerBonus = tycoonState.unlockedPads.tower ? 50 : 0;
+        tycoonState.storedCollectorCash += (baseVal * mult) + towerBonus;
+    }
+
+    // 2. Update All Active Farm Plots (3-Minute Total Completion = 90s Water 1 + 90s Water 2)
     worldItems.forEach(plot => {
         if (plot.type !== 'farm_plot') return;
         if (!plot.farmState) {
@@ -203,14 +246,12 @@ setInterval(() => {
         if (fsState.stage === 'growing_1') {
             const elapsed = now - (fsState.stageStartedAt || now);
             fsState.progressPct = Math.min(50, Math.round((elapsed / 90000) * 50));
-            // 90 seconds after first watering -> requires second watering!
             if (elapsed >= 90000) {
                 fsState.stage = 'needs_water_2';
             }
         } else if (fsState.stage === 'growing_2') {
             const elapsed = now - (fsState.stageStartedAt || now);
             fsState.progressPct = Math.min(100, 50 + Math.round((elapsed / 90000) * 50));
-            // 90 seconds after second watering (180s / 3 mins total) -> ready to harvest!
             if (elapsed >= 90000) {
                 fsState.stage = 'ready_harvest';
                 fsState.progressPct = 100;
@@ -218,7 +259,7 @@ setInterval(() => {
         }
     });
 
-    // 2. Update All Companions (Peanut + Spawned Peers)
+    // 3. Update All Companions (Peanut + Spawned Peers)
     npcs.forEach((npc) => {
         npc.hunger = Math.max(10, +(npc.hunger - 0.008).toFixed(2));
         npc.energy = Math.max(10, +(npc.energy - 0.006).toFixed(2));
@@ -229,7 +270,6 @@ setInterval(() => {
             return;
         }
 
-        // Check if this companion has an active Farm Plot needing action right now
         const urgentPlot = worldItems.find(it =>
             it.type === 'farm_plot' &&
             it.farmState &&
@@ -262,7 +302,6 @@ setInterval(() => {
                 destX = npc.targetX;
                 destZ = npc.targetZ;
             }
-            // Show growing status if they are waiting on a crop, while still letting them roam freely
             const growingPlot = worldItems.find(it =>
                 it.type === 'farm_plot' &&
                 it.farmState &&
@@ -286,8 +325,6 @@ setInterval(() => {
             const baseAngle = Math.atan2(dx, dz);
             const speed = 0.22;
             let moved = false;
-
-            // If currently trapped inside a newly placed structure, walk straight out
             const trappedInside = isNpcBlockedByWall(npc.x, npc.z, ignoreId);
 
             for (let a = 0; a < STEER_ANGLES.length; a++) {
@@ -298,14 +335,12 @@ setInterval(() => {
                 if (trappedInside || !isNpcBlockedByWall(stepX, stepZ, ignoreId)) {
                     npc.x = +stepX.toFixed(2);
                     npc.z = +stepZ.toFixed(2);
-                    // Smooth server-side angle update
                     npc.rotY = +tryAngle.toFixed(2);
                     moved = true;
                     break;
                 }
             }
 
-            // Progress Watchdog: if distance to target hasn't improved by at least 0.15m, count stall tick
             if (typeof npc.lastProgressDist === 'number' && dist >= npc.lastProgressDist - 0.05) {
                 npc.stallTicks = (npc.stallTicks || 0) + 1;
             } else {
@@ -315,17 +350,14 @@ setInterval(() => {
 
             if (!moved || npc.stallTicks > 15) {
                 if (urgentPlot) {
-                    // Snap directly to farm plot edge so a wall never blocks farming completion
                     npc.x = urgentPlot.x;
                     npc.z = urgentPlot.z + 2.8;
                     npc.stallTicks = 0;
                 } else {
-                    // Immediately abandon unreachable waypoint and pick a new clear one
                     pickRandomRoamWaypoint(npc);
                 }
             }
         } else {
-            // Reached destination! Handle Farming Stage Transitions
             if (urgentPlot) {
                 const fsState = urgentPlot.farmState;
                 npc.rotY = +(Math.atan2(urgentPlot.x - npc.x, urgentPlot.z - npc.z)).toFixed(2);
@@ -427,10 +459,36 @@ app.post('/api/coop/sync', (req, res) => {
         gods: Object.values(activePlayers),
         npcs,
         worldCount: worldItems.length,
+        worldRev,
+        tycoon: tycoonState,
         sportsScores,
         farmStates,
         serverTimeMs: now
     });
+});
+
+// Real-Time Tycoon Endpoints (Saved & Synced Across All Players)
+app.post('/api/tycoon/collect', (req, res) => {
+    if (tycoonState.storedCollectorCash > 0) {
+        tycoonState.walletCash += tycoonState.storedCollectorCash;
+        tycoonState.storedCollectorCash = 0;
+        tycoonState.rev = Date.now();
+        saveAllToDisk();
+    }
+    res.json({ success: true, tycoon: tycoonState });
+});
+
+app.post('/api/tycoon/unlock', (req, res) => {
+    const { padKey } = req.body || {};
+    const cost = TYCOON_COSTS[padKey];
+    if (!cost) return res.status(400).json({ error: 'Invalid pad' });
+    if (!tycoonState.unlockedPads[padKey] && tycoonState.walletCash >= cost) {
+        tycoonState.walletCash -= cost;
+        tycoonState.unlockedPads[padKey] = true;
+        tycoonState.rev = Date.now();
+        saveAllToDisk();
+    }
+    res.json({ success: true, tycoon: tycoonState });
 });
 
 app.post('/api/sports/score', (req, res) => {
@@ -442,33 +500,51 @@ app.post('/api/sports/score', (req, res) => {
 });
 
 app.get('/api/world', (req, res) => {
-    res.json({ items: worldItems, npcs, sportsScores });
+    res.json({ items: worldItems, npcs, sportsScores, worldRev, tycoon: tycoonState });
 });
 
 app.post('/api/world', (req, res) => {
     if (Array.isArray(req.body)) {
         worldItems = req.body;
+        worldRev = Date.now();
         saveAllToDisk();
-        return res.json({ success: true, count: worldItems.length });
+        return res.json({ success: true, count: worldItems.length, worldRev });
     }
     res.status(400).json({ error: 'Expected array' });
 });
 
+// Auto-Rehydrate World, Companions & Tycoon Progress After Any Server Restart
 app.post('/api/world/rehydrate', (req, res) => {
-    const { items, savedNpcs, forceNpcs } = req.body || {};
+    const { items, savedNpcs, savedTycoon, forceNpcs } = req.body || {};
     let restored = false;
     if (worldItems.length === 0 && Array.isArray(items) && items.length > 0) {
         worldItems = items;
+        worldRev = Date.now();
         restored = true;
     }
     if (Array.isArray(savedNpcs) && savedNpcs.length > 0 && (forceNpcs || npcs.length <= 1)) {
         npcs = savedNpcs;
         restored = true;
     }
+    const hasUnlockedAny = Object.keys(tycoonState.unlockedPads || {}).some(k => k !== 'dropper1' && tycoonState.unlockedPads[k]);
+    if (!hasUnlockedAny && tycoonState.walletCash <= 50 && savedTycoon && typeof savedTycoon.walletCash === 'number') {
+        tycoonState = Object.assign(createDefaultTycoon(), savedTycoon);
+        tycoonState.rev = Date.now();
+        restored = true;
+    }
     if (restored) saveAllToDisk();
-    res.json({ success: true, restored, worldCount: worldItems.length, npcCount: npcs.length, npcs });
+    res.json({
+        success: true,
+        restored,
+        worldCount: worldItems.length,
+        worldRev,
+        npcCount: npcs.length,
+        npcs,
+        tycoon: tycoonState
+    });
 });
 
+// Real-Time Single Item Edit (Word Edits on Signs, Merchants, Doors, Beds, Storage, Farms)
 app.post('/api/world/update-item', (req, res) => {
     const { id, isOpen, inventory, assignedTo, merchantSkin, shopItems, merchantName, signText, signColor, signBg, lastUrl, farmConfig } = req.body || {};
     const target = worldItems.find(it => it.id === id);
@@ -492,7 +568,6 @@ app.post('/api/world/update-item', (req, res) => {
     if (typeof signBg === 'string') target.signBg = signBg;
     if (typeof lastUrl === 'string') target.lastUrl = lastUrl;
 
-    // God Farm Plot Assignment (Starts 3-Minute Two-Watering Loop)
     if (farmConfig && target.type === 'farm_plot') {
         target.farmState = {
             assignedNpcId: farmConfig.assignedNpcId || 'peanut',
@@ -510,8 +585,10 @@ app.post('/api/world/update-item', (req, res) => {
         }
     }
 
+    // Bump revision so all connected players immediately pull the live edit!
+    worldRev = Date.now();
     saveAllToDisk();
-    res.json({ success: true, item: target, npcs });
+    res.json({ success: true, item: target, npcs, worldRev });
 });
 
 app.post('/api/npcs/spawn', (req, res) => {
@@ -599,6 +676,7 @@ app.post('/api/npcs/action', (req, res) => {
         npc.wallet -= price;
         npc.inventory.push(itemName || '🎁 Gift');
         npc.mood = 'Spoiled & Joyful 🛍️';
+        addLog(npc, 'Bought ' + (itemName || 'item') + ' ($' + price + ') from Merchant.');
     }
 
     saveAllToDisk();
