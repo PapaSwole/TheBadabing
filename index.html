@@ -3,157 +3,287 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>The Badabing - Fortnite Style Co-op, Farming & Tycoon Portals</title>
+    <title>The Badabing - 3D Anime World, Farming & Tycoon Portals</title>
     <style>
-        * { box-sizing: border-box; }
+        :root {
+            --anime-bg: rgba(13, 18, 30, 0.86);
+            --anime-panel: rgba(16, 23, 40, 0.94);
+            --anime-cyan: #38bdf8;
+            --anime-gold: #facc15;
+            --anime-pink: #f472b6;
+            --anime-green: #4ade80;
+            --anime-border: rgba(56, 189, 248, 0.45);
+        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
             margin: 0; padding: 0; overflow: hidden;
-            background-color: #0b101d;
+            background-color: #080c14;
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            color: #fff; user-select: none; -webkit-user-select: none; touch-action: none;
+            color: #f8fafc; user-select: none; -webkit-user-select: none;
+            touch-action: none;
         }
-        /* Fortnite-Inspired Vibrant Skewed/Bold HUD */
+
+        /* 1. Sleek Modern Anime Top Bar */
         #top-status-banner {
-            position: absolute; top: 0; left: 0; width: 100%; height: 40px;
-            background: linear-gradient(90deg, rgba(12, 18, 34, 0.95), rgba(25, 33, 58, 0.95));
-            border-bottom: 3px solid #38bdf8;
+            position: absolute; top: 0; left: 0; width: 100%; min-height: 44px;
+            background: linear-gradient(90deg, rgba(10, 14, 26, 0.92), rgba(20, 29, 52, 0.88));
+            border-bottom: 2px solid var(--anime-cyan);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 15px rgba(56, 189, 248, 0.2);
             display: flex; align-items: center; justify-content: space-between;
-            padding: 0 14px; z-index: 20; font-size: 12px; backdrop-filter: blur(8px);
+            padding: 4px 14px; z-index: 25; font-size: 12px;
+            backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+            flex-wrap: wrap; gap: 6px;
         }
-        .banner-left, .banner-center, .banner-right { display: flex; align-items: center; gap: 10px; }
-        .brand-title {
-            color: #fde047; font-weight: 900; letter-spacing: 0.8px;
-            text-transform: uppercase; text-shadow: 2px 2px 0 #000; font-style: italic;
+        .banner-left, .banner-center, .banner-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .brand-badge {
+            background: linear-gradient(135deg, #facc15, #f97316);
+            color: #090d16; font-weight: 900; font-size: 12px;
+            padding: 4px 10px; border-radius: 6px;
+            transform: skewX(-10deg);
+            box-shadow: 2px 2px 0 #000;
+            letter-spacing: 0.6px; text-transform: uppercase;
+        }
+        .score-pill {
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 3px 9px; border-radius: 20px; font-weight: 800; font-size: 11px;
+            display: flex; align-items: center; gap: 4px;
         }
         .clock-pill {
-            background: linear-gradient(135deg, #1e293b, #0f172a);
-            border: 2px solid #facc15; color: #fde047;
-            padding: 3px 10px; border-radius: 14px; font-weight: 900; font-size: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
+            border: 1.5px solid var(--anime-gold); color: var(--anime-gold);
+            padding: 4px 12px; border-radius: 20px; font-weight: 900; font-size: 12px;
+            box-shadow: 0 0 12px rgba(250, 204, 21, 0.25);
         }
         .coop-pills { display: flex; gap: 5px; flex-wrap: wrap; }
         .god-pill {
-            padding: 2px 8px; border-radius: 12px; font-size: 11px;
-            font-weight: 800; background: rgba(30, 41, 59, 0.9); border: 1px solid #38bdf8;
+            padding: 3px 10px; border-radius: 20px; font-size: 11px;
+            font-weight: 800; background: rgba(30, 41, 59, 0.9);
+            border: 1px solid var(--anime-cyan);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
         }
+
+        /* 2. Modern Anime Companion Telemetry Bar */
         #companion-bar {
-            position: absolute; top: 40px; left: 0; width: 100%; min-height: 42px;
-            background: rgba(15, 23, 42, 0.9); border-bottom: 2px solid #090d16;
+            position: absolute; top: 44px; left: 0; width: 100%; min-height: 44px;
+            background: rgba(13, 19, 34, 0.84);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
-            padding: 4px 14px; z-index: 19; font-size: 12px; gap: 8px;
+            padding: 5px 14px; z-index: 24; font-size: 12px; gap: 8px;
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
         }
         .companion-stats, .companion-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
         #npc-selector {
-            background: #0f172a; color: #fde047; border: 2px solid #38bdf8;
-            border-radius: 6px; padding: 3px 8px; font-weight: 900; font-size: 12px; cursor: pointer;
+            background: linear-gradient(180deg, #1e293b, #0f172a);
+            color: var(--anime-gold); border: 1.5px solid var(--anime-cyan);
+            border-radius: 8px; padding: 4px 10px; font-weight: 900; font-size: 12px;
+            cursor: pointer; outline: none;
         }
         .stat-item {
-            display: flex; align-items: center; gap: 5px;
-            background: rgba(9, 13, 22, 0.7); padding: 3px 8px; border-radius: 6px; border: 1px solid #334155;
+            display: flex; align-items: center; gap: 6px;
+            background: rgba(9, 13, 24, 0.72); padding: 4px 10px;
+            border-radius: 8px; border: 1px solid rgba(148, 163, 184, 0.2);
         }
         .wallet-badge {
-            background: rgba(250, 204, 21, 0.2); border: 1px solid #facc15;
-            color: #fde047; font-weight: 900; padding: 3px 9px; border-radius: 6px;
+            background: linear-gradient(135deg, rgba(250, 204, 21, 0.22), rgba(234, 179, 8, 0.1));
+            border: 1.5px solid var(--anime-gold); color: #fde047;
+            font-weight: 900; padding: 4px 10px; border-radius: 8px;
         }
-        .stat-bar-bg { width: 48px; height: 9px; background: #090b10; border-radius: 5px; overflow: hidden; border: 1px solid #000; }
-        .stat-bar-fill { height: 100%; background: linear-gradient(90deg, #22c55e, #4ade80); transition: width 0.25s; }
+        .stat-bar-bg {
+            width: 56px; height: 8px; background: #060911;
+            border-radius: 6px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15);
+        }
+        .stat-bar-fill {
+            height: 100%; background: linear-gradient(90deg, #10b981, #4ade80);
+            transition: width 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        /* Anime Pill Buttons */
         .mini-ui-btn {
-            background: linear-gradient(180deg, #2563eb, #1d4ed8);
-            border: 2px solid #000; box-shadow: 0 2px 0 #000; color: #fff;
-            padding: 5px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; font-weight: 900;
-            transition: transform 0.1s;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            border: 1.5px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.45);
+            color: #fff; padding: 5px 11px; border-radius: 8px;
+            font-size: 11px; cursor: pointer; font-weight: 800;
+            transition: all 0.15s cubic-bezier(0.22, 1, 0.36, 1);
+            letter-spacing: 0.3px;
         }
-        .mini-ui-btn:hover, .mini-ui-btn.active { background: #facc15; color: #111; transform: translateY(-1px); }
+        .mini-ui-btn:hover, .mini-ui-btn.active {
+            background: linear-gradient(135deg, #facc15, #f97316);
+            color: #090d16; border-color: #fff;
+            transform: translateY(-1.5px) scale(1.02);
+            box-shadow: 0 5px 14px rgba(250, 204, 21, 0.4);
+        }
         .god-only-ui { display: none; }
 
-        /* Modals */
+        /* 3. Anime Floating Modals & Mind Panel */
         .game-modal {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 440px; max-width: 94vw; max-height: 84vh; overflow-y: auto;
-            background: rgba(15, 23, 42, 0.98); border: 3px solid #000; outline: 2px solid #38bdf8;
-            border-radius: 12px; padding: 16px; z-index: 35; display: none;
-            box-shadow: 0 22px 55px rgba(0,0,0,0.95);
+            width: 450px; max-width: 94vw; max-height: 82vh; overflow-y: auto;
+            background: var(--anime-panel);
+            border: 2px solid var(--anime-cyan);
+            border-radius: 16px; padding: 18px; z-index: 40; display: none;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.9), 0 0 25px rgba(56, 189, 248, 0.25);
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
         }
         #companion-mind-panel {
-            position: absolute; top: 88px; left: 14px; width: 380px; max-width: calc(100vw - 28px);
-            max-height: calc(100vh - 110px); overflow-y: auto;
-            background: rgba(15, 23, 42, 0.97); border: 3px solid #000; outline: 2px solid #facc15;
-            border-radius: 12px; padding: 14px; z-index: 24; display: none;
+            position: absolute; top: 96px; left: 14px; width: 370px; max-width: calc(100vw - 28px);
+            max-height: calc(100vh - 120px); overflow-y: auto;
+            background: var(--anime-panel);
+            border: 2px solid var(--anime-gold);
+            border-radius: 16px; padding: 14px; z-index: 30; display: none;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.85);
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
         }
-        .mind-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #334155; padding-bottom: 6px; margin-bottom: 8px; }
-        .mind-box { background: #090d16; border: 1px solid #334155; border-radius: 6px; padding: 6px 8px; max-height: 75px; overflow-y: auto; font-size: 11px; line-height: 1.4; margin-bottom: 8px; }
-        .companion-bag-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px; }
-        .bag-item-chip { background: #1e293b; border: 1px solid #475569; border-radius: 6px; padding: 5px; font-size: 11px; text-align: center; cursor: pointer; }
-        .bag-item-chip:hover { border-color: #4ade80; }
+        .mind-header {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1.5px solid rgba(255,255,255,0.12);
+            padding-bottom: 8px; margin-bottom: 10px;
+        }
+        .mind-box {
+            background: rgba(8, 12, 22, 0.85); border: 1px solid rgba(56, 189, 248, 0.25);
+            border-radius: 10px; padding: 8px 10px; max-height: 80px;
+            overflow-y: auto; font-size: 11px; line-height: 1.45; margin-bottom: 8px;
+        }
+        .companion-bag-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 10px; }
+        .bag-item-chip {
+            background: rgba(30, 41, 59, 0.85); border: 1px solid rgba(148, 163, 184, 0.3);
+            border-radius: 8px; padding: 6px; font-size: 11px; text-align: center; cursor: pointer;
+            transition: 0.15s;
+        }
+        .bag-item-chip:hover { border-color: var(--anime-green); background: rgba(16, 185, 129, 0.2); }
 
+        /* 4. God & Build Menu */
         #toggle-build-btn {
-            position: absolute; top: 88px; right: 14px;
-            background: linear-gradient(180deg, #facc15, #eab308);
-            border: 2px solid #000; color: #111; padding: 10px 16px; border-radius: 8px;
+            position: absolute; top: 96px; right: 14px;
+            background: linear-gradient(135deg, #facc15, #f97316);
+            border: 2px solid #fff; color: #090d16; padding: 10px 16px; border-radius: 12px;
             cursor: pointer; font-weight: 900; font-size: 12px; text-transform: uppercase;
-            z-index: 20; box-shadow: 0 5px 15px rgba(0,0,0,0.6); display: none;
+            z-index: 26; box-shadow: 0 6px 20px rgba(249, 115, 22, 0.5); display: none;
         }
         #build-menu-modal {
-            position: absolute; top: 136px; right: 14px; width: 500px; max-width: calc(100vw - 28px);
-            max-height: calc(100vh - 155px); overflow-y: auto;
-            background: rgba(15, 23, 42, 0.98); border: 3px solid #000; outline: 2px solid #facc15;
-            border-radius: 12px; padding: 14px; z-index: 25; display: none;
+            position: absolute; top: 144px; right: 14px; width: 490px; max-width: calc(100vw - 28px);
+            max-height: calc(100vh - 165px); overflow-y: auto;
+            background: var(--anime-panel); border: 2px solid var(--anime-gold);
+            border-radius: 16px; padding: 14px; z-index: 32; display: none;
+            box-shadow: 0 20px 55px rgba(0,0,0,0.92);
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
         }
         .tab-row { display: flex; gap: 6px; margin-bottom: 10px; }
-        .tab-btn { flex: 1; padding: 8px 6px; background: #1e293b; border: 1px solid #475569; color: #cbd5e1; font-weight: 800; font-size: 11px; border-radius: 6px; cursor: pointer; text-transform: uppercase; }
-        .tab-btn.active { background: #38bdf8; color: #090d16; border-color: #fff; }
-        .build-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; margin-bottom: 10px; }
-        .build-card { background: #1e293b; border: 2px solid #090d16; border-radius: 7px; padding: 7px 4px; text-align: center; cursor: pointer; color: #e2e8f0; }
-        .build-card:hover { border-color: #38bdf8; background: #283548; }
-        .build-card.active { background: rgba(56, 189, 248, 0.28); border: 2px solid #facc15; color: #fff; }
-        .build-card .icon { font-size: 19px; display: block; }
+        .tab-btn {
+            flex: 1; padding: 8px 6px; background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.25); color: #cbd5e1;
+            font-weight: 800; font-size: 11px; border-radius: 8px; cursor: pointer; text-transform: uppercase;
+        }
+        .tab-btn.active { background: linear-gradient(135deg, #38bdf8, #2563eb); color: #fff; border-color: #fff; }
+        .build-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px; }
+        .build-card {
+            background: rgba(23, 32, 54, 0.85); border: 1.5px solid rgba(148, 163, 184, 0.2);
+            border-radius: 10px; padding: 8px 5px; text-align: center; cursor: pointer; color: #e2e8f0;
+            transition: all 0.14s;
+        }
+        .build-card:hover { border-color: var(--anime-cyan); transform: translateY(-2px); background: rgba(30, 45, 75, 0.95); }
+        .build-card.active { background: rgba(56, 189, 248, 0.25); border: 2px solid var(--anime-gold); color: #fff; }
+        .build-card .icon { font-size: 20px; display: block; margin-bottom: 2px; }
         .build-card .label { font-size: 11px; font-weight: 800; display: block; }
         .build-card .sub { font-size: 9px; color: #94a3b8; }
 
         .swatch-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 6px 0 10px 0; }
-        .color-swatch { width: 24px; height: 24px; border-radius: 50%; border: 2px solid #000; cursor: pointer; }
-        .color-swatch.active { border-color: #fff; transform: scale(1.18); }
+        .color-swatch { width: 25px; height: 25px; border-radius: 50%; border: 2px solid #000; cursor: pointer; }
+        .color-swatch.active { border-color: #fff; transform: scale(1.2); box-shadow: 0 0 10px var(--anime-gold); }
 
+        /* 5. Prompts, Tycoon Banner & Crosshair */
         #interaction-prompt {
-            position: absolute; top: 56%; left: 50%; transform: translate(-50%, -50%);
-            background: rgba(9, 13, 22, 0.95); border: 2px solid #facc15; color: #fff;
-            padding: 7px 16px; border-radius: 8px; font-size: 13px; font-weight: 900;
-            z-index: 15; display: none; pointer-events: none;
+            position: absolute; top: 57%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(10, 15, 28, 0.92); border: 2px solid var(--anime-gold);
+            color: #fff; padding: 8px 18px; border-radius: 24px; font-size: 13px; font-weight: 900;
+            z-index: 20; display: none; pointer-events: none;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.7);
         }
-        #interaction-prompt span { color: #facc15; }
+        #interaction-prompt span { color: var(--anime-gold); }
 
-        /* Tycoon Sub-World HUD Banner */
         #tycoon-hud {
-            position: absolute; top: 90px; left: 50%; transform: translateX(-50%);
-            background: linear-gradient(90deg, #7c2d12, #ea580c);
-            border: 3px solid #facc15; color: #fff; padding: 8px 20px; border-radius: 24px;
-            font-size: 14px; font-weight: 900; z-index: 21; display: none;
-            align-items: center; gap: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.8);
+            position: absolute; top: 96px; left: 50%; transform: translateX(-50%);
+            background: linear-gradient(90deg, rgba(124, 45, 18, 0.95), rgba(234, 88, 12, 0.95));
+            border: 2px solid var(--anime-gold); color: #fff; padding: 8px 20px; border-radius: 24px;
+            font-size: 13px; font-weight: 900; z-index: 22; display: none;
+            align-items: center; gap: 14px; box-shadow: 0 8px 25px rgba(0,0,0,0.8);
         }
-
         #sports-hud {
-            position: absolute; bottom: 54px; left: 50%; transform: translateX(-50%);
-            background: linear-gradient(90deg, #2563eb, #38bdf8); border: 2px solid #000;
-            color: #fff; padding: 6px 18px; border-radius: 20px; font-size: 13px; font-weight: 900;
-            z-index: 18; display: none; align-items: center; gap: 10px;
+            position: absolute; bottom: 56px; left: 50%; transform: translateX(-50%);
+            background: linear-gradient(90deg, #2563eb, #38bdf8); border: 2px solid #fff;
+            color: #fff; padding: 7px 18px; border-radius: 24px; font-size: 13px; font-weight: 900;
+            z-index: 20; display: none; align-items: center; gap: 10px;
         }
         #builder-hud {
             position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
-            background: rgba(12, 18, 34, 0.94); border: 2px solid #38bdf8;
-            padding: 6px 16px; border-radius: 20px; font-size: 11px; color: #f8fafc;
-            z-index: 15; display: flex; gap: 12px; align-items: center; pointer-events: none;
+            background: var(--anime-bg); border: 1.5px solid var(--anime-border);
+            padding: 6px 18px; border-radius: 24px; font-size: 11px; color: #f8fafc;
+            z-index: 18; display: flex; gap: 14px; align-items: center; pointer-events: none;
+            backdrop-filter: blur(10px); white-space: nowrap;
         }
-        #builder-hud span { color: #fde047; font-weight: 900; }
+        #builder-hud span { color: var(--anime-gold); font-weight: 900; }
+
         #crosshair {
-            position: absolute; top: 50%; left: 50%; width: 10px; height: 10px;
-            transform: translate(-50%, -50%); border: 2px solid #facc15; border-radius: 50%;
-            pointer-events: none; z-index: 5;
+            position: absolute; top: 50%; left: 50%; width: 12px; height: 12px;
+            transform: translate(-50%, -50%); border: 2px solid rgba(250, 204, 21, 0.95);
+            border-radius: 50%; pointer-events: none; z-index: 10;
+            box-shadow: 0 0 8px rgba(56, 189, 248, 0.8);
         }
-        .merchant-input { background: #1e293b; border: 1px solid #475569; color: #fff; padding: 6px 10px; border-radius: 5px; font-size: 12px; }
-        #mobile-controls { display: none; position: absolute; inset: 0; pointer-events: none; z-index: 22; }
-        #mobile-move-btns { position: absolute; bottom: 58px; left: 18px; display: flex; flex-direction: column; gap: 10px; pointer-events: auto; }
-        #mobile-action-btns { position: absolute; bottom: 58px; right: 18px; display: flex; flex-direction: column; gap: 10px; pointer-events: auto; }
-        .mob-btn { width: 54px; height: 54px; background: rgba(56, 189, 248, 0.88); border: 2px solid #000; border-radius: 50%; color: #111; font-size: 16px; font-weight: bold; display: flex; align-items: center; justify-content: center; pointer-events: auto; }
+        .merchant-input {
+            background: #141c2f; border: 1.5px solid #334155; color: #fff;
+            padding: 7px 10px; border-radius: 8px; font-size: 12px; outline: none;
+        }
+
+        /* 6. Fixed Dual Mobile Touch Controls (Analog Thumbstick + D-Pad + Action Buttons) */
+        #mobile-controls {
+            display: none; position: absolute; inset: 0; pointer-events: none; z-index: 28;
+        }
+        #joystick-zone {
+            position: absolute; bottom: 26px; left: 22px;
+            width: 126px; height: 126px; border-radius: 50%;
+            background: rgba(15, 23, 42, 0.65);
+            border: 2px solid rgba(56, 189, 248, 0.7);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+            pointer-events: auto; touch-action: none;
+            display: flex; align-items: center; justify-content: center;
+        }
+        #joystick-knob {
+            width: 52px; height: 52px; border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #facc15, #f97316);
+            border: 2px solid #fff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.7);
+            pointer-events: none;
+            transform: translate(0px, 0px);
+        }
+        /* Backup D-Pad arrows above thumbstick */
+        #mobile-dpad {
+            position: absolute; bottom: 162px; left: 26px;
+            display: flex; gap: 8px; pointer-events: auto;
+        }
+        #mobile-action-btns {
+            position: absolute; bottom: 28px; right: 20px;
+            display: grid; grid-template-columns: repeat(2, 56px); gap: 10px;
+            pointer-events: auto;
+        }
+        .mob-btn {
+            width: 54px; height: 54px;
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9));
+            border: 2px solid var(--anime-cyan); border-radius: 50%;
+            color: #fff; font-size: 17px; font-weight: 900;
+            display: flex; align-items: center; justify-content: center;
+            pointer-events: auto; touch-action: none; cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.65);
+            transition: transform 0.08s;
+        }
+        .mob-btn:active, .mob-btn.pressed {
+            background: var(--anime-gold); color: #000; border-color: #fff;
+            transform: scale(0.92);
+        }
+        @media (max-width: 950px) {
+            #mobile-controls { display: block; }
+            #builder-hud { bottom: 6px; font-size: 10px; padding: 4px 10px; }
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
@@ -162,42 +292,43 @@
 
     <div id="crosshair"></div>
 
-    <!-- 1. Top Status Banner with Live Day/Night Clock -->
+    <!-- 1. Modern Anime Top Status Banner -->
     <div id="top-status-banner">
         <div class="banner-left">
-            <span class="brand-title">⚡ THE BADABING ROYALE</span>
-            <span>Pieces: <strong id="piece-count" style="color:#38bdf8;">0</strong></span>
-            <span>🏀 <strong id="score-hoops" style="color:#fde047;">0</strong></span>
-            <span>⚽ <strong id="score-goals" style="color:#4ade80;">0</strong></span>
-            <span>🎾 <strong id="score-rallies" style="color:#38bdf8;">0</strong></span>
+            <span class="brand-badge">⚡ THE BADABING 3D</span>
+            <span class="score-pill">🧱 <strong id="piece-count" style="color:#38bdf8;">0</strong></span>
+            <span class="score-pill">🏀 <strong id="score-hoops" style="color:#fde047;">0</strong></span>
+            <span class="score-pill">⚽ <strong id="score-goals" style="color:#4ade80;">0</strong></span>
+            <span class="score-pill">🎾 <strong id="score-rallies" style="color:#38bdf8;">0</strong></span>
         </div>
         <div class="banner-center">
             <div class="coop-pills" id="coop-gods-list"><span class="god-pill">😇 Visitor Halo</span></div>
         </div>
         <div class="banner-right">
             <span class="clock-pill" id="world-clock">☀️ 12:00 PM</span>
-            <button class="mini-ui-btn" id="btn-unlock-god" style="background:#facc15;color:#111;">🔒 Unlock God Mode</button>
+            <button class="mini-ui-btn" id="btn-toggle-touch" title="Toggle Touch Controls">📱 Touch HUD</button>
+            <button class="mini-ui-btn" id="btn-unlock-god" style="background:linear-gradient(135deg,#facc15,#f97316);color:#090d16;">🔒 Unlock God</button>
         </div>
     </div>
 
-    <!-- Tycoon Dimension Banner (Visible When Inside Portal World) -->
+    <!-- Tycoon Dimension Banner -->
     <div id="tycoon-hud">
-        <span>🏭 BADABING TYCOON DIMENSION</span>
-        <span>💰 Tycoon Cash: $<strong id="tycoon-cash-val">0</strong></span>
-        <span>⚡ Income: $<strong id="tycoon-rate-val">5</strong>/sec</span>
-        <button class="mini-ui-btn" id="btn-return-main-world" style="background:#38bdf8;color:#111;">🌀 Return to Main World</button>
+        <span>🏭 TYCOON SKY-ISLAND</span>
+        <span>💰 Cash: $<strong id="tycoon-cash-val">50</strong></span>
+        <span>⚡ Rate: $<strong id="tycoon-rate-val">10</strong>/drop</span>
+        <button class="mini-ui-btn" id="btn-return-main-world" style="background:#38bdf8;color:#090d16;">🌀 Return to Main World</button>
     </div>
 
     <!-- Password Unlock Modal -->
     <div id="password-modal" class="game-modal" style="width:360px;text-align:center;">
         <h3 style="margin:0 0 6px 0;color:#fde047;">🦍 UNLOCK SILVERBACK GOD MODE</h3>
-        <p style="font-size:11px;color:#cbd5e1;margin:0 0 10px 0;">Password is <strong>PEANUT</strong>. Choose your God Name!</p>
-        <input type="text" id="god-custom-name-input" class="merchant-input" placeholder="Your God Name (e.g. Papa Swole)" style="width:100%;margin-bottom:8px;font-weight:bold;" />
+        <p style="font-size:11px;color:#cbd5e1;margin:0 0 12px 0;">Password is <strong>PEANUT</strong>. Enter your custom God Name!</p>
+        <input type="text" id="god-custom-name-input" class="merchant-input" placeholder="Custom God Name (e.g. Papa Swole)" style="width:100%;margin-bottom:8px;font-weight:bold;" />
         <input type="password" id="god-password-input" class="merchant-input" placeholder="Enter PEANUT..." style="width:100%;text-align:center;margin-bottom:10px;" />
         <div id="password-error" style="color:#ef4444;font-size:11px;margin-bottom:8px;display:none;">Incorrect password! Enter PEANUT.</div>
         <div style="display:flex;gap:8px;">
             <button class="mini-ui-btn" id="btn-cancel-pw" style="flex:1;">Cancel</button>
-            <button class="mini-ui-btn" id="btn-submit-pw" style="flex:1;background:#4ade80;color:#111;">🔓 Spawn as God</button>
+            <button class="mini-ui-btn" id="btn-submit-pw" style="flex:1;background:#4ade80;color:#090d16;">🔓 Spawn as God</button>
         </div>
     </div>
 
@@ -207,18 +338,18 @@
             <select id="npc-selector"></select>
             <div class="wallet-badge">💰 $<span id="p-wallet">250</span></div>
             <div class="stat-item">Mood: <strong id="p-mood" style="color:#fde047;">Happy ✨</strong></div>
-            <div class="stat-item">Pos: <strong id="p-coords" style="color:#38bdf8;">(6, 14)</strong></div>
+            <div class="stat-item">📍 <strong id="p-coords" style="color:#38bdf8;">(6, 14)</strong></div>
             <div class="stat-item">
-                Hunger: <div class="stat-bar-bg"><div id="p-hunger-bar" class="stat-bar-fill" style="width:88%;"></div></div>
+                🍔 <div class="stat-bar-bg"><div id="p-hunger-bar" class="stat-bar-fill" style="width:88%;"></div></div>
             </div>
             <div class="stat-item">
-                Energy: <div class="stat-bar-bg"><div id="p-energy-bar" class="stat-bar-fill" style="width:92%;background:#38bdf8;"></div></div>
+                ⚡ <div class="stat-bar-bg"><div id="p-energy-bar" class="stat-bar-fill" style="width:92%;background:linear-gradient(90deg,#0284c7,#38bdf8);"></div></div>
             </div>
             <div class="stat-item">Task: <strong id="p-activity" style="color:#4ade80;">Roaming Town</strong></div>
         </div>
         <div class="companion-actions">
-            <button class="mini-ui-btn" id="btn-toggle-mind" style="background:#facc15;color:#111;">🎒 Mind, Wallet & Bag</button>
-            <button class="mini-ui-btn god-only-ui" id="btn-toggle-manager" style="background:#4ade80;color:#111;">🐾 Manage Companions</button>
+            <button class="mini-ui-btn" id="btn-toggle-mind" style="background:linear-gradient(135deg,#facc15,#eab308);color:#090d16;">🎒 Mind & Bag</button>
+            <button class="mini-ui-btn god-only-ui" id="btn-toggle-manager" style="background:linear-gradient(135deg,#4ade80,#16a34a);color:#090d16;">🐾 Roster</button>
             <button class="mini-ui-btn god-only-ui" id="btn-feed-npc">🍔 Feed</button>
             <button class="mini-ui-btn god-only-ui" id="btn-rest-npc">⚡ Energize</button>
         </div>
@@ -230,25 +361,25 @@
             <strong id="mind-panel-title" style="color:#fde047;">🐼 Peanut's Mind, Wallet & Bag</strong>
             <button class="mini-ui-btn" id="btn-close-mind">✖</button>
         </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;background:#090d16;border:1px solid #facc15;padding:8px;border-radius:8px;margin-bottom:8px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;background:#090d16;border:1.5px solid #facc15;padding:8px 12px;border-radius:10px;margin-bottom:10px;">
             <strong style="color:#fde047;font-size:16px;">💰 $<span id="mind-wallet-val">250</span></strong>
-            <button class="mini-ui-btn god-only-ui" id="btn-give-allowance" style="background:#4ade80;color:#111;">+$50 Allowance</button>
+            <button class="mini-ui-btn god-only-ui" id="btn-give-allowance" style="background:#4ade80;color:#090d16;">+$50 Allowance</button>
         </div>
-        <div style="font-size:11px;color:#38bdf8;font-weight:bold;margin-bottom:4px;">🎒 Inventory Bag (Click to Use):</div>
+        <div style="font-size:11px;color:#38bdf8;font-weight:bold;margin-bottom:4px;">🎒 Inventory Bag (Tap item to consume):</div>
         <div class="companion-bag-grid" id="mind-bag-grid"></div>
-        <div style="font-size:11px;color:#38bdf8;font-weight:bold;margin-bottom:4px;">💭 Wants:</div>
+        <div style="font-size:11px;color:#38bdf8;font-weight:bold;margin-bottom:4px;">💭 Current Wants:</div>
         <div class="mind-box" id="mind-wants-box"></div>
-        <div style="font-size:11px;color:#38bdf8;font-weight:bold;margin-bottom:4px;">📔 Diary:</div>
+        <div style="font-size:11px;color:#38bdf8;font-weight:bold;margin-bottom:4px;">📔 Personal Diary:</div>
         <div class="mind-box" id="mind-diary-box"></div>
         <div style="font-size:11px;color:#38bdf8;font-weight:bold;margin-bottom:4px;">📋 Activity Log:</div>
         <div class="mind-box" id="mind-log-box"></div>
-        <button class="mini-ui-btn" id="btn-live-chat" style="width:100%;padding:7px;background:#38bdf8;color:#111;">💬 Live Chat with Companion</button>
+        <button class="mini-ui-btn" id="btn-live-chat" style="width:100%;padding:8px;">💬 Live Chat with Companion</button>
     </div>
 
     <!-- Companion Roster Modal -->
     <div id="companion-manager-modal" class="game-modal" style="width:540px;">
         <div class="mind-header">
-            <strong style="color:#4ade80;">🐾 Companion Roster & Manager</strong>
+            <strong style="color:#4ade80;">🐾 Town Companion Roster & Manager</strong>
             <button class="mini-ui-btn" id="btn-close-manager">✖</button>
         </div>
         <div id="companion-roster-list"></div>
@@ -257,7 +388,7 @@
     <!-- Retro Arcade Modal -->
     <div id="arcade-modal" class="game-modal" style="width:760px;height:74vh;padding:0;overflow:hidden;">
         <div style="display:flex;justify-content:space-between;align-items:center;background:#1e1b4b;padding:8px 12px;">
-            <div style="display:flex;gap:6px;align-items:center;">
+            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
                 <strong style="color:#fde047;">🕹️ RETRO ARCADE</strong>
                 <button class="mini-ui-btn arcade-game-btn" data-url="https://funhtml5games.com/donkeykong/index.html">🦍 Donkey Kong</button>
                 <button class="mini-ui-btn arcade-game-btn" data-url="https://freepacman.org/">🟡 Pac-Man</button>
@@ -273,39 +404,39 @@
         <div style="display:flex;gap:8px;align-items:center;background:#1e293b;padding:8px 12px;">
             <strong style="color:#38bdf8;">💻 WEB PC</strong>
             <input type="text" id="browser-url-bar" class="merchant-input" value="https://en.m.wikipedia.org/wiki/Giant_panda" style="flex:1;" />
-            <button class="mini-ui-btn" id="btn-browser-go" style="background:#4ade80;color:#111;">Go</button>
-            <button class="mini-ui-btn" id="btn-browser-ext" style="background:#facc15;color:#111;">🚀 Pop Out</button>
+            <button class="mini-ui-btn" id="btn-browser-go" style="background:#4ade80;color:#090d16;">Go</button>
+            <button class="mini-ui-btn" id="btn-browser-ext" style="background:#facc15;color:#090d16;">🚀 Pop Out</button>
             <button class="mini-ui-btn" id="btn-browser-close" style="background:#ef4444;">✖</button>
         </div>
         <iframe id="browser-iframe" src="about:blank" style="width:100%;height:calc(100% - 46px);border:none;background:#fff;"></iframe>
     </div>
 
     <!-- 4. Fortnite-Style God & Build Menu -->
-    <button id="toggle-build-btn">🔨 Fortnite Build & God Menu (B)</button>
+    <button id="toggle-build-btn">🔨 Build & God Menu (B)</button>
 
     <div id="build-menu-modal">
-        <div style="display:flex;justify-content:space-between;align-items:center;background:#090d16;padding:8px 12px;border-radius:8px;margin-bottom:10px;font-size:12px;">
-            <div>🦍 <strong>Movement:</strong> <span id="physics-mode-label" style="color:#4ade80;">Walking + Sprint (Shift)</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;background:#090d16;padding:8px 12px;border-radius:10px;margin-bottom:10px;font-size:12px;">
+            <div>🦍 <strong>Physics:</strong> <span id="physics-mode-label" style="color:#4ade80;">Walking + Sprint (Shift)</span></div>
             <button class="mini-ui-btn" id="btn-toggle-fly">✈️ Toggle Glider Fly</button>
         </div>
 
         <div class="tab-row">
-            <button class="tab-btn active" id="tab-modular">🧱 Fortnite Builds</button>
+            <button class="tab-btn active" id="tab-modular">🧱 3D Structures</button>
             <button class="tab-btn" id="tab-buildings">🏢 Farming, Portals & City</button>
             <button class="tab-btn" id="tab-companions">🐾 Spawn Companions</button>
         </div>
 
         <div class="build-grid" id="grid-modular">
-            <div class="build-card" data-type="foundation"><span class="icon">⬛</span><span class="label">Foundation</span><span class="sub">4x4m Slab</span></div>
-            <div class="build-card" data-type="wall"><span class="icon">🧱</span><span class="label">Fortnite Wall</span><span class="sub">Pop-In Build</span></div>
-            <div class="build-card" data-type="doorway"><span class="icon">🚪</span><span class="label">Door Wall</span><span class="sub">Interactive Door</span></div>
-            <div class="build-card" data-type="window"><span class="icon">🪟</span><span class="label">Window Wall</span><span class="sub">Fort Frame</span></div>
-            <div class="build-card" data-type="stairs"><span class="icon">🪜</span><span class="label">90s Ramp Stairs</span><span class="sub">Fast Climb</span></div>
+            <div class="build-card" data-type="foundation"><span class="icon">⬛</span><span class="label">3D Foundation</span><span class="sub">Stone Slab</span></div>
+            <div class="build-card" data-type="wall"><span class="icon">🧱</span><span class="label">Textured Wall</span><span class="sub">3D Trim & Brick</span></div>
+            <div class="build-card" data-type="doorway"><span class="icon">🚪</span><span class="label">Doorway Wall</span><span class="sub">Interactive Door</span></div>
+            <div class="build-card" data-type="window"><span class="icon">🪟</span><span class="label">Window Wall</span><span class="sub">3D Awning</span></div>
+            <div class="build-card" data-type="stairs"><span class="icon">🪜</span><span class="label">3D Ramp Stairs</span><span class="sub">Wood Stringers</span></div>
             <div class="build-card" data-type="roof_flat"><span class="icon">⬜</span><span class="label">Floor / Ceiling</span><span class="sub">4x4m Tile</span></div>
-            <div class="build-card" data-type="roof_pitched"><span class="icon">⛺</span><span class="label">Cone Roof</span><span class="sub">Fortnite Pyramid</span></div>
-            <div class="build-card" data-type="fence"><span class="icon">⛓️</span><span class="label">Chain Fence</span><span class="sub">Barrier</span></div>
+            <div class="build-card" data-type="roof_pitched"><span class="icon">⛺</span><span class="label">Shingle Roof</span><span class="sub">3D Gable</span></div>
+            <div class="build-card" data-type="fence"><span class="icon">⛓️</span><span class="label">Iron Fence</span><span class="sub">Barrier</span></div>
             <div class="build-card" data-type="sign_post"><span class="icon">🪧</span><span class="label">Text Sign</span><span class="sub">Editable Text</span></div>
-            <div class="build-card" data-type="streetlight"><span class="icon">🏮</span><span class="label">Streetlight</span><span class="sub">Night Glow</span></div>
+            <div class="build-card" data-type="streetlight"><span class="icon">🏮</span><span class="label">Streetlight</span><span class="sub">Warm Lantern</span></div>
         </div>
 
         <div class="build-grid" id="grid-buildings" style="display:none;">
@@ -335,7 +466,7 @@
         <div id="grid-companions" style="display:none;margin-bottom:10px;">
             <div style="display:flex;gap:6px;margin-bottom:8px;">
                 <input type="text" id="new-companion-name" class="merchant-input" placeholder="Companion Name" style="flex:1;" />
-                <button class="mini-ui-btn" id="btn-spawn-companion" style="background:#4ade80;color:#111;">➕ Spawn</button>
+                <button class="mini-ui-btn" id="btn-spawn-companion" style="background:#4ade80;color:#090d16;">➕ Spawn</button>
             </div>
             <div class="build-grid" id="animal-species-grid" style="max-height:170px;overflow-y:auto;"></div>
         </div>
@@ -346,7 +477,7 @@
         </div>
 
         <div class="swatch-row">
-            <div class="color-swatch active" data-color="#8a483c" style="background:#8a483c;"></div>
+            <div class="color-swatch active" data-color="#b45309" style="background:#b45309;"></div>
             <div class="color-swatch" data-color="#38bdf8" style="background:#38bdf8;"></div>
             <div class="color-swatch" data-color="#f8fafc" style="background:#f8fafc;"></div>
             <div class="color-swatch" data-color="#2563eb" style="background:#2563eb;"></div>
@@ -356,8 +487,8 @@
             <div class="color-swatch" data-color="#a855f7" style="background:#a855f7;"></div>
         </div>
 
-        <div style="display:flex;justify-content:space-between;align-items:center;background:#090d16;padding:6px 10px;border-radius:6px;font-size:11px;">
-            <div>Build Elevation: <strong id="hud-floor-modal" style="color:#facc15;">0m</strong></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;background:#090d16;padding:6px 10px;border-radius:8px;font-size:11px;">
+            <div>Elevation: <strong id="hud-floor-modal" style="color:#facc15;">0m</strong></div>
             <div style="display:flex;gap:6px;">
                 <button class="mini-ui-btn" id="rotate-piece-btn">🔄 Rot (R)</button>
                 <button class="mini-ui-btn" id="level-down-btn">⬇️ Q</button>
@@ -366,14 +497,14 @@
         </div>
     </div>
 
-    <div id="interaction-prompt">Press <span>[F]</span> to Interact</div>
+    <div id="interaction-prompt">Press <span>[F]</span> or Tap <span>🖐️</span> to Interact</div>
 
     <div id="sports-hud">
         <span id="sports-hud-text">🏀 Playing Sport!</span>
-        <button class="mini-ui-btn" id="btn-sport-action" style="background:#facc15;color:#111;">Action [G]</button>
+        <button class="mini-ui-btn" id="btn-sport-action" style="background:#facc15;color:#090d16;">Shoot / Hit [G]</button>
     </div>
 
-    <!-- Universal Object Inspector Modal (Farming, Merchants, Books, Signs) -->
+    <!-- Universal Object Inspector Modal -->
     <div id="object-modal" class="game-modal">
         <div class="mind-header">
             <strong id="modal-title" style="color:#fde047;">Inspector</strong>
@@ -384,22 +515,27 @@
 
     <div id="builder-hud">
         <div>Role: <span id="hud-role">😇 VISITOR HALO</span></div>
-        <div>Build: <span id="hud-tool">EXPLORE</span></div>
+        <div>Tool: <span id="hud-tool">EXPLORE</span></div>
         <div>X:<span id="target-x">0</span> Z:<span id="target-z">0</span></div>
         <div>Rot: <span id="hud-rot">0°</span></div>
     </div>
 
+    <!-- 5. Rebuilt Mobile Touch Controls (Analog Thumbstick + Backup D-Pad + Right Action Pad) -->
     <div id="mobile-controls">
-        <div id="mobile-move-btns">
-            <div class="mob-btn" id="btn-forward">🔼</div>
-            <div class="mob-btn" id="btn-backward">🔽</div>
-            <div class="mob-btn" id="btn-interact" style="background:#facc15;">🖐️</div>
+        <div id="mobile-dpad">
+            <div class="mob-btn" id="btn-forward" title="Forward">▲</div>
+            <div class="mob-btn" id="btn-backward" title="Backward">▼</div>
+        </div>
+        <div id="joystick-zone">
+            <div id="joystick-knob"></div>
         </div>
         <div id="mobile-action-btns">
-            <div class="mob-btn" id="btn-up">⬆️</div>
-            <div class="mob-btn" id="btn-down">⬇️</div>
-            <div class="mob-btn" id="btn-place" style="background:#4ade80;">🔨</div>
-            <div class="mob-btn" id="btn-mob-shoot" style="background:#f97316;">🏆</div>
+            <div class="mob-btn" id="btn-interact" style="background:linear-gradient(135deg,#facc15,#f97316);color:#000;" title="Interact / Wave">🖐️</div>
+            <div class="mob-btn" id="btn-place" style="background:linear-gradient(135deg,#4ade80,#16a34a);color:#000;" title="Place / Build">🔨</div>
+            <div class="mob-btn" id="btn-up" title="Jump / Fly Up">⬆️</div>
+            <div class="mob-btn" id="btn-down" title="Crouch / Fly Down">⬇️</div>
+            <div class="mob-btn" id="btn-mob-rot" title="Rotate Build Piece">🔄</div>
+            <div class="mob-btn" id="btn-mob-shoot" style="background:linear-gradient(135deg,#38bdf8,#2563eb);" title="Shoot / Swing Ball">🏀</div>
         </div>
     </div>
 
@@ -423,8 +559,8 @@
                 document.getElementById('toggle-build-btn').style.display = unlocked ? 'block' : 'none';
                 document.querySelectorAll('.god-only-ui').forEach(el => { el.style.display = unlocked ? 'inline-block' : 'none'; });
                 document.getElementById('hud-role').innerText = unlocked ? ('🦍 ' + (customGodName || 'SILVERBACK GOD').toUpperCase()) : '😇 VISITOR HALO';
-                unlockBtn.innerText = unlocked ? ('🦍 ' + (customGodName || 'God Active')) : '🔒 Unlock God Mode';
-                unlockBtn.style.background = unlocked ? '#4ade80' : '#facc15';
+                unlockBtn.innerText = unlocked ? ('🦍 ' + (customGodName || 'God Active')) : '🔒 Unlock God';
+                unlockBtn.style.background = unlocked ? '#4ade80' : 'linear-gradient(135deg,#facc15,#f97316)';
                 if (!unlocked) {
                     isFlyingMode = false;
                     selectBuildTool('none');
@@ -452,11 +588,11 @@
             pwInput.addEventListener('keydown', (e) => { e.stopPropagation(); if (e.key === 'Enter') verifyGodPassword(); });
 
             // =========================================================
-            // 1. FORTNITE GRAPHICS ENGINE (ACES FILMIC + VIBRANT PBR)
+            // 1. 3D ENGINE WITH BUMP-MAPPED TEXTURES & REAL SHADOWS
             // =========================================================
             const scene = new THREE.Scene();
             scene.background = new THREE.Color(0x0ea5e9);
-            scene.fog = new THREE.FogExp2(0x38bdf8, 0.0009);
+            scene.fog = new THREE.FogExp2(0x38bdf8, 0.0008);
 
             const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 4500);
             camera.rotation.order = 'YXZ';
@@ -465,27 +601,162 @@
 
             const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
             renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             renderer.shadowMap.enabled = true;
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
             renderer.toneMapping = THREE.ACESFilmicToneMapping;
-            renderer.toneMappingExposure = 1.15;
+            renderer.toneMappingExposure = 1.18;
             document.body.appendChild(renderer.domElement);
 
-            // Fortnite Vibrant Sky/Ground Bounce Lighting + Sun
-            const hemiLight = new THREE.HemisphereLight(0x7dd3fc, 0x22c55e, 0.85);
+            const maxAniso = renderer.capabilities.getMaxAnisotropy();
+
+            const hemiLight = new THREE.HemisphereLight(0xbae6fd, 0x15803d, 0.85);
             scene.add(hemiLight);
-            const sunLight = new THREE.DirectionalLight(0xfffbeb, 1.45);
-            sunLight.position.set(120, 180, 100);
+
+            const sunLight = new THREE.DirectionalLight(0xfffbeb, 1.55);
+            sunLight.position.set(90, 150, 80);
             sunLight.castShadow = true;
+            sunLight.shadow.mapSize.width = 2048;
+            sunLight.shadow.mapSize.height = 2048;
+            sunLight.shadow.camera.near = 10;
+            sunLight.shadow.camera.far = 420;
+            const dCam = 130;
+            sunLight.shadow.camera.left = -dCam;
+            sunLight.shadow.camera.right = dCam;
+            sunLight.shadow.camera.top = dCam;
+            sunLight.shadow.camera.bottom = -dCam;
+            sunLight.shadow.bias = -0.0005;
             scene.add(sunLight);
 
-            function makeAnimeMat(opts) {
-                return new THREE.MeshStandardMaterial(Object.assign({ roughness: 0.42, metalness: 0.08 }, opts));
+            // High-Detail 512px Procedural Albedo + 3D Bump Texture Generator
+            function make3DTexturePair(drawColorFn, drawBumpFn, repeatX, repeatY) {
+                const cCol = document.createElement('canvas');
+                cCol.width = 512; cCol.height = 512;
+                drawColorFn(cCol.getContext('2d'), 512, 512);
+                const map = new THREE.CanvasTexture(cCol);
+                map.wrapS = THREE.RepeatWrapping; map.wrapT = THREE.RepeatWrapping;
+                map.repeat.set(repeatX || 1, repeatY || 1);
+                map.anisotropy = maxAniso;
+
+                const cBump = document.createElement('canvas');
+                cBump.width = 512; cBump.height = 512;
+                (drawBumpFn || drawColorFn)(cBump.getContext('2d'), 512, 512);
+                const bumpMap = new THREE.CanvasTexture(cBump);
+                bumpMap.wrapS = THREE.RepeatWrapping; bumpMap.wrapT = THREE.RepeatWrapping;
+                bumpMap.repeat.set(repeatX || 1, repeatY || 1);
+                bumpMap.anisotropy = maxAniso;
+
+                return { map, bumpMap };
             }
-            const animeOutlineMat = new THREE.LineBasicMaterial({ color: 0x090d16 });
+
+            // 1. Lush 3D Grass Texture + Relief Bump
+            const grassPair = make3DTexturePair((ctx, w, h) => {
+                ctx.fillStyle = '#22a84a'; ctx.fillRect(0, 0, w, h);
+                for (let i = 0; i < 2400; i++) {
+                    ctx.fillStyle = (i % 3 === 0) ? '#188238' : ((i % 2 === 0) ? '#34c759' : '#1f9d45');
+                    const x = Math.random() * w, y = Math.random() * h;
+                    ctx.fillRect(x, y, 3, 9);
+                }
+            }, (ctx, w, h) => {
+                ctx.fillStyle = '#808080'; ctx.fillRect(0, 0, w, h);
+                for (let i = 0; i < 2200; i++) {
+                    ctx.fillStyle = (i % 2 === 0) ? '#ffffff' : '#303030';
+                    ctx.fillRect(Math.random() * w, Math.random() * h, 3, 8);
+                }
+            }, 85, 85);
+
+            // 2. 3D Brick & Stucco Wall Texture + Deep Mortar Bump
+            const brickPair = make3DTexturePair((ctx, w, h) => {
+                ctx.fillStyle = '#cbd5e1'; ctx.fillRect(0, 0, w, h);
+                const rows = 8, cols = 4, rh = h / rows, cw = w / cols;
+                for (let r = 0; r < rows; r++) {
+                    const off = (r % 2) * (cw / 2);
+                    for (let c = -1; c <= cols; c++) {
+                        ctx.fillStyle = ((r + c) % 2 === 0) ? '#f1f5f9' : '#e2e8f0';
+                        ctx.fillRect(c * cw + off + 4, r * rh + 4, cw - 8, rh - 8);
+                    }
+                }
+            }, (ctx, w, h) => {
+                ctx.fillStyle = '#111111'; ctx.fillRect(0, 0, w, h);
+                const rows = 8, cols = 4, rh = h / rows, cw = w / cols;
+                for (let r = 0; r < rows; r++) {
+                    const off = (r % 2) * (cw / 2);
+                    for (let c = -1; c <= cols; c++) {
+                        ctx.fillStyle = '#f0f0f0';
+                        ctx.fillRect(c * cw + off + 5, r * rh + 5, cw - 10, rh - 10);
+                    }
+                }
+            }, 2, 2);
+
+            // 3. 3D Wood Plank Grain + Groove Bump
+            const woodPair = make3DTexturePair((ctx, w, h) => {
+                ctx.fillStyle = '#b46934'; ctx.fillRect(0, 0, w, h);
+                for (let i = 0; i < 6; i++) {
+                    ctx.fillStyle = (i % 2 === 0) ? '#a35c2b' : '#c2743d';
+                    ctx.fillRect(0, i * (h / 6), w, h / 6);
+                    ctx.fillStyle = '#3b1e0a';
+                    ctx.fillRect(0, i * (h / 6), w, 5);
+                }
+                for (let g = 0; g < 400; g++) {
+                    ctx.fillStyle = 'rgba(60, 28, 10, 0.22)';
+                    ctx.fillRect(Math.random() * w, Math.random() * h, 45, 2);
+                }
+            }, null, 2, 2);
+
+            // 4. 3D Cobblestone / Concrete Slab + Bevel Bump
+            const stonePair = make3DTexturePair((ctx, w, h) => {
+                ctx.fillStyle = '#94a3b8'; ctx.fillRect(0, 0, w, h);
+                for (let i = 0; i < 900; i++) {
+                    ctx.fillStyle = (i % 2 === 0) ? '#cbd5e1' : '#64748b';
+                    ctx.fillRect(Math.random() * w, Math.random() * h, 5, 5);
+                }
+                ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 10;
+                ctx.strokeRect(5, 5, w - 10, h - 10);
+                ctx.strokeRect(w / 2, 0, 2, h); ctx.strokeRect(0, h / 2, w, 2);
+            }, null, 2, 2);
+
+            // 5. 3D Roof Shingles Texture
+            const roofShinglePair = make3DTexturePair((ctx, w, h) => {
+                ctx.fillStyle = '#7c2d12'; ctx.fillRect(0, 0, w, h);
+                for (let y = 0; y < h; y += 32) {
+                    ctx.fillStyle = (y % 64 === 0) ? '#9a3412' : '#7c2d12';
+                    ctx.fillRect(0, y, w, 28);
+                    ctx.fillStyle = '#290f05';
+                    ctx.fillRect(0, y + 28, w, 4);
+                }
+            }, null, 3, 3);
+
+            // 6. Asphalt Road with Sidewalk Curbs
+            const roadPair = make3DTexturePair((ctx, w, h) => {
+                ctx.fillStyle = '#1e2430'; ctx.fillRect(0, 0, w, h);
+                for (let i = 0; i < 1200; i++) {
+                    ctx.fillStyle = (i % 2 === 0) ? '#283040' : '#151922';
+                    ctx.fillRect(Math.random() * w, Math.random() * h, 3, 3);
+                }
+                ctx.fillStyle = '#94a3b8'; ctx.fillRect(0, 0, 22, h); ctx.fillRect(w - 22, 0, 22, h);
+                ctx.fillStyle = '#facc15';
+                ctx.fillRect(w / 2 - 6, 30, 12, 160);
+                ctx.fillRect(w / 2 - 6, 280, 12, 160);
+            }, null, 1, 35);
+
+            function makeAnimeMat(opts) {
+                const mat = new THREE.MeshStandardMaterial(Object.assign({
+                    roughness: 0.48,
+                    metalness: 0.08
+                }, opts));
+                return mat;
+            }
+
+            const animeOutlineMat = new THREE.LineBasicMaterial({ color: 0x090d16, transparent: true, opacity: 0.65 });
             function applyAnimeInkOutlines(rootObj) {
                 const meshes = [];
-                rootObj.traverse(c => { if (c.isMesh && !c.userData.noOutline) meshes.push(c); });
+                rootObj.traverse(c => {
+                    if (c.isMesh && !c.userData.noOutline) {
+                        c.castShadow = true;
+                        c.receiveShadow = true;
+                        meshes.push(c);
+                    }
+                });
                 meshes.forEach(m => {
                     try {
                         const line = new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry, 35), animeOutlineMat);
@@ -495,7 +766,7 @@
                 });
             }
 
-            // Dynamic Day/Night Sky Shader Dome + Sun/Moon Orb
+            // Sky Shader Dome, Sun/Moon & 3D Volumetric Clouds
             const skyGeo = new THREE.SphereGeometry(2800, 32, 16);
             const skyMat = new THREE.ShaderMaterial({
                 uniforms: {
@@ -534,125 +805,97 @@
             );
             scene.add(celestialOrb);
 
-            // Live Top-Right Clock & Day/Night Cycle Updater (1 full 24h cycle = 12 real minutes)
+            // 3D Drifting Anime Clouds
+            const cloudsGroup = new THREE.Group();
+            scene.add(cloudsGroup);
+            const cloudMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9, metalness: 0.0 });
+            for (let i = 0; i < 18; i++) {
+                const cg = new THREE.Group();
+                [[0, 0, 0, 14], [11, -2, 3, 10], [-11, -1, -2, 11], [5, 4, -4, 9]].forEach(b => {
+                    const puff = new THREE.Mesh(new THREE.SphereGeometry(b[3], 12, 12), cloudMat);
+                    puff.scale.set(1.3, 0.65, 1.0);
+                    puff.position.set(b[0], b[1], b[2]);
+                    cg.add(puff);
+                });
+                cg.position.set((Math.random() - 0.5) * 650, 95 + Math.random() * 45, (Math.random() - 0.5) * 650);
+                cloudsGroup.add(cg);
+            }
+
             const clockEl = document.getElementById('world-clock');
-            function updateDayNightCycle() {
+            function updateDayNightCycle(delta) {
                 const cycleSec = (Date.now() / 1000) % 720;
-                const hourFloat = (cycleSec / 720) * 24; // 0.0 to 24.0
+                const hourFloat = (cycleSec / 720) * 24;
                 const hr24 = Math.floor(hourFloat);
                 const min = Math.floor((hourFloat - hr24) * 60);
                 const ampm = hr24 >= 12 ? 'PM' : 'AM';
                 const hr12 = (hr24 % 12) || 12;
-                const isDay = hourFloat >= 6 && hourFloat < 19.5;
                 const icon = (hourFloat >= 6 && hourFloat < 17.5) ? '☀️' : (hourFloat >= 17.5 && hourFloat < 20 ? '🌅' : '🌙');
                 clockEl.innerText = `${icon} ${hr12}:${min < 10 ? '0' + min : min} ${ampm}`;
 
-                // Orbit Sun/Moon
                 const sunAngle = ((hourFloat - 6) / 24) * Math.PI * 2;
                 const sx = Math.cos(sunAngle) * 650;
                 const sy = Math.sin(sunAngle) * 650;
                 celestialOrb.position.set(camera.position.x + sx, Math.max(-100, sy), camera.position.z - 250);
+                sunLight.position.set(camera.position.x + sx * 0.25, Math.max(40, sy * 0.35), camera.position.z + 80);
                 skyDome.position.copy(camera.position);
 
+                cloudsGroup.children.forEach(c => {
+                    c.position.x += delta * 2.5;
+                    if (c.position.x > 350) c.position.x = -350;
+                });
+
                 if (hourFloat >= 6 && hourFloat < 8) {
-                    // Sunrise
                     skyMat.uniforms.topColor.value.setHex(0x1d4ed8);
                     skyMat.uniforms.bottomColor.value.setHex(0xfb923c);
-                    sunLight.intensity = 1.0;
-                    hemiLight.intensity = 0.65;
-                    celestialOrb.material.color.setHex(0xf97316);
+                    sunLight.intensity = 1.05; hemiLight.intensity = 0.65;
                 } else if (hourFloat >= 8 && hourFloat < 17.5) {
-                    // Vibrant Fortnite Day
                     skyMat.uniforms.topColor.value.setHex(0x0284c7);
                     skyMat.uniforms.bottomColor.value.setHex(0xbae6fd);
-                    sunLight.intensity = 1.45;
-                    hemiLight.intensity = 0.85;
-                    celestialOrb.material.color.setHex(0xfde047);
+                    sunLight.intensity = 1.55; hemiLight.intensity = 0.85;
                 } else if (hourFloat >= 17.5 && hourFloat < 20) {
-                    // Golden / Purple Fortnite Sunset
                     skyMat.uniforms.topColor.value.setHex(0x3b0764);
                     skyMat.uniforms.bottomColor.value.setHex(0xf97316);
-                    sunLight.intensity = 0.85;
-                    hemiLight.intensity = 0.55;
-                    celestialOrb.material.color.setHex(0xfb7185);
+                    sunLight.intensity = 0.9; hemiLight.intensity = 0.55;
                 } else {
-                    // Starry Night
                     skyMat.uniforms.topColor.value.setHex(0x050814);
                     skyMat.uniforms.bottomColor.value.setHex(0x1e1b4b);
-                    sunLight.intensity = 0.35;
-                    hemiLight.intensity = 0.35;
-                    celestialOrb.material.color.setHex(0xe2e8f0);
+                    sunLight.intensity = 0.38; hemiLight.intensity = 0.35;
                 }
                 scene.fog.color.copy(skyMat.uniforms.bottomColor.value);
             }
 
             // =========================================================
-            // 2. FORTNITE TEXTURES & ANIMAL / MERCHANT CATALOGS
+            // 2. EXTRA TEXTURES & CATALOGS
             // =========================================================
-            function makeScheduleTexture(drawFn, repeatX, repeatY) {
-                const canvas = document.createElement('canvas');
-                canvas.width = 256; canvas.height = 256;
-                drawFn(canvas.getContext('2d'), 256, 256);
-                const tex = new THREE.CanvasTexture(canvas);
-                tex.wrapS = THREE.RepeatWrapping; tex.wrapT = THREE.RepeatWrapping;
-                tex.repeat.set(repeatX || 1, repeatY || 1);
-                return tex;
+            function makeSimpleTex(drawFn, rx, ry) {
+                const c = document.createElement('canvas'); c.width = 256; c.height = 256;
+                drawFn(c.getContext('2d'), 256, 256);
+                const t = new THREE.CanvasTexture(c);
+                t.wrapS = THREE.RepeatWrapping; t.wrapT = THREE.RepeatWrapping;
+                t.repeat.set(rx || 1, ry || 1);
+                return t;
             }
-
-            const grassTex = makeScheduleTexture((ctx, w, h) => {
-                ctx.fillStyle = '#22c55e'; ctx.fillRect(0, 0, w, h);
-                for (let i = 0; i < 550; i++) {
-                    ctx.fillStyle = (i % 2 === 0) ? '#16a34a' : '#4ade80';
-                    ctx.fillRect(Math.random() * w, Math.random() * h, 4, 8);
-                }
-            }, 90, 90);
-
-            const roadTex = makeScheduleTexture((ctx, w, h) => {
-                ctx.fillStyle = '#1e293b'; ctx.fillRect(0, 0, w, h);
-                ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 14, h); ctx.fillRect(w - 14, 0, 14, h);
-                ctx.fillStyle = '#facc15'; ctx.fillRect(w / 2 - 5, 20, 10, 80); ctx.fillRect(w / 2 - 5, 148, 10, 80);
-            }, 1, 35);
-
-            const stuccoWallTex = makeScheduleTexture((ctx, w, h) => {
-                ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, w, h);
-                ctx.fillStyle = '#e2e8f0';
-                for (let y = 0; y < h; y += 32) ctx.fillRect(0, y, w, 4);
-                ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 6; ctx.strokeRect(0, 0, w, h);
-            }, 2, 2);
-
-            const concreteTex = makeScheduleTexture((ctx, w, h) => {
-                ctx.fillStyle = '#cbd5e1'; ctx.fillRect(0, 0, w, h);
-                ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 6; ctx.strokeRect(3, 3, w - 6, h - 6);
-            }, 2, 2);
-
-            const woodTex = makeScheduleTexture((ctx, w, h) => {
-                ctx.fillStyle = '#b45309'; ctx.fillRect(0, 0, w, h);
-                ctx.strokeStyle = '#451a03'; ctx.lineWidth = 5;
-                for (let i = 0; i < 5; i++) ctx.strokeRect(0, i * (h / 5), w, h / 5);
-            }, 2, 2);
-
-            const fenceTex = makeScheduleTexture((ctx, w, h) => {
+            const fenceTex = makeSimpleTex((ctx, w, h) => {
                 ctx.clearRect(0, 0, w, h);
-                ctx.strokeStyle = '#f1f5f9'; ctx.lineWidth = 4;
+                ctx.strokeStyle = '#f1f5f9'; ctx.lineWidth = 5;
                 for (let x = -h; x < w + h; x += 32) {
                     ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x + h, h); ctx.stroke();
                     ctx.beginPath(); ctx.moveTo(x + h, 0); ctx.lineTo(x, h); ctx.stroke();
                 }
             }, 2, 1);
 
-            const bballTex = makeScheduleTexture((ctx, w, h) => {
+            const bballTex = makeSimpleTex((ctx, w, h) => {
                 ctx.fillStyle = '#ea580c'; ctx.fillRect(0, 0, w, h);
                 ctx.strokeStyle = '#090d16'; ctx.lineWidth = 10;
                 ctx.beginPath(); ctx.arc(w / 2, h / 2, w * 0.38, 0, Math.PI * 2); ctx.stroke();
             }, 1, 1);
 
             function makeSignTexture(text, bgColor, textColor) {
-                const c = document.createElement('canvas');
-                c.width = 512; c.height = 160;
+                const c = document.createElement('canvas'); c.width = 512; c.height = 160;
                 const ctx = c.getContext('2d');
                 ctx.fillStyle = bgColor || '#0f172a'; ctx.fillRect(0, 0, 512, 160);
-                ctx.strokeStyle = '#000'; ctx.lineWidth = 10; ctx.strokeRect(5, 5, 502, 150);
-                ctx.fillStyle = textColor || '#fde047'; ctx.font = '900 38px sans-serif';
+                ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 8; ctx.strokeRect(4, 4, 504, 152);
+                ctx.fillStyle = textColor || '#fde047'; ctx.font = '900 36px sans-serif';
                 ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
                 const lines = String(text || 'SIGN').split('\n');
                 if (lines.length === 1) ctx.fillText(lines[0], 256, 80);
@@ -711,29 +954,43 @@
                 speciesGrid.appendChild(div);
             });
 
-            // Ground, Roads & Fortnite Stylized Trees
-            const ground = new THREE.Mesh(new THREE.PlaneGeometry(900, 900), makeAnimeMat({ map: grassTex, roughness: 0.65 }));
-            ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; ground.userData.noOutline = true;
+            // 3D Ground with Bump Relief + 3D Extruded Roads & Sidewalk Curbs
+            const ground = new THREE.Mesh(
+                new THREE.PlaneGeometry(900, 900),
+                makeAnimeMat({ map: grassPair.map, bumpMap: grassPair.bumpMap, bumpScale: 0.08, roughness: 0.72 })
+            );
+            ground.rotation.x = -Math.PI / 2;
+            ground.receiveShadow = true;
+            ground.userData.noOutline = true;
             scene.add(ground);
 
-            const roadMat = makeAnimeMat({ map: roadTex });
-            const poleMat = makeAnimeMat({ color: 0x18181b });
+            const roadMat = makeAnimeMat({ map: roadPair.map, bumpMap: roadPair.bumpMap, bumpScale: 0.05, roughness: 0.65 });
+            const curbMat = makeAnimeMat({ map: stonePair.map, bumpMap: stonePair.bumpMap, bumpScale: 0.06, color: 0x94a3b8 });
+            const poleMat = makeAnimeMat({ color: 0x1e293b, metalness: 0.5, roughness: 0.3 });
+
             [-180, -90, 0, 90, 180].forEach(pos => {
                 const rNS = new THREE.Mesh(new THREE.PlaneGeometry(16, 750), roadMat);
-                rNS.rotation.x = -Math.PI / 2; rNS.position.set(pos, 0.02, 0); scene.add(rNS);
+                rNS.rotation.x = -Math.PI / 2; rNS.position.set(pos, 0.03, 0); rNS.receiveShadow = true; scene.add(rNS);
+                // 3D Raised Sidewalk Curbs
+                const curbL = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.22, 750), curbMat);
+                curbL.position.set(pos - 8.7, 0.11, 0); curbL.receiveShadow = true; scene.add(curbL);
+                const curbR = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.22, 750), curbMat);
+                curbR.position.set(pos + 8.7, 0.11, 0); curbR.receiveShadow = true; scene.add(curbR);
+
                 const rEW = new THREE.Mesh(new THREE.PlaneGeometry(16, 750), roadMat);
-                rEW.rotation.x = -Math.PI / 2; rEW.rotation.z = Math.PI / 2; rEW.position.set(0, 0.03, pos); scene.add(rEW);
+                rEW.rotation.x = -Math.PI / 2; rEW.rotation.z = Math.PI / 2; rEW.position.set(0, 0.04, pos); rEW.receiveShadow = true; scene.add(rEW);
             });
 
-            const trunkMat = makeAnimeMat({ map: woodTex });
-            const leavesMat = makeAnimeMat({ color: 0x22c55e, roughness: 0.35 });
-            [[-55, -55], [-75, -30], [75, 30], [35, 75], [-55, 55], [55, -55], [-125, -55], [125, 55]].forEach(c => {
+            // 3D Trees with Bark Bump & Multi-Sphere Canopy Shadows
+            const trunkMat = makeAnimeMat({ map: woodPair.map, bumpMap: woodPair.bumpMap, bumpScale: 0.12, roughness: 0.75 });
+            const leavesMat = makeAnimeMat({ map: grassPair.map, bumpMap: grassPair.bumpMap, bumpScale: 0.06, color: 0x22c55e, roughness: 0.45 });
+            [[-55, -55], [-75, -30], [75, 30], [35, 75], [-55, 55], [55, -55], [-125, -55], [125, 55], [-35, 75], [45, -75]].forEach(c => {
                 const tree = new THREE.Group();
-                const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.9, 4.2, 10), trunkMat);
-                trunk.position.y = 2.1; tree.add(trunk);
-                [[0, 5.6, 0, 2.9], [1.4, 4.8, 0.8, 2.2], [-1.3, 5.0, -0.7, 2.1]].forEach(p => {
-                    const puff = new THREE.Mesh(new THREE.SphereGeometry(p[3], 14, 14), leavesMat);
-                    puff.position.set(p[0], p[1], p[2]); tree.add(puff);
+                const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.95, 4.5, 12), trunkMat);
+                trunk.position.y = 2.25; trunk.castShadow = true; trunk.receiveShadow = true; tree.add(trunk);
+                [[0, 5.8, 0, 3.0], [1.5, 4.9, 0.9, 2.3], [-1.4, 5.1, -0.8, 2.2], [0, 7.2, 0.3, 2.1]].forEach(p => {
+                    const puff = new THREE.Mesh(new THREE.SphereGeometry(p[3], 16, 16), leavesMat);
+                    puff.position.set(p[0], p[1], p[2]); puff.castShadow = true; puff.receiveShadow = true; tree.add(puff);
                 });
                 tree.position.set(c[0], 0, c[1]);
                 scene.add(tree);
@@ -747,37 +1004,30 @@
             tycoonGroup.position.set(TYCOON_ORIGIN.x, TYCOON_ORIGIN.y, TYCOON_ORIGIN.z);
             scene.add(tycoonGroup);
 
-            const tycoonFloor = new THREE.Mesh(new THREE.BoxGeometry(90, 0.6, 90), makeAnimeMat({ color: 0x1e293b, map: concreteTex }));
-            tycoonFloor.position.y = -0.3;
+            const tycoonFloor = new THREE.Mesh(new THREE.BoxGeometry(90, 0.8, 90), makeAnimeMat({ map: stonePair.map, bumpMap: stonePair.bumpMap, bumpScale: 0.08, color: 0x1e293b }));
+            tycoonFloor.position.y = -0.4; tycoonFloor.receiveShadow = true;
             tycoonGroup.add(tycoonFloor);
 
-            // Return Portal in Tycoon World
-            const returnPortalArch = new THREE.Mesh(new THREE.TorusGeometry(2.2, 0.3, 14, 28), makeAnimeMat({ color: 0x38bdf8, emissive: 0x0284c7, emissiveIntensity: 0.6 }));
+            const returnPortalArch = new THREE.Mesh(new THREE.TorusGeometry(2.2, 0.32, 16, 32), makeAnimeMat({ color: 0x38bdf8, emissive: 0x0284c7, emissiveIntensity: 0.7 }));
             returnPortalArch.position.set(0, 2.4, 24);
             const returnSign = new THREE.Mesh(new THREE.PlaneGeometry(4.5, 1.1), new THREE.MeshBasicMaterial({ map: makeSignTexture('🌀 RETURN TO MAIN WORLD\nWALK IN OR PRESS [F]', '#090d16', '#38bdf8'), side: THREE.DoubleSide }));
             returnSign.position.set(0, 5.2, 24);
             tycoonGroup.add(returnPortalArch, returnSign);
 
-            // Conveyor Belt & Collector
-            const conveyorMesh = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.4, 26), makeAnimeMat({ color: 0x090d16 }));
-            conveyorMesh.position.set(-10, 0.2, 0);
-            const collectorVault = new THREE.Mesh(new THREE.BoxGeometry(3.8, 2.5, 3.8), makeAnimeMat({ color: 0x22c55e, emissive: 0x15803d, emissiveIntensity: 0.4 }));
-            collectorVault.position.set(-10, 1.25, 14);
+            const conveyorMesh = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.5, 26), makeAnimeMat({ color: 0x090d16, metalness: 0.4 }));
+            conveyorMesh.position.set(-10, 0.25, 0);
+            const collectorVault = new THREE.Mesh(new THREE.BoxGeometry(3.8, 2.8, 3.8), makeAnimeMat({ color: 0x22c55e, emissive: 0x15803d, emissiveIntensity: 0.4 }));
+            collectorVault.position.set(-10, 1.4, 14);
             tycoonGroup.add(conveyorMesh, collectorVault);
 
-            // Cash Collector Pad (Green Step Pad)
-            const cashClaimPad = new THREE.Mesh(new THREE.CylinderGeometry(2.2, 2.4, 0.3, 20), makeAnimeMat({ color: 0x4ade80, emissive: 0x22c55e, emissiveIntensity: 0.5 }));
-            cashClaimPad.position.set(-4, 0.15, 14);
+            const cashClaimPad = new THREE.Mesh(new THREE.CylinderGeometry(2.2, 2.4, 0.35, 24), makeAnimeMat({ color: 0x4ade80, emissive: 0x22c55e, emissiveIntensity: 0.5 }));
+            cashClaimPad.position.set(-4, 0.18, 14);
             const claimSign = new THREE.Mesh(new THREE.PlaneGeometry(3.5, 0.9), new THREE.MeshBasicMaterial({ map: makeSignTexture('💰 STEP TO COLLECT\n$0 READY', '#064e3b', '#fde047'), side: THREE.DoubleSide }));
             claimSign.position.set(-4, 2.1, 14);
             tycoonGroup.add(cashClaimPad, claimSign);
 
             let tycoonState = {
-                inTycoonWorld: false,
-                walletCash: 50,
-                storedCollectorCash: 0,
-                dropInterval: 1.8,
-                crateValue: 10,
+                inTycoonWorld: false, walletCash: 50, storedCollectorCash: 0,
                 unlockedPads: { dropper1: true, speed: false, upgrader: false, megaDropper: false, tower: false },
                 crates: []
             };
@@ -793,55 +1043,8 @@
             const tycoonBuiltProps = new THREE.Group();
             tycoonGroup.add(tycoonBuiltProps);
 
-            function rebuildTycoonUpgrades() {
-                tycoonBuiltProps.clear();
-                // Starter Dropper
-                const d1 = new THREE.Mesh(new THREE.BoxGeometry(2.2, 3.5, 2.2), makeAnimeMat({ color: 0x64748b }));
-                d1.position.set(-10, 1.75, -11);
-                tycoonBuiltProps.add(d1);
-
-                if (tycoonState.unlockedPads.upgrader) {
-                    const arch = new THREE.Mesh(new THREE.BoxGeometry(3.2, 3.0, 0.8), makeAnimeMat({ color: 0xa855f7, emissive: 0x7e22ce, emissiveIntensity: 0.4 }));
-                    arch.position.set(-10, 1.5, 0);
-                    tycoonBuiltProps.add(arch);
-                }
-                if (tycoonState.unlockedPads.megaDropper) {
-                    const d2 = new THREE.Mesh(new THREE.BoxGeometry(2.8, 4.2, 2.8), makeAnimeMat({ color: 0xfacc15 }));
-                    d2.position.set(-10, 2.1, -5);
-                    tycoonBuiltProps.add(d2);
-                }
-                if (tycoonState.unlockedPads.tower) {
-                    const trophy = createRealisticSilverbackGorilla('#facc15', 3.5, 'TYCOON KING 👑', true);
-                    trophy.position.set(14, 0, -4);
-                    tycoonBuiltProps.add(trophy);
-                }
-            }
-            rebuildTycoonUpgrades();
-
-            TYCOON_BUTTON_DEFS.forEach(def => {
-                const pad = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 1.8, 0.3, 18), makeAnimeMat({ color: def.color }));
-                pad.position.set(def.x, 0.15, def.z);
-                const lbl = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 0.85), new THREE.MeshBasicMaterial({ map: makeSignTexture(def.label, '#090d16', '#ffffff'), side: THREE.DoubleSide }));
-                lbl.position.set(def.x, 1.8, def.z);
-                tycoonGroup.add(pad, lbl);
-                tycoonPadMeshes[def.key] = { def, pad, lbl };
-            });
-
-            function enterTycoonWorld() {
-                tycoonState.inTycoonWorld = true;
-                camera.position.set(TYCOON_ORIGIN.x, 2.2, TYCOON_ORIGIN.z + 18);
-                document.getElementById('tycoon-hud').style.display = 'flex';
-            }
-
-            function exitTycoonWorld() {
-                tycoonState.inTycoonWorld = false;
-                camera.position.set(0, 2.2, 22);
-                document.getElementById('tycoon-hud').style.display = 'none';
-            }
-            document.getElementById('btn-return-main-world').addEventListener('click', (e) => { e.stopPropagation(); exitTycoonWorld(); });
-
             // =========================================================
-            // 4. ORGANIC ANIMAL COMPANIONS & SILVERBACK GORILLAS
+            // 4. ORGANIC 3D ANIMAL COMPANIONS & SILVERBACK GORILLAS
             // =========================================================
             const npcsGroup = new THREE.Group();
             scene.add(npcsGroup);
@@ -854,16 +1057,16 @@
                 const sc = scaleMultiplier || 0.68;
                 const root = new THREE.Group();
 
-                const primMat = makeAnimeMat({ color: spec.primary });
-                const secMat = makeAnimeMat({ color: spec.secondary });
-                const bellyMat = makeAnimeMat({ color: 0xffffff });
+                const primMat = makeAnimeMat({ color: spec.primary, roughness: 0.38 });
+                const secMat = makeAnimeMat({ color: spec.secondary, roughness: 0.42 });
+                const bellyMat = makeAnimeMat({ color: 0xffffff, roughness: 0.4 });
                 const pinkMat = new THREE.MeshBasicMaterial({ color: 0xff8da1 });
                 const eyeWhite = new THREE.MeshBasicMaterial({ color: 0xffffff });
                 const eyeIris = new THREE.MeshBasicMaterial({ color: 0x2563eb });
                 const eyeBlack = new THREE.MeshBasicMaterial({ color: 0x050505 });
 
-                const torso = new THREE.Mesh(new THREE.SphereGeometry(1.05 * sc, 22, 22), primMat);
-                torso.scale.set(1.0, 1.15, 0.95); torso.position.y = 1.75 * sc; root.add(torso);
+                const torso = new THREE.Mesh(new THREE.SphereGeometry(1.05 * sc, 24, 24), primMat);
+                torso.scale.set(1.0, 1.15, 0.95); torso.position.y = 1.75 * sc; torso.castShadow = true; root.add(torso);
 
                 const tummy = new THREE.Mesh(new THREE.SphereGeometry(0.82 * sc, 18, 18), spec.id === 'panda' ? secMat : bellyMat);
                 tummy.scale.set(0.9, 1.05, 0.55); tummy.position.set(0, 1.72 * sc, 0.62 * sc); root.add(tummy);
@@ -875,8 +1078,8 @@
 
                 const head = new THREE.Group();
                 head.position.set(0, 3.25 * sc, 0.12 * sc); root.add(head);
-                const headSphere = new THREE.Mesh(new THREE.SphereGeometry(0.96 * sc, 22, 22), primMat);
-                headSphere.scale.set(1.12, 0.98, 0.98); head.add(headSphere);
+                const headSphere = new THREE.Mesh(new THREE.SphereGeometry(0.96 * sc, 24, 24), primMat);
+                headSphere.scale.set(1.12, 0.98, 0.98); headSphere.castShadow = true; head.add(headSphere);
 
                 [-0.68 * sc, 0.68 * sc].forEach(ex => {
                     const side = ex > 0 ? 1 : -1;
@@ -912,7 +1115,7 @@
                 function makeLimb(radius, len) {
                     const pivot = new THREE.Group();
                     const m = new THREE.Mesh(new THREE.CylinderGeometry(radius * sc, radius * 0.88 * sc, len * sc, 14), secMat);
-                    m.position.y = -(len * sc) / 2; pivot.add(m);
+                    m.position.y = -(len * sc) / 2; m.castShadow = true; pivot.add(m);
                     return pivot;
                 }
                 const leftLeg = makeLimb(0.34, 0.95); leftLeg.position.set(-0.46 * sc, 1.0 * sc, 0); root.add(leftLeg);
@@ -936,23 +1139,24 @@
             function createRealisticSilverbackGorilla(furColorHex, scale, nameLabel, isStatue) {
                 const g = new THREE.Group();
                 const sc = scale || 1.0;
-                const darkFur = makeAnimeMat({ color: new THREE.Color(furColorHex || '#1f232a') });
-                const silverMat = makeAnimeMat({ color: isStatue ? 0xfbbf24 : 0x9ca3af });
-                const skinMat = makeAnimeMat({ color: 0x373a40 });
+                const darkFur = makeAnimeMat({ color: new THREE.Color(furColorHex || '#1f232a'), bumpMap: stonePair.bumpMap, bumpScale: 0.04, roughness: isStatue ? 0.25 : 0.55, metalness: isStatue ? 0.65 : 0.1 });
+                const silverMat = makeAnimeMat({ color: isStatue ? 0xfbbf24 : 0x9ca3af, roughness: 0.35, metalness: isStatue ? 0.75 : 0.15 });
 
-                const torso = new THREE.Mesh(new THREE.SphereGeometry(1.15 * sc, 20, 20), darkFur);
-                torso.scale.set(1.28, 1.15, 1.05); torso.position.set(0, 2.35 * sc, 0.15 * sc); g.add(torso);
-                const saddle = new THREE.Mesh(new THREE.SphereGeometry(1.08 * sc, 18, 18), silverMat);
+                const torso = new THREE.Mesh(new THREE.SphereGeometry(1.15 * sc, 22, 22), darkFur);
+                torso.scale.set(1.28, 1.15, 1.05); torso.position.set(0, 2.35 * sc, 0.15 * sc); torso.castShadow = true; g.add(torso);
+                const saddle = new THREE.Mesh(new THREE.SphereGeometry(1.08 * sc, 20, 20), silverMat);
                 saddle.scale.set(1.22, 0.95, 0.85); saddle.position.set(0, 2.15 * sc, -0.22 * sc); g.add(saddle);
 
-                const head = new THREE.Mesh(new THREE.SphereGeometry(0.68 * sc, 18, 18), darkFur);
-                head.position.set(0, 3.45 * sc, 0.55 * sc); g.add(head);
+                const head = new THREE.Mesh(new THREE.SphereGeometry(0.68 * sc, 20, 20), darkFur);
+                head.position.set(0, 3.45 * sc, 0.55 * sc); head.castShadow = true; g.add(head);
 
                 [-1, 1].forEach(side => {
-                    const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.45 * sc, 0.38 * sc, 2.3 * sc, 14), darkFur);
-                    arm.position.set(side * 1.45 * sc, 1.55 * sc, 0.45 * sc); g.add(arm);
-                    const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.42 * sc, 0.34 * sc, 1.4 * sc, 14), silverMat);
-                    leg.position.set(side * 0.68 * sc, 0.75 * sc, -0.25 * sc); g.add(leg);
+                    const shoulder = new THREE.Mesh(new THREE.SphereGeometry(0.62 * sc, 16, 16), darkFur);
+                    shoulder.position.set(side * 1.38 * sc, 2.75 * sc, 0.25 * sc); g.add(shoulder);
+                    const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.45 * sc, 0.38 * sc, 2.3 * sc, 16), darkFur);
+                    arm.position.set(side * 1.45 * sc, 1.55 * sc, 0.45 * sc); arm.castShadow = true; g.add(arm);
+                    const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.42 * sc, 0.34 * sc, 1.4 * sc, 16), silverMat);
+                    leg.position.set(side * 0.68 * sc, 0.75 * sc, -0.25 * sc); leg.castShadow = true; g.add(leg);
                 });
 
                 if (nameLabel) {
@@ -965,7 +1169,7 @@
 
             function createVisitorHaloAvatar(nameLabel) {
                 const g = new THREE.Group();
-                const ring = new THREE.Mesh(new THREE.TorusGeometry(0.55, 0.08, 14, 28), new THREE.MeshBasicMaterial({ color: 0xfde047 }));
+                const ring = new THREE.Mesh(new THREE.TorusGeometry(0.55, 0.08, 16, 32), new THREE.MeshBasicMaterial({ color: 0xfde047 }));
                 ring.rotation.x = Math.PI / 2; ring.position.y = 2.4; g.add(ring);
                 if (nameLabel) {
                     const tag = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 0.5), new THREE.MeshBasicMaterial({ map: makeSignTexture('😇 ' + nameLabel, '#0f172a', '#fde047'), side: THREE.DoubleSide }));
@@ -974,12 +1178,52 @@
                 return g;
             }
 
+            function rebuildTycoonUpgrades() {
+                tycoonBuiltProps.clear();
+                const d1 = new THREE.Mesh(new THREE.BoxGeometry(2.2, 3.5, 2.2), makeAnimeMat({ map: stonePair.map, color: 0x64748b }));
+                d1.position.set(-10, 1.75, -11); tycoonBuiltProps.add(d1);
+                if (tycoonState.unlockedPads.upgrader) {
+                    const arch = new THREE.Mesh(new THREE.BoxGeometry(3.2, 3.0, 0.8), makeAnimeMat({ color: 0xa855f7, emissive: 0x7e22ce, emissiveIntensity: 0.4 }));
+                    arch.position.set(-10, 1.5, 0); tycoonBuiltProps.add(arch);
+                }
+                if (tycoonState.unlockedPads.megaDropper) {
+                    const d2 = new THREE.Mesh(new THREE.BoxGeometry(2.8, 4.2, 2.8), makeAnimeMat({ color: 0xfacc15 }));
+                    d2.position.set(-10, 2.1, -5); tycoonBuiltProps.add(d2);
+                }
+                if (tycoonState.unlockedPads.tower) {
+                    const trophy = createRealisticSilverbackGorilla('#facc15', 3.5, 'TYCOON KING 👑', true);
+                    trophy.position.set(14, 0, -4); tycoonBuiltProps.add(trophy);
+                }
+            }
+            rebuildTycoonUpgrades();
+
+            TYCOON_BUTTON_DEFS.forEach(def => {
+                const pad = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 1.8, 0.3, 18), makeAnimeMat({ color: def.color }));
+                pad.position.set(def.x, 0.15, def.z);
+                const lbl = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 0.85), new THREE.MeshBasicMaterial({ map: makeSignTexture(def.label, '#090d16', '#ffffff'), side: THREE.DoubleSide }));
+                lbl.position.set(def.x, 1.8, def.z);
+                tycoonGroup.add(pad, lbl);
+                tycoonPadMeshes[def.key] = { def, pad, lbl };
+            });
+
+            function enterTycoonWorld() {
+                tycoonState.inTycoonWorld = true;
+                camera.position.set(TYCOON_ORIGIN.x, 2.2, TYCOON_ORIGIN.z + 18);
+                document.getElementById('tycoon-hud').style.display = 'flex';
+            }
+            function exitTycoonWorld() {
+                tycoonState.inTycoonWorld = false;
+                camera.position.set(0, 2.2, 22);
+                document.getElementById('tycoon-hud').style.display = 'none';
+            }
+            document.getElementById('btn-return-main-world').addEventListener('click', (e) => { e.stopPropagation(); exitTycoonWorld(); });
+
             const coopGodsGroup = new THREE.Group();
             scene.add(coopGodsGroup);
             const remoteGodMeshes = {};
 
             // =========================================================
-            // 5. BUILDER FACTORY (INCLUDES FARM PLOT & WORLD PORTAL)
+            // 5. 3D TEXTURED BUILDER FACTORY
             // =========================================================
             const cityPropsGroup = new THREE.Group();
             scene.add(cityPropsGroup);
@@ -989,72 +1233,82 @@
             let activeBasketballCourts = [], activeTennisCourts = [], activeSoccerCourts = [], activeIceRinks = [], activePools = [], activePortals = [];
             const farmPlotVisuals = {};
 
-            let selectedTool = 'none', selectedColor = '#8a483c', buildRotation = 0, buildElevation = 0, ghostMesh = null;
-            const glassMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.6, roughness: 0.1 });
-            const darkTrimMat = makeAnimeMat({ color: 0x1e222d });
+            let selectedTool = 'none', selectedColor = '#b45309', buildRotation = 0, buildElevation = 0, ghostMesh = null;
+            const glassMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.58, roughness: 0.08, metalness: 0.4 });
+            const darkTrimMat = makeAnimeMat({ map: stonePair.map, bumpMap: stonePair.bumpMap, bumpScale: 0.04, color: 0x1e293b });
 
             function buildModularMesh(type, colorHex, isGhost, itemData) {
                 const group = new THREE.Group();
-                const baseColor = new THREE.Color(colorHex || '#8a483c');
-                const ghostMat = isGhost ? new THREE.MeshBasicMaterial({ color: type === 'delete' ? 0xef4444 : 0x38bdf8, transparent: true, opacity: 0.5 }) : null;
+                const baseColor = new THREE.Color(colorHex || '#b45309');
+                const ghostMat = isGhost ? new THREE.MeshBasicMaterial({ color: type === 'delete' ? 0xef4444 : 0x38bdf8, transparent: true, opacity: 0.48 }) : null;
 
-                const wallMat = isGhost ? ghostMat : makeAnimeMat({ map: stuccoWallTex, color: baseColor });
-                const concreteMat = isGhost ? ghostMat : makeAnimeMat({ map: concreteTex, color: baseColor });
-                const woodMat = isGhost ? ghostMat : makeAnimeMat({ map: woodTex });
+                const wallMat = isGhost ? ghostMat : makeAnimeMat({ map: brickPair.map, bumpMap: brickPair.bumpMap, bumpScale: 0.09, color: baseColor });
+                const concreteMat = isGhost ? ghostMat : makeAnimeMat({ map: stonePair.map, bumpMap: stonePair.bumpMap, bumpScale: 0.07, color: baseColor });
+                const woodMat = isGhost ? ghostMat : makeAnimeMat({ map: woodPair.map, bumpMap: woodPair.bumpMap, bumpScale: 0.09 });
+                const shingleMat = isGhost ? ghostMat : makeAnimeMat({ map: roofShinglePair.map, bumpMap: roofShinglePair.bumpMap, bumpScale: 0.1, color: baseColor });
                 const trimMat = isGhost ? ghostMat : darkTrimMat;
                 const fenceMat = isGhost ? ghostMat : new THREE.MeshStandardMaterial({ map: fenceTex, color: baseColor, transparent: true, alphaTest: 0.2, side: THREE.DoubleSide });
 
                 if (type === 'foundation') {
-                    const slab = new THREE.Mesh(new THREE.BoxGeometry(4, 0.36, 4), concreteMat); slab.position.y = 0.18; group.add(slab);
+                    const slab = new THREE.Mesh(new THREE.BoxGeometry(4, 0.36, 4), concreteMat); slab.position.y = 0.18;
+                    const lip = new THREE.Mesh(new THREE.BoxGeometry(4.12, 0.08, 4.12), trimMat); lip.position.y = 0.38;
+                    group.add(slab, lip);
                 } else if (type === 'wall') {
-                    const mainW = new THREE.Mesh(new THREE.BoxGeometry(4, 3.8, 0.34), wallMat); mainW.position.y = 1.9; mainW.userData.isSolidWall = !isGhost; group.add(mainW);
+                    // 3D Textured Wall with Baseboard, Crown Molding & Corner Pillars
+                    const mainW = new THREE.Mesh(new THREE.BoxGeometry(3.8, 3.6, 0.36), wallMat); mainW.position.y = 2.0; mainW.userData.isSolidWall = !isGhost;
+                    const baseB = new THREE.Mesh(new THREE.BoxGeometry(4.06, 0.26, 0.46), trimMat); baseB.position.y = 0.13;
+                    const crown = new THREE.Mesh(new THREE.BoxGeometry(4.08, 0.24, 0.48), trimMat); crown.position.y = 3.88;
+                    const pilL = new THREE.Mesh(new THREE.BoxGeometry(0.28, 4.0, 0.48), trimMat); pilL.position.set(-1.9, 2.0, 0);
+                    const pilR = new THREE.Mesh(new THREE.BoxGeometry(0.28, 4.0, 0.48), trimMat); pilR.position.set(1.9, 2.0, 0);
+                    group.add(mainW, baseB, crown, pilL, pilR);
                 } else if (type === 'doorway') {
-                    const lP = new THREE.Mesh(new THREE.BoxGeometry(1.2, 4, 0.36), wallMat); lP.position.set(-1.4, 2.0, 0); lP.userData.isSolidWall = !isGhost;
-                    const rP = new THREE.Mesh(new THREE.BoxGeometry(1.2, 4, 0.36), wallMat); rP.position.set(1.4, 2.0, 0); rP.userData.isSolidWall = !isGhost;
+                    const lP = new THREE.Mesh(new THREE.BoxGeometry(1.2, 4, 0.38), wallMat); lP.position.set(-1.4, 2.0, 0); lP.userData.isSolidWall = !isGhost;
+                    const rP = new THREE.Mesh(new THREE.BoxGeometry(1.2, 4, 0.38), wallMat); rP.position.set(1.4, 2.0, 0); rP.userData.isSolidWall = !isGhost;
+                    const topH = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.1, 0.38), wallMat); topH.position.set(0, 3.45, 0);
                     const dHinge = new THREE.Group(); dHinge.position.set(-0.8, 0, 0);
-                    const dPanel = new THREE.Mesh(new THREE.BoxGeometry(1.6, 2.85, 0.14), woodMat); dPanel.position.set(0.8, 1.42, 0);
+                    const dPanel = new THREE.Mesh(new THREE.BoxGeometry(1.6, 2.85, 0.16), woodMat); dPanel.position.set(0.8, 1.42, 0);
                     const isOpen = itemData && itemData.isOpen;
                     dHinge.rotation.y = isOpen ? -Math.PI * 0.55 : 0;
                     dPanel.userData.isSolidWall = (!isGhost && !isOpen);
                     dPanel.userData.interactType = 'door';
                     dHinge.add(dPanel);
-                    group.add(lP, rP, dHinge);
+                    group.add(lP, rP, topH, dHinge);
                 } else if (type === 'window') {
-                    const b = new THREE.Mesh(new THREE.BoxGeometry(4, 1.2, 0.36), wallMat); b.position.set(0, 0.6, 0); b.userData.isSolidWall = !isGhost;
-                    const pane = new THREE.Mesh(new THREE.BoxGeometry(2.2, 2.0, 0.1), isGhost ? ghostMat : glassMat); pane.position.set(0, 2.2, 0); pane.userData.isSolidWall = !isGhost;
-                    group.add(b, pane);
+                    const b = new THREE.Mesh(new THREE.BoxGeometry(4, 1.2, 0.38), wallMat); b.position.set(0, 0.6, 0); b.userData.isSolidWall = !isGhost;
+                    const pane = new THREE.Mesh(new THREE.BoxGeometry(2.2, 2.0, 0.12), isGhost ? ghostMat : glassMat); pane.position.set(0, 2.2, 0); pane.userData.isSolidWall = !isGhost;
+                    const awning = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.25, 0.85), shingleMat); awning.position.set(0, 3.35, 0.35); awning.rotation.x = 0.25;
+                    group.add(b, pane, awning);
                 } else if (type === 'stairs') {
                     for (let i = 0; i < 10; i++) {
-                        const s = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.35, 0.45), woodMat);
+                        const s = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.32, 0.45), woodMat);
                         s.position.set(0, (i + 0.5) * 0.4, -1.8 + i * 0.4); group.add(s);
                     }
                 } else if (type === 'roof_flat') {
                     const m = new THREE.Mesh(new THREE.BoxGeometry(4.3, 0.35, 4.3), concreteMat); m.position.y = 4.0; group.add(m);
                 } else if (type === 'roof_pitched') {
-                    const m = new THREE.Mesh(new THREE.ConeGeometry(3.3, 2.6, 4), wallMat); m.position.y = 5.3; m.rotation.y = Math.PI / 4; group.add(m);
+                    const m = new THREE.Mesh(new THREE.ConeGeometry(3.35, 2.65, 4), shingleMat); m.position.y = 5.3; m.rotation.y = Math.PI / 4; group.add(m);
                 } else if (type === 'fence') {
                     const p = new THREE.Mesh(new THREE.BoxGeometry(4, 2.4, 0.14), fenceMat); p.position.y = 1.2; p.userData.isSolidWall = !isGhost; group.add(p);
                 } else if (type === 'sign_post') {
                     const sText = (itemData && itemData.signText) ? itemData.signText : 'WELCOME TO\nTHE BADABING';
-                    const board = new THREE.Mesh(new THREE.BoxGeometry(3.4, 1.35, 0.22), isGhost ? ghostMat : new THREE.MeshBasicMaterial({ map: makeSignTexture(sText, itemData?.signBg || '#111318', itemData?.signColor || '#fde047') }));
+                    const board = new THREE.Mesh(new THREE.BoxGeometry(3.4, 1.35, 0.24), isGhost ? ghostMat : new THREE.MeshBasicMaterial({ map: makeSignTexture(sText, itemData?.signBg || '#111318', itemData?.signColor || '#fde047') }));
                     board.position.set(0, 2.2, 0); board.userData.interactType = 'sign'; group.add(board);
                 } else if (type === 'streetlight') {
-                    const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.18, 5.5), poleMat); pole.position.y = 2.75;
-                    const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.35, 12, 12), new THREE.MeshBasicMaterial({ color: 0xfef08a })); bulb.position.set(0.8, 5.2, 0);
+                    const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.2, 5.5), poleMat); pole.position.y = 2.75;
+                    const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.36, 14, 14), new THREE.MeshBasicMaterial({ color: 0xfef08a })); bulb.position.set(0.8, 5.2, 0);
                     group.add(pole, bulb);
                 } else if (type === 'farm_plot') {
-                    // Placeable Companion Farm Plot (3-Minute Crop Growth + 2x Watering)
-                    const bedFrame = new THREE.Mesh(new THREE.BoxGeometry(4.6, 0.45, 4.6), woodMat);
-                    bedFrame.position.y = 0.22; bedFrame.userData.interactType = 'farm_plot';
-                    const soil = new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.48, 4.2), isGhost ? ghostMat : makeAnimeMat({ color: 0x3e2723 }));
-                    soil.position.y = 0.24; soil.userData.interactType = 'farm_plot';
+                    const bedFrame = new THREE.Mesh(new THREE.BoxGeometry(4.6, 0.48, 4.6), woodMat);
+                    bedFrame.position.y = 0.24; bedFrame.userData.interactType = 'farm_plot';
+                    const soil = new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.52, 4.2), isGhost ? ghostMat : makeAnimeMat({ bumpMap: grassPair.bumpMap, bumpScale: 0.12, color: 0x3e2723, roughness: 0.9 }));
+                    soil.position.y = 0.26; soil.userData.interactType = 'farm_plot';
                     group.add(bedFrame, soil);
 
                     const cropsContainer = new THREE.Group();
                     for (let r = -1.2; r <= 1.2; r += 1.2) {
                         for (let c = -1.2; c <= 1.2; c += 1.2) {
-                            const stalk = new THREE.Mesh(new THREE.ConeGeometry(0.28, 0.9, 8), makeAnimeMat({ color: 0x22c55e }));
-                            stalk.position.set(r, 0.7, c);
+                            const stalk = new THREE.Mesh(new THREE.ConeGeometry(0.3, 0.95, 10), leavesMat);
+                            stalk.position.set(r, 0.72, c);
                             cropsContainer.add(stalk);
                         }
                     }
@@ -1062,10 +1316,10 @@
 
                     const fsState = (itemData && itemData.farmState) || { cropType: '🍅 Slurp Tomatoes', stage: 'idle', loopsRemaining: 0, progressPct: 0 };
                     const signBoard = new THREE.Mesh(
-                        new THREE.PlaneGeometry(3.2, 0.8),
+                        new THREE.PlaneGeometry(3.2, 0.85),
                         new THREE.MeshBasicMaterial({ map: makeSignTexture(`🌱 ${fsState.cropType}\n${fsState.stage.toUpperCase()} (${fsState.progressPct || 0}%)`, '#064e3b', '#fde047'), side: THREE.DoubleSide })
                     );
-                    signBoard.position.set(0, 1.85, -2.2);
+                    signBoard.position.set(0, 1.9, -2.2);
                     signBoard.userData.interactType = 'farm_plot';
                     group.add(signBoard);
 
@@ -1073,18 +1327,16 @@
                         farmPlotVisuals[itemData.id] = { cropsContainer, signBoard, soil };
                     }
                 } else if (type === 'portal') {
-                    // Placeable Dimension Portal to Playable Tycoon World
-                    const base = new THREE.Mesh(new THREE.CylinderGeometry(2.4, 2.8, 0.4, 20), concreteMat);
-                    base.position.y = 0.2;
-                    const arch = new THREE.Mesh(new THREE.TorusGeometry(2.1, 0.28, 14, 28), isGhost ? ghostMat : makeAnimeMat({ color: 0xa855f7, emissive: 0x7e22ce, emissiveIntensity: 0.7 }));
+                    const base = new THREE.Mesh(new THREE.CylinderGeometry(2.4, 2.8, 0.45, 24), concreteMat); base.position.y = 0.22;
+                    const arch = new THREE.Mesh(new THREE.TorusGeometry(2.1, 0.3, 16, 32), isGhost ? ghostMat : makeAnimeMat({ color: 0xa855f7, emissive: 0x7e22ce, emissiveIntensity: 0.75 }));
                     arch.position.y = 2.4; arch.userData.interactType = 'portal';
-                    const vortex = new THREE.Mesh(new THREE.CircleGeometry(1.9, 24), new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.75, side: THREE.DoubleSide }));
+                    const vortex = new THREE.Mesh(new THREE.CircleGeometry(1.9, 24), new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.78, side: THREE.DoubleSide }));
                     vortex.position.y = 2.4; vortex.userData.interactType = 'portal';
                     const label = new THREE.Mesh(new THREE.PlaneGeometry(3.8, 0.85), new THREE.MeshBasicMaterial({ map: makeSignTexture('🌀 TYCOON WORLD PORTAL\nWALK IN OR PRESS [F]', '#3b0764', '#fde047'), side: THREE.DoubleSide }));
                     label.position.y = 5.0;
                     group.add(base, arch, vortex, label);
                 } else if (type === 'gorilla_statue') {
-                    const ped = new THREE.Mesh(new THREE.CylinderGeometry(3.8, 4.4, 2.2, 20), concreteMat); ped.position.y = 1.1; ped.userData.isSolidWall = !isGhost;
+                    const ped = new THREE.Mesh(new THREE.CylinderGeometry(3.8, 4.4, 2.2, 24), concreteMat); ped.position.y = 1.1; ped.userData.isSolidWall = !isGhost;
                     const silverback = createRealisticSilverbackGorilla(colorHex || '#3f3f46', 2.8, null, true); silverback.position.y = 2.2;
                     group.add(ped, silverback);
                 } else if (type === 'arcade') {
@@ -1095,24 +1347,26 @@
                     group.add(cab, scr);
                 } else if (type === 'watch_tower') {
                     [[-2, -2], [2, -2], [-2, 2], [2, 2]].forEach(lp => {
-                        const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.26, 12, 10), woodMat);
+                        const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.3, 12, 12), woodMat);
                         leg.position.set(lp[0], 6, lp[1]); group.add(leg);
                     });
-                    const nest = new THREE.Mesh(new THREE.BoxGeometry(5.2, 0.4, 5.2), woodMat); nest.position.y = 12;
-                    const ladder = new THREE.Mesh(new THREE.BoxGeometry(0.8, 12, 0.2), makeAnimeMat({ color: 0xfacc15 }));
+                    const nest = new THREE.Mesh(new THREE.BoxGeometry(5.4, 0.45, 5.4), woodMat); nest.position.y = 12;
+                    const roof = new THREE.Mesh(new THREE.ConeGeometry(4.2, 2.4, 4), shingleMat); roof.position.y = 15.2; roof.rotation.y = Math.PI / 4;
+                    const ladder = new THREE.Mesh(new THREE.BoxGeometry(0.85, 12, 0.22), makeAnimeMat({ color: 0xfacc15 }));
                     ladder.position.set(0, 6, 2.5); ladder.userData.interactType = 'tower_ladder';
-                    group.add(nest, ladder);
+                    group.add(nest, roof, ladder);
                 } else if (type === 'library' || type === 'gym' || type === 'mcdonalds' || type === 'hobby_store' || type === 'deli' || type === 'walmart' || type === 'mechanic_shop') {
                     const w = type === 'walmart' ? 24 : (type === 'mechanic_shop' ? 20 : 16);
                     const d = type === 'walmart' ? 18 : (type === 'mechanic_shop' ? 16 : 12);
-                    const bMat = isGhost ? ghostMat : makeAnimeMat({ map: stuccoWallTex, color: baseColor });
-                    const fl = new THREE.Mesh(new THREE.BoxGeometry(w, 0.3, d), concreteMat); fl.position.y = 0.15;
-                    const bW = new THREE.Mesh(new THREE.BoxGeometry(w, 4.8, 0.4), bMat); bW.position.set(0, 2.4, -d / 2); bW.userData.isSolidWall = !isGhost;
-                    const lW = new THREE.Mesh(new THREE.BoxGeometry(0.4, 4.8, d), bMat); lW.position.set(-w / 2, 2.4, 0); lW.userData.isSolidWall = !isGhost;
-                    const rW = new THREE.Mesh(new THREE.BoxGeometry(0.4, 4.8, d), bMat); rW.position.set(w / 2, 2.4, 0); rW.userData.isSolidWall = !isGhost;
-                    const roof = new THREE.Mesh(new THREE.BoxGeometry(w + 0.8, 0.5, d + 0.8), trimMat); roof.position.y = 5.0;
-                    const sBoard = new THREE.Mesh(new THREE.BoxGeometry(11, 2.0, 0.4), new THREE.MeshBasicMaterial({ map: makeSignTexture(type.toUpperCase().replace('_', ' '), '#090d16', '#fde047') }));
-                    sBoard.position.set(0, 6.2, d / 2);
+                    const fl = new THREE.Mesh(new THREE.BoxGeometry(w, 0.35, d), concreteMat); fl.position.y = 0.17;
+                    const bW = new THREE.Mesh(new THREE.BoxGeometry(w, 4.8, 0.45), wallMat); bW.position.set(0, 2.4, -d / 2); bW.userData.isSolidWall = !isGhost;
+                    const lW = new THREE.Mesh(new THREE.BoxGeometry(0.45, 4.8, d), wallMat); lW.position.set(-w / 2, 2.4, 0); lW.userData.isSolidWall = !isGhost;
+                    const rW = new THREE.Mesh(new THREE.BoxGeometry(0.45, 4.8, d), wallMat); rW.position.set(w / 2, 2.4, 0); rW.userData.isSolidWall = !isGhost;
+                    // 3D Overhanging Cornice Roof + Rooftop AC Unit
+                    const roof = new THREE.Mesh(new THREE.BoxGeometry(w + 1.2, 0.6, d + 1.2), shingleMat); roof.position.y = 5.1;
+                    const acBox = new THREE.Mesh(new THREE.BoxGeometry(2.4, 1.1, 2.0), trimMat); acBox.position.set(w * 0.22, 5.9, -d * 0.18);
+                    const sBoard = new THREE.Mesh(new THREE.BoxGeometry(11.5, 2.1, 0.45), new THREE.MeshBasicMaterial({ map: makeSignTexture(type.toUpperCase().replace('_', ' '), '#090d16', '#fde047') }));
+                    sBoard.position.set(0, 6.4, d / 2);
                     if (type === 'library') {
                         const shelf = new THREE.Mesh(new THREE.BoxGeometry(6, 3.2, 1.0), woodMat);
                         shelf.position.set(0, 1.6, -d / 2 + 1); shelf.userData.interactType = 'bookshelf'; group.add(shelf);
@@ -1121,20 +1375,20 @@
                         const bench = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.7, 2.6), trimMat);
                         bench.position.set(0, 0.4, -2); bench.userData.interactType = 'bench_press'; group.add(bench);
                     }
-                    group.add(fl, bW, lW, rW, roof, sBoard);
+                    group.add(fl, bW, lW, rW, roof, acBox, sBoard);
                 } else if (type === 'swimming_pool') {
-                    const deck = new THREE.Mesh(new THREE.BoxGeometry(18, 0.4, 12), concreteMat); deck.position.y = 0.2;
-                    const water = new THREE.Mesh(new THREE.BoxGeometry(15, 0.38, 9), new THREE.MeshStandardMaterial({ color: 0x06b6d4, transparent: true, opacity: 0.85 })); water.position.y = 0.22;
+                    const deck = new THREE.Mesh(new THREE.BoxGeometry(18, 0.45, 12), concreteMat); deck.position.y = 0.22;
+                    const water = new THREE.Mesh(new THREE.BoxGeometry(15, 0.42, 9), new THREE.MeshStandardMaterial({ color: 0x06b6d4, roughness: 0.08, metalness: 0.2, transparent: true, opacity: 0.86 })); water.position.y = 0.26;
                     group.add(deck, water);
                 } else if (type === 'ice_rink') {
-                    const ice = new THREE.Mesh(new THREE.BoxGeometry(22, 0.24, 14), new THREE.MeshStandardMaterial({ color: 0xe0f2fe, roughness: 0.05 })); ice.position.y = 0.12;
+                    const ice = new THREE.Mesh(new THREE.BoxGeometry(22, 0.26, 14), new THREE.MeshStandardMaterial({ color: 0xe0f2fe, roughness: 0.04, metalness: 0.25 })); ice.position.y = 0.13;
                     group.add(ice);
                 } else if (type === 'basketball_court' || type === 'tennis_court' || type === 'soccer_court') {
                     const cColor = type === 'basketball_court' ? 0xd96b27 : (type === 'tennis_court' ? 0x15803d : 0x16a34a);
-                    const surf = new THREE.Mesh(new THREE.BoxGeometry(28, 0.12, 18), makeAnimeMat({ color: cColor })); surf.position.y = 0.06;
+                    const surf = new THREE.Mesh(new THREE.BoxGeometry(28, 0.15, 18), makeAnimeMat({ map: stonePair.map, bumpMap: stonePair.bumpMap, bumpScale: 0.04, color: cColor })); surf.position.y = 0.08;
                     group.add(surf);
                 } else if (type === 'pond') {
-                    const water = new THREE.Mesh(new THREE.CylinderGeometry(7, 7, 0.25, 22), new THREE.MeshStandardMaterial({ color: 0x0ea5e9, transparent: true, opacity: 0.88 }));
+                    const water = new THREE.Mesh(new THREE.CylinderGeometry(7, 7, 0.28, 24), new THREE.MeshStandardMaterial({ color: 0x0ea5e9, roughness: 0.08, transparent: true, opacity: 0.88 }));
                     water.scale.set(1.3, 1, 1); water.position.y = 0.14; group.add(water);
                 } else if (type === 'computer_desk') {
                     const desk = new THREE.Mesh(new THREE.BoxGeometry(2.2, 1.1, 1.2), woodMat); desk.position.y = 0.55; desk.userData.interactType = 'computer';
@@ -1146,13 +1400,15 @@
                     const skin = MERCHANT_SKINS[skinIdx % MERCHANT_SKINS.length];
                     const counter = new THREE.Mesh(new THREE.BoxGeometry(3.6, 1.05, 1.3), woodMat);
                     counter.position.set(0, 0.52, 0.85); counter.userData.interactType = 'merchant';
+                    const canopy = new THREE.Mesh(new THREE.ConeGeometry(2.9, 1.3, 4), shingleMat);
+                    canopy.position.set(0, 3.4, 0.4); canopy.rotation.y = Math.PI / 4;
                     const vendor = createCuteAnimeAnimalMesh(skin.species, null, 0.65, { hatColor: skin.hat, apronColor: skin.apron });
                     vendor.position.set(0, 0, -0.35);
                     vendor.traverse(c => { if (c.isMesh) c.userData.interactType = 'merchant'; });
-                    group.add(counter, vendor);
+                    group.add(counter, canopy, vendor);
                 } else {
-                    const box = new THREE.Mesh(new THREE.BoxGeometry(2.2, 1.2, 2.2), concreteMat);
-                    box.position.y = 0.6;
+                    const box = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.9, 3.4), woodMat);
+                    box.position.y = 0.45;
                     if (type === 'bed') box.userData.interactType = 'bed';
                     if (type === 'mailbox' || type === 'locker') box.userData.interactType = 'inventory';
                     group.add(box);
@@ -1163,7 +1419,7 @@
             }
 
             // =========================================================
-            // 6. WORLD SYNC, REHYDRATION & FARM VISUAL UPDATER
+            // 6. WORLD SYNC & REHYDRATION
             // =========================================================
             let worldDataList = [];
             let popInAnimations = [];
@@ -1179,7 +1435,7 @@
                 pieceCountEl.innerText = list.length;
 
                 list.forEach((item, idx) => {
-                    const mesh = buildModularMesh(item.type, item.color || '#8a483c', false, item);
+                    const mesh = buildModularMesh(item.type, item.color || '#b45309', false, item);
                     mesh.position.set(item.x, item.y || 0, item.z);
                     mesh.rotation.y = THREE.MathUtils.degToRad(item.rot || 0);
                     mesh.userData = Object.assign(mesh.userData || {}, item);
@@ -1283,7 +1539,7 @@
 
                     const bagGrid = document.getElementById('mind-bag-grid');
                     const bag = activeNpc.inventory || [];
-                    bagGrid.innerHTML = bag.length ? bag.map((it, idx) => `<div class="bag-item-chip" data-idx="${idx}"><strong>${it}</strong></div>`).join('') : '<div style="grid-column:span 3;color:#94a3b8;">Empty</div>';
+                    bagGrid.innerHTML = bag.length ? bag.map((it, idx) => `<div class="bag-item-chip" data-idx="${idx}"><strong>${it}</strong></div>`).join('') : '<div style="grid-column:span 3;color:#94a3b8;">Bag is empty</div>';
                     bagGrid.querySelectorAll('.bag-item-chip').forEach(chip => {
                         chip.addEventListener('click', async () => {
                             const res = await fetch('/api/npcs/action', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ npcId: activeNpc.id, actionType: 'use_item', slotIndex: Number(chip.getAttribute('data-idx')) }) });
@@ -1334,7 +1590,6 @@
                         });
                     }
 
-                    // Update Farm Plot 3D Crop Visuals & Progress Signs
                     if (Array.isArray(data.farmStates)) {
                         data.farmStates.forEach(fsItem => {
                             const vis = farmPlotVisuals[fsItem.id];
@@ -1343,7 +1598,7 @@
                             const scaleY = st.stage === 'idle' ? 0.01 : Math.max(0.25, (st.progressPct || 10) / 55);
                             vis.cropsContainer.visible = st.stage !== 'idle';
                             vis.cropsContainer.scale.set(1, scaleY, 1);
-                            const statusText = st.stage === 'idle' ? 'IDLE (CLICK [F] TO FARM)' : `${st.stage.toUpperCase()} • ${st.progressPct || 0}%\nWater: ${st.waterCount || 0}/2 • Loops: ${st.loopsRemaining}`;
+                            const statusText = st.stage === 'idle' ? 'IDLE (TAP [F] TO FARM)' : `${st.stage.toUpperCase()} • ${st.progressPct || 0}%\nWater: ${st.waterCount || 0}/2 • Loops: ${st.loopsRemaining}`;
                             vis.signBoard.material.map = makeSignTexture(`🌱 ${st.cropType}\n${statusText}`, '#064e3b', '#fde047');
                             vis.signBoard.material.needsUpdate = true;
                         });
@@ -1355,7 +1610,7 @@
             }, 350);
 
             // =========================================================
-            // 7. INTERACTIONS: FARMING CONFIG, PORTALS, WAVE, SHOPS
+            // 7. INTERACTIONS: FARMING, PORTALS, WAVE, SHOPS
             // =========================================================
             const raycaster = new THREE.Raycaster();
             const centerScreen = new THREE.Vector2(0, 0);
@@ -1382,7 +1637,7 @@
                     if (foundNpc) {
                         currentHoveredInteract = { interactType: 'companion', npc: foundNpc };
                         promptEl.style.display = 'block';
-                        promptEl.innerHTML = `Press <span>[F]</span> to Wave at <span>${foundNpc.name}</span>`;
+                        promptEl.innerHTML = `Press <span>[F]</span> or Tap <span>🖐️</span> to Wave at <span>${foundNpc.name}</span>`;
                         return;
                     }
                 }
@@ -1396,8 +1651,8 @@
                         currentHoveredInteract = { interactType, rootGroup: findRootPieceGroup(hits[0].object) };
                         promptEl.style.display = 'block';
                         const labels = {
-                            farm_plot: 'Configure Companion Farm Plot (3m Crop + Loops)',
-                            portal: 'Enter Badabing Tycoon World Portal 🌀',
+                            farm_plot: 'Configure Companion Farm Plot 🌱',
+                            portal: 'Enter Badabing Tycoon Portal 🌀',
                             arcade: 'Play Retro Arcade 🕹️',
                             tower_ladder: 'Climb Watch Tower 🗼',
                             bookshelf: 'Check Out Cooking Book 📚',
@@ -1407,7 +1662,7 @@
                             sign: 'Edit Sign Text 🪧',
                             computer: 'Use Internet PC 💻'
                         };
-                        promptEl.innerHTML = `Press <span>[F]</span> to ${labels[interactType] || 'Interact'}`;
+                        promptEl.innerHTML = `Press <span>[F]</span> or Tap <span>🖐️</span> to ${labels[interactType] || 'Interact'}`;
                         return;
                     }
                 }
@@ -1434,7 +1689,7 @@
                     enterTycoonWorld();
                 } else if (interactType === 'farm_plot') {
                     if (!isGodUnlocked) {
-                        alert('🔒 Only Gorilla Gods can select the crop and assign a companion to a Farm Plot! Unlock God Mode with password PEANUT.');
+                        alert('🔒 Only Gorilla Gods can assign crops to a Farm Plot! Unlock God Mode with password PEANUT.');
                         return;
                     }
                     if (controls.isLocked) controls.unlock();
@@ -1470,34 +1725,33 @@
                 }
             }
 
-            // God-Only Farm Plot Configuration Modal (Select Companion, Crop & Loop Count)
             function openFarmConfigModal(itemData) {
                 const fsState = itemData.farmState || { assignedNpcId: 'peanut', cropType: '🍅 Slurp Tomatoes', loopsRemaining: 3 };
                 const crops = ['🍅 Slurp Tomatoes', '🌽 Golden Corn', '🥕 Crunchy Carrots', '🍓 Shield Berries', '🎃 Mythic Pumpkins'];
                 modalTitle.innerText = '🌱 Companion Farm Plot Manager';
                 modalContent.innerHTML = `
                     <p style="font-size:11px;color:#cbd5e1;margin:0 0 10px 0;">
-                        Total completion time is <strong>3 minutes (180s)</strong> per crop. Your selected companion will automatically plant the seeds, water immediately, water a second time after <strong>90 seconds</strong>, and harvest at 3 minutes!
+                        Total completion is <strong>3 minutes (180s)</strong> per crop. Your companion plants seeds, waters immediately, waters a second time at <strong>90s</strong>, and harvests at 3 minutes!
                     </p>
                     <div style="margin-bottom:8px;">
-                        <label style="font-size:11px;color:#38bdf8;display:block;margin-bottom:3px;">1. Select Responsible Companion:</label>
+                        <label style="font-size:11px;color:#38bdf8;display:block;margin-bottom:3px;">1. Select Companion:</label>
                         <select id="farm-npc-select" class="merchant-input" style="width:100%;">
                             ${npcList.map(n => `<option value="${n.id}" ${n.id === fsState.assignedNpcId ? 'selected' : ''}>${n.name} (${n.species})</option>`).join('')}
                         </select>
                     </div>
                     <div style="margin-bottom:8px;">
-                        <label style="font-size:11px;color:#38bdf8;display:block;margin-bottom:3px;">2. Select Crop / Vegetable (God Only):</label>
+                        <label style="font-size:11px;color:#38bdf8;display:block;margin-bottom:3px;">2. Select Crop (God Only):</label>
                         <select id="farm-crop-select" class="merchant-input" style="width:100%;">
                             ${crops.map(c => `<option value="${c}" ${c === fsState.cropType ? 'selected' : ''}>${c}</option>`).join('')}
                         </select>
                     </div>
                     <div style="margin-bottom:12px;">
-                        <label style="font-size:11px;color:#38bdf8;display:block;margin-bottom:3px;">3. Loop Amount (Cycles before returning to free roam):</label>
+                        <label style="font-size:11px;color:#38bdf8;display:block;margin-bottom:3px;">3. Loop Amount:</label>
                         <select id="farm-loops-select" class="merchant-input" style="width:100%;">
                             ${[1, 2, 3, 5, 10].map(l => `<option value="${l}" ${l === (fsState.loopsRemaining || 3) ? 'selected' : ''}>${l} ${l === 1 ? 'Cycle (3 mins)' : 'Loops (' + (l * 3) + ' mins)'}</option>`).join('')}
                         </select>
                     </div>
-                    <button class="mini-ui-btn" id="btn-start-farming" style="width:100%;padding:10px;background:#4ade80;color:#111;font-size:13px;">🌱 Assign Companion & Start Farming</button>
+                    <button class="mini-ui-btn" id="btn-start-farming" style="width:100%;padding:10px;background:#4ade80;color:#090d16;font-size:13px;">🌱 Assign & Start Farming</button>
                 `;
                 objectModal.style.display = 'block';
 
@@ -1514,7 +1768,7 @@
             }
 
             // =========================================================
-            // 8. UI MENUS, BUILD PLACEMENT & CONTROLS
+            // 8. UI MENUS, BUILD PLACEMENT & FIXED MOBILE TOUCH CONTROLS
             // =========================================================
             const mindPanel = document.getElementById('companion-mind-panel');
             document.getElementById('btn-toggle-mind').addEventListener('click', (e) => { e.stopPropagation(); mindPanel.style.display = mindPanel.style.display === 'block' ? 'none' : 'block'; });
@@ -1523,7 +1777,7 @@
                 e.stopPropagation();
                 const m = document.getElementById('companion-manager-modal');
                 m.style.display = m.style.display === 'block' ? 'none' : 'block';
-                document.getElementById('companion-roster-list').innerHTML = npcList.map(n => `<div class="comp-row"><strong>${n.name} (${n.species})</strong><span>${n.activity}</span></div>`).join('');
+                document.getElementById('companion-roster-list').innerHTML = npcList.map(n => `<div class="comp-row" style="display:flex;justify-content:space-between;padding:6px;border-bottom:1px solid #334155;"><strong>${n.name} (${n.species})</strong><span style="color:#4ade80;">${n.activity}</span></div>`).join('');
             });
             document.getElementById('btn-close-manager').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('companion-manager-modal').style.display = 'none'; });
             document.getElementById('btn-close-arcade').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('arcade-modal').style.display = 'none'; document.getElementById('arcade-iframe').src = 'about:blank'; });
@@ -1660,17 +1914,29 @@
                 return true;
             }
 
+            // =========================================================
+            // 9. DESKTOP + COMPLETELY FIXED MULTI-TOUCH MOBILE CONTROLS
+            // =========================================================
             const controls = new THREE.PointerLockControls(camera, document.body);
-            const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-            if (isTouchDevice) document.getElementById('mobile-controls').style.display = 'block';
+            const mobileControlsEl = document.getElementById('mobile-controls');
+            const isTouchCapable = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.innerWidth <= 950);
+            if (isTouchCapable) mobileControlsEl.style.display = 'block';
+
+            document.getElementById('btn-toggle-touch').addEventListener('click', (e) => {
+                e.stopPropagation();
+                const vis = mobileControlsEl.style.display === 'block';
+                mobileControlsEl.style.display = vis ? 'none' : 'block';
+            });
 
             document.body.addEventListener('click', (e) => {
                 if (e.target.closest('#build-menu-modal, #toggle-build-btn, #top-status-banner, #tycoon-hud, .game-modal, #companion-bar, #companion-mind-panel, #sports-hud, #mobile-controls')) return;
-                if (!controls.isLocked && !isTouchDevice) { if (buildMenuOpen) toggleBuildMenu(false); controls.lock(); }
-                else if (!isTouchDevice) executeBuildAction();
+                if (!controls.isLocked && !isTouchCapable) { if (buildMenuOpen) toggleBuildMenu(false); controls.lock(); }
+                else if (!isTouchCapable) executeBuildAction();
             });
 
             const keys = { w: false, a: false, s: false, d: false, space: false, shift: false };
+            const joyVec = { x: 0, y: 0 }; // Analog Thumbstick Vector (-1 to 1)
+
             window.addEventListener('keydown', (e) => {
                 const tag = document.activeElement && document.activeElement.tagName;
                 if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
@@ -1698,8 +1964,131 @@
                 if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') keys.shift = false;
             });
 
+            // Helper to bind both touch and pointer events for 100% reliable mobile buttons
+            function bindHoldButton(btnId, onDown, onUp) {
+                const el = document.getElementById(btnId);
+                if (!el) return;
+                const start = (e) => { e.preventDefault(); e.stopPropagation(); el.classList.add('pressed'); onDown(); };
+                const end = (e) => { e.preventDefault(); e.stopPropagation(); el.classList.remove('pressed'); if (onUp) onUp(); };
+                el.addEventListener('touchstart', start, { passive: false });
+                el.addEventListener('touchend', end, { passive: false });
+                el.addEventListener('touchcancel', end, { passive: false });
+                el.addEventListener('mousedown', start);
+                el.addEventListener('mouseup', end);
+                el.addEventListener('mouseleave', end);
+            }
+
+            bindHoldButton('btn-forward', () => { keys.w = true; }, () => { keys.w = false; });
+            bindHoldButton('btn-backward', () => { keys.s = true; }, () => { keys.s = false; });
+            bindHoldButton('btn-up', () => {
+                keys.space = true;
+                if (!isFlyingMode && camera.position.y <= 2.25) verticalVelocity = 10.5;
+            }, () => { keys.space = false; });
+            bindHoldButton('btn-down', () => { keys.shift = true; }, () => { keys.shift = false; });
+            bindHoldButton('btn-interact', () => { triggerInteraction(); }, null);
+            bindHoldButton('btn-place', () => { executeBuildAction(); }, null);
+            bindHoldButton('btn-mob-rot', () => { buildRotation = (buildRotation + 90) % 360; updateGhostPreview(); }, null);
+            bindHoldButton('btn-mob-shoot', () => {
+                const lookDir = new THREE.Vector3(); camera.getWorldDirection(lookDir);
+                activeBasketballCourts.forEach(bc => {
+                    if (bc.held) { bc.held = false; bc.cooldown = 0.5; bc.pos.copy(camera.position).addScaledVector(lookDir, 1.3); bc.vel.set(lookDir.x * 16.5, 10.0, lookDir.z * 16.5); }
+                });
+            }, null);
+
+            // Virtual Left Analog Thumbstick (Multi-Touch Safe)
+            const joyZone = document.getElementById('joystick-zone');
+            const joyKnob = document.getElementById('joystick-knob');
+            let joyTouchId = null;
+
+            function updateJoystickFromPoint(clientX, clientY) {
+                const rect = joyZone.getBoundingClientRect();
+                const cx = rect.left + rect.width / 2;
+                const cy = rect.top + rect.height / 2;
+                const maxR = rect.width / 2 - 16;
+                let dx = clientX - cx;
+                let dy = clientY - cy;
+                const dist = Math.hypot(dx, dy);
+                if (dist > maxR) { dx = (dx / dist) * maxR; dy = (dy / dist) * maxR; }
+                joyKnob.style.transform = `translate(${dx}px, ${dy}px)`;
+                joyVec.x = +(dx / maxR).toFixed(2);
+                joyVec.y = +(-dy / maxR).toFixed(2); // Up is positive forward
+            }
+
+            function resetJoystick() {
+                joyTouchId = null;
+                joyKnob.style.transform = 'translate(0px, 0px)';
+                joyVec.x = 0; joyVec.y = 0;
+            }
+
+            joyZone.addEventListener('touchstart', (e) => {
+                e.preventDefault(); e.stopPropagation();
+                const t = e.changedTouches[0];
+                joyTouchId = t.identifier;
+                updateJoystickFromPoint(t.clientX, t.clientY);
+            }, { passive: false });
+
+            joyZone.addEventListener('touchmove', (e) => {
+                e.preventDefault(); e.stopPropagation();
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    if (e.changedTouches[i].identifier === joyTouchId) {
+                        updateJoystickFromPoint(e.changedTouches[i].clientX, e.changedTouches[i].clientY);
+                        break;
+                    }
+                }
+            }, { passive: false });
+
+            joyZone.addEventListener('touchend', (e) => {
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    if (e.changedTouches[i].identifier === joyTouchId) { resetJoystick(); break; }
+                }
+            });
+            joyZone.addEventListener('touchcancel', resetJoystick);
+
+            // Multi-Touch Right-Screen Look Drag (Works Simultaneously While Moving with Left Thumb!)
+            let lookTouchId = null, lastLookX = 0, lastLookY = 0;
+
+            window.addEventListener('touchstart', (e) => {
+                if (e.target.closest('#build-menu-modal, #toggle-build-btn, #top-status-banner, #tycoon-hud, .game-modal, #companion-bar, #companion-mind-panel, #sports-hud, #joystick-zone, .mob-btn')) return;
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    const t = e.changedTouches[i];
+                    if (t.identifier !== joyTouchId && lookTouchId === null) {
+                        lookTouchId = t.identifier;
+                        lastLookX = t.clientX;
+                        lastLookY = t.clientY;
+                        break;
+                    }
+                }
+            }, { passive: false });
+
+            window.addEventListener('touchmove', (e) => {
+                if (lookTouchId === null) return;
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    const t = e.changedTouches[i];
+                    if (t.identifier === lookTouchId) {
+                        const dx = t.clientX - lastLookX;
+                        const dy = t.clientY - lastLookY;
+                        lastLookX = t.clientX;
+                        lastLookY = t.clientY;
+                        camera.rotation.order = 'YXZ';
+                        camera.rotation.y -= dx * 0.0058;
+                        camera.rotation.x = Math.max(-Math.PI * 0.44, Math.min(Math.PI * 0.44, camera.rotation.x - dy * 0.0058));
+                        camera.rotation.z = 0; // Strictly lock roll to zero so view never twists!
+                        break;
+                    }
+                }
+            }, { passive: false });
+
+            function endLookTouch(e) {
+                if (lookTouchId === null) return;
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    if (e.changedTouches[i].identifier === lookTouchId) { lookTouchId = null; break; }
+                }
+            }
+            window.addEventListener('touchend', endLookTouch);
+            window.addEventListener('touchcancel', endLookTouch);
+
             // =========================================================
-            // 9. MAIN ANIMATION LOOP (DAY/NIGHT + SMOOTH COMPANIONS + TYCOON)
+            // 10. MAIN ANIMATION LOOP
             // =========================================================
             const targetXEl = document.getElementById('target-x');
             const targetZEl = document.getElementById('target-z');
@@ -1712,10 +2101,9 @@
                 const elapsed = clock.getElapsedTime();
 
                 camera.rotation.z = 0;
-                updateDayNightCycle();
+                updateDayNightCycle(delta);
                 checkInteractiveTarget();
 
-                // Fortnite Build Pop-In Scale Animation
                 for (let i = popInAnimations.length - 1; i >= 0; i--) {
                     const anim = popInAnimations[i];
                     anim.t += delta * 6.0;
@@ -1732,20 +2120,15 @@
                     if (ghostMesh) { ghostMesh.position.set(snapPt.x, snapPt.y, snapPt.z); ghostMesh.rotation.y = THREE.MathUtils.degToRad(buildRotation); }
                 }
 
-                // Walk-Into Portal Check (Main World -> Tycoon World & Return Portal)
+                // Portal & Tycoon Sub-World Logic
                 if (!tycoonState.inTycoonWorld) {
                     for (let i = 0; i < activePortals.length; i++) {
                         const p = activePortals[i];
-                        if (Math.hypot(camera.position.x - p.x, camera.position.z - p.z) < 1.8) {
-                            enterTycoonWorld(); break;
-                        }
+                        if (Math.hypot(camera.position.x - p.x, camera.position.z - p.z) < 1.8) { enterTycoonWorld(); break; }
                     }
                 } else {
-                    // Inside Tycoon World Mechanics
-                    if (Math.hypot(camera.position.x - TYCOON_ORIGIN.x, camera.position.z - (TYCOON_ORIGIN.z + 24)) < 2.2) {
-                        exitTycoonWorld();
-                    }
-                    // Spawn & Move Tycoon Crates on Conveyor Belt
+                    if (Math.hypot(camera.position.x - TYCOON_ORIGIN.x, camera.position.z - (TYCOON_ORIGIN.z + 24)) < 2.2) exitTycoonWorld();
+
                     const interval = tycoonState.unlockedPads.speed ? 0.85 : 1.7;
                     if (elapsed - lastTycoonDrop > interval) {
                         lastTycoonDrop = elapsed;
@@ -1768,7 +2151,6 @@
                             claimSign.material.needsUpdate = true;
                         }
                     }
-                    // Step on Green Cash Claim Pad
                     if (Math.hypot(camera.position.x - (TYCOON_ORIGIN.x - 4), camera.position.z - (TYCOON_ORIGIN.z + 14)) < 2.3 && tycoonState.storedCollectorCash > 0) {
                         tycoonState.walletCash += tycoonState.storedCollectorCash;
                         tycoonState.storedCollectorCash = 0;
@@ -1776,7 +2158,6 @@
                         claimSign.material.map = makeSignTexture('💰 COLLECTED!\n$0 READY', '#064e3b', '#fde047');
                         claimSign.material.needsUpdate = true;
                     }
-                    // Step on Tycoon Upgrade Pads
                     Object.keys(tycoonPadMeshes).forEach(k => {
                         if (tycoonState.unlockedPads[k]) return;
                         const pm = tycoonPadMeshes[k];
@@ -1794,7 +2175,7 @@
                     });
                 }
 
-                // Silky-Smooth Exponential Damping for Companion Walking & Turning
+                // Smooth Companion Walking & Turning
                 const smoothAlpha = 1 - Math.exp(-8.5 * delta);
                 Object.keys(npcMeshes).forEach((id, idx) => {
                     const mesh = npcMeshes[id];
@@ -1833,23 +2214,24 @@
                     }
                 });
 
-                // Player Movement (Supports Fortnite Sprint via Shift when Walking)
+                // Player Movement (Combines Keyboard WASD + Mobile D-Pad + Mobile Analog Thumbstick)
                 const baseSpeed = (!isFlyingMode && keys.shift) ? 30.0 : 20.0;
                 const moveSpeed = baseSpeed * delta;
                 const oldPos = camera.position.clone();
-                if (controls.isLocked) {
-                    if (keys.w) controls.moveForward(moveSpeed);
-                    if (keys.s) controls.moveForward(-moveSpeed);
-                    if (keys.a) controls.moveRight(-moveSpeed);
-                    if (keys.d) controls.moveRight(moveSpeed);
-                } else {
-                    const camDir = new THREE.Vector3(); camera.getWorldDirection(camDir); camDir.y = 0; camDir.normalize();
-                    const sideDir = new THREE.Vector3(-camDir.z, 0, camDir.x);
-                    if (keys.w) camera.position.addScaledVector(camDir, moveSpeed);
-                    if (keys.s) camera.position.addScaledVector(camDir, -moveSpeed);
-                    if (keys.a) camera.position.addScaledVector(sideDir, moveSpeed);
-                    if (keys.d) camera.position.addScaledVector(sideDir, -moveSpeed);
+
+                const forwardInput = (keys.w ? 1 : 0) - (keys.s ? 1 : 0) + joyVec.y;
+                const strafeInput = (keys.d ? 1 : 0) - (keys.a ? 1 : 0) + joyVec.x;
+
+                if (Math.abs(forwardInput) > 0.01 || Math.abs(strafeInput) > 0.01) {
+                    const camDir = new THREE.Vector3();
+                    camera.getWorldDirection(camDir);
+                    camDir.y = 0; camDir.normalize();
+                    const rightDir = new THREE.Vector3(camDir.z, 0, -camDir.x);
+
+                    camera.position.addScaledVector(camDir, forwardInput * moveSpeed);
+                    camera.position.addScaledVector(rightDir, strafeInput * moveSpeed);
                 }
+
                 if (!tycoonState.inTycoonWorld && !canMoveTo(oldPos, camera.position)) {
                     camera.position.x = oldPos.x; camera.position.z = oldPos.z;
                 }
