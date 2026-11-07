@@ -12,6 +12,7 @@ app.use(express.json({ limit: '25mb' }));
 app.use(express.static(__dirname));
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Revision counter so in-place word edits (signs, merchants, doors, farms) sync to all players immediately
 let worldRev = Date.now();
 
 let worldItems = [];
@@ -32,7 +33,6 @@ function createDefaultPeanut() {
         lastProgressDist: 999,
         stallTicks: 0,
         waveUntil: 0,
-        assignedOfficeId: null,
         wallet: 250,
         inventory: ['🎋 Fresh Bamboo', '🥪 Deli Sub', '📖 Master Chef Cooking Vol. 1'],
         mood: 'Happy ✨',
@@ -40,10 +40,10 @@ function createDefaultPeanut() {
         energy: 92,
         activity: 'Roaming Town',
         assignedBedId: null,
-        wants: ['Work 10AM-4PM at the Office Tower 🏢', 'Grow crops on a Farm Plot 🌱', 'Wave at a Player 👋'],
+        wants: ['Grow crops on a Farm Plot 🌱', 'Visit the Italian Deli 🥪', 'Wave at a Player 👋'],
         diary: [
-            'Dear Diary: The new 3-story Office Tower has cubicles, a boardroom, and a Secretary!',
-            'If assigned to the Office, I work 10:00 AM to 4:00 PM EST and earn salary!'
+            'Dear Diary: All signs, buildings, and Tycoon progress now sync live across the server!',
+            'Ready to plant, water, and harvest crops whenever a Gorilla God assigns me a Farm Plot!'
         ],
         activityLog: ['[' + new Date().toLocaleTimeString() + '] Roaming town freely.']
     };
@@ -59,7 +59,13 @@ function createDefaultTycoon() {
     return {
         walletCash: 50,
         storedCollectorCash: 0,
-        unlockedPads: { dropper1: true, speed: false, upgrader: false, megaDropper: false, tower: false },
+        unlockedPads: {
+            dropper1: true,
+            speed: false,
+            upgrader: false,
+            megaDropper: false,
+            tower: false
+        },
         rev: Date.now()
     };
 }
@@ -68,7 +74,9 @@ let tycoonState = createDefaultTycoon();
 if (fs.existsSync(TYCOON_FILE)) {
     try {
         const loaded = JSON.parse(fs.readFileSync(TYCOON_FILE, 'utf8') || '{}');
-        if (typeof loaded.walletCash === 'number') tycoonState = Object.assign(createDefaultTycoon(), loaded);
+        if (typeof loaded.walletCash === 'number') {
+            tycoonState = Object.assign(createDefaultTycoon(), loaded);
+        }
     } catch (e) {}
 }
 
@@ -98,31 +106,16 @@ function addDiary(npc, text) {
     }
 }
 
-// Get Current Real-Time EST Hour (0 - 23) for 10 AM - 4 PM Office Work Shift
-const estHourFormatter = new Intl.DateTimeFormat('en-US', {
-    timeZone: 'America/New_York',
-    hour12: false,
-    hour: 'numeric'
-});
-function getCurrentEstHour() {
-    try {
-        const parts = estHourFormatter.formatToParts(new Date());
-        const hrPart = parts.find(p => p.type === 'hour');
-        return hrPart ? (Number(hrPart.value) % 24) : 12;
-    } catch (e) {
-        return 12;
-    }
-}
-
+// Bounding-Box Obstacle Check so Companions Never Clip or Loop on Structures
 const BUILDING_BOUNDS = {
-    wall: [2.6, 0.7], window: [2.6, 0.7], fence: [2.6, 0.7], doorway: [2.6, 0.7],
-    mcdonalds: [10.5, 8.2], hobby_store: [10.5, 8.2], deli: [10.5, 8.2], library: [10.5, 8.2], gym: [10.5, 8.2],
-    walmart: [15.5, 11.8], mechanic_shop: [13.0, 10.5], office_building: [16.5, 13.5], watch_tower: [4.2, 4.2],
-    fountain: [4.8, 4.8], gorilla_statue: [5.0, 5.0], pond: [11.0, 8.8],
-    swimming_pool: [11.5, 7.8], ice_rink: [14.2, 9.8],
-    basketball_court: [17.5, 11.5], tennis_court: [16.5, 9.5], soccer_court: [21.0, 14.0],
-    arcade: [2.0, 2.0], locker: [2.0, 2.0], computer_desk: [2.2, 2.0], merchant: [3.2, 2.8],
-    farm_plot: [3.0, 3.0], portal: [3.0, 2.0], bed: [2.4, 2.8], mailbox: [1.6, 1.6], sign_post: [2.4, 1.2]
+    wall: [2.2, 0.6], window: [2.2, 0.6], fence: [2.2, 0.6], doorway: [2.2, 0.6],
+    mcdonalds: [9.2, 7.2], hobby_store: [9.2, 7.2], deli: [9.2, 7.2], library: [9.2, 7.2], gym: [9.2, 7.2],
+    walmart: [13.2, 10.2], mechanic_shop: [11.2, 9.2], watch_tower: [3.6, 3.6],
+    fountain: [4.2, 4.2], gorilla_statue: [4.5, 4.5], pond: [9.5, 7.5],
+    swimming_pool: [9.8, 6.8], ice_rink: [12.5, 8.5],
+    basketball_court: [15.0, 10.0], tennis_court: [14.0, 8.0], soccer_court: [18.0, 12.0],
+    arcade: [1.8, 1.8], locker: [1.8, 1.8], computer_desk: [2.0, 1.8], merchant: [2.8, 2.4],
+    farm_plot: [2.6, 2.6], portal: [2.6, 1.8], bed: [2.0, 2.4], mailbox: [1.4, 1.4], sign_post: [2.0, 1.0]
 };
 
 function isNpcBlockedByWall(nx, nz, ignoreItemId) {
@@ -133,7 +126,7 @@ function isNpcBlockedByWall(nx, nz, ignoreItemId) {
         if ((it.y || 0) > 2.5 || it.type === 'foundation' || it.type === 'roof_flat' || it.type === 'roof_pitched') continue;
         if (it.type === 'doorway' && it.isOpen) continue;
 
-        const b = BUILDING_BOUNDS[it.type] || [2.4, 2.4];
+        const b = BUILDING_BOUNDS[it.type] || [2.2, 2.2];
         const dx = nx - it.x;
         const dz = nz - it.z;
         const rad = -((it.rot || 0) * Math.PI) / 180;
@@ -149,7 +142,9 @@ function isPathClear(x1, z1, x2, z2, ignoreItemId) {
     const steps = 8;
     for (let s = 1; s <= steps; s++) {
         const t = s / steps;
-        if (isNpcBlockedByWall(x1 + (x2 - x1) * t, z1 + (z2 - z1) * t, ignoreItemId)) return false;
+        const px = x1 + (x2 - x1) * t;
+        const pz = z1 + (z2 - z1) * t;
+        if (isNpcBlockedByWall(px, pz, ignoreItemId)) return false;
     }
     return true;
 }
@@ -158,8 +153,10 @@ function pickRandomRoamWaypoint(npc) {
     for (let attempt = 0; attempt < 20; attempt++) {
         const angle = Math.random() * Math.PI * 2;
         const dist = 12 + Math.random() * 38;
-        const clampedX = Math.max(-140, Math.min(140, +(npc.x + Math.cos(angle) * dist).toFixed(1)));
-        const clampedZ = Math.max(-140, Math.min(140, +(npc.z + Math.sin(angle) * dist).toFixed(1)));
+        const tx = +(npc.x + Math.cos(angle) * dist).toFixed(1);
+        const tz = +(npc.z + Math.sin(angle) * dist).toFixed(1);
+        const clampedX = Math.max(-140, Math.min(140, tx));
+        const clampedZ = Math.max(-140, Math.min(140, tz));
         if (!isNpcBlockedByWall(clampedX, clampedZ) && isPathClear(npc.x, npc.z, clampedX, clampedZ)) {
             npc.targetX = clampedX;
             npc.targetZ = clampedZ;
@@ -168,7 +165,9 @@ function pickRandomRoamWaypoint(npc) {
             return;
         }
     }
-    npc.targetX = 0; npc.targetZ = 0; npc.stallTicks = 0;
+    npc.targetX = 0;
+    npc.targetZ = 0;
+    npc.stallTicks = 0;
     npc.lastProgressDist = Math.hypot(npc.x, npc.z);
 }
 
@@ -177,13 +176,37 @@ npcs.forEach(n => {
     if (!Array.isArray(n.inventory)) n.inventory = ['🍎 Sweet Apple'];
     if (typeof n.x !== 'number' || isNaN(n.x)) n.x = 6;
     if (typeof n.z !== 'number' || isNaN(n.z)) n.z = 14;
+    if (isNpcBlockedByWall(n.x, n.z)) {
+        for (let r = 4; r <= 40; r += 4) {
+            let escaped = false;
+            for (let a = 0; a < 8; a++) {
+                const tx = +(n.x + Math.cos((a * Math.PI) / 4) * r).toFixed(1);
+                const tz = +(n.z + Math.sin((a * Math.PI) / 4) * r).toFixed(1);
+                if (!isNpcBlockedByWall(tx, tz)) {
+                    n.x = tx; n.z = tz; escaped = true; break;
+                }
+            }
+            if (escaped) break;
+        }
+    }
     pickRandomRoamWaypoint(n);
 });
 
 const CROP_REWARDS = {
-    '🍅 Slurp Tomatoes': 35, '🌽 Golden Corn': 40, '🥕 Crunchy Carrots': 30, '🍓 Shield Berries': 50, '🎃 Mythic Pumpkins': 75
+    '🍅 Slurp Tomatoes': 35,
+    '🌽 Golden Corn': 40,
+    '🥕 Crunchy Carrots': 30,
+    '🍓 Shield Berries': 50,
+    '🎃 Mythic Pumpkins': 75
 };
-const TYCOON_COSTS = { speed: 50, upgrader: 150, megaDropper: 400, tower: 1000 };
+
+const TYCOON_COSTS = {
+    speed: 50,
+    upgrader: 150,
+    megaDropper: 400,
+    tower: 1000
+};
+
 const activePlayers = {};
 const GOD_COLORS = ['#fa9549', '#38bdf8', '#4ade80', '#c084fc'];
 let sportsScores = { hoops: 0, goals: 0, rallies: 0 };
@@ -191,13 +214,12 @@ let sportsScores = { hoops: 0, goals: 0, rallies: 0 };
 let tickCount = 0;
 const STEER_ANGLES = [0, 0.35, -0.35, 0.75, -0.75, 1.25, -1.25, 1.85, -1.85, Math.PI];
 
+// Main Server Simulation Tick (100ms) — Handles Tycoon Income, 3-Min Farming Cycle & Companion Roaming
 setInterval(() => {
     tickCount++;
     const now = Date.now();
-    const estHour = getCurrentEstHour();
-    const isOfficeWorkHours = (estHour >= 10 && estHour < 16); // 10:00 AM to 4:00 PM EST
 
-    // 1. Tycoon Income
+    // 1. Server-Side Authoritative Tycoon Dropper Income
     const dropTicks = tycoonState.unlockedPads.speed ? 10 : 18;
     if (tickCount % dropTicks === 0) {
         const baseVal = tycoonState.unlockedPads.megaDropper ? 25 : 10;
@@ -206,25 +228,38 @@ setInterval(() => {
         tycoonState.storedCollectorCash += (baseVal * mult) + towerBonus;
     }
 
-    // 2. Farm Plots (3-Min Total Completion)
+    // 2. Update All Active Farm Plots (3-Minute Total Completion = 90s Water 1 + 90s Water 2)
     worldItems.forEach(plot => {
         if (plot.type !== 'farm_plot') return;
         if (!plot.farmState) {
-            plot.farmState = { assignedNpcId: 'peanut', cropType: '🍅 Slurp Tomatoes', loopsRemaining: 0, stage: 'idle', waterCount: 0, stageStartedAt: 0, progressPct: 0 };
+            plot.farmState = {
+                assignedNpcId: 'peanut',
+                cropType: '🍅 Slurp Tomatoes',
+                loopsRemaining: 0,
+                stage: 'idle',
+                waterCount: 0,
+                stageStartedAt: 0,
+                progressPct: 0
+            };
         }
         const fsState = plot.farmState;
         if (fsState.stage === 'growing_1') {
             const elapsed = now - (fsState.stageStartedAt || now);
             fsState.progressPct = Math.min(50, Math.round((elapsed / 90000) * 50));
-            if (elapsed >= 90000) fsState.stage = 'needs_water_2';
+            if (elapsed >= 90000) {
+                fsState.stage = 'needs_water_2';
+            }
         } else if (fsState.stage === 'growing_2') {
             const elapsed = now - (fsState.stageStartedAt || now);
             fsState.progressPct = Math.min(100, 50 + Math.round((elapsed / 90000) * 50));
-            if (elapsed >= 90000) { fsState.stage = 'ready_harvest'; fsState.progressPct = 100; }
+            if (elapsed >= 90000) {
+                fsState.stage = 'ready_harvest';
+                fsState.progressPct = 100;
+            }
         }
     });
 
-    // 3. Companion AI ( Farming + 10AM-4PM EST Office Work Shift + Roaming )
+    // 3. Update All Companions (Peanut + Spawned Peers)
     npcs.forEach((npc) => {
         npc.hunger = Math.max(10, +(npc.hunger - 0.008).toFixed(2));
         npc.energy = Math.max(10, +(npc.energy - 0.006).toFixed(2));
@@ -241,12 +276,6 @@ setInterval(() => {
             it.farmState.assignedNpcId === npc.id &&
             it.farmState.loopsRemaining > 0 &&
             ['needs_planting', 'needs_water_1', 'needs_water_2', 'ready_harvest'].includes(it.farmState.stage)
-        );
-
-        // Check if companion is assigned to an Office Building and it is 10 AM - 4 PM EST
-        const assignedOffice = worldItems.find(it =>
-            it.type === 'office_building' &&
-            ((Array.isArray(it.assignedWorkers) && it.assignedWorkers.includes(npc.id)) || npc.assignedOfficeId === it.id)
         );
 
         let destX = npc.targetX;
@@ -266,24 +295,6 @@ setInterval(() => {
             };
             npc.activity = labelMap[fsState.stage] || 'Farming 🌱';
             npc.mood = 'Hardworking Farmer 🌾';
-        } else if (assignedOffice && isOfficeWorkHours) {
-            // Walk inside the Ground-Floor Office Lobby / Cubicle Area (10:00 AM - 4:00 PM EST)
-            ignoreId = assignedOffice.id;
-            destX = assignedOffice.x + 3.0;
-            destZ = assignedOffice.z - 2.0;
-            const distToDesk = Math.hypot(destX - npc.x, destZ - npc.z);
-            if (distToDesk <= 1.6) {
-                npc.activity = '💼 Working at Office (10AM-4PM Shift)';
-                npc.mood = 'Productive Executive 📈';
-                if (tickCount % 600 === 0) {
-                    npc.wallet = (npc.wallet || 0) + 15;
-                    addLog(npc, 'Earned +$15 Office Shift Salary!');
-                }
-                return;
-            } else {
-                npc.activity = '🏢 Commuting to Office Shift (10AM-4PM)';
-                npc.mood = 'Focused 💼';
-            }
         } else {
             const distToTarget = Math.hypot((destX || 0) - npc.x, (destZ || 0) - npc.z);
             if (typeof destX !== 'number' || typeof destZ !== 'number' || isNaN(distToTarget) || distToTarget < 1.8) {
@@ -292,13 +303,14 @@ setInterval(() => {
                 destZ = npc.targetZ;
             }
             const growingPlot = worldItems.find(it =>
-                it.type === 'farm_plot' && it.farmState && it.farmState.assignedNpcId === npc.id &&
-                it.farmState.loopsRemaining > 0 && ['growing_1', 'growing_2'].includes(it.farmState.stage)
+                it.type === 'farm_plot' &&
+                it.farmState &&
+                it.farmState.assignedNpcId === npc.id &&
+                it.farmState.loopsRemaining > 0 &&
+                ['growing_1', 'growing_2'].includes(it.farmState.stage)
             );
             if (growingPlot) {
-                npc.activity = `Tending ${growingPlot.farmState.cropType} (${growingPlot.farmState.progressPct}%)`;
-            } else if (assignedOffice && !isOfficeWorkHours) {
-                npc.activity = 'Off-Duty (Office Shift 10AM-4PM EST)';
+                npc.activity = `Tending ${growingPlot.farmState.cropType} (${growingPlot.farmState.progressPct}% Grown • Loops: ${growingPlot.farmState.loopsRemaining})`;
             } else {
                 npc.activity = 'Roaming Town ✨';
             }
@@ -337,9 +349,9 @@ setInterval(() => {
             }
 
             if (!moved || npc.stallTicks > 15) {
-                if (urgentPlot || (assignedOffice && isOfficeWorkHours)) {
-                    npc.x = destX;
-                    npc.z = destZ;
+                if (urgentPlot) {
+                    npc.x = urgentPlot.x;
+                    npc.z = urgentPlot.z + 2.8;
                     npc.stallTicks = 0;
                 } else {
                     pickRandomRoamWaypoint(npc);
@@ -350,14 +362,20 @@ setInterval(() => {
                 const fsState = urgentPlot.farmState;
                 npc.rotY = +(Math.atan2(urgentPlot.x - npc.x, urgentPlot.z - npc.z)).toFixed(2);
                 if (fsState.stage === 'needs_planting') {
-                    fsState.stage = 'needs_water_1'; fsState.waterCount = 0; fsState.progressPct = 5;
+                    fsState.stage = 'needs_water_1';
+                    fsState.waterCount = 0;
+                    fsState.progressPct = 5;
                     addLog(npc, 'Planted ' + fsState.cropType + ' seeds.');
                 } else if (fsState.stage === 'needs_water_1') {
-                    fsState.stage = 'growing_1'; fsState.waterCount = 1; fsState.stageStartedAt = now;
+                    fsState.stage = 'growing_1';
+                    fsState.waterCount = 1;
+                    fsState.stageStartedAt = now;
                     addLog(npc, 'Watered ' + fsState.cropType + ' (1/2). Next water in 90s!');
                     pickRandomRoamWaypoint(npc);
                 } else if (fsState.stage === 'needs_water_2') {
-                    fsState.stage = 'growing_2'; fsState.waterCount = 2; fsState.stageStartedAt = now;
+                    fsState.stage = 'growing_2';
+                    fsState.waterCount = 2;
+                    fsState.stageStartedAt = now;
                     addLog(npc, 'Watered ' + fsState.cropType + ' (2/2). Harvest in 90s!');
                     pickRandomRoamWaypoint(npc);
                 } else if (fsState.stage === 'ready_harvest') {
@@ -365,16 +383,22 @@ setInterval(() => {
                     npc.inventory.push(fsState.cropType);
                     npc.wallet = (npc.wallet || 0) + reward;
                     fsState.loopsRemaining = Math.max(0, (fsState.loopsRemaining || 1) - 1);
-                    addLog(npc, `Harvested ${fsState.cropType}! (+$${reward})`);
+                    addLog(npc, `Harvested ${fsState.cropType}! (+$${reward}, Loops left: ${fsState.loopsRemaining})`);
+                    addDiary(npc, `Harvested fresh ${fsState.cropType} from the farm!`);
+
                     if (fsState.loopsRemaining > 0) {
-                        fsState.stage = 'needs_planting'; fsState.waterCount = 0; fsState.progressPct = 0;
+                        fsState.stage = 'needs_planting';
+                        fsState.waterCount = 0;
+                        fsState.progressPct = 0;
                     } else {
-                        fsState.stage = 'idle'; fsState.waterCount = 0; fsState.progressPct = 0;
+                        fsState.stage = 'idle';
+                        fsState.waterCount = 0;
+                        fsState.progressPct = 0;
                         pickRandomRoamWaypoint(npc);
                     }
                     saveAllToDisk();
                 }
-            } else if (!assignedOffice || !isOfficeWorkHours) {
+            } else {
                 pickRandomRoamWaypoint(npc);
             }
         }
@@ -417,7 +441,9 @@ app.post('/api/coop/sync', (req, res) => {
                     p.color = GOD_COLORS[currentGods.length % 4];
                 }
             } else if (!isGod && p.isGod) {
-                p.isGod = false; p.name = 'Visitor ' + p.slot; p.color = '#fde047';
+                p.isGod = false;
+                p.name = 'Visitor ' + p.slot;
+                p.color = '#fde047';
             } else if (isGod && customName && p.name !== customName) {
                 p.name = customName;
             }
@@ -425,13 +451,23 @@ app.post('/api/coop/sync', (req, res) => {
         }
     }
 
-    const farmStates = worldItems.filter(it => it.type === 'farm_plot').map(it => ({ id: it.id, farmState: it.farmState }));
+    const farmStates = worldItems
+        .filter(it => it.type === 'farm_plot')
+        .map(it => ({ id: it.id, farmState: it.farmState }));
+
     res.json({
-        gods: Object.values(activePlayers), npcs, worldCount: worldItems.length,
-        worldRev, tycoon: tycoonState, sportsScores, farmStates, serverTimeMs: now
+        gods: Object.values(activePlayers),
+        npcs,
+        worldCount: worldItems.length,
+        worldRev,
+        tycoon: tycoonState,
+        sportsScores,
+        farmStates,
+        serverTimeMs: now
     });
 });
 
+// Real-Time Tycoon Endpoints (Saved & Synced Across All Players)
 app.post('/api/tycoon/collect', (req, res) => {
     if (tycoonState.storedCollectorCash > 0) {
         tycoonState.walletCash += tycoonState.storedCollectorCash;
@@ -477,26 +513,40 @@ app.post('/api/world', (req, res) => {
     res.status(400).json({ error: 'Expected array' });
 });
 
+// Auto-Rehydrate World, Companions & Tycoon Progress After Any Server Restart
 app.post('/api/world/rehydrate', (req, res) => {
     const { items, savedNpcs, savedTycoon, forceNpcs } = req.body || {};
     let restored = false;
     if (worldItems.length === 0 && Array.isArray(items) && items.length > 0) {
-        worldItems = items; worldRev = Date.now(); restored = true;
+        worldItems = items;
+        worldRev = Date.now();
+        restored = true;
     }
     if (Array.isArray(savedNpcs) && savedNpcs.length > 0 && (forceNpcs || npcs.length <= 1)) {
-        npcs = savedNpcs; restored = true;
+        npcs = savedNpcs;
+        restored = true;
     }
     const hasUnlockedAny = Object.keys(tycoonState.unlockedPads || {}).some(k => k !== 'dropper1' && tycoonState.unlockedPads[k]);
     if (!hasUnlockedAny && tycoonState.walletCash <= 50 && savedTycoon && typeof savedTycoon.walletCash === 'number') {
         tycoonState = Object.assign(createDefaultTycoon(), savedTycoon);
-        tycoonState.rev = Date.now(); restored = true;
+        tycoonState.rev = Date.now();
+        restored = true;
     }
     if (restored) saveAllToDisk();
-    res.json({ success: true, restored, worldCount: worldItems.length, worldRev, npcCount: npcs.length, npcs, tycoon: tycoonState });
+    res.json({
+        success: true,
+        restored,
+        worldCount: worldItems.length,
+        worldRev,
+        npcCount: npcs.length,
+        npcs,
+        tycoon: tycoonState
+    });
 });
 
+// Real-Time Single Item Edit (Word Edits on Signs, Merchants, Doors, Beds, Storage, Farms)
 app.post('/api/world/update-item', (req, res) => {
-    const { id, isOpen, inventory, assignedTo, assignedWorkers, merchantSkin, shopItems, merchantName, signText, signColor, signBg, lastUrl, farmConfig } = req.body || {};
+    const { id, isOpen, inventory, assignedTo, merchantSkin, shopItems, merchantName, signText, signColor, signBg, lastUrl, farmConfig } = req.body || {};
     const target = worldItems.find(it => it.id === id);
     if (!target) return res.status(404).json({ error: 'Item not found' });
 
@@ -507,21 +557,8 @@ app.post('/api/world/update-item', (req, res) => {
         const foundNpc = npcs.find(n => n.name === assignedTo || n.id === assignedTo);
         if (foundNpc) {
             foundNpc.assignedBedId = target.id;
-            addDiary(foundNpc, 'Assigned to my very own bed!');
+            addDiary(foundNpc, 'The Gorilla Gods assigned me my very own bed!');
         }
-    }
-    // Office Building Employee Roster (10 AM - 4 PM EST Shift)
-    if (Array.isArray(assignedWorkers)) {
-        target.assignedWorkers = assignedWorkers;
-        npcs.forEach(n => {
-            if (assignedWorkers.includes(n.id)) {
-                n.assignedOfficeId = target.id;
-                addDiary(n, 'Hired at Badabing Corp Tower! My shift is 10:00 AM - 4:00 PM EST.');
-                addLog(n, 'Assigned to 10AM-4PM shift at Office Tower.');
-            } else if (n.assignedOfficeId === target.id) {
-                n.assignedOfficeId = null;
-            }
-        });
     }
     if (typeof merchantSkin === 'number') target.merchantSkin = merchantSkin;
     if (Array.isArray(shopItems)) target.shopItems = shopItems;
@@ -537,10 +574,18 @@ app.post('/api/world/update-item', (req, res) => {
             cropType: farmConfig.cropType || '🍅 Slurp Tomatoes',
             loopsRemaining: Number(farmConfig.loops) || 1,
             stage: (Number(farmConfig.loops) || 0) > 0 ? 'needs_planting' : 'idle',
-            waterCount: 0, stageStartedAt: Date.now(), progressPct: 0
+            waterCount: 0,
+            stageStartedAt: Date.now(),
+            progressPct: 0
         };
+        const farmer = npcs.find(n => n.id === target.farmState.assignedNpcId);
+        if (farmer && target.farmState.loopsRemaining > 0) {
+            addLog(farmer, `Assigned to farm ${target.farmState.cropType} (${target.farmState.loopsRemaining} loops).`);
+            addDiary(farmer, `I'm in charge of growing ${target.farmState.cropType} on the farm!`);
+        }
     }
 
+    // Bump revision so all connected players immediately pull the live edit!
     worldRev = Date.now();
     saveAllToDisk();
     res.json({ success: true, item: target, npcs, worldRev });
@@ -549,14 +594,29 @@ app.post('/api/world/update-item', (req, res) => {
 app.post('/api/npcs/spawn', (req, res) => {
     const { name, species, x, z } = req.body || {};
     if (!name || !species) return res.status(400).json({ error: 'Name and species required' });
-    const startX = typeof x === 'number' ? x : 6, startZ = typeof z === 'number' ? z : 12;
+
+    const startX = typeof x === 'number' ? x : 6;
+    const startZ = typeof z === 'number' ? z : 12;
     const newCompanion = {
         id: 'npc_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
-        name: name.trim(), species, x: startX, z: startZ, rotY: 0,
-        targetX: startX + 14, targetZ: startZ - 14, lastProgressDist: 20, stallTicks: 0, waveUntil: 0,
-        assignedOfficeId: null, wallet: 200, inventory: ['🍎 Welcome Apple'],
-        mood: 'Excited 🎉', hunger: 90, energy: 95, activity: 'Roaming Town', assignedBedId: null,
-        wants: ['Work at the Office Tower 🏢', 'Help farm crops 🌱', 'Explore Town ✨'],
+        name: name.trim(),
+        species,
+        x: startX,
+        z: startZ,
+        rotY: 0,
+        targetX: startX + 14,
+        targetZ: startZ - 14,
+        lastProgressDist: 20,
+        stallTicks: 0,
+        waveUntil: 0,
+        wallet: 200,
+        inventory: ['🍎 Welcome Apple'],
+        mood: 'Excited 🎉',
+        hunger: 90,
+        energy: 95,
+        activity: 'Roaming Town',
+        assignedBedId: null,
+        wants: ['Help farm crops 🌱', 'Wave at Visitors 👋', 'Explore Town ✨'],
         diary: ['Dear Diary: Arrived in The Badabing!'],
         activityLog: ['[' + new Date().toLocaleTimeString() + '] Spawned as a ' + species + '!']
     };
@@ -589,20 +649,26 @@ app.post('/api/npcs/action', (req, res) => {
         if (typeof playerX === 'number' && typeof playerZ === 'number') {
             npc.rotY = +(Math.atan2(playerX - npc.x, playerZ - npc.z)).toFixed(2);
         }
+        addLog(npc, 'Waved back at a friendly player!');
     } else if (actionType === 'add_book') {
         npc.inventory.push(itemName || '📖 Recipe Cooking Book');
+        addDiary(npc, 'Checked out "' + (itemName || 'Cooking Book') + '" from the library!');
     } else if (actionType === 'feed') {
         npc.hunger = 100; npc.mood = 'Stuffed & Happy 🍔';
     } else if (actionType === 'rest') {
         npc.energy = 100; npc.mood = 'Super Charged ⚡';
+    } else if (actionType === 'cheer') {
+        npc.mood = 'Loved ❤️';
     } else if (actionType === 'add_funds') {
         npc.wallet += (Number(amount) || 50);
     } else if (actionType === 'use_item') {
         const idx = Number(slotIndex);
         if (idx >= 0 && idx < npc.inventory.length) {
-            npc.inventory.splice(idx, 1);
+            const used = npc.inventory.splice(idx, 1)[0];
             npc.hunger = Math.min(100, npc.hunger + 30);
             npc.energy = Math.min(100, npc.energy + 25);
+            npc.mood = 'Delighted 🌟';
+            addLog(npc, 'Used ' + used + ' from bag.');
         }
     } else if (actionType === 'buy') {
         const price = Number(itemPrice) || 0;
@@ -610,6 +676,7 @@ app.post('/api/npcs/action', (req, res) => {
         npc.wallet -= price;
         npc.inventory.push(itemName || '🎁 Gift');
         npc.mood = 'Spoiled & Joyful 🛍️';
+        addLog(npc, 'Bought ' + (itemName || 'item') + ' ($' + price + ') from Merchant.');
     }
 
     saveAllToDisk();
